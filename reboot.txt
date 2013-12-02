@@ -1,0 +1,78 @@
+; PET/CBM EDIT ROM - Soft Reboot (C)2013 Steve J. Gray
+; ================
+; Soft Reboot - Hold down a combination of keys to reset the computer
+;
+; IMPORTANT: Make sure this does not interfere with normal keyboard scanning!
+;            Might need to restore ROW REGISTER!
+
+CheckReboot
+		LDY #9					; ROW=9
+CheckLoop
+		STY PIA1_Port_A 			; Keyboard row select
+		LDA PIA1_Port_B				; Keyboard col - keypressed
+		CMP RebootCodes,Y
+		BNE CheckOut				; Exit if no match
+		DEY					; ROW=ROW-1
+		BPL CheckLoop				; Get more if not <0
+
+		JMP ColdReset				; All keys match, so reset!
+
+CheckOut	RTS
+
+RebootCodes
+;		----------------- Normal/Graphic Keyboard: @-SHIFT-SHIFT-DEL
+!if KEYBOARD = 0 {
+		!byte $ff	; ROW 0 - No keys
+		!byte $7f	; ROW 1 - <DEL>
+		!byte $ff	; ROW 2 - No keys
+		!byte $ff	; ROW 3 - No keys
+		!byte $ff	; ROW 4 - No keys
+		!byte $ff	; ROW 5 - No keys
+		!byte $ff	; ROW 6 - No keys
+		!byte $ff	; ROW 7 - No keys
+		!byte 220	; ROW 8 - @ + Both Shifts
+		!byte $ff	; ROW 9 - No keys
+}
+
+;		----------------- Business Keyboard: To be determined
+!if KEYBOARD = 1 {
+		!byte $ff	; ROW 0 - No keys
+		!byte $ff	; ROW 1 - No keys
+		!byte $ff	; ROW 2 - No keys
+		!byte $ff	; ROW 3 - No keys
+		!byte $ff	; ROW 4 - No keys
+		!byte $ff	; ROW 5 - No keys
+		!byte $ff	; ROW 6 - No keys
+		!byte $ff	; ROW 7 - No keys
+		!byte $ff	; ROW 8 - No keys
+		!byte $ff	; ROW 9 - No keys
+}
+
+;		----------------- DIN Keyboard: To be determined
+!if KEYBOARD = 2 { 
+		!byte $ff	; ROW 0 - No keys
+		!byte $ff	; ROW 1 - No keys
+		!byte $ff	; ROW 2 - No keys
+		!byte $ff	; ROW 3 - No keys
+		!byte $ff	; ROW 4 - No keys
+		!byte $ff	; ROW 5 - No keys
+		!byte $ff	; ROW 6 - No keys
+		!byte $ff	; ROW 7 - No keys
+		!byte $ff	; ROW 8 - No keys
+		!byte $ff	; ROW 9 - No keys
+}
+
+;		----------------- C64 Keyboard: To be determined
+!if KEYBOARD = 3 { 
+		!byte $ff	; ROW 0 - No keys
+		!byte $ff	; ROW 1 - No keys
+		!byte $ff	; ROW 2 - No keys
+		!byte $ff	; ROW 3 - No keys
+		!byte $ff	; ROW 4 - No keys
+		!byte $ff	; ROW 5 - No keys
+		!byte $ff	; ROW 6 - No keys
+		!byte $ff	; ROW 7 - No keys
+		!byte $ff	; ROW 8 - No keys
+		!byte $ff	; ROW 9 - No keys
+}
+
