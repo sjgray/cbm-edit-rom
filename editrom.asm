@@ -1182,6 +1182,9 @@ SOUND_TAB
 
 
 ;************* CRTC Chip Register Setup Tables (OLD)
+;
+; These are copies of the above files. 
+; TODO: Figure out how the old and new files are used!!!!
 
 !if COLUMNS = 80 {
 	!if REFRESH = 0 { !source "crtc-80-50hz-old.asm" }
