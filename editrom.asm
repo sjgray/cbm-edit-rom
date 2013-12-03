@@ -21,6 +21,7 @@
 ;    * ColourPET - My own project to add colour capabilities
 ;    * Alternate Keyboards - Such as the VIC/C64 keyboard
 ;    * Soft40 - Simulate a 40 column screen on 80 column hardware
+;	* Soft-switchable SOFT40
 ;    * Soft-switchable real 40/80 columns (requires hardware mod)
 ;    * Extended screen editor - CBM-II compatible ESC sequences
 ;    * Keyboard soft-reset (kinda like CTRL-ALT-DEL on PC's)
@@ -117,8 +118,8 @@ UPDATE_CURSOR_ROW
 
 UPDATE_PNT
            JMP Update_ScrPtr	;@@@@@@@@@@ PATCH
-Me072	   INY
-           STY CursorCol
+Me072		INY
+      	STY CursorCol
            JMP IRQ_EPILOG
            TAX
            TAX
@@ -382,7 +383,8 @@ CURSOR_TO_LEFT_MARGIN
 
 ;************* Set Full Screen (no Window)
 ; This routine is used to set the screen size parameters for the entire system
-; update for SOFT40
+; TODO: Update for 'Software switchable' SOFT40.
+; Q?: Do we want to support VIC-20  22x23 screen as well? OSI 64x32!?
 
 FULL_SCREEN_WINDOW
            LDA #0					; Top/Left=0
@@ -586,12 +588,12 @@ Be30a     LDX QuoteMode
 Be322     DEY
            LDA (ScrPtr),Y				; Read it from the screen
            INY
-           STA (ScrPtr),Y				; Write it to the screen
+           STA (ScrPtr),Y				; Write it to the screen @@@@@@@@@@@@@@ COLOURPET
            DEY
            CPY CursorCol
            BNE Be322
            LDA #$20 					; <SPACE>
-           STA (ScrPtr),Y				; Write it to the screen
+           STA (ScrPtr),Y				; Write it to the screen @@@@@@@@@@@@@@ COLOURPET
            LDA RigMargin
            SEC
            SBC CursorCol
@@ -643,7 +645,7 @@ Be396     LDA #$20 					; <SPACE>
            LDY LefMargin
 Be39a     CPY CursorCol
            BCS Be38c
-           STA (ScrPtr),Y				; Write it to the screen
+           STA (ScrPtr),Y				; Write it to the screen @@@@@@@@@@@@@@ COLOURPET
            INY
            BNE Be39a
 
@@ -691,7 +693,7 @@ Be3cb     DEX
            INX
 Be3d8     INY
            LDA (SAL),Y
-           STA (ScrPtr),Y			;@@@@@@@@@@@@@@@ COLOURPET
+           STA (ScrPtr),Y				;@@@@@@@@@@@@@@@ COLOURPET
            CPY RigMargin
            BCC Be3d8
            BCS Be3cb
@@ -710,7 +712,7 @@ Be3e6      INX
            DEX
 Be3f3      INY
            LDA (SAL),Y
-           STA (ScrPtr),Y			;@@@@@@@@@@@@@@@ COLOURPET
+           STA (ScrPtr),Y				;@@@@@@@@@@@@@@@ COLOURPET
            CPY RigMargin
            BCC Be3f3
            BCS Be3e6
@@ -724,11 +726,11 @@ Be40b      CPX STKEY
            BNE Be40b
 Be40f      LDA STKEY
            ASL
-           CMP #$40 				; '@'
+           CMP #$40 					; '@'
            BEQ Be41f
            JSR CHKSTOP				; Check if STOP key pressed
            BNE Be40f
-Be41b      CMP #$20 				; <SPACE>
+Be41b      CMP #$20 					; <SPACE>
            BNE Be427
 Be41f      DEX
            BNE Be41f
@@ -1017,7 +1019,7 @@ Be61a      STA JIFFY_CLOCK,X		; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
 ;************* Clear Tab Stops (80 bits)
            LDX #12
            LDA #0
-Be66d      STA TABS_SET,X			; Table of 80 bits to set TABs
+Be66d      STA TABS_SET,X				; Table of 80 bits to set TABs
            DEX
            BPL Be66d
 
@@ -1039,18 +1041,18 @@ Be66d      STA TABS_SET,X			; Table of 80 bits to set TABs
 ;************* Character Out Margin Beep
 
 ChrOutMarginBeep
-           JSR CHROUT_SCREEN		; Output to Screen
+           JSR CHROUT_SCREEN			; Output to Screen
            TAX
-           LDA RigMargin			; Physical Screen Line Length
+           LDA RigMargin				; Physical Screen Line Length
            SEC
-           SBC CursorCol			; Cursor Column on Current Line
-           CMP #5				; 5 characters from end of line
+           SBC CursorCol				; Cursor Column on Current Line
+           CMP #5					; 5 characters from end of line
            BNE Be6d0
            TXA
-           CMP #$1d 				; <Cursor Right> ?
+           CMP #$1d 					; <Cursor Right> ?
            BEQ Double_Beep
            AND #$7f
-           CMP #$20 				; <SPACE>
+           CMP #$20 					; <SPACE>
            BCC Be6d0
 
 ;************* Do BELL
@@ -1058,7 +1060,7 @@ ChrOutMarginBeep
 Double_Beep
            JSR BEEP
 BEEP
-           LDY CHIME				; Chime Time FLAG
+           LDY CHIME					; Chime Time FLAG
            BEQ Be6d0
 
            LDA #16
@@ -1068,14 +1070,14 @@ BEEP
            LDX #7
 Be6b7      LDA SOUND_TAB-1,X
            STA VIA_Timer_2_Lo
-           LDA CHIME				; Chime Time
+           LDA CHIME					; Chime Time
 Be6bf      DEY
-           BNE Be6bf				; delay loop
+           BNE Be6bf					; delay loop
            SEC
            SBC #1
-           BNE Be6bf				; delay loop
+           BNE Be6bf					; delay loop
            DEX
-           BNE Be6b7				; delay loop
+           BNE Be6b7					; delay loop
            STX VIA_Shift
            STX VIA_ACR
 Be6d0     RTS
@@ -1084,7 +1086,7 @@ Be6d0     RTS
 
 Set_Screen_SAL
            TXA
-           LDX #$c7 			; #<SAL
+           LDX #$c7 					; #<SAL
            BNE Be6dc
 
 ;************* Move Cursor to Beginning of Line
