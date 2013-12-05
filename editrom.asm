@@ -101,7 +101,7 @@ CURSOR_LEFT_MARGIN
 UPDATE_CURSOR_ROW
            LDX CursorRow
            JMP Update_ScrPtr
-           JMP Cursor_BOL
+           JMP Cursor_BOL		;HOW DO WE GET TO THIS CODE?
 
 ;************* Update Cursor Pointer
 ; E067	iE067	LDX $D8		; Current Cursor Physical Line Number
@@ -539,6 +539,7 @@ Be2c5     LDA TABS_SET,X				; Get TAB from table
 
 Be2d0     CMP #$16 					; <Ctrl V> : Erase to EOL
            BNE Be2e0
+
            LDA #$20 					; <SPACE>
            DEY
 Be2d7     INY
@@ -548,10 +549,11 @@ Be2d7     INY
            BCS Be299
 
 Be2e0     CMP #$15 					; <Ctrl U> - DELETE LINE
-           BEQ Be2e7
+           BEQ DELETE_LINE
            JMP Scroll_Or_Select_Charset
 
-Be2e7     LDA TopMargin				;
+DELETE_LINE
+	     LDA TopMargin				;
            PHA
            LDA CursorRow
            STA TopMargin
@@ -717,26 +719,34 @@ Be3f3      INY
            BCC Be3f3
            BCS Be3e6
 Be3fe      JSR Erase_To_EOL
-           LDA STKEY
-           LDX #$ff
+
+;          ------------------------------- Scroll Delay?
+
+           LDA STKEY					; Key Scan value
+           LDX #$ff					; $FF=no key
            LDY #0
            CMP #$a0
            BNE Be41b
-Be40b      CPX STKEY
-           BNE Be40b
-Be40f      LDA STKEY
+
+Be40b      CPX STKEY					; Key Scan value
+           BNE Be40b					; Loop when key still pressed
+
+Be40f      LDA STKEY					; Key Scan value
            ASL
            CMP #$40 					; '@'
            BEQ Be41f
+
            JSR CHKSTOP				; Check if STOP key pressed
            BNE Be40f
-Be41b      CMP #$20 					; <SPACE>
-           BNE Be427
-Be41f      DEX
-           BNE Be41f
+Be41b      CMP #$20 					; Is it a <SPACE>?
+           BNE Be427					; No, exit
+
+Be41f      DEX						; Yes, do delay
+           BNE Be41f					; Loop back
            DEY
-           BNE Be41f
-           STY CharsInBuffer
+           BNE Be41f					; Loop back
+
+           STY CharsInBuffer			; Clear buffer
 Be427      RTS
 
 ;************* Correct Jiffy Clock Timer
@@ -966,6 +976,7 @@ Restore_Char_at_Cursor
            RTS
 
 ;************* Editor Initialization
+; TODO: Initialize colourpet locations
 
 INIT_EDITOR
            LDA #$7f
@@ -1016,6 +1027,7 @@ Be61a      STA JIFFY_CLOCK,X		; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
            STA KOUNT				; Repeat Speed Counter
            STA VIA_IER
            JSR FULL_SCREEN_WINDOW	; Exit Window
+
 ;************* Clear Tab Stops (80 bits)
            LDX #12
            LDA #0
@@ -1097,6 +1109,7 @@ Cursor_BOL
 
 ;************* Update Screen Pointer
 ; This routine is new. Need to analyze!
+; this routine seems to be a replacement for the screen address table!?!?!?
 
 Update_ScrPtr
            TXA
@@ -1150,8 +1163,8 @@ ModifierKeys
 ;************* SHIFT RUN/STOP string
 
 RUN_String
-           !byte $44,$cc,$22,$2a,$0d,$52,$55,$4e
-           !byte $0d
+      	!byte $44,$cc,$22,$2a,$0d		; dL"*<CR>
+		!byte $52,$55,$4e,$0d			; run<cr>
 
 ;************* CRTC Chip Register Setup Tables
 
