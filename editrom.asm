@@ -800,7 +800,7 @@ IRQ_NORMAL
 Be470      EOR #$80					; Flip the reverse bit
            STA (ScrPtr),Y				; Put it back on the screen
 Be474      LDY #0
-           LDA PIA1_Port_A 			; Keyboard row select
+           LDA PIA1_Port_A 			; Keyboard ROW select
            ASL 
            ASL 
            ASL 
@@ -826,6 +826,7 @@ Be49e      LDA CAS2
 Be4a7      STA VIA_Port_B
 Be4aa      JSR SCAN_KEYBOARD
            JMP IRQ_END
+
            !fill $e4be-*,$aa			; 14 bytes
 
 ;************* Original Keyboard Scanner
