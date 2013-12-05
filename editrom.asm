@@ -100,7 +100,7 @@ CURSOR_LEFT_MARGIN
 
 UPDATE_CURSOR_ROW
            LDX CursorRow
-           JMP Update_ScrPtr
+           JMP Update_ScrPtr	;New Screen pointer calculation routine
            JMP Cursor_BOL		;HOW DO WE GET TO THIS CODE?
 
 ;************* Update Cursor Pointer
@@ -117,7 +117,7 @@ UPDATE_CURSOR_ROW
 ; E079		RTS
 
 UPDATE_PNT
-           JMP Update_ScrPtr	;@@@@@@@@@@ PATCH
+           JMP Update_ScrPtr	;New Screen pointer calculation routine @@@@@@@@@@ PATCH
 Me072		INY
       	STY CursorCol
            JMP IRQ_EPILOG
@@ -208,9 +208,9 @@ Be0d3      JSR GETKEY					; Get Character From Keyboard Buffer
 
            SEI
            LDX #9					; Length of string
-           STX CharsInBuffer			
-Be0df     	LDA RUN_String-1,X			; Normally:  dL"*<CR>run<cr>
-           STA KEYD-1,X				; stuff it in the buffer
+           STX CharsInBuffer			; Set number of characters in buffer
+Be0df		LDA RUN_String-1,X			; Normally:  dL"*<CR>run<cr>
+           STA KEYD-1,X				; stuff it into the buffer
            DEX
            BNE Be0df					; loop back for more
            BEQ GetLin10
@@ -221,7 +221,7 @@ Be0ea     CMP #13 					; <RETURN> ?
            BNE GetLine
            LDY RigMargin				; Physical Screen Line Length
            STY CRSW 					; # 0 -> Screen Input
-Be0f2     LDA (ScrPtr),Y
+Be0f2     LDA (ScrPtr),Y				;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ColourPET!
            CMP #$20 					; <SPACE> Ignore trailing blanks
            BNE Be0fb
            DEY
@@ -368,7 +368,7 @@ Be1ba      DEC CursorRow				; Current Cursor Physical Line Number
 Erase_To_EOL
            LDA #$20 					; <SPACE>
 Be1c3      INY
-           STA (ScrPtr),Y				; Pointer: Current Screen Line Address
+           STA (ScrPtr),Y				; Pointer: Current Screen Line Address @@@@@@@@@@@@@@ ColourPET
            CPY RigMargin
            BCC Be1c3
            RTS
@@ -471,9 +471,9 @@ Be23e     CMP #$14 					; <DEL>
 Be24d     DEC CursorCol				; Cursor Column on Current Line
            LDY CursorCol				; Cursor Column on Current Line
 Be251     INY
-           LDA (ScrPtr),Y				; Pointer: Current Screen Line Address
+           LDA (ScrPtr),Y				; Pointer: Current Screen Line Address @@@@@@@@@@@@@@ ColourPET
            DEY
-           STA (ScrPtr),Y				; Pointer: Current Screen Line Address
+           STA (ScrPtr),Y				; Pointer: Current Screen Line Address @@@@@@@@@@@@@@ ColourPET
            INY
            CPY RigMargin
            BNE Be251
@@ -481,7 +481,7 @@ Be251     INY
 ;          -------------------------------- Note: "80240.PRG" jumps here ($E25C)
 
 Be25c     LDA #$20 					; <SPACE>
-           STA (ScrPtr),Y				; put it on the screen!
+           STA (ScrPtr),Y				; put it on the screen!  @@@@@@@@@@@@@@@ ColourPET
            BNE Be299
 Be262     LDX QuoteMode				; Flag: Editor in Quote Mode, $00 = NO
            BEQ Be269
@@ -798,7 +798,7 @@ IRQ_NORMAL
            INC BlinkPhase
            STA CursorChar
 Be470      EOR #$80					; Flip the reverse bit
-           STA (ScrPtr),Y
+           STA (ScrPtr),Y				; Put it back on the screen
 Be474      LDY #0
            LDA PIA1_Port_A 			; Keyboard row select
            ASL 
@@ -1084,6 +1084,7 @@ BEEP
 Be6b7      LDA SOUND_TAB-1,X
            STA VIA_Timer_2_Lo
            LDA CHIME					; Chime Time
+
 Be6bf      DEY
            BNE Be6bf					; delay loop
            SEC
@@ -1109,50 +1110,49 @@ Cursor_BOL
            DEY
 
 ;************* Update Screen Pointer
-; This routine is new. Need to analyze!
-; this routine seems to be a replacement for the screen address table!?!?!?
+;
+; Calculate screen pointer (ScrPtr) for printing to screen, scrolling etc.
+; This routine is a replacement for the screen address table and is hardcoded to 80 columns.
+; Called from EDITROMEXT.ASM
+; TODO: Change to support 40 or 80, or REPLACE with old table!
 
 Update_ScrPtr
-           TXA
-           LDX #<ScrPtr
-Be6dc     PHA
-           STA Basic_USR,X
-           LDA #>ScrPtr
-           STA USRADD,X
-           TYA
-           PHA
-           LDA Basic_USR,X
-           LDY #2
-           JSR Shift_ZPX_Left_Y 		; Row * 4
-           JSR Add_ZPX_AY 				; Row * 5
-           LDY #4
-           JSR Shift_ZPX_Left_Y 		; Row * 80
-           LDY #$80
-           JSR Add_ZPX_AY 				; $8000 + Row * 80 + Col
-           PLA
-           TAY
-           PLA
-           TAX
-           RTS
-
-;************* Shift ZPX Left Y
+		TXA
+		LDX #<ScrPtr
+Be6dc		PHA
+		STA Basic_USR,X
+		LDA #>ScrPtr
+		STA USRADD,X
+		TYA
+		PHA
+		LDA Basic_USR,X
+		LDY #2
+		JSR Shift_ZPX_Left_Y 		; Row * 4
+		JSR Add_ZPX_AY 				; Row * 5
+		LDY #4
+		JSR Shift_ZPX_Left_Y 		; Row * 80
+		LDY #$80
+		JSR Add_ZPX_AY 				; $8000 + Row * 80 + Col
+		PLA
+		TAY
+		PLA
+		TAX
+		RTS
 
 Shift_ZPX_Left_Y
-           ASL Basic_USR,X
-           ROL USRADD,X
-           DEY
-           BNE Shift_ZPX_Left_Y
-           RTS
-
-;************* Add ZPX AY
+		ASL Basic_USR,X
+		ROL USRADD,X
+		DEY
+		BNE Shift_ZPX_Left_Y
+		RTS
 
 Add_ZPX_AY
-           ADC Basic_USR,X
-           STA Basic_USR,X
-           TYA
-           ADC USRADD,X
-           STA USRADD,X
-           RTS
+		ADC Basic_USR,X
+		STA Basic_USR,X
+		TYA
+		ADC USRADD,X
+		STA USRADD,X
+		RTS
 
 ;************* Modifier Keys
 

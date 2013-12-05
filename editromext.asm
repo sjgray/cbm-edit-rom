@@ -33,6 +33,7 @@
 ;--------- EXTENDED Keyboard Scanner		(called from EDITROM.ASM)
 ;
 ; This routine requires two keyboard matrix tables (NORMAL and SHIFTED)
+; CAUTION! Uses unused Screen RAM to store results of each row scan!!!!!
 
 SCAN_KEYBOARD
            LDA PIA1_Port_A 			; Keyboard row select
@@ -47,12 +48,12 @@ SCAN_KEYBOARD
            LDY #$ff
            STY KEYPRESSED
            INY 						; Y = Keyboard row = 0
-Be93c      LDA KBD_MATRIX,Y
-           ORA ModifierKeys,Y
+Be93c      LDA KBD_MATRIX,Y			; KBD_MATRIX located in SCREEN_RAM!!!!!
+           ORA ModifierKeys,Y			; (table located in EDITROM.ASM)
            EOR #$ff
            STA RPTFLG 				; 1: pressed & not modifier
 Be946      LDA PIA1_Port_B 			; Keyboard row
-           STA KBD_MATRIX,Y
+           STA KBD_MATRIX,Y			; KBD_MATRIX located in SCREEN_RAM!!!!!
            CMP PIA1_Port_B 			; Keyboard row
            BNE Be946
            ORA RPTFLG 				; Remove bouncing
@@ -152,8 +153,8 @@ Be9f6      RTS
 ;--------- Modifier Active
 
 ModifyerActive
-           LDA KBD_MATRIX-1,Y
-           ORA ModifierKeys-1,Y
+           LDA KBD_MATRIX-1,Y			;KBD_MATRIX is located in SCREEN_RAM!!!!!!!!!!!!!!!
+           ORA ModifierKeys-1,Y			;(table located in EDITROM.ASM)
            EOR #$ff
 
 ;--------- ?
@@ -226,7 +227,7 @@ CURSOR_LEFT
            DEC CursorRow
            STY CursorCol
            LDX CursorRow
-           JMP Update_ScrPtr
+           JMP Update_ScrPtr			;New screen pointer calculation routine (in EDITROM.ASM)
 Bea64      LDY LefMargin
            STY CursorCol
            RTS
