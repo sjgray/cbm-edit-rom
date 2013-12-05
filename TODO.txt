@@ -1,6 +1,9 @@
 PET/CBM EDIT ROM PROJECT - TODO List
 ========================
 
+- This Editor rom appears to bypass the old screen line address tables, and instead calculate the screen pointer
+  and as such, appears to be fixed for 80-column screen. We might have to re-instate then if we wish to support
+  soft-switched Soft-40!!!!
 - Continue to add memory variable descriptions (see Commodore's CBM-II source for 'official' labels)
 - Find all screen writes and add code to handle colour
 - Analyze extended keyboard scanning routine
