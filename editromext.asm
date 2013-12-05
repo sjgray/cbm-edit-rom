@@ -33,7 +33,9 @@
 ;--------- EXTENDED Keyboard Scanner		(called from EDITROM.ASM)
 ;
 ; This routine requires two keyboard matrix tables (NORMAL and SHIFTED)
-; CAUTION! Uses unused Screen RAM to store results of each row scan!!!!!
+;
+; CAUTION! Uses unused 80 column SCREEN RAM to store results of each row scan!!!!!
+;          This code WILL NOT WORK on 40 column machines!!!!
 
 SCAN_KEYBOARD
            LDA PIA1_Port_A 			; Keyboard row select
