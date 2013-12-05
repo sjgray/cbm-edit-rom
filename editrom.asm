@@ -317,7 +317,7 @@ CHARACTER_TO_SCREEN
 Me179      LDX ReverseFlag
            BEQ Be17f
 Me17d      ORA #$80
-Be17f      JSR CHROUT_WITH_DIACRITICS		; PATCH
+Be17f      JSR CHROUT_WITH_DIACRITICS		; PATCH (located in EDITROMEXT.ASM)
            BVS IRQ_EPILOG
            NOP
            JSR Restore_Char_at_Cursor		; Put character on screen
@@ -750,6 +750,7 @@ Be41f      DEX						; Yes, do delay
 Be427      RTS
 
 ;************* Correct Jiffy Clock Timer
+; TODO: Analyze JIFFY CLOCK differences from older ROMs
 
 ADVANCE_TIMER_CORR
            LDA #6
@@ -758,7 +759,7 @@ ADVANCE_TIMER_CORR
 ;************* Update Jiffy Clock
 
 ADVANCE_TIMER
-           JSR ADVANCE_JIFFY_CLOCK
+           JSR ADVANCE_JIFFY_CLOCK		; In EDITROMEXT file
            DEC JIFFY6DIV5
            BEQ ADVANCE_TIMER_CORR
            RTS
@@ -834,7 +835,7 @@ OLD_SCAN_KEYBOARD
            STA Key_Image			; Key Image
            LDA CharsInBuffer
            PHA
-           JSR SCAN_KEYBOARD
+           JSR SCAN_KEYBOARD		; EXTENDED Keyboard scanner in EXTROM
            PLA
            CMP CharsInBuffer
            BCC Be4e5

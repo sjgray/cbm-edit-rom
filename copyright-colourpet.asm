@@ -2,7 +2,7 @@
 ; ================
 ; This area is not visible, and can be used for comments and/or copyright notice
 
-           !byte "SJG COLOURPET EDIT ROM, "
-           !byte "2013-11-23 (C) 2013 STEVE J GRAY. "
+		!byte "SJG COLOURPET EDIT ROM, "
+		!byte "2013-11-23 (C) 2013 STEVE J GRAY. "
+		!byte 0,0
 
-           !fill $e900-*,$ff  ; 169 bytes

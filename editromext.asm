@@ -1,13 +1,15 @@
 ; PET/CBM EDIT ROM - Extended ROM Code
 ; ================
 ; This code goes in the upper half of the 4K EDIT ROMS
-; NOTE: The code from $E800-E8FF is not visible
+; NOTE: The code from $E800-E8FF is not visible - fill with copyright or comments
 ;
 ;*=e800
-;---------- Copyright Notice
+;---------- Copyright Notice or Comments
 
-!if COLOURPET = 0 { !source "copyright-4v4e.asm" }
-!if COLOURPET = 1 { !source "copyright-colourpet.asm" }
+		!if COLOURPET = 0 { !source "copyright-4v4e.asm" }
+		!if COLOURPET = 1 { !source "copyright-colourpet.asm" }
+
+		!fill $e900-*,$ff  
 
 ;*=e900
 ;--------- Start of Visible Code
@@ -15,6 +17,7 @@
            !byte $16,$44,$20,$20,$07,$01	;??????????
 
 ;--------- Extended Screen Editor Jump Table
+; (Does anything use this table? - not called from EDITROM itself!)
 
            JMP CHROUT_WITH_DIACRITICS
            JMP IS_DIACRITIC_CHAR
@@ -22,12 +25,14 @@
            JMP Jeb44
            JMP IS_SPECIAL_KEY
            JMP IS_VOCAL
-           JMP PET_TO_ASCII
+           JMP PET_TO_ASCII			;not called? not in EDITROM.ASM
            JMP SCAN_KEYBOARD
 
            !fill $e924-*,$aa			; 6 bytes
 
-;--------- Scan Keyboard
+;--------- EXTENDED Keyboard Scanner		(called from EDITROM.ASM)
+;
+; This routine requires two keyboard matrix tables (NORMAL and SHIFTED)
 
 SCAN_KEYBOARD
            LDA PIA1_Port_A 			; Keyboard row select
@@ -159,13 +164,13 @@ Je9ff
            BNE ModifyerActive
 Bea04      RTS
 
-;--------- Get PETSCII
+;--------- Get PETSCII   (Local to EDITROMEXT)
 
 GETPETSCII
-           LDA KEYBOARD_NORMAL,X
+           LDA KEYBOARD_NORMAL,X		; Get key code from NORMAL table
            BIT KEYFLAGS
            BMI Bea0f
-           LDA KEYBOARD_SHIFTED,X
+           LDA KEYBOARD_SHIFTED,X		; Get key code from SHIFTED table
 Bea0f      TAY
            BVS Bea20
            AND #$7f
@@ -182,7 +187,7 @@ Bea20      CPX #$11					; WAS '#15' ????? ; <STOP>
 Bea25      TYA
            RTS
 
-;--------- Conditional Left/Right Cursor
+;--------- Conditional Left/Right Cursor	(called from EDITROM.ASM)
 
 CONDITIONAL_LR_CURSOR
            CLV
@@ -208,7 +213,7 @@ CONDITIONAL_LR_CURSOR
            JSR CURSOR_LEFT
            JMP Mea80
 
-;--------- Cursor LEFT
+;--------- Cursor LEFT   				(local)
 
 CURSOR_LEFT
            LDY LefMargin
@@ -228,7 +233,7 @@ Bea64      LDY LefMargin
 Bea69      DEC CursorCol
            RTS
 
-;--------- Cursor RIGHT
+;--------- Cursor RIGHT  				(local)
 
 CURSOR_RIGHT
            PHA
@@ -246,7 +251,7 @@ Bea83      PLA
            LDY CursorCol
            RTS
 
-;--------- Character Out with Diacritics
+;--------- Character Out with Diacritics	(called from EDITROM.ASM)
 
 CHROUT_WITH_DIACRITICS
            CLV
@@ -268,7 +273,7 @@ Beaa2      LDX INSRT
            DEC INSRT
 Beaa8      RTS
 
-;--------- Is Diacritic Character
+;--------- Is Diacritic Character   (local)
 
 IS_DIACRITIC_CHAR
            TAY
@@ -394,7 +399,7 @@ Beb55      CMP DIACRITIC_CODES,X
            CLC
            RTS
 Beb60      LDA DIACRITIC_INDEX,X
-           STA RPTFLG
+           STA RPTFLG					; Repeat flag now used for Diacritic storage??????
            TAX
 Beb66      LDA DIACRITIC_ACTION,X
            DEC RPTFLG
@@ -431,7 +436,7 @@ Beb8d      CMP VOCALS,X
            BPL Beb8d
 Beb95      RTS
 
-;--------- PET to ASCII
+;--------- PET to ASCII				(local)
 
 PET_TO_ASCII
            LDX #13
@@ -460,7 +465,7 @@ Bebbd      RTS
 Bebbe      LDA ASC_REP,X
            RTS
 
-;--------- Program CRTC
+;--------- Program CRTC				(called from EDITROM.ASM)
 
 CRT_PROGRAM
            PHA
@@ -468,7 +473,7 @@ CRT_PROGRAM
            PLA
            JMP CRT_PROGRAM_OLD
 
-;--------- Set Screen to TEXT mode
+;--------- Set Screen to TEXT mode		(called from EDITROM.ASM)
 
 CRT_SET_TEXT
            LDA KEYFLAGS
@@ -526,6 +531,7 @@ CRT_SET_TEXT_OLD_1
            JMP CRT_PROGRAM_OLD
 
 ;--------- Advance JIFFY Clock
+; This routine was relocated to EXTROM
 
 ADVANCE_JIFFY_CLOCK
            INC JIFFY_CORR
@@ -589,7 +595,7 @@ Vee9d      !byte $05,$07,$04,$04,$05,$10,$08,$07
 Veead      !byte $07
 Veeae      !byte $07
 
-;---------- BIT MASK Table
+;---------- BIT MASK Table				(local)
 
 BITMASK    !byte $01,$02,$04,$08,$10,$20
 

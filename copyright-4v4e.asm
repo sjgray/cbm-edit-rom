@@ -7,4 +7,3 @@
            !text "ELECTRONICS LTD D  "
            !text $07,$01
 
-           !fill $e900-*,$ff  			; 169 bytes
