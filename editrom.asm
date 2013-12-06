@@ -288,8 +288,14 @@ Be131      BCC Be137
            BNE Be13b
 Be137      BVS Be13b
            ORA #$40 					; '@'
-Be13b      NOP						; PATCH: WAS: INC $C6 ; Cursor Column on Current Line
-           NOP
+Be13b
+!if EXTENDED = 0 {
+		INC CursorCol				; Cursor Column on Current Line
+}
+!if EXTENDED = 1 {
+		NOP						; PATCH for conditional cursor?
+		NOP
+}
            JSR INCREASE_COL
            CPY LastInputCol			; Pointer: End of Logical Line for INPUT
            BNE Be15b
@@ -313,7 +319,7 @@ Be15b      STA DATAX					; Current Character to Print
            CMP #$de					; PI symbol
            BNE Be169
            LDA #$ff					; replace with $FF (PI in alt set)
-Be169     RTS
+Be169		RTS
 
 ;************* Check Quote Mode
 
@@ -333,10 +339,21 @@ CHARACTER_TO_SCREEN
 Me179      LDX ReverseFlag
            BEQ Be17f
 Me17d      ORA #$80
-Be17f      JSR CHROUT_WITH_DIACRITICS		; PATCH (located in EDITROMEXT.ASM)
-           BVS IRQ_EPILOG
+Be17f
+
+!if EXTENDED = 0 {
+		LDX INSRT					; Flag: Insert Mode, >0 = # INSTs
+		BEQ iE185
+		DEC INSRT					; Flag: Insert Mode, >0 = # INSTs
+}
+
+!if EXTENDED = 1 {		
+		JSR CHROUT_WITH_DIACRITICS		; PATCH (located in EDITROMEXT.ASM)
+           BVS IRQ_EPILOG				; Do not print character! Character pending
            NOP
-           JSR Restore_Char_at_Cursor		; Put character on screen
+}
+
+iE185      JSR Restore_Char_at_Cursor		; Put character on screen
            INC CursorCol				; Cursor Column on Current Line
            LDY RigMargin				; Physical Screen Line Length
            CPY CursorCol				; Cursor Column on Current Line
@@ -397,7 +414,7 @@ CURSOR_TO_LEFT_MARGIN
            LDY #0
            RTS
 
-;************* Set Full Screen (no Window)
+;************* Set Full Screen (Exit Window)
 ; This routine is used to set the screen size parameters for the entire system
 ; TODO: Update for 'Software switchable' SOFT40.
 ; Q?: Do we want to support VIC-20  22x23 screen as well? OSI 64x32!?
@@ -429,6 +446,7 @@ WINDOW_SET_TOP
            STA TopMargin				; First line of window
            STX LefMargin				; First column of window
            RTS
+
            !fill $e202-*,$aa			; 28 bytes
 
 ; ************ Output Character to Screen Dispatch
@@ -450,23 +468,30 @@ CHROUT_SCREEN
 ChrOutNormal
            LDA #0
            STA CRSW					; Flag: INPUT or GET from Keyboard
-           JSR CONDITIONAL_LR_CURSOR		;@@@@@@@@@@ PATCH
+
+!if EXTENDED = 0 {
+		LDY CursorCOl				; Cursor Column on Current Line
+		LDA DATAX					; Current Character to Print
+		AND #$7F					; Strip off top bit (REVERSE)
+}
+!if EXTENDED = 1 {
+           JSR CONDITIONAL_LR_CURSOR		; PATCH for conditional
            BVS IRQ_EPILOG
            NOP
-
+}
            CMP #$1b					; <ESC>
            BNE Be21d
            JMP Escape					; Cancel RVS/INS/QUOTE modes
 
-Be21d     LDA DATAX					; Current Character to Print
-           BPL Be224					; Handle unshifted characters
-           JMP ChrOutHighBitSet			; Handle shifted characters
+Be21d		LDA DATAX					; Current Character to Print
+		BPL Be224					; Handle unshifted characters
+		JMP ChrOutHighBitSet			; Handle shifted characters
 
 ;************* Handle unshifted characters
 
-Be224     CMP #13 					; <RETURN>
-           BNE Be22b
-           JMP ScreenReturn
+Be224		CMP #13 					; <RETURN>
+		BNE Be22b
+		JMP ScreenReturn
 
 Be22b     CMP #$20 					; <SPACE>
            BCC Be237 					; -> Control code
@@ -568,13 +593,14 @@ Be2e0     CMP #$15 					; <Ctrl U> - DELETE LINE
            BEQ DELETE_LINE
            JMP Scroll_Or_Select_Charset
 
+;************* Delete Line
 DELETE_LINE
-	     LDA TopMargin				;
-           PHA
-           LDA CursorRow
-           STA TopMargin
-           JSR WINDOW_SCROLL_UP			; Scroll window up
-           JMP Me5ca
+		LDA TopMargin				;
+		PHA
+		LDA CursorRow				; Current Cursor Physical Line Number
+		STA TopMargin
+		JSR WINDOW_SCROLL_UP			; Scroll window up
+		JMP Me5ca
 
 ;************* Character Output with High Bit SET
 
@@ -598,37 +624,37 @@ Be30a     LDX QuoteMode
            LDY RigMargin
            LDA (ScrPtr),Y				; Read it from the screen
            CMP #$20 					; <SPACE>
-           BNE Be38c
-           CPY CursorCol
-           BCC Be38c
-           BEQ Be38c
-           LDY RigMargin
-Be322     DEY
-           LDA (ScrPtr),Y				; Read it from the screen
-           INY
-           STA (ScrPtr),Y				; Write it to the screen @@@@@@@@@@@@@@ COLOURPET
-           DEY
-           CPY CursorCol
-           BNE Be322
-           LDA #$20 					; <SPACE>
-           STA (ScrPtr),Y				; Write it to the screen @@@@@@@@@@@@@@ COLOURPET
-           LDA RigMargin
-           SEC
-           SBC CursorCol
-           SBC INSRT
-           BMI Be38c
-           INC INSRT
-           BNE Be38c
-Be33e     LDX INSRT
-           BEQ Be347
-Be342     ORA #$40 					; '@'
-           JMP Me17d
+		BNE Be38c
+		CPY CursorCol
+		BCC Be38c
+		BEQ Be38c
+		LDY RigMargin
+Be322		DEY
+		LDA (ScrPtr),Y				; Read it from the screen
+		INY
+		STA (ScrPtr),Y				; Write it to the screen @@@@@@@@@@@@@@ COLOURPET
+		DEY
+		CPY CursorCol
+		BNE Be322
+		LDA #$20 					; <SPACE>
+		STA (ScrPtr),Y				; Write it to the screen @@@@@@@@@@@@@@ COLOURPET
+		LDA RigMargin				; Physical Screen Line Length
+		SEC
+		SBC CursorCol				; Cursor Column on Current Line
+		SBC INSRT					; Flag: Insert Mode, >0 = # INSTs
+		BMI Be38c
+		INC INSRT					; Flag: Insert Mode, >0 = # INSTs
+		BNE Be38c
+Be33e		LDX INSRT					; Flag: Insert Mode, >0 = # INSTs
+		BEQ Be347
+Be342		ORA #$40 					; '@'
+		JMP Me17d
 
-Be347     CMP #$11 					; <CURSOR UP>
-           BNE Be358
-           LDX TopMargin
-           CPX CursorRow
-           BCS Be38c
+Be347		CMP #$11 					; <CURSOR UP>
+		BNE Be358
+		LDX TopMargin
+		CPX CursorRow
+		BCS Be38c
            DEC CursorRow
            JSR UPDATE_CURSOR_ROW
            BNE Be38c
@@ -657,17 +683,20 @@ Be37c     CMP #9 					; <Shift TAB>
            STA TABS_SET,X
 Be38c     JMP IRQ_EPILOG
 Be38f     CMP #$16 					; <Shift Ctrl-V>
-           BEQ Be396
+           BEQ ERASE_TO_SOL
            JMP ProcControl_A
-Be396     LDA #$20 					; <SPACE>
-           LDY LefMargin
-Be39a     CPY CursorCol
-           BCS Be38c
-           STA (ScrPtr),Y				; Write it to the screen @@@@@@@@@@@@@@ COLOURPET
-           INY
-           BNE Be39a
 
-;************* Do Cursor DOWN
+;************* Erase to Start of Line
+ERASE_TO_SOL
+		LDA #$20 					; <SPACE>
+		LDY LefMargin
+Be39a		CPY CursorCol
+		BCS Be38c
+		STA (ScrPtr),Y				; Write it to the screen @@@@@@@@@@@@@@ COLOURPET
+		INY
+		BNE Be39a
+
+;************* Do Cursor DOWN, Go to next line
 
 Cursor_Down
            LSR InputRow
@@ -676,8 +705,8 @@ Cursor_Down
            BCC Be3b1
            JSR WINDOW_SCROLL_UP
            JMP UPDATE_CURSOR_ROW
-Be3b1     INC CursorRow
-           JMP UPDATE_CURSOR_ROW
+Be3b1		INC CursorRow
+		JMP UPDATE_CURSOR_ROW
 
 ;************* Do CARRIAGE RETURN
 
@@ -706,10 +735,19 @@ Be3cb     DEX
            JSR Cursor_BOL
            CPX TopMargin
            BEQ Be3fe
+
+!if EXTENDED = 0 {
+		LDA Line_Addr_Lo-1,X     		; Screen Line address table LO - 1
+		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
+		LDA Line_Addr_Hi-1,X 			; Screen Line address table HI - 1
+		STA SAL+1
+}
+!if EXTENDED = 1 {
            DEX
-           JSR Set_Screen_SAL
+           JSR Set_Screen_SAL			;PATCH to calculate screen pointer
            INX
-Be3d8     INY
+}
+Be3d8		INY
            LDA (SAL),Y
            STA (ScrPtr),Y				;@@@@@@@@@@@@@@@ COLOURPET
            CPY RigMargin
