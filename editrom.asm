@@ -1144,17 +1144,22 @@ ChrOutMarginBeep
            BNE Be6d0
            TXA
            CMP #$1d 					; <Cursor Right> ?
-           BEQ Double_Beep
+           BEQ Double_BEEP				; Ring BELL
            AND #$7f
            CMP #$20 					; <SPACE>
            BCC Be6d0
 
 ;************* Do BELL
 
-Double_Beep
+Double_BEEP
            JSR BEEP
 BEEP
+!if SILENT=0 {
            LDY CHIME					; Chime Time FLAG
+} ELSE {
+		NOP
+		RTS
+}
            BEQ Be6d0
 
            LDA #16
@@ -1177,12 +1182,15 @@ Be6bf      DEY
            STX VIA_ACR
 Be6d0		RTS
 
+
 ;************* Set Screen SAL
+!if EXTENDED = 1 {
 
 Set_Screen_SAL
            TXA
-           LDX #$c7 					; #<SAL
+           LDX #$c7 					; 199?  #<SAL ?
            BNE Be6dc
+}
 
 ;************* Move Cursor to Beginning of Line
 
@@ -1241,7 +1249,7 @@ SOUND_TAB
 !if COLUMNS = 40 {!source "screen-40.asm"}
 
 
-;************* CRTC Chip Register Setup Tables (OLD)
+;************* CRTC Chip Register Setup Tables 
 ;
 ; These are copies of the above files. 
 ; TODO: Figure out how the old and new files are used!!!!
