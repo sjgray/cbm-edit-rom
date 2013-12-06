@@ -99,44 +99,54 @@ CURSOR_LEFT_MARGIN
 ; ************ Update Cursor ROW
 
 UPDATE_CURSOR_ROW
-           LDX CursorRow
-           JMP Update_ScrPtr	;New Screen pointer calculation routine
-           JMP Cursor_BOL		;HOW DO WE GET TO THIS CODE?
+           LDX CursorRow				; Current Cursor Physical Line Number
 
-;************* Update Cursor Pointer
-; E067	iE067	LDX $D8		; Current Cursor Physical Line Number
-; E069		JMP $E06F
-;
-; E06C	iE06C	LDY $E2		; First column of window
-; E06E		DEY
-; 
-; E06F	iE06F	LDA $E755,X	; Screen Line Addresses LO		DATA
-; E072		STA $C4		; Pointer: Current Screen Line Address LO
-; E074		LDA $E76E,X	; Screen Line Addresses HI		DATA
-; E077		STA $C5         ; Pointer: Current Screen Line Address HI
-; E079		RTS
+!if EXTENDED=0 {
+		JMP UPDATE_CURSOR_R2			;$E06F
+iE06C		LDY LefMargin				; First column of window
+		DEY
+UPDATE_CURSOR_R2
+		LDA Line_Addr_Lo,X			; Screen Line Addresses LO		DATA
+		STA ScrPrt					; Pointer: Current Screen Line Address LO
+		LDA Line_Addr_Hi,X			; Screen Line Addresses HI		DATA
+		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
+		RTS
+}
 
+!if EXTENDED = 1 {
+           JMP Update_ScrPtr			; New Screen pointer calculation routine
+           JMP Cursor_BOL				; HOW DO WE GET TO THIS CODE?
 UPDATE_PNT
-           JMP Update_ScrPtr	;New Screen pointer calculation routine @@@@@@@@@@ PATCH
+           JMP Update_ScrPtr			;New Screen pointer calculation routine @@@@@@@@@@ PATCH
 Me072		INY
       	STY CursorCol
            JMP IRQ_EPILOG
            TAX
            TAX
+}
+
 
 ;************* Set Screen to TEXT or GRAPHICS MODE
-;;-------------- Initialize CRTC to TEXT Mode
-;
-; E07A	iE07A	LDA #$2A        ; Point to DATA TABLE at $E72A
-; E07C		LDX #$E7        ; Point to DATA TABLE at $E72A
-; E07E		LDY #$0E        ; 
-; E080		BNE $E088
-;
-;;-------------- Initialize CRTC to GRAPHICS Mode
-;
-; E082	iE082	LDA #$3C        ; Point to DATA TABLE at $E73C
-; E084		LDX #$E7        ; Point to DATA TABLE at $E73C
-; E086		LDY #$0C		;
+
+!if EXTENDED = 0 {
+;-------------- Initialize CRTC to TEXT Mode
+CRT_SET_TEXT
+		LDA #<CRT_CONFIG_TEXT			; Point to DATA TABLE at $E72A
+		LDX #>CRT_CONFIG_TEXT			; Point to DATA TABLE at $E72A
+		LDY #$0E					; TEXT
+		BNE CRT_PROGRAM_OLD
+
+;-------------- Initialize CRTC to GRAPHICS Mode
+
+CRT_SET_GRAPHICS
+		LDA #<CRT_CONFIG_GRAPHICS       ; Point to DATA TABLE at $E73C
+		LDX #>CRT_CONFIG_GRAPHICS       ; Point to DATA TABLE at $E73C
+		LDY #$0C					; GRAPHICS
+}
+
+!if EXTENDED = 1 {
+
+;-------------- Initialize CRTC to TEXT Mode
 
 CRT_SET_TEXT_MODE_OLD
            JMP CRT_SET_TEXT
@@ -146,15 +156,19 @@ CRT_SET_TEXT_MODE_OLD
            NOP
            NOP
 
+;-------------- Initialize CRTC to GRAPHICS Mode
+
 CRT_SET_GRAPHICS_MODE_OLD
            JMP CRT_SET_GRAPHICS
            NOP
            NOP
            NOP
+}
 
 ;************* Program CRTC chip for selected screen MODE
 
 CRT_PROGRAM_OLD
+;		--------------------- Set the character set line
            STA SAL			; Pointer LO: Tape Buffer/ Screen Scrolling
            STX SAL+1			; Pointer HI
            LDA VIA_PCR		; Get current register byte VIA Register C - CA2	CHIP 
@@ -163,9 +177,11 @@ CRT_PROGRAM_OLD
            TYA				; Move character set byte to A
            ORA FNLEN			; update lower nibble in Temp Variable
            STA VIA_PCR		; write it back to VIA Register C - CA2			CHIP
+
+;		--------------------- Write to the CRTC controller
            LDY #$11			; Number of bytes to copy = 17
 
-Be09b	   LDA (SAL),Y			; Pointer: Tape Buffer/ Screen Scrolling
+Be09b		LDA (SAL),Y		; Pointer: Tape Buffer/ Screen Scrolling
            STY CRT_Address		; Select the register to update 6545/6845 CRT		CHIP
            STA CRT_Status		; Write to the register
            DEY
