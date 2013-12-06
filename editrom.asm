@@ -969,19 +969,23 @@ Be590      RTS
 Scroll_Or_Select_Charset
            CMP #$19 				; <Ctrl> Y - Scroll window up
            BNE SELECT_CHAR_SET
+
            JSR WINDOW_SCROLL_UP
            JMP Me5d9
 Be59b      CMP #15 				; <Ctrl> O - Set top left window corner
            BNE Be5aa
+
            LDA CursorRow
            STA TopMargin
            LDA CursorCol
            STA LefMargin
 Be5a7      JMP IRQ_EPILOG
+
 Be5aa      CMP #14 				; <Ctrl> N - Text mode
            BNE Be5b3
            JSR CRT_SET_TEXT
            BMI Be5a7
+
 Be5b3      CMP #7 				; <Ctrl> G - Bell
            BNE Be5a7
            JSR BEEP
@@ -1080,10 +1084,10 @@ Be61a      STA JIFFY_CLOCK,X		; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
            STA VIA_DDR_B
            STX PIA2_Port_B
            STX VIA_Timer_1_Hi
-           LDA #$3d 				; '='
+           LDA #$3d 				;
            STA PIA1_Cont_B
            BIT PIA1_Port_B 		; Keyboard row
-           LDA #$3c 				; '<'
+           LDA #$3c 				;
            STA PIA2_Cont_A
            STA PIA2_Cont_B
            STA PIA1_Cont_A
@@ -1094,7 +1098,7 @@ Be61a      STA JIFFY_CLOCK,X		; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
            STA DELAY				; Repeat Delay Counter
            STA KOUNT				; Repeat Speed Counter
            STA VIA_IER
-           JSR FULL_SCREEN_WINDOW	; Exit Window
+           JSR FULL_SCREEN_WINDOW	; Exit Window - Set screen size (ie: 80x25)
 
 ;************* Clear Tab Stops (80 bits)
            LDX #12
@@ -1115,8 +1119,8 @@ Be66d      STA TABS_SET,X				; Table of 80 bits to set TABs
 
            LDA #16
            STA CHIME
-           JSR Double_Beep
-           BEQ Double_Beep
+           JSR Double_Beep				; Power-up chimes
+           BEQ Double_Beep				; More chimes (4 total)
 
 ;************* Character Out Margin Beep
 
@@ -1161,7 +1165,7 @@ Be6bf      DEY
            BNE Be6b7					; delay loop
            STX VIA_Shift
            STX VIA_ACR
-Be6d0     RTS
+Be6d0		RTS
 
 ;************* Set Screen SAL
 
@@ -1176,50 +1180,7 @@ Cursor_BOL
            LDY LefMargin
            DEY
 
-;************* Update Screen Pointer
-;
-; Calculate screen pointer (ScrPtr) for printing to screen, scrolling etc.
-; This routine is a replacement for the screen address table and is hardcoded to 80 columns.
-; Called from EDITROMEXT.ASM
-; TODO: Change to support 40 or 80, or REPLACE with old table!
-
-Update_ScrPtr
-		TXA
-		LDX #<ScrPtr
-Be6dc		PHA
-		STA Basic_USR,X
-		LDA #>ScrPtr
-		STA USRADD,X
-		TYA
-		PHA
-		LDA Basic_USR,X
-		LDY #2
-		JSR Shift_ZPX_Left_Y 		; Row * 4
-		JSR Add_ZPX_AY 				; Row * 5
-		LDY #4
-		JSR Shift_ZPX_Left_Y 		; Row * 80
-		LDY #$80
-		JSR Add_ZPX_AY 				; $8000 + Row * 80 + Col
-		PLA
-		TAY
-		PLA
-		TAX
-		RTS
-
-Shift_ZPX_Left_Y
-		ASL Basic_USR,X
-		ROL USRADD,X
-		DEY
-		BNE Shift_ZPX_Left_Y
-		RTS
-
-Add_ZPX_AY
-		ADC Basic_USR,X
-		STA Basic_USR,X
-		TYA
-		ADC USRADD,X
-		STA USRADD,X
-		RTS
+!if EXTENDED = 1 { !source "extscreenptr.asm" }
 
 ;************* Modifier Keys
 
