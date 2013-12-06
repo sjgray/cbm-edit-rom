@@ -1129,8 +1129,8 @@ Be66d      STA TABS_SET,X				; Table of 80 bits to set TABs
 
            LDA #16
            STA CHIME
-           JSR Double_Beep				; Power-up chimes
-           BEQ Double_Beep				; More chimes (4 total)
+           JSR Double_BEEP				; Power-up chimes
+           BEQ Double_BEEP				; More chimes (4 total)
 
 ;************* Character Out Margin Beep
 
@@ -1154,7 +1154,7 @@ ChrOutMarginBeep
 Double_BEEP
            JSR BEEP
 BEEP
-!if SILENT=0 {
+!if SILENT = 0 {
            LDY CHIME					; Chime Time FLAG
 } ELSE {
 		NOP
