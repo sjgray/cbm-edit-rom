@@ -764,13 +764,13 @@ Be3e6      INX
            CPX BotMargin
            BCS Be3fe
 
-if EXTENDED = 0 {
+!if EXTENDED = 0 {
 		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
 		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
 		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
 		STA SAL+1					; Pointer: Tape Buffer/ Screen Scrolling
 }
-if EXTENDED = 1 {
+!if EXTENDED = 1 {
            INX
            JSR Set_Screen_SAL			;PATCH to calculate screen pointer
            DEX
