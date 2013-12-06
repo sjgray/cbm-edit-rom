@@ -763,21 +763,32 @@ Be3e6      INX
            JSR Cursor_BOL
            CPX BotMargin
            BCS Be3fe
+
+if EXTENDED = 0 {
+		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
+		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
+		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
+		STA SAL+1					; Pointer: Tape Buffer/ Screen Scrolling
+}
+if EXTENDED = 1 {
            INX
-           JSR Set_Screen_SAL
+           JSR Set_Screen_SAL			;PATCH to calculate screen pointer
            DEX
+}
 Be3f3      INY
            LDA (SAL),Y
            STA (ScrPtr),Y				;@@@@@@@@@@@@@@@ COLOURPET
            CPY RigMargin
            BCC Be3f3
            BCS Be3e6
-Be3fe      JSR Erase_To_EOL
 
-;          ------------------------------- Scroll Delay?
+Be3fe      JSR Erase_To_EOL			; Clear the bottom line
+
+;************* Check Keyboard Scroll Control
+; This code looks very different from older ROMS
 
            LDA STKEY					; Key Scan value
-           LDX #$ff					; $FF=no key
+           LDX #$ff					;
            LDY #0
            CMP #$a0
            BNE Be41b
@@ -792,6 +803,7 @@ Be40f      LDA STKEY					; Key Scan value
 
            JSR CHKSTOP				; Check if STOP key pressed
            BNE Be40f
+
 Be41b      CMP #$20 					; Is it a <SPACE>?
            BNE Be427					; No, exit
 
