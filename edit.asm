@@ -11,7 +11,7 @@
 ;
 ; DIRECTIVE		FEATURE				VALID OPTIONS			FUTURE OPTIONS
 ;----------		-------				-------------			--------------
-EXTENDED  = 0		; ROM Size:			1=4K				0=2K 
+EXTENDED  = 0		; ROM Size:			0=2K, 1=4K
 KEYBOARD  = 1		; Keyboard type:		0=N,1=B,2=DIN,3=C64
 COLUMNS   = 80		; Screen Width:			40 or 80
 SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes

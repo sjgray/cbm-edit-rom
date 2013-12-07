@@ -91,7 +91,7 @@ WINDOW_CLEAR
            LDX TopMargin
            DEX
 Be054	   INX
-           JSR Cursor_BOL
+           JSR CURSOR_LEFT_MARGIN			; Was: Cursor_BOL
            JSR Erase_To_EOL
            CPX BotMargin
            BCC Be054
@@ -529,7 +529,7 @@ Be23e     CMP #$14 					; <DEL>
            BCC Be24d
            JSR CURSOR_TO_END_OF_PREVIOUS_LINE
            BPL Be25c
-Be24d     DEC CursorCol				; Cursor Column on Current Line
+Be24d     DEC CursorCol					; Cursor Column on Current Line
            LDY CursorCol				; Cursor Column on Current Line
 Be251     INY
            LDA (ScrPtr),Y				; Pointer: Current Screen Line Address @@@@@@@@@@@@@@ ColourPET
@@ -544,7 +544,7 @@ Be251     INY
 Be25c     LDA #$20 					; <SPACE>
            STA (ScrPtr),Y				; put it on the screen!  @@@@@@@@@@@@@@@ ColourPET
            BNE Be299
-Be262     LDX QuoteMode				; Flag: Editor in Quote Mode, $00 = NO
+Be262     LDX QuoteMode					; Flag: Editor in Quote Mode, $00 = NO
            BEQ Be269
            JMP Me17d
 
@@ -553,9 +553,9 @@ Be269     CMP #$12 					; <RVS>
            STA ReverseFlag
 Be26f     CMP #$13 					; <HOME>
            BNE Be283
-           LDA HOMECT 				; Home Count (<HOME><HOME> sets window to full screen)
+           LDA HOMECT 					; Home Count (<HOME><HOME> sets window to full screen)
            BPL Be27b
-           JSR FULL_SCREEN_WINDOW		; Set to full screen
+           JSR FULL_SCREEN_WINDOW			; Set to full screen
            CLC
 Be27b     ROR HOMECT					; Reset Home Count
            JSR CURSOR_HOME				; Home the cursor
@@ -692,7 +692,7 @@ Be360     CMP #$1d 					; <CURSOR LEFT>
            BNE Be373
            LDY LefMargin
            CPY CursorCol
-           BCC Be36f
+           BCC Be36f					; ???????? E36D BNE $E38C
            JSR CURSOR_TO_END_OF_PREVIOUS_LINE
            BPL Be38c
 Be36f     DEC CursorCol
@@ -757,8 +757,8 @@ Escape
 WINDOW_SCROLL_DOWN
            LDX BotMargin
            INX
-Be3cb     DEX
-           JSR Cursor_BOL
+Be3cb      DEX
+           JSR CURSOR_LEFT_MARGIN			; Was: Cursor_BOL
            CPX TopMargin
            BEQ Be3fe
 
@@ -770,10 +770,10 @@ Be3cb     DEX
 }
 !if EXTENDED = 1 {
            DEX
-           JSR Set_Screen_SAL			;PATCH to calculate screen pointer
+           JSR Set_Screen_SAL				;PATCH to calculate screen pointer
            INX
 }
-Be3d8		INY
+Be3d8	   INY
            LDA (SAL),Y
            STA (ScrPtr),Y				;@@@@@@@@@@@@@@@ COLOURPET
            CPY RigMargin
@@ -786,7 +786,7 @@ WINDOW_SCROLL_UP
            LDX TopMargin
            DEX
 Be3e6      INX
-           JSR Cursor_BOL
+           JSR CURSOR_LEFT_MARGIN			; Was: Cursor_BOL
            CPX BotMargin
            BCS Be3fe
 
@@ -1167,8 +1167,8 @@ BEEP
 !if SILENT = 0 {
            LDY CHIME					; Chime Time FLAG
 } ELSE {
-		NOP
-		RTS
+	   NOP
+	   RTS
 }
            BEQ Be6d0
 
@@ -1189,8 +1189,8 @@ Be6bf      DEY
            DEX
            BNE Be6b7					; delay loop
            STX VIA_Shift
- 	STX VIA_ACR
-Be6d0		RTS
+ 	   STX VIA_ACR
+Be6d0	   RTS
 
 
 ;************* Set Screen SAL
@@ -1201,7 +1201,6 @@ Set_Screen_SAL
            TXA
            LDX #$c7 					; 199?  #<SAL ?
            BNE Be6dc
-}
 
 ;************* Move Cursor to Beginning of Line
 
@@ -1212,7 +1211,6 @@ Cursor_BOL
 ;************* Screen Pointer calculation
 ; This routine replaces the screen address table from previous roms
 
-!if EXTENDED = 1 {
 	!source "extscreenptr.asm"
 
 ;************* Modifier Keys (called from EDITROMEXT.ASM)
