@@ -8,3 +8,4 @@ CHKSTOP = $F335
 
 ;----------------- Standard KERNAL Entry Points
 
+UDTIME = $FFEA			; Update Time

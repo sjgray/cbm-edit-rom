@@ -49,7 +49,7 @@ EDITOR
            JMP CRT_PROGRAM			; Program CRTC (table ptr in A/X, chr set in Y)
            JMP WINDOW_SCROLL_DOWN		; Scroll DOWN
            JMP WINDOW_SCROLL_UP			; Scroll UP
-           JMP OLD_SCAN_KEYBOARD		; Scan Keyboard
+           JMP SCAN_KEYBOARD			; Scan Keyboard
            JMP BEEP				; Ring BELL/CHIME
 
 !if REPEATOPT = 1 {
@@ -83,7 +83,7 @@ SET_REPEAT_MODE
 
 RESET_EDITOR
            JSR INIT_EDITOR
-           JSR CRT_SET_TEXT_NEW
+           JSR CRT_SET_TEXT
 
 ;************* Clear Window
 
@@ -118,7 +118,7 @@ iE06C		LDY LefMargin				; First column of window
 		DEY
 UPDATE_CURSOR_R2
 		LDA Line_Addr_Lo,X			; Screen Line Addresses LO		DATA
-		STA ScrPrt					; Pointer: Current Screen Line Address LO
+		STA ScrPtr				; Pointer: Current Screen Line Address LO
 		LDA Line_Addr_Hi,X			; Screen Line Addresses HI		DATA
 		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
 		RTS
@@ -144,8 +144,8 @@ Me072		INY
 CRT_SET_TEXT
 		LDA #<CRT_CONFIG_TEXT			; Point to DATA TABLE at $E72A
 		LDX #>CRT_CONFIG_TEXT			; Point to DATA TABLE at $E72A
-		LDY #$0E					; TEXT
-		BNE CRT_PROGRAM_OLD
+		LDY #$0E				; TEXT
+		BNE CRT_PROGRAM
 
 ;-------------- Initialize CRTC to GRAPHICS Mode
 
@@ -159,8 +159,8 @@ CRT_SET_GRAPHICS
 
 ;-------------- Initialize CRTC to TEXT Mode
 
-CRT_SET_TEXT_MODE_OLD
-		JMP CRT_SET_TEXT
+CRT_SET_TEXT_MODE
+		JMP CRT_SET_TEXT_EXT
 		NOP
 		NOP
 		NOP
@@ -169,8 +169,8 @@ CRT_SET_TEXT_MODE_OLD
 
 ;-------------- Initialize CRTC to GRAPHICS Mode
 
-CRT_SET_GRAPHICS_MODE_OLD
-		JMP CRT_SET_GRAPHICS
+CRT_SET_GRAPHICS_MODE
+		JMP CRT_SET_GRAPHICS_EXT
 		NOP
 		NOP
 		NOP
@@ -178,7 +178,7 @@ CRT_SET_GRAPHICS_MODE_OLD
 
 ;************* Program CRTC chip for selected screen MODE
 
-CRT_PROGRAM_OLD
+CRT_PROGRAM
 ;		--------------------- Set the character set line
            STA SAL			; Pointer LO: Tape Buffer/ Screen Scrolling
            STX SAL+1			; Pointer HI
@@ -286,9 +286,16 @@ DEFAULT_SCREEN_VECTOR
 ;************* Screen Input
 
 Screen_Input
+
+!if EXTENDED = 0 {
+iE121	   LDY CursorCol				; Cursor Column on Current Line
+	   LDA (ScrPtr),Y				; Pointer: Current Screen Line Address
+	   STA DATAX					; Current Character to Print
+} else {
            JSR Jeb3a					; PATCH for extended ROM
            BVS Be13b
            NOP
+}
            AND #$3f 					; '?'
            ASL DATAX					; Current Character to Print
            BIT DATAX
@@ -307,7 +314,7 @@ Be13b
 		NOP					; PATCH for conditional cursor?
 		NOP
 }
-           JSR INCREASE_COL
+           JSR CheckQuote				; ?? Was: INCREASE_COL ??
            CPY LastInputCol				; Pointer: End of Logical Line for INPUT
            BNE Be15b
 Be144      LDA #0
@@ -483,7 +490,7 @@ ChrOutNormal
            STA CRSW					; Flag: INPUT or GET from Keyboard
 
 !if EXTENDED = 0 {
-		LDY CursorCOl				; Cursor Column on Current Line
+		LDY CursorCol				; Cursor Column on Current Line
 		LDA DATAX					; Current Character to Print
 		AND #$7F					; Strip off top bit (REVERSE)
 }
@@ -589,7 +596,13 @@ Be2b6     ASL DOS_Syntax				; temp var
 Be2c5     LDA TABS_SET,X				; Get TAB from table
            AND DOS_Syntax				; temp var
            BEQ Be2a3
+
+!if EXTENDED = 0 {
+	   INY
+	   STY CursorCol
+} ELSE {
            JMP Me072
+}
 
 Be2d0     CMP #$16 					; <Ctrl V> : Erase to EOL
            BNE Be2e0
@@ -795,54 +808,40 @@ Be3f3      INY
            BCC Be3f3
            BCS Be3e6
 
-Be3fe      JSR Erase_To_EOL			; Clear the bottom line
+Be3fe      JSR Erase_To_EOL				; Clear the bottom line
 
 ;************* Check Keyboard Scroll Control
-; This code looks very different from older ROMS
 
-           LDA STKEY					; Key Scan value
-           LDX #$ff					;
-           LDY #0
-           CMP #$a0
-           BNE Be41b
+!if EXTENDED = 0 { !source "scrollpause-b.asm" }
+!if EXTENDED = 1 { !source "scrollpause-din.asm" }
 
-Be40b      CPX STKEY					; Key Scan value
-           BNE Be40b					; Loop when key still pressed
-
-Be40f      LDA STKEY					; Key Scan value
-           ASL
-           CMP #$40 					; '@'
-           BEQ Be41f
-
-           JSR CHKSTOP				; Check if STOP key pressed
-           BNE Be40f
-
-Be41b      CMP #$20 					; Is it a <SPACE>?
-           BNE Be427					; No, exit
-
-Be41f      DEX						; Yes, do delay
-           BNE Be41f					; Loop back
-           DEY
-           BNE Be41f					; Loop back
-
-           STY CharsInBuffer			; Clear buffer
-Be427      RTS
 
 ;************* Correct Jiffy Clock Timer
+; Patch for 50 Hz
 ; TODO: Analyze JIFFY CLOCK differences from older ROMs
+; TODO: make selectable
+
+!if EXTENDED = 0 {
+ADVANCE_TIMER
+		JSR UDTIME			; $FFEA / jmp $f768	udtim	Update System Jiffy Clock
+		INC JIFFY6DIV5			; Counter to speed TI by 6/5
+		LDA JIFFY6DIV5			; Counter to speed TI by 6/5
+		CMP #$06			; every 6 IRQ's
+		BNE ADVANCE_TIMER		; no, jump back to IRQ routine
+		LDA #$00      			; yes, reset counter
+		STA JIFFY6DIV5			; Counter to speed TI by 6/5
+		BEQ ADVANCE_TIMER		; re-do jiffy clock update
+} ELSE {
 
 ADVANCE_TIMER_CORR
            LDA #6
            STA JIFFY6DIV5
-
-;************* Update Jiffy Clock
-
 ADVANCE_TIMER
            JSR ADVANCE_JIFFY_CLOCK		; In EDITROMEXT file
            DEC JIFFY6DIV5
            BEQ ADVANCE_TIMER_CORR
            RTS
-
+}
 
 ;##################################################################
            !fill $e442-*,$aa			;##################
@@ -868,8 +867,8 @@ Be452      JMP (CINV)
 ;************* IRQ
 
 IRQ_NORMAL
-           JSR ADVANCE_TIMER
-           LDA Blink
+ie455      JSR ADVANCE_TIMER
+ie458      LDA Blink
            BNE Be474
            DEC BLNCT
            BNE Be474
@@ -977,7 +976,12 @@ Be590      RTS
 
 Scroll_Or_Select_Charset
            CMP #$19 				; <Ctrl> Y - Scroll window up
+
+!if EXTENDED = 1 {
            BNE SELECT_CHAR_SET
+} ELSE {
+	   BNE Be59b
+}
 
            JSR WINDOW_SCROLL_UP
            JMP Me5d9
@@ -1004,7 +1008,8 @@ Be5b3      CMP #7 				; <Ctrl> G - Bell
 
 ProcControl_A
            CMP #$15 				; <Ctrl> U -> Delete line
-           BNE ProcControl_B
+;           BNE ProcControl_B
+           BNE ProcControl_C
            LDA TopMargin
            PHA
            LDA CursorRow
@@ -1207,17 +1212,27 @@ Cursor_BOL
 ;************* Screen Pointer calculation
 ; This routine replaces the screen address table from previous roms
 
-!if EXTENDED = 1 { !source "extscreenptr.asm" }
+!if EXTENDED = 1 {
+	!source "extscreenptr.asm"
 
-;************* Modifier Keys
+;************* Modifier Keys (called from EDITROMEXT.ASM)
 
 ModifierKeys
 	!byte $00,$00,$00,$00,$00,$00,$41,$00
 	!byte $01,$00
+}
 
 ;###################################################################################
-           !fill $e721-*, $aa			;###################################
+!if EXTENDED = 1 { !fill $e721-*, $aa }		;###################################
 ;###################################################################################
+
+;************* Keyboard Decoding Table
+!if EXTENDED = 0 {
+	!if KEYBOARD = 0 { !source "kbd-n.asm" }
+	!if KEYBOARD = 1 { !source "kbd-b.asm" }
+	!if KEYBOARD = 2 { !source "kbd-din1.asm" }
+	!if KEYBOARD = 3 { !source "kbd-c64.asm" }
+}
 
 ;************* SHIFT RUN/STOP string
 
