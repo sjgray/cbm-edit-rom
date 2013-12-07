@@ -842,7 +842,12 @@ ADVANCE_TIMER
            DEC JIFFY6DIV5
            BEQ ADVANCE_TIMER_CORR
            RTS
-           !fill $e442-*,$aa			; 14 bytes
+
+
+;##################################################################
+           !fill $e442-*,$aa			;##################
+;##################################################################
+
 
 ;************* Main IRQ Dispatcher
 ; This entry point must not move! It is called directly from KERNAL
@@ -879,46 +884,49 @@ IRQ_NORMAL
 Be470      EOR #$80					; Flip the reverse bit
            STA (ScrPtr),Y				; Put it back on the screen
 Be474      LDY #0
-           LDA PIA1_Port_A 			; Keyboard ROW select
+           LDA PIA1_Port_A 				; Keyboard ROW select
            ASL 
            ASL 
            ASL 
            BPL Be487
-           STY CAS1
+           STY CAS1					; Tape Motor Interlock #1
            LDA PIA1_Cont_B
            ORA #8
            BNE Be490
-Be487      LDA CAS1
+Be487      LDA CAS1					; Tape Motor Interlock #1
            BNE Be493
            LDA PIA1_Cont_B
            AND #$f7
 Be490      STA PIA1_Cont_B
 Be493      BCC Be49e
-           STY CAS2
+           STY CAS2					; Tape Motor Interlock #2
            LDA VIA_Port_B
            ORA #16
            BNE Be4a7
-Be49e      LDA CAS2
+Be49e      LDA CAS2					; Tape Motor Interlock #2
            BNE Be4aa
            LDA VIA_Port_B
            AND #$ef
 Be4a7      STA VIA_Port_B
-Be4aa      JSR SCAN_KEYBOARD			;Scan the keyboard
-           JMP IRQ_END
+Be4aa      JSR SCAN_KEYBOARD				; Scan the keyboard
+           JMP IRQ_END					; Return from Interrupt
+
 
 ;###################################################################################
-           !fill $e4be-*,$aa			;########################################
+           !fill $e4be-*,$aa			;###################################
 ;###################################################################################
+
 
 ;************* Keyboard Scanner
 
 !if EXTENDED = 0 { !source "keyscan-b.asm" }
 !if EXTENDED = 1 { !source "keyscan-din.asm" }
 
-}
-;#############################################################################
-           !fill $e54e-*,$aa		;########################################
-;#############################################################################
+
+;###################################################################################
+!if EXTENDED = 1 { !fill $e54e-*,$aa }		;###########################################
+;###################################################################################
+
 
 ;************* Select Character Set
 !if EXTENDED = 1 {
@@ -1181,6 +1189,7 @@ Be6d0		RTS
 
 
 ;************* Set Screen SAL
+
 !if EXTENDED = 1 {
 
 Set_Screen_SAL
@@ -1203,18 +1212,18 @@ Cursor_BOL
 ;************* Modifier Keys
 
 ModifierKeys
-           !byte $00,$00,$00,$00,$00,$00,$41,$00
-           !byte $01,$00
+	!byte $00,$00,$00,$00,$00,$00,$41,$00
+	!byte $01,$00
 
 ;###################################################################################
-           !fill $e721-*, $aa			;########################################
+           !fill $e721-*, $aa			;###################################
 ;###################################################################################
 
 ;************* SHIFT RUN/STOP string
 
 RUN_String
       	!byte $44,$cc,$22,$2a,$0d		; dL"*<CR>
-		!byte $52,$55,$4e,$0d			; run<cr>
+	!byte $52,$55,$4e,$0d			; run<cr>
 
 ;************* CRTC Chip Register Setup Tables
 

@@ -11,10 +11,10 @@
 ;
 ; DIRECTIVE		FEATURE				VALID OPTIONS			FUTURE OPTIONS
 ;----------		-------				-------------			--------------
-EXTENDED  = 1		; ROM Size:			1=4K				0=2K 
-KEYBOARD  = 2		; Keyboard type:		0=N,1=B,2=DIN,3=C64
+EXTENDED  = 0		; ROM Size:			1=4K				0=2K 
+KEYBOARD  = 1		; Keyboard type:		0=N,1=B,2=DIN,3=C64
 COLUMNS   = 80		; Screen Width:			40 or 80
-SOFT40    = 1		; 40 columns on 8032s?		0=No, 1=Yes
+SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes
 REFRESH   = 0		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
 HERTZ     = 50		; Line Frequency (Clock):					50=Euro, 60=NorthAmerica
 
@@ -23,7 +23,7 @@ REBOOT    = 0		; Add keyboard reboot? 						0=No, 1=Yes
 ESCCODES  = 0		; Add ESC codes? 						0=No, 1=Yes
 EXECUDESK = 0		; Add Execudesk Menu?						0=No, 1=Yes
 SILENT    = 0		; Disable BELL/CHIME		0=Normal, 1=Disabled
-REPEATOPT = 0		; Include Key Repeat		0=No (Always ON), 1=Yes
+REPEATOPT = 0		; Key Repeat Option		0=No (Always ON), 1=Yes
 
 ;---------------------- Output filename
 
@@ -31,7 +31,7 @@ REPEATOPT = 0		; Include Key Repeat		0=No (Always ON), 1=Yes
 
 ;---------------------- These are the symbol definitions for PET/CBM memory and IO chips
 
-!source "stdzeropage.asm"		; $00-$FF		Zero Page 
+!source "stdzeropage.asm"	; $00-FF	Zero Page 
 !source "stdlowmem.asm"		; $0100-03FC	Low Memory
 !source "stdchips.asm"		; $E800-E8FF	Chips
 !source "stdkernal.asm"		; $F000-FFFF	Kernal
