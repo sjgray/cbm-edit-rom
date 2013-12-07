@@ -1,4 +1,4 @@
-; PET/CBM EDIT ROM - Steve J. Gray - Nov 29/2013
+; PET/CBM EDIT ROM - Steve J. Gray - Started: Nov 29/2013
 ; ================
 ; A Project to create replacement EDIT ROMs for the PET/CBM line of computers.
 ; Use MAKE.BAT to assemble (ACME.EXE must be in same folder or in search path).
@@ -11,18 +11,19 @@
 ;
 ; DIRECTIVE		FEATURE				VALID OPTIONS			FUTURE OPTIONS
 ;----------		-------				-------------			--------------
-EXTENDED  = 1		; ROM Size:			1=4K					0=2K 
+EXTENDED  = 1		; ROM Size:			1=4K				0=2K 
 KEYBOARD  = 2		; Keyboard type:		0=N,1=B,2=DIN,3=C64
 COLUMNS   = 80		; Screen Width:			40 or 80
-SOFT40    = 1		; 40 columns on 8032s?	0=No, 1=Yes
+SOFT40    = 1		; 40 columns on 8032s?		0=No, 1=Yes
 REFRESH   = 0		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
-HERTZ     = 50		; Line Frequency (Clock):						50=Euro, 60=NorthAmerica
+HERTZ     = 50		; Line Frequency (Clock):					50=Euro, 60=NorthAmerica
 
 COLOURPET = 0		; ColourPET additions?						0=No, 1=Yes
 REBOOT    = 0		; Add keyboard reboot? 						0=No, 1=Yes
-ESCCODES  = 0		; Add ESC codes? 							0=No, 1=Yes
-EXECUDESK = 0		; Add Execudesk Menu?							0=No, 1=Yes
+ESCCODES  = 0		; Add ESC codes? 						0=No, 1=Yes
+EXECUDESK = 0		; Add Execudesk Menu?						0=No, 1=Yes
 SILENT    = 0		; Disable BELL/CHIME		0=Normal, 1=Disabled
+REPEATOPT = 0		; Include Key Repeat		0=No (Always ON), 1=Yes
 
 ;---------------------- Output filename
 
