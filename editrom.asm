@@ -21,7 +21,7 @@
 ;    * ColourPET - My own project to add colour capabilities
 ;    * Alternate Keyboards - Such as the VIC/C64 keyboard
 ;    * Soft40 - Simulate a 40 column screen on 80 column hardware
-;	* Soft-switchable SOFT40
+;    * Soft-switchable SOFT40
 ;    * Soft-switchable real 40/80 columns (requires hardware mod)
 ;    * Extended screen editor - CBM-II compatible ESC sequences
 ;    * Keyboard soft-reset (kinda like CTRL-ALT-DEL on PC's)
@@ -37,34 +37,42 @@
 
 EDITOR
            JMP RESET_EDITOR			; Main Initialization (called from Kernal power up reset 
-           JMP GETKEY					; Get Character From Keyboard Buffer
+           JMP GETKEY				; Get Character From Keyboard Buffer
            JMP INPUT_CHARACTER			; Input From Screen or Keyboard
            JMP CHROUT_SCREEN			; Output to Screen (FIXED ENTRY POINT. Must not move!)
            JMP IRQ_MAIN				; Main IRQ Handler (FIXED ENTRY POINT. Must not move!)
-           JMP IRQ_NORMAL				; Actual IRQ (clock, keyboard scan)
+           JMP IRQ_NORMAL			; Actual IRQ (clock, keyboard scan)
            JMP IRQ_END				; Return From Interrupt
            JMP WINDOW_CLEAR			; Clear Window
            JMP CRT_SET_TEXT			; Set CRTC to TEXT mode
            JMP CRT_SET_GRAPHICS			; Set CRTC to GRAPHICS mode
-           JMP CRT_PROGRAM				; Program CRTC (table ptr in A/X, chr set in Y)
+           JMP CRT_PROGRAM			; Program CRTC (table ptr in A/X, chr set in Y)
            JMP WINDOW_SCROLL_DOWN		; Scroll DOWN
            JMP WINDOW_SCROLL_UP			; Scroll UP
            JMP OLD_SCAN_KEYBOARD		; Scan Keyboard
-           JMP BEEP					; Ring BELL/CHIME
-           JMP BEEP					; BEEP   Was: SET_REPEAT_MODE			; Set REPEAT MODE
+           JMP BEEP				; Ring BELL/CHIME
+
+!if REPEATOPT = 1 {
+	   JMP SET_REPEAT_MODE			; Set REPEAT MODE
+} else {
+           JMP BEEP				; BEEP
+}
+
            JMP WINDOW_SET_TOP			; Set Window Top
            JMP WINDOW_SET_BOTTOM		; Set Window Bottom
 
 
 ;************* Set REPEAT MODE (Called from Jump Table)
-; Flag:    $80 = Repeat, $40 = disable
-; Was:	STA $E4
-;          RTS
-; In later ROMs repeat is permanently enabled
+; Flag: $80 = Repeat, $40 = disable
 
 SET_REPEAT_MODE
+
+!if REPEATOPT = 1 {
+	   STA RPTFLG				;$E4
+} else {
            NOP
            NOP
+}
            RTS
 
 ;###################################################################################
@@ -102,7 +110,7 @@ CURSOR_LEFT_MARGIN
 ; ************ Update Cursor ROW
 
 UPDATE_CURSOR_ROW
-           LDX CursorRow				; Current Cursor Physical Line Number
+		LDX CursorRow				; Current Cursor Physical Line Number
 
 !if EXTENDED=0 {
 		JMP UPDATE_CURSOR_R2			;$E06F
@@ -117,15 +125,15 @@ UPDATE_CURSOR_R2
 }
 
 !if EXTENDED = 1 {
-           JMP Update_ScrPtr			; New Screen pointer calculation routine
-           JMP Cursor_BOL				; HOW DO WE GET TO THIS CODE?
+           	JMP Update_ScrPtr			; New Screen pointer calculation routine
+           	JMP Cursor_BOL				; HOW DO WE GET TO THIS CODE?
 UPDATE_PNT
-           JMP Update_ScrPtr			;New Screen pointer calculation routine @@@@@@@@@@ PATCH
+           	JMP Update_ScrPtr			;New Screen pointer calculation routine @@@@@@@@@@ PATCH
 Me072		INY
-      	STY CursorCol
-           JMP IRQ_EPILOG
-           TAX
-           TAX
+      		STY CursorCol	
+		JMP IRQ_EPILOG
+		TAX
+		TAX
 }
 
 
@@ -152,20 +160,20 @@ CRT_SET_GRAPHICS
 ;-------------- Initialize CRTC to TEXT Mode
 
 CRT_SET_TEXT_MODE_OLD
-           JMP CRT_SET_TEXT
-           NOP
-           NOP
-           NOP
-           NOP
-           NOP
+		JMP CRT_SET_TEXT
+		NOP
+		NOP
+		NOP
+		NOP
+		NOP
 
 ;-------------- Initialize CRTC to GRAPHICS Mode
 
 CRT_SET_GRAPHICS_MODE_OLD
-           JMP CRT_SET_GRAPHICS
-           NOP
-           NOP
-           NOP
+		JMP CRT_SET_GRAPHICS
+		NOP
+		NOP
+		NOP
 }
 
 ;************* Program CRTC chip for selected screen MODE
@@ -174,17 +182,17 @@ CRT_PROGRAM_OLD
 ;		--------------------- Set the character set line
            STA SAL			; Pointer LO: Tape Buffer/ Screen Scrolling
            STX SAL+1			; Pointer HI
-           LDA VIA_PCR		; Get current register byte VIA Register C - CA2	CHIP 
+           LDA VIA_PCR			; Get current register byte VIA Register C - CA2	CHIP 
            AND #$f0			; mask out lower nibble
            STA FNLEN			; save it to Temp Variable
            TYA				; Move character set byte to A
            ORA FNLEN			; update lower nibble in Temp Variable
-           STA VIA_PCR		; write it back to VIA Register C - CA2			CHIP
+           STA VIA_PCR			; write it back to VIA Register C - CA2			CHIP
 
 ;		--------------------- Write to the CRTC controller
            LDY #$11			; Number of bytes to copy = 17
 
-Be09b		LDA (SAL),Y		; Pointer: Tape Buffer/ Screen Scrolling
+Be09b	   LDA (SAL),Y			; Pointer: Tape Buffer/ Screen Scrolling
            STY CRT_Address		; Select the register to update 6545/6845 CRT		CHIP
            STA CRT_Status		; Write to the register
            DEY
@@ -196,12 +204,12 @@ Be09b		LDA (SAL),Y		; Pointer: Tape Buffer/ Screen Scrolling
 GETKEY
            LDY KEYD					; Get key at start of buffer
            LDX #0 					; scroll keyboard buffer
-getkey1	LDA KEYD+1,X				; Now shift the next keys in line
+getkey1	   LDA KEYD+1,X					; Now shift the next keys in line
            STA KEYD,X					;     to the front of the buffer
            INX
-           CPX CharsInBuffer			; No. of Chars. in Keyboard Buffer
+           CPX CharsInBuffer				; No. of Chars. in Keyboard Buffer
            BNE getkey1
-           DEC CharsInBuffer			; No. of Chars. in Keyboard Buffer
+           DEC CharsInBuffer				; No. of Chars. in Keyboard Buffer
            TYA
            CLI
            RTS
@@ -227,9 +235,9 @@ Be0d3      JSR GETKEY					; Get Character From Keyboard Buffer
 
            SEI
            LDX #9					; Length of string
-           STX CharsInBuffer			; Set number of characters in buffer
+           STX CharsInBuffer				; Set number of characters in buffer
 Be0df		LDA RUN_String-1,X			; Normally:  dL"*<CR>run<cr>
-           STA KEYD-1,X				; stuff it into the buffer
+           STA KEYD-1,X					; stuff it into the buffer
            DEX
            BNE Be0df					; loop back for more
            BEQ GetLin10
@@ -250,13 +258,13 @@ Be0fb     INY
            JSR CURSOR_TO_LEFT_MARGIN
            NOP
            STY QuoteMode 				; = 0 (off)
-           LDA InputRow				; Cursor Y-X Pos. at Start of INPUT
+           LDA InputRow					; Cursor Y-X Pos. at Start of INPUT
            BMI Screen_Input
            CMP CursorRow				; Current Cursor Physical Line Number
            BNE Screen_Input
            LDA InputCol
            STA CursorCol				; Cursor Column on Current Line
-           CMP LastInputCol			; Pointer: End of Logical Line for INPUT
+           CMP LastInputCol				; Pointer: End of Logical Line for INPUT
            BCC Screen_Input
            BCS Be144
 
@@ -267,7 +275,7 @@ INPUT_CHARACTER
            PHA
            TXA
            PHA
-           JMP (SCRIV)				; Input from Screen Vector
+           JMP (SCRIV)					; Input from Screen Vector
 
 ;************* Default Screen Vector
 
@@ -296,11 +304,11 @@ Be13b
 		INC CursorCol				; Cursor Column on Current Line
 }
 !if EXTENDED = 1 {
-		NOP						; PATCH for conditional cursor?
+		NOP					; PATCH for conditional cursor?
 		NOP
 }
            JSR INCREASE_COL
-           CPY LastInputCol			; Pointer: End of Logical Line for INPUT
+           CPY LastInputCol				; Pointer: End of Logical Line for INPUT
            BNE Be15b
 Be144      LDA #0
            STA CRSW					; Flag: INPUT or GET from Keyboard
@@ -311,7 +319,7 @@ Be144      LDA #0
            LDX DFLTO					; Default Output (CMD) Device (3)
            CPX #3
            BEQ Be159
-Be156      JSR CHROUT_SCREEN			; Output to Screen
+Be156      JSR CHROUT_SCREEN				; Output to Screen
 Be159      LDA #13
 Be15b      STA DATAX					; Current Character to Print
            PLA
@@ -322,7 +330,7 @@ Be15b      STA DATAX					; Current Character to Print
            CMP #$de					; PI symbol
            BNE Be169
            LDA #$ff					; replace with $FF (PI in alt set)
-Be169		RTS
+Be169	   RTS
 
 ;************* Check Quote Mode
 
@@ -333,7 +341,7 @@ CheckQuote
            EOR #1					; toggle the BIT
            STA QuoteMode				; Flag: Editor in Quote Mode, $00 = NO
            LDA #$22 					; reload the <QUOTE>
-Be176     RTS
+Be176      RTS
 
 ;************* Put Character to Screen
 
@@ -351,9 +359,9 @@ Be17f
 }
 
 !if EXTENDED = 1 {		
-		JSR CHROUT_WITH_DIACRITICS		; PATCH (located in EDITROMEXT.ASM)
-           BVS IRQ_EPILOG				; Do not print character! Character pending
-           NOP
+	JSR CHROUT_WITH_DIACRITICS		; PATCH (located in EDITROMEXT.ASM)
+        BVS IRQ_EPILOG				; Do not print character! Character pending
+        NOP
 }
 
 iE185      JSR Restore_Char_at_Cursor		; Put character on screen
@@ -895,48 +903,30 @@ Be49e      LDA CAS2
            LDA VIA_Port_B
            AND #$ef
 Be4a7      STA VIA_Port_B
-Be4aa      JSR SCAN_KEYBOARD
+Be4aa      JSR SCAN_KEYBOARD			;Scan the keyboard
            JMP IRQ_END
 
 ;###################################################################################
            !fill $e4be-*,$aa			;########################################
 ;###################################################################################
 
-;************* Original Keyboard Scanner
+;************* Keyboard Scanner
 
-OLD_SCAN_KEYBOARD
-           LDA #$ff
-           STA Key_Image			; Key Image
-           LDA CharsInBuffer
-           PHA
-           JSR SCAN_KEYBOARD		; EXTENDED Keyboard scanner in EXTROM
-           PLA
-           CMP CharsInBuffer
-           BCC Be4e5
-           TAX
-           LDA Key_Image
-           CMP #$ff
-           BEQ Be4e5
-           CPX XMAX
-           BCS Be4dd
-           STA KEYD,X
-           INC ReverseFlag-1
-Be4dd      CMP #3 				; <STOP>
-           BNE Be4e5
-           LDA #$ef
-           STA STKEY
-Be4e5      RTS
+!if EXTENDED = 0 { !source "keyscan-b.asm" }
+!if EXTENDED = 1 { !source "keyscan-din.asm" }
 
+}
 ;#############################################################################
            !fill $e54e-*,$aa		;########################################
 ;#############################################################################
 
 ;************* Select Character Set
+!if EXTENDED = 1 {
 
 SELECT_CHAR_SET
            CMP #1
            BNE Be557
-Be552	   	JSR CRT_SET_TEXT_NEW
+Be552	   JSR CRT_SET_TEXT_NEW
            BMI Be5a7
 Be557      CMP #2
            BEQ Be552
@@ -953,6 +943,7 @@ Be567      CMP #2 				; <$82> - Switch to old (PET) char set
            BNE ProcControl_C
            JSR CRT_SET_TEXT_OLD
            BMI Be5a7
+}
 
 ;************* Do TAB
 
@@ -974,7 +965,7 @@ Me582      CPY NextTab
            JMP Me582
 Be590      RTS
 
-;************* Scroll or Select Character Set
+;************* More character code checking
 
 Scroll_Or_Select_Charset
            CMP #$19 				; <Ctrl> Y - Scroll window up
@@ -1001,7 +992,7 @@ Be5b3      CMP #7 				; <Ctrl> G - Bell
            JSR BEEP
            BEQ Be5a7
 
-;*************
+;*************  Continue checking codes... 
 
 ProcControl_A
            CMP #$15 				; <Ctrl> U -> Delete line
@@ -1036,7 +1027,11 @@ Be5ed      CMP #14 				; <142> - Graphics mode
            JSR CRT_SET_GRAPHICS
            BMI Be5ea
 
-           !fill $e600-*,$aa		; 10 bytes
+
+;########################################################################
+           !fill $e600-*,$aa		;################################
+;########################################################################
+
 
 ;************* End of IRQ
 
@@ -1081,6 +1076,7 @@ Be61a      STA JIFFY_CLOCK,X		; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
            STA CINV
            LDA #>IRQ_NORMAL
            STA CINV+1
+
 ;*************
 
            LDA #9
@@ -1088,7 +1084,7 @@ Be61a      STA JIFFY_CLOCK,X		; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
            LDA #3
            STA DFLTO				; Default Output (CMD) Device (3)
            LDA #15
-           STA PIA1_Port_A 		; Keyboard row select
+           STA PIA1_Port_A 			; Keyboard row select
            ASL 
            STA VIA_Port_B
            STA VIA_DDR_B
@@ -1096,7 +1092,7 @@ Be61a      STA JIFFY_CLOCK,X		; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
            STX VIA_Timer_1_Hi
            LDA #$3d 				;
            STA PIA1_Cont_B
-           BIT PIA1_Port_B 		; Keyboard row
+           BIT PIA1_Port_B 			; Keyboard row
            LDA #$3c 				;
            STA PIA2_Cont_A
            STA PIA2_Cont_B
@@ -1108,24 +1104,25 @@ Be61a      STA JIFFY_CLOCK,X		; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
            STA DELAY				; Repeat Delay Counter
            STA KOUNT				; Repeat Speed Counter
            STA VIA_IER
-           JSR FULL_SCREEN_WINDOW	; Exit Window - Set screen size (ie: 80x25)
+           JSR FULL_SCREEN_WINDOW		; Exit Window - Set screen size (ie: 80x25)
 
 ;************* Clear Tab Stops (80 bits)
+
            LDX #12
            LDA #0
 Be66d      STA TABS_SET,X				; Table of 80 bits to set TABs
            DEX
            BPL Be66d
 
-           LDA #<DEFAULT_SCREEN_VECTOR	; LO Address of Screen Input vector (from E006)
-           LDX #>DEFAULT_SCREEN_VECTOR	; HI 
-           STA SCRIV					; Input from screen vector (from E006)
+           LDA #<DEFAULT_SCREEN_VECTOR		; LO Address of Screen Input vector (from E006)
+           LDX #>DEFAULT_SCREEN_VECTOR		; HI 
+           STA SCRIV				; Input from screen vector (from E006)
            STX SCRIV+1				; Input from screen vector (from E006)
 
            LDA #<ChrOutNormal
            LDX #>ChrOutNormal
            STA SCROV					; Print to screen vector (from E009)
-           STX SCROV+1				; Print to screen vector (from E009)
+           STX SCROV+1					; Print to screen vector (from E009)
 
            LDA #16
            STA CHIME
@@ -1135,7 +1132,7 @@ Be66d      STA TABS_SET,X				; Table of 80 bits to set TABs
 ;************* Character Out Margin Beep
 
 ChrOutMarginBeep
-           JSR CHROUT_SCREEN			; Output to Screen
+           JSR CHROUT_SCREEN				; Output to Screen
            TAX
            LDA RigMargin				; Physical Screen Line Length
            SEC
@@ -1179,7 +1176,7 @@ Be6bf      DEY
            DEX
            BNE Be6b7					; delay loop
            STX VIA_Shift
-           STX VIA_ACR
+ 	STX VIA_ACR
 Be6d0		RTS
 
 
