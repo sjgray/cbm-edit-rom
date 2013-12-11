@@ -1,7 +1,15 @@
 ; PET/CBM EDIT ROM - Scroll Pause/Resume Control - B
 ; ================
 
-		LDY #$00        ; Scroll delay
+;--------------- Check Keyboard Scroll Control
+
+iE40B		LDA PIA1_Port_B		; PIA#1, Register 2 - Keyboard COL input
+iE40E		CMP #$FE        	; Is BIT 0 set? ie: key held down?
+iE410		BNE iE420       	; no, skip scroll delay loop
+
+;--------------- Scroll Delay and Pause
+
+iE412		LDY #$00       		; Scroll delay
 iE414		NOP
 		DEX
 		BNE iE414       	; Loop back

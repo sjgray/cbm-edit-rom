@@ -91,7 +91,7 @@ WINDOW_CLEAR
            LDX TopMargin
            DEX
 Be054	   INX
-           JSR CURSOR_LEFT_MARGIN			; Was: Cursor_BOL
+           JSR UPDATE_CURSOR_R2			; was:CURSOR_LEFT_MARGIN  ; Was: Cursor_BOL
            JSR Erase_To_EOL
            CPX BotMargin
            BCC Be054
@@ -110,14 +110,17 @@ CURSOR_LEFT_MARGIN
 ; ************ Update Cursor ROW
 
 UPDATE_CURSOR_ROW
-		LDX CursorRow				; Current Cursor Physical Line Number
+		LDX CursorRow				;$E06C Current Cursor Physical Line Number
 
 !if EXTENDED=0 {
-		JMP UPDATE_CURSOR_R2			;$E06F
-iE06C		LDY LefMargin				; First column of window
-		DEY
+		JMP UPDATE_CURSOR_R3			;$E06F
+
 UPDATE_CURSOR_R2
+		LDY LefMargin				; First column of window
+		DEY
+UPDATE_CURSOR_R3
 		LDA Line_Addr_Lo,X			; Screen Line Addresses LO		DATA
+UPDATE_SCREEN_PTR
 		STA ScrPtr				; Pointer: Current Screen Line Address LO
 		LDA Line_Addr_Hi,X			; Screen Line Addresses HI		DATA
 		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
@@ -528,7 +531,7 @@ Be23e     CMP #$14 					; <DEL>
            CPY CursorCol				; Cursor Column on Current Line
            BCC Be24d
            JSR CURSOR_TO_END_OF_PREVIOUS_LINE
-           BPL Be25c
+           BNE Be25c					; Was: BPL Be25c
 Be24d     DEC CursorCol					; Cursor Column on Current Line
            LDY CursorCol				; Cursor Column on Current Line
 Be251     INY
@@ -680,23 +683,23 @@ Be347		CMP #$11 					; <CURSOR UP>
 		BNE Be358
 		LDX TopMargin
 		CPX CursorRow
-		BCS Be38c
-           DEC CursorRow
-           JSR UPDATE_CURSOR_ROW
-           BNE Be38c
-Be358     CMP #$12 					; <RVS OFF>
-           BNE Be360
+		BCS Be38c	
+		DEC CursorRow
+		JSR UPDATE_CURSOR_ROW
+		BNE Be38c
+Be358		CMP #$12 					; <RVS OFF>
+		BNE Be360
            LDA #0
            STA ReverseFlag
 Be360     CMP #$1d 					; <CURSOR LEFT>
            BNE Be373
            LDY LefMargin
            CPY CursorCol
-           BCC Be36f					; ???????? E36D BNE $E38C
+           BCC Be36f 				;@@@@@@@@@@@@@@@ was: BNE $E38C
            JSR CURSOR_TO_END_OF_PREVIOUS_LINE
-           BPL Be38c
+           BNE Be38c				;@@@@@@@@@@@@@@@ was: BPL Be38c
 Be36f     DEC CursorCol
-           BPL Be38c
+           BPL Be38c				;@@@@@@@@@@@@@@@ was: BNE Be38c				;@@@@@@@@@@@@@@@ was: BPL Be38c
 Be373     CMP #$13 					; <CLR>
            BNE Be37c
            JSR WINDOW_CLEAR
@@ -758,7 +761,7 @@ WINDOW_SCROLL_DOWN
            LDX BotMargin
            INX
 Be3cb      DEX
-           JSR CURSOR_LEFT_MARGIN			; Was: Cursor_BOL
+           JSR UPDATE_CURSOR_R2		;@@@@@@@@@@ was: JSR CURSOR_LEFT_MARGIN	; Was: Cursor_BOL
            CPX TopMargin
            BEQ Be3fe
 
@@ -786,15 +789,15 @@ WINDOW_SCROLL_UP
            LDX TopMargin
            DEX
 Be3e6      INX
-           JSR CURSOR_LEFT_MARGIN			; Was: Cursor_BOL
+           JSR UPDATE_CURSOR_R2		;@@@@@@@@@@@@@@ was: CURSOR_LEFT_MARGIN			; Was: Cursor_BOL
            CPX BotMargin
            BCS Be3fe
 
-!if EXTENDED = 0 {
+!if EXTENDED = 0 {	
 		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
 		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
 		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
-		STA SAL+1					; Pointer: Tape Buffer/ Screen Scrolling
+		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
 }
 !if EXTENDED = 1 {
            INX
