@@ -1,7 +1,8 @@
 ; PET/CBM EDIT ROM - ColourPET - Colour RAM Address Table - 40 Column screen
 ; ================ ****** ADJUSTED FOR COLOUR SHIFT!!!!!!!!!!!!!!!!!!!!!!!!!
 ;
-; These tables are used to calculate the starting address of each colour line on the screen
+; These tables are used to calculate the starting address of each colour line on the screen.
+; Tables have been offset by 1 to adjust for hardware colour shift problem with current design.
 
 ;--------- LO Bytes Table
 

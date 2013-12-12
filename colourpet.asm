@@ -18,14 +18,17 @@
 ; The foreground colour is definable as above
 ; The background colour is selectable for the entire screen using a register (to be determined)
 ; The border colour is set via a register (to be determined)
-; -------------------------------------------------------------------------------------------------
+; ---------------------------------------------------------------------------------------------
 
-COLOURV 		= $83F0		; Combined FG and BG value (poke 33776)
-COLOURFG		= $83F1		; Foreground Colour
-COLOURBG		= $83F2		; Background Colour
+COLOURV 	= $83F0		; Combined FG and BG value (poke 33776)
+COLOURFG	= $83F1		; Foreground Colour
+COLOURBG	= $83F2		; Background Colour
 COLOURBORDER	= $83F3		; Border Colour
-COLOURCOUNT	= $83F4		; Count to track colour change codes (0=FG,1=BG,2=BORDER)
+COLOURCOUNT	= $83F4		; Count to track colour change codes 	(1=FG,2=BG,3=BORDER)
 
-COLOURREGBG	= $83F5		; Colour Background Register	(dummy location for now)
+COLOURREGBG	= $83F5		; Colour Background Register		(dummy location for now)
 COLOURREGBORDER = $83F6		; Colour Border Register		(dummy location for now)
-COLOURREGMODE   = $83F7		; Colour Mode Register - For future use
+COLOURREGMODE   = $83F7		; Colour Mode Register 			(For future use)
+
+COLOURPTR	= $83FC		; Pointer for screen writes (can these go in ZP?)
+COLOURPTR2	= $83FE		; Pointer for scrolling etc
