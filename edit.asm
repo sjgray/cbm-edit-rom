@@ -6,8 +6,10 @@
 ;----------------------- Assembler directives to choose which features are included
 ;
 ; For byte-exact 324243-04 ROM, set EXTENDED=1,KEYBOARD=2,COLUMNS=80,SOFT40=0,REFRESH=0,HERTZ=50
+; For byte-exact 901474-04 ROM, set EXTENDED=0,KEYBOARD=1,COLUMNS=80,SOFT40=0,REFRESH=0,HERTZ=50
+;
 ; If there are no valid options it means that supports has not been added yet!
-; NOTE!: Not all combinations are valid!!
+; NOTE!: Not all combinations may be valid!!
 ;
 ; DIRECTIVE		FEATURE				VALID OPTIONS			FUTURE OPTIONS
 ;----------		-------				-------------			--------------

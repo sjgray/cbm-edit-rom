@@ -830,7 +830,7 @@ ADVANCE_TIMER
 		INC JIFFY6DIV5			; Counter to speed TI by 6/5
 		LDA JIFFY6DIV5			; Counter to speed TI by 6/5
 		CMP #$06			; every 6 IRQ's
-		BNE ADVANCE_TIMER		; no, jump back to IRQ routine
+		BNE IRQ_NORMAL2			; no, jump back to IRQ routine
 		LDA #$00      			; yes, reset counter
 		STA JIFFY6DIV5			; Counter to speed TI by 6/5
 		BEQ ADVANCE_TIMER		; re-do jiffy clock update
@@ -870,13 +870,19 @@ Be452      JMP (CINV)
 ;************* IRQ
 
 IRQ_NORMAL
-ie455      JSR ADVANCE_TIMER
-ie458      LDA Blink
-           BNE Be474
-           DEC BLNCT
-           BNE Be474
+	   JMP	ADVANCE_TIMER		;@@@@@@@@@@@@@@@ waa: JSR ADVANCE_TIMER
+IRQ_NORMAL2				;ie458
+	   LDA Blink					; Cursor Blink enable: 0 = Flash Cursor
+           BNE Be474					; skip it
+           DEC BLNCT					; Timer: Countdown to Toggle Cursor
+           BNE Be474					; skip it
            LDA #$14
-           STA BLNCT
+!if EXTENDED = 0 {
+	   BIT RPTFLG
+	   BPL ie468
+	   LDA #2					; make cursor blink immediately
+}
+ie468      STA BLNCT
            LDY CursorCol
            LSR BlinkPhase
            LDA (ScrPtr),Y				; Get character from the screen
@@ -886,7 +892,13 @@ ie458      LDA Blink
 Be470      EOR #$80					; Flip the reverse bit
            STA (ScrPtr),Y				; Put it back on the screen
 Be474      LDY #0
-           LDA PIA1_Port_A 				; Keyboard ROW select
+           LDA PIA1_Port_A 				; Keyboard ROW select - PIA#1, Register 0
+
+!if EXTENDED = 0 {
+ 	   AND #$F0
+	   STA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
+ 	   LDA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
+} 
            ASL 
            ASL 
            ASL 
@@ -1073,22 +1085,28 @@ Restore_Char_at_Cursor
 
 INIT_EDITOR
            LDA #$7f
-           STA VIA_IER			; VIA, Register E - I/O Timers
+           STA VIA_IER				; VIA, Register E - I/O Timers
            LDX #$6d
            LDA #0
            STA HOMECT				; Clear Home Count
+
+!if EXTENDED = 0 {
+	   STA RPTFLG 				; Clear REPEAT ($80 = Repeat, $40 = disable)
+}
+
 ;-------------
-;removed   STA $E4 				; Clear REPEAT ($80 = Repeat, $40 = disable)
-;-------------
-Be61a      STA JIFFY_CLOCK,X		; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
+Be61a      STA JIFFY_CLOCK,X			; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
            DEX
            BPL Be61a
+
+!if EXTENDED = 1 {
            STX KEYFLAGS 			; $FF = Clear all flags
+}
 
 ;************* Set IRQ Vector
 ; Normally $E455 - (Note: Execudesk changes this to $E900)
 ;
-           LDA #<IRQ_NORMAL		; Set IRQ Vector 
+           LDA #<IRQ_NORMAL			; Set IRQ Vector 
            STA CINV
            LDA #>IRQ_NORMAL
            STA CINV+1
@@ -1276,28 +1294,32 @@ SOUND_TAB
 ; These are copies of the above files. 
 ; TODO: Figure out how the old and new files are used!!!!
 
-!if COLUMNS = 80 {
-	!if REFRESH = 0 { !source "crtc-80-50hz-old.asm" }
-	!if REFRESH = 1 { !source "crtc-80-60hz-old.asm" }
-}
-
-!if COLUMNS = 40 {
-	!if SOFT40 = 1 {
-		!if REFRESH = 0 { !source "crtc-soft40-50hz-old.asm" }
-		!if REFRESH = 1 { !source "crtc-soft40-60hz-old.asm" }
-	} ELSE {
-		!if REFRESH = 0 { !source "crtc-40-50hz-old.asm" }
-		!if REFRESH = 1 { !source "crtc-40-60hz-old.asm" }
-		!if REFRESH = 2 { !source "crtc-40-pal-old.asm" }
-		!if REFRESH = 3 { !source "crtc-40-ntsc-old.asm" }
+!if EXTENDED = 1 {
+	!if COLUMNS = 80 {
+		!if REFRESH = 0 { !source "crtc-80-50hz-old.asm" }
+		!if REFRESH = 1 { !source "crtc-80-60hz-old.asm" }
 	}
+
+	!if COLUMNS = 40 {
+		!if SOFT40 = 1 {
+			!if REFRESH = 0 { !source "crtc-soft40-50hz-old.asm" }
+			!if REFRESH = 1 { !source "crtc-soft40-60hz-old.asm" }
+		} ELSE {
+			!if REFRESH = 0 { !source "crtc-40-50hz-old.asm" }
+			!if REFRESH = 1 { !source "crtc-40-60hz-old.asm" }
+			!if REFRESH = 2 { !source "crtc-40-pal-old.asm" }
+			!if REFRESH = 3 { !source "crtc-40-ntsc-old.asm" }
+		}
+	}
+	!byte $28			; ??????
 }
-
-
-		!byte $28			; ??????
 
 ;##############################################################################
+!if EXTENDED = 0 {
+           !fill $e7ff-*,$aa	; Fill to end of 2K ###########################
+} ELSE {
            !fill $e7ff-*,$ff	; Fill to end of 2K ###########################
+}
 ;##############################################################################
  
 		!byte $1a			; ??????
