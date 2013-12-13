@@ -20,6 +20,15 @@
 ; The border colour is set via a register (to be determined)
 ; ---------------------------------------------------------------------------------------------
 
+;---------------- Zero Page Storage
+; NOTE: These locations were used for TAPE. Do not use TAPE on ColourPET!!!!!!!!
+
+COLOURPTR	= $C0		; Pointer for screen writes (WAS: Tape Pointer)
+COLOURPTR2	= $C2		; Pointer for scrolling etc (WAS: Tape Pointer)
+
+
+;---------------- Storage (Currently in Screen RAM - To be moved?)
+
 COLOURV 	= $83F0		; Combined FG and BG value (poke 33776)
 COLOURFG	= $83F1		; Foreground Colour
 COLOURBG	= $83F2		; Background Colour
@@ -30,5 +39,3 @@ COLOURREGBG	= $83F5		; Colour Background Register		(dummy location for now)
 COLOURREGBORDER = $83F6		; Colour Border Register		(dummy location for now)
 COLOURREGMODE   = $83F7		; Colour Mode Register 			(For future use)
 
-COLOURPTR	= $83FC		; Pointer for screen writes (can these go in ZP?)
-COLOURPTR2	= $83FE		; Pointer for scrolling etc

@@ -51,3 +51,8 @@ REPEATOPT = 1		; Key Repeat Option		0=No (Always ON), 1=Yes
 	; *=e900		; Extended ROM start address ($e800-e8ff is reserved for IO)
 	!source "editromext.asm"
 }
+
+!if COLOURPET = 1 {
+	; *=e900		; Extended ROM start address ($e800-e8ff is reserved for IO)
+	!source "colourpetsubs.asm"
+}
