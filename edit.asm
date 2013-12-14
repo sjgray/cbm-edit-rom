@@ -24,8 +24,8 @@ COLOURPET = 1		; ColourPET additions?						0=No, 1=Yes
 REBOOT    = 0		; Add keyboard reboot? 						0=No, 1=Yes
 ESCCODES  = 0		; Add ESC codes? 						0=No, 1=Yes
 EXECUDESK = 0		; Add Execudesk Menu?						0=No, 1=Yes
-SILENT    = 1		; Disable BELL/CHIME		0=Normal, 1=Disabled
-REPEATOPT = 1		; Key Repeat Option		0=No (Always ON), 1=Yes
+SILENT    = 0		; Disable BELL/CHIME		0=Normal, 1=Disabled
+REPEATOPT = 0		; Key Repeat Option		0=No (Always ON), 1=Yes
 
 ;---------------------- Output filename
 

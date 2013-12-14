@@ -55,6 +55,8 @@ ColourPET_Init
 		LDA #0				; Black
 		STA COLOURBG			; Background=Black
 		STA COLOURCOUNT			; Reset Colour Count
+		JSR ClearColourRAM		; Clear Colour RAM
+		LDA #0				; Black
 
 ;-------------- Set Border Colour and update Register
 
@@ -74,6 +76,20 @@ SetColourValue
 		STA COLOURV			; Store it
 		RTS
 
+ClearColourRAM
+		LDA #5
+		LDX #0
+CCRAM1		
+		STA COLOUR_RAM,X
+		STA COLOUR_RAM+$100,X
+		STA COLOUR_RAM+$200,X
+		STA COLOUR_RAM+$300,X
+		INX
+		BNE CCRAM1
+		RTS
+
+
+;-------------- Subs for Scrolling/INS/DEL etc
 
 ColourPET_SyncPointers
 		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
