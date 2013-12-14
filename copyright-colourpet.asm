@@ -5,4 +5,6 @@
 		!text "SJG COLOURPET EDIT ROM, "
 		!text "2013-11-23 (C) 2013 STEVE J GRAY. "
 		!byte 0,0
+		!fill $E900-*,$00
+
 
