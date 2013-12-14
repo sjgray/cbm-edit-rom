@@ -85,7 +85,7 @@ RESET_EDITOR
 		JSR INIT_EDITOR
 		JSR CRT_SET_TEXT
 
-!if COLOURPET = 1 { JSR InitColourPET }			; Initialize ColourPET settings
+!if COLOURPET = 1 { JSR ColourPET_Init }			; Initialize ColourPET settings
 
 
 ;************** Clear Window (Called from Jump Table)
@@ -502,7 +502,7 @@ CHROUT_SCREEN
 		PHA
 		JMP (SCROV) 				; Via Screen Output Vector (normally 'ChrOutNormal')
 
-;************** Output Character to Screen
+;************** Output Character to Screen		SCROV vector normally points here
 
 ChrOutNormal
 		LDA #0
@@ -518,6 +518,9 @@ ChrOutNormal
 		BVS IRQ_EPILOG
 		NOP
 }
+
+!if COLOURPET = 1 { JSR CheckColourCodes }		; Check table of color values @@@@@@@@@@@@@@@@ COLOURPET
+
 		CMP #$1b				; <ESC>		
 		BNE Be21d
 		JMP Escape				; Cancel RVS/INS/QUOTE modes
@@ -565,7 +568,7 @@ Be251		INY
 }
 
 ;		-------------------------------- Note: "80240.PRG" jumps here ($E25C)
-; 		Q?: Should we padd he for compatibility, or would including "Soft-40" be ok?
+; 		Q?: Should we pad here for compatibility, or would including "Soft-40" be ok?
 
 Be25c		LDA #$20 				; <SPACE>
 		STA (ScrPtr),Y				; put it on the screen! 
