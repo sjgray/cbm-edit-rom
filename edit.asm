@@ -27,6 +27,8 @@ EXECUDESK = 0		; Add Execudesk Menu?						0=No, 1=Yes
 SILENT    = 0		; Disable BELL/CHIME		0=Normal, 1=Disabled
 REPEATOPT = 0		; Key Repeat Option		0=No (Always ON), 1=Yes
 
+DEBUG = 1		; Add debugging			0=No, 1=Yes
+
 ;---------------------- Output filename
 
 !to "editrom.bin",plain		; Name of output file with no load address

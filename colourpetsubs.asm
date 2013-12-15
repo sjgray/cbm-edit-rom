@@ -8,15 +8,16 @@
 ; The FIRST code will set the FG colour (normal behaviour)
 ; The SECOND code will set the BG colour
 ; The THIRD code will set the BORDER colour (future hardware)
-; Any NON-Colour Code will reset the count (where????)
+; Any NON-Colour Code will reset the count
 ; ------------------------------------------------------------------
 ; NOTE: Some code is included for possible future hardware options
 ;       Colour key codes (C64 code at E8DA)
 ; ------------------------------------------------------------------
-; TODO: This code must be inserted somewhere in print routine (check C64 code for ideas)
-; ------------------------------------------------------------------
 
 CheckColourCodes
+
+!if DEBUG = 1 { INC $83E0 }			; DEBUG
+
 		PHA				; Save the character
    		LDX #$0F			; Table has 15 entries
 ccloop		CMP COLOURS,X			; Does it match code from table?
@@ -24,24 +25,24 @@ ccloop		CMP COLOURS,X			; Does it match code from table?
 		DEX				; 
 		BPL ccloop			; loop for more
 
-ccnotfound	LDA #0				; not found
-		STA COLOURCOUNT			; Clear the Count
-		BMI ccexit			; no match, exit 
+ccnotfound	LDX #0				; not found
+		STX COLOURCOUNT			; Clear the Count
+		BEQ ccexit			; no match, exit 
 
 ccfound		INC COLOURCOUNT			; Count code
-		LDA COLOURCOUNT			; 
-		CMP #1				; FIRST?
+		LDX COLOURCOUNT			; 
+		CPX #1				; FIRST?
 		BNE cc3		
-		STX COLOURFG			; Set the FG colour		
+		STA COLOURFG			; Set the FG colour		
 
-cc3		CMP #2				; SECOND?
+cc3		CPX #2				; SECOND?
 		BNE cc4
-		STX COLOURBG			; Set the BG colour
+		STA COLOURBG			; Set the BG colour
 
-cc4		CMP #3				; THIRD?
+cc4		CPX #3				; THIRD?
 		BNE cc5
-		STX COLOURBORDER		; Set the BORDER colour
-		STX COLOURREGBORDER		; Store it in the BORDER register
+		STA COLOURBORDER		; Set the BORDER colour
+		STA COLOURREGBORDER		; Store it in the BORDER register
 
 cc5		JSR SetColourValue   		; Set the FG/BG value
 ccexit		PLA
@@ -50,12 +51,13 @@ ccexit		PLA
 ;-------------- Initialize ColourPET
 
 ColourPET_Init
-		LDA #5				; Light Green
+		JSR ClearColourRAM		; Clear Colour to RAM
+		LDA #7				; Light Cyan
 		STA COLOURFG
 		LDA #0				; Black
 		STA COLOURBG			; Background=Black
 		STA COLOURCOUNT			; Reset Colour Count
-		JSR ClearColourRAM		; Clear Colour RAM
+		
 		LDA #0				; Black
 
 ;-------------- Set Border Colour and update Register
@@ -76,6 +78,7 @@ SetColourValue
 		STA COLOURV			; Store it
 		RTS
 
+;-------------- Clear Colour Ram - Green on Black
 ClearColourRAM
 		LDA #5
 		LDX #0

@@ -220,10 +220,12 @@ Be09b		LDA (SAL),Y				; Pointer: Tape Buffer/ Screen Scrolling
 ;************* Get a KEY from keyboard buffer (Called from Jump Table)
 
 GETKEY
+!if DEBUG = 1 { INC $83c3 }				; DEBUG - 4th chr on bottom line
 		LDY KEYD				; Get key at start of buffer
 		LDX #0 					; scroll keyboard buffer
 getkey1		LDA KEYD+1,X				; Now shift the next keys in line
 		STA KEYD,X				;     to the front of the buffer
+!if DEBUG = 1 { STA $83D0,X }				; DEBUG - update screen
 		INX
 		CPX CharsInBuffer			; No. of Chars. in Keyboard Buffer
 		BNE getkey1
@@ -233,11 +235,22 @@ getkey1		LDA KEYD+1,X				; Now shift the next keys in line
 		RTS
 
 ;************** Get Line
+;
+; The PET is usually in this routine, waiting for keypresses and printing them or acting on them.
+; This routine continually loops until a <CR> is pressed. When <CR> is pressed then the line
+; where the cursor is, is processed. If the <RUN> key is pressed then the string is stuffed into
+; the keyboard buffer (overwriting whatever might be there)
 
-GetLine		JSR ChrOutMarginBeep
-GetLin10	LDA CharsInBuffer
+GetLine		JSR ChrOutMarginBeep			; 
+GetLin10
+!if DEBUG = 1 { INC $83c5 }				; DEBUG - 6th chr on bottom line
+
+		LDA CharsInBuffer			; Are there any keys waiting?
 		STA Blink 				; 0 chars -> blink cursor
 		BEQ GetLin10 				; loop until char in buffer
+
+;		---------------------------------------- Got a character, so process it
+
 		SEI
 		LDA BlinkPhase				; Flag: Last Cursor Blink On/Off
 		BEQ Be0d3
@@ -246,8 +259,8 @@ GetLin10	LDA CharsInBuffer
 		STY BlinkPhase				; Flag: Last Cursor Blink On/Off
 		JSR Restore_Char_at_Cursor		; Put character on screen
 Be0d3		JSR GETKEY				; Get Character From Keyboard Buffer
-		CMP #$83				; <RUN> ?
-		BNE Be0ea
+		CMP #$83				; Is it the <RUN> key?
+		BNE Be0ea				; No, skip ahead
 
 ;		--------------------------------------- Stuff the <RUN> string to the keyboard buffer
 
@@ -260,22 +273,30 @@ Be0df		LDA RUN_String-1,X			; Normally:  dL"*<CR>run<cr>
 		BNE Be0df				; loop back for more
 		BEQ GetLin10
 
-;		--------------------------------------- Continue reading line
+;		--------------------------------------- Check for RETURN key
 
-Be0ea		CMP #13 				; <RETURN> ?
-		BNE GetLine
+Be0ea		CMP #13 				; Check if <RETURN> pressed
+		BNE GetLine				; if not go get more keys
+
+;*******************************************************************************************
+; Parse the line. When the <CR> key is pressed the line where the cursor lives is executed
+;*******************************************************************************************
+
+!if DEBUG = 1 { INC $83c6 }				; DEBUG - 7th chr on bottom line
+
 		LDY RigMargin				; Physical Screen Line Length
 		STY CRSW 				; # 0 -> Screen Input
 Be0f2		LDA (ScrPtr),Y				; Read Character from Screen RAM
 		CMP #$20 				; <SPACE> Ignore trailing blanks
-		BNE Be0fb
-		DEY
-		BNE Be0f2
-Be0fb		INY
-		STY LastInputCol
-		JSR CURSOR_TO_LEFT_MARGIN
+		BNE Be0fb				; Yes, exit out
+		DEY					; move to previous character position
+		BNE Be0f2				; At start of line? No, loop back for more
+
+Be0fb		INY					; last was not <SPACE> so move ahead one
+		STY LastInputCol			; record the position
+		JSR CURSOR_TO_LEFT_MARGIN		; move to the start of the line
 		NOP
-		STY QuoteMode 				; = 0 (off)
+		STY QuoteMode 				; Turn off quote mode
 		LDA InputRow				; Cursor Y-X Pos. at Start of INPUT
 		BMI Screen_Input
 		CMP CursorRow				; Current Cursor Physical Line Number
@@ -459,7 +480,8 @@ FULL_SCREEN_WINDOW
 		LDA #0					; Top/Left=0
 		TAX
 		JSR WINDOW_SET_TOP			; Set Window Top
-		LDA #$18				; 25 lines   (0-24)
+!if DEBUG = 1 { LDA #24 } ELSE {
+		LDA #25	}				; 25 lines   (0-24)
 
 !if COLUMNS = 80 {
 		LDX #$4f 				; 80 columns (0-79)
@@ -505,6 +527,7 @@ CHROUT_SCREEN
 ;************** Output Character to Screen		SCROV vector normally points here
 
 ChrOutNormal
+!if DEBUG = 1 { INC $83C0 }				; DEBUG - 1st chr on bottom line
 		LDA #0
 		STA CRSW				; Flag: INPUT or GET from Keyboard
 
@@ -936,6 +959,7 @@ Be452		JMP (CINV)
 IRQ_NORMAL
 		JMP ADVANCE_TIMER			;@@@@@@@@@@@@@@@ waa: JSR ADVANCE_TIMER
 IRQ_NORMAL2						;ie458
+!if DEBUG = 1 { INC $83c1 }				; DEBUG - 2nd chr on bottom line
 		LDA Blink				; Cursor Blink enable: 0 = Flash Cursor
 		BNE Be474				; skip it
 		DEC BLNCT				; Timer: Countdown to Toggle Cursor
@@ -1133,6 +1157,7 @@ IRQ_END		PLA
 		PLA
 		TAX
 		PLA
+!if DEBUG = 1 { INC $83c2 }			; DEBUG - 3rd chr on bottom line
 		RTI
 
 ;************** Restore Character at Cursor
