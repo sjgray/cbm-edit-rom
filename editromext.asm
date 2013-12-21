@@ -21,8 +21,8 @@
 
            JMP CHROUT_WITH_DIACRITICS
            JMP IS_DIACRITIC_CHAR
-           JMP Jeb3a
-           JMP Jeb44
+           JMP Screen_Input_Ext
+           JMP Check_Diacritic
            JMP IS_SPECIAL_KEY
            JMP IS_VOCAL
            JMP PET_TO_ASCII			;not called? not in EDITROM.ASM

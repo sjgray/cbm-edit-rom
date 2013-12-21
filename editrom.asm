@@ -91,24 +91,24 @@ RESET_EDITOR
 ;************** Clear Window (Called from Jump Table)
 
 WINDOW_CLEAR
-		LDX TopMargin
-		DEX
-Be054		INX
+		LDX TopMargin				; Window Top line
+		DEX					; prep for loop
+Be054		INX					; Next line
 		JSR UPDATE_CURSOR_R2			; was: CURSOR_LEFT_MARGIN  ; Was: Cursor_BOL
-		JSR Erase_To_EOL
-		CPX BotMargin
-		BCC Be054
+		JSR Erase_To_EOL			; Erase the line
+		CPX BotMargin				; Check if at the last line
+		BCC Be054				; No, go do next line
 
 ;************** Home the Cursor
 CURSOR_HOME
-		LDX TopMargin
-		STX CursorRow
+		LDX TopMargin				; Go to TOP of window
+		STX CursorRow				; put cursor there too
 
 ;************** Move cursor to LEFT MARGIN
 
 CURSOR_LEFT_MARGIN
-		LDY LefMargin
-		STY CursorCol
+		LDY LefMargin				; Get Left margin
+		STY CursorCol				; Set cursor there
 
 ;************** Update Cursor ROW - Get pointer from Screen Line Address Tables (and Colour)
 
@@ -117,6 +117,9 @@ UPDATE_CURSOR_ROW
 
 !if EXTENDED=0 {
 		JMP UPDATE_CURSOR_R3			;$E06F
+
+;		----------------------------------------
+
 UPDATE_CURSOR_R2
 		LDY LefMargin				; First column of window
 		DEY
@@ -127,12 +130,12 @@ UPDATE_SCREEN_PTR
 		LDA Line_Addr_Hi,X			; Screen Line Addresses HI		DATA
 		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
 
-!if COLOURPET = 1 {
+	!if COLOURPET = 1 {
 		LDA CLine_Addr_Lo,X			; Colour Screen Line Addresses LO	DATA
 		STA COLOURPTR				; Colour Pointer: Current Screen Line Address LO
 		LDA CLine_Addr_Hi,X			; Colour Screen Line Addresses HI	DATA
-		STA COLOURPTR+1        			; Colour Pointer: Current Screen Line Address HI
-}		
+		STA COLOURPTR+1      			; Colour Pointer: Current Screen Line Address HI
+	}		
 		RTS
 }
 
@@ -191,7 +194,7 @@ CRT_SET_GRAPHICS
 		NOP
 }
 
-;************* Program CRTC chip for selected screen MODE (Called from Jump Table)
+;************** Program CRTC chip for selected screen MODE (Called from Jump Table)
 ; Parameters: Table pointer in A/X, CHRSET in Y
 
 CRT_PROGRAM
@@ -217,20 +220,27 @@ Be09b		LDA (SAL),Y				; Pointer: Tape Buffer/ Screen Scrolling
 		BPL Be09b				; loop for more
 		RTS
 
-;************* Get a KEY from keyboard buffer (Called from Jump Table)
+
+;************** Get a KEY from keyboard buffer (Called from Jump Table)
+; Reads a character from 'KEYD' then shifts remaining buffer characters
+; If there is NO key it will return $FF.
 
 GETKEY
-!if DEBUG = 1 { INC $83c3 }				; DEBUG - 4th chr on bottom line
+!if DEBUG = 1 { INC $83EE,X }				; DEBUG
 		LDY KEYD				; Get key at start of buffer
-		LDX #0 					; scroll keyboard buffer
-getkey1		LDA KEYD+1,X				; Now shift the next keys in line
+		LDX #0 					; Start at 0
+
+getkey1		LDA KEYD+1,X				; LOOP START - Now shift the next keys in line
 		STA KEYD,X				;     to the front of the buffer
 !if DEBUG = 1 { STA $83D0,X }				; DEBUG - update screen
 		INX
-		CPX CharsInBuffer			; No. of Chars. in Keyboard Buffer
-		BNE getkey1
-		DEC CharsInBuffer			; No. of Chars. in Keyboard Buffer
-		TYA
+		CPX CharsInBuffer			; Num Chars in Keyboard Buffer
+		BNE getkey1				; Done? No, loop for another
+
+		DEC CharsInBuffer			; Reduce Num Chars in Keyboard Buffer
+
+		TYA					; Put the character in Accumulator
+!if DEBUG = 1 { STA $83c9 }				; DEBUG - 4th chr on bottom line
 		CLI
 		RTS
 
@@ -249,7 +259,9 @@ GetLin10
 		STA Blink 				; 0 chars -> blink cursor
 		BEQ GetLin10 				; loop until char in buffer
 
-;		---------------------------------------- Got a character, so process it
+!if DEBUG = 1 { INC $83c7 }				; DEBUG - 7th chr on bottom line
+
+;************** Got a character, so process it
 
 		SEI
 		LDA BlinkPhase				; Flag: Last Cursor Blink On/Off
@@ -282,7 +294,7 @@ Be0ea		CMP #13 				; Check if <RETURN> pressed
 ; Parse the line. When the <CR> key is pressed the line where the cursor lives is executed
 ;*******************************************************************************************
 
-!if DEBUG = 1 { INC $83c6 }				; DEBUG - 7th chr on bottom line
+;!if DEBUG = 1 { INC $83c6 }				; DEBUG - 7th chr on bottom line
 
 		LDY RigMargin				; Physical Screen Line Length
 		STY CRSW 				; # 0 -> Screen Input
@@ -331,7 +343,7 @@ iE121		LDY CursorCol				; Cursor Column on Current Line
 		LDA (ScrPtr),Y				; Pointer: Current Screen Line Address
 		STA DATAX				; Current Character to Print
 } else {
-		JSR Jeb3a				; PATCH for extended ROM
+		JSR Screen_Input_Ext			; PATCH for extended ROM
 		BVS Be13b
 		NOP
 }
@@ -410,7 +422,8 @@ Be17f
 		NOP
 }
 
-iE185		JSR Restore_Char_at_Cursor		; Put character on screen
+iE185
+		JSR Restore_Char_at_Cursor		; Put character on screen
 		INC CursorCol				; Cursor Column on Current Line
 		LDY RigMargin				; Physical Screen Line Length
 		CPY CursorCol				; Cursor Column on Current Line
@@ -456,11 +469,15 @@ Be1ba		DEC CursorRow				; Current Cursor Physical Line Number
 ; update for COLOURPET
 
 Erase_To_EOL
+!if COLOURPET = 0 {
 		LDA #$20 				; <SPACE>
 Be1c3		INY
 		STA (ScrPtr),Y				; Pointer: Current Screen Line Address @@@@@@@@@@@@@@ ColourPET
 		CPY RigMargin
 		BCC Be1c3
+} ELSE {
+		JSR ColourEraseEOL
+}
 		RTS
 
 ;************** Move Cursor to Left Margin
@@ -474,14 +491,13 @@ CURSOR_TO_LEFT_MARGIN
 ;************** Set Full Screen (Exit Window)
 ; This routine is used to set the screen size parameters for the entire system
 ; TODO: Update for 'Software switchable' SOFT40.
-; Q?: Do we want to support VIC-20  22x23 screen as well? OSI 64x32!?
+; Q?: Do we want to support VIC-20  22x23 screen as well? OSI 64x32!? Any other usefull format?
 
 FULL_SCREEN_WINDOW
 		LDA #0					; Top/Left=0
 		TAX
 		JSR WINDOW_SET_TOP			; Set Window Top
-!if DEBUG = 1 { LDA #24 } ELSE {
-		LDA #25	}				; 25 lines   (0-24)
+		LDA #24					; 25 lines   (0-24)
 
 !if COLUMNS = 80 {
 		LDX #$4f 				; 80 columns (0-79)
@@ -597,7 +613,7 @@ Be25c		LDA #$20 				; <SPACE>
 		STA (ScrPtr),Y				; put it on the screen! 
 !if COLOURPET = 1 {
 		LDA COLOURV				; Get the current Colour	@@@@@@@@@@@@@@@ ColourPET
-		STA COLOURPTR,Y				; put it to Colour MEM		@@@@@@@@@@@@@@@ ColourPET
+		STA (COLOURPTR),Y			; put it to Colour MEM		@@@@@@@@@@@@@@@ ColourPET
 }
 		BNE Be299
 
@@ -951,19 +967,24 @@ IRQ_MAIN
 		LDA STACK+4,X
 		AND #16
 		BEQ Be452
-		JMP (CBINV)
-Be452		JMP (CINV)
+		JMP (CBINV)	; Vector: BRK Instr. Interrupt [D478]
+Be452		JMP (CINV)	; Vector: Hardware Interrupt   [E455] Points to 'IRQ_NORMAL'
 
 ;************** IRQ (Called from Jump Table)
+; Normally: $E455
 
 IRQ_NORMAL
-		JMP ADVANCE_TIMER			;@@@@@@@@@@@@@@@ waa: JSR ADVANCE_TIMER
+!if DEBUG = 0 {	JMP ADVANCE_TIMER }			;@@@@@@@@@@@@@@@ waa: JSR ADVANCE_TIMER
+
 IRQ_NORMAL2						;ie458
 !if DEBUG = 1 { INC $83c1 }				; DEBUG - 2nd chr on bottom line
 		LDA Blink				; Cursor Blink enable: 0 = Flash Cursor
 		BNE Be474				; skip it
 		DEC BLNCT				; Timer: Countdown to Toggle Cursor
 		BNE Be474				; skip it
+
+;		----------------------------------------- BLINK THE CURSOR
+
 		LDA #$14
 !if REPEATOPT = 1 {
 		BIT RPTFLG
@@ -971,36 +992,43 @@ IRQ_NORMAL2						;ie458
 		LDA #2					; make cursor blink immediately
 }
 ie468		STA BLNCT
-		LDY CursorCol
-		LSR BlinkPhase
+		LDY CursorCol				; Column where cursor lives
+		LSR BlinkPhase				; Is it blinking?
 		LDA (ScrPtr),Y				; Get character from the screen
-		BCS Be470
-		INC BlinkPhase
-		STA CursorChar
+		BCS Be470				; Yes, skip
+		INC BlinkPhase				; count
+		STA CursorChar				; Remember the character at cursor (to be restored when cursor moves)
 Be470		EOR #$80				; Flip the reverse bit
 		STA (ScrPtr),Y				; Put it back on the screen
+
+;		----------------------------------------- Check IEEE and Cassette status
+
 Be474		LDY #0
 		LDA PIA1_Port_A 			; Keyboard ROW select - PIA#1, Register 0
 
 !if EXTENDED = 0 {
-		AND #$F0
+		AND #$F0				; Mask off lower 4 bits
 		STA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
 		LDA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
 } 
+		ASL					; Shift upper bits to lower 
 		ASL 
 		ASL 
-		ASL 
-		BPL Be487
-		STY CAS1				; Tape Motor Interlock #1
+		BPL Be487				; Is CASSETTE#1 Sense? No, skip
+
+		STY CAS1				; Yes, Tape Motor Interlock #1
 		LDA PIA1_Cont_B
-		ORA #8
-		BNE Be490
-Be487		LDA CAS1				; Tape Motor Interlock #1
+		ORA #8					; Is CASSETTE#2 Sense?
+		BNE Be490				; No, skip
+
+Be487		LDA CAS1				; Yes, Tape Motor Interlock #1
 		BNE Be493
+
 		LDA PIA1_Cont_B
-		AND #$f7
+		AND #$f7				; Mask off bit 4
 Be490		STA PIA1_Cont_B
 Be493		BCC Be49e
+
 		STY CAS2				; Tape Motor Interlock #2
 		LDA VIA_Port_B
 		ORA #16
@@ -1157,14 +1185,21 @@ IRQ_END		PLA
 		PLA
 		TAX
 		PLA
-!if DEBUG = 1 { INC $83c2 }			; DEBUG - 3rd chr on bottom line
 		RTI
 
 ;************** Restore Character at Cursor
+; This routine is called to put the character back at the cursor position.
+; It is called to put the initial character on the screen and as part of the
+; cursor blinking routine.
 
 Restore_Char_at_Cursor
-		LDY CursorCol			; Cursor Column on Current Line
+		LDY CursorCol			; Cursor Column on Current Line		
 		STA (ScrPtr),Y			; Pointer: Current Screen Line Address
+!if COLOURPET = 1 {
+		LDY CursorCol			; Cursor Column on Current Line
+		LDA COLOURV			; Get current Colour
+		STA (COLOURPTR),Y		; Set the Colour
+}
 		LDA #2				; Set blink count so cursor appears immediately
 		STA BLNCT			; Timer: Countdown to Toggle Cursor
 		RTS
@@ -1369,11 +1404,10 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e
 
 !if COLUMNS = 40 {
 		!source "screen-40.asm"
-		!if COLOURPET = 1 { !source "screen-40c!.asm" }		; Colour address table WITH ADJUSTMENT FOR SHIFT
+		!if COLOURPET = 1 { !source "screen-40c.asm" }		; Colour address table
+		;NOTE: If running on real hardware change above to 'screen-40c!.asm'
 }
 
-
-!if COLOURPET = 1 { !TEXT "STEVE WAS HERE!" }				; TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ;##############################################################################
 !if EXTENDED = 0 {

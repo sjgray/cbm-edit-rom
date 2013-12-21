@@ -185,13 +185,13 @@ INCREASE_COL
 Jeb3a
            LDY CursorCol
            LDA (ScrPtr),Y				;----------------(!!!!!!!!!!!!!!!! fix for colour)?
-           JSR Jeb44
+           JSR Check_Diacritic
            STA DATAX
 Beb43      RTS
 
 ;--------- ?
 
-Jeb44
+Check_Diacritic
            CLV
            TAX
            LDA KEYFLAGS

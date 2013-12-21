@@ -14,10 +14,10 @@
 ; DIRECTIVE		FEATURE				VALID OPTIONS			FUTURE OPTIONS
 ;----------		-------				-------------			--------------
 EXTENDED  = 0		; ROM Size:			0=2K, 1=4K
-KEYBOARD  = 0		; Keyboard type:		0=N,1=B,2=DIN,3=C64
+KEYBOARD  = 1		; Keyboard type:		0=N,1=B,2=DIN,3=C64
 COLUMNS   = 40		; Screen Width:			40 or 80
 SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes
-REFRESH   = 3		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
+REFRESH   = 0		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
 HERTZ     = 50		; Line Frequency (Clock):					50=Euro, 60=NorthAmerica
 
 COLOURPET = 1		; ColourPET additions?						0=No, 1=Yes
@@ -25,9 +25,9 @@ REBOOT    = 0		; Add keyboard reboot? 						0=No, 1=Yes
 ESCCODES  = 0		; Add ESC codes? 						0=No, 1=Yes
 EXECUDESK = 0		; Add Execudesk Menu?						0=No, 1=Yes
 SILENT    = 0		; Disable BELL/CHIME		0=Normal, 1=Disabled
-REPEATOPT = 0		; Key Repeat Option		0=No (Always ON), 1=Yes
+REPEATOPT = 1		; Key Repeat Option		0=No (Always ON), 1=Yes
 
-DEBUG = 1		; Add debugging			0=No, 1=Yes
+DEBUG 	  = 1		; Add debugging			0=No, 1=Yes
 
 ;---------------------- Output filename
 

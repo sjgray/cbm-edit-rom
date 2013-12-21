@@ -7,14 +7,14 @@
 ;--------------- Scan Keyboard (scnkey)
 
 SCAN_KEYBOARD
-!if DEBUG = 1 { INC $83c5 }		; DEBUG - 4th character on top line
+;!if DEBUG = 1 { INC $83c5 }		; DEBUG - 6th character on top line
 		LDY #$FF		; No Key
 		STY Key_Image		; Key Image
 		INY
 		STY KEYFLAGS		; Flag: Print Shifted Chars.
-		LDA $E4			; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
+		LDA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
 		AND #$7F
-		STA $E4			; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
+		STA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
 		LDX #$50
 iE4CD		LDY #$08
 		LDA PIA1_Port_B 	; Keyboard COL result
@@ -74,10 +74,11 @@ iE52A		LDX DELAY		; Repeat Delay Counter
 iE532		DEC KOUNT		; Repeat Speed Counter
 		BNE iE56F
 		LDX #$04
-		STX $E5			; Repeat Speed Counter
+		STX KOUNT		; Repeat Speed Counter
 		LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
-		DEX
-		BPL iE56F
+		DEX			; one less
+		BPL iE56F		; 
+
 iE53F		STA KEYPRESSED		; Current Key Pressed: 255 = No Key
 		CMP #$FF		; No Key?
  		BEQ iE56F		; Yes, exit
@@ -90,17 +91,19 @@ iE53F		STA KEYPRESSED		; Current Key Pressed: 255 = No Key
 
 		LSR KEYFLAGS		; Check for SHIFT
 		BCC iE563		; No, store as-is
-		CMP #$2C		;  
-		BCC iE561
-		CMP #$3C		;
-		BCS iE561
-		SBC #$0F
+		CMP #$2C		; is it less than 2C? 
+		BCC iE561		; yes, skip
+		CMP #$3C		; is it greater than 3C?
+		BCS iE561		; yes, skip
+		SBC #$0F		; no, so subtract 15
 		CMP #$20		; <SPACE>
 		BCS iE563
 
 		ADC #$20
 		!byte $2C		; hide the next instruction trick
 iE561		ORA #$80
+
+;		----------------------- Put the KEY into the Buffer (Key in accumulator)
 
 iE563		LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 		CPX XMAX		; Size of Keyboard Buffer
@@ -109,4 +112,5 @@ iE563		LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 !if DEBUG = 1 { STA $83D0,X }		; DEBUG - Put on screen!
 		INX			; Increment character count
 		STX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
+!if DEBUG = 1 { STX $83CF }		; DEBUG
 iE56F		RTS

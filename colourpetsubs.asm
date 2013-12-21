@@ -45,13 +45,14 @@ cc4		CPX #3				; THIRD?
 		STA COLOURREGBORDER		; Store it in the BORDER register
 
 cc5		JSR SetColourValue   		; Set the FG/BG value
-ccexit		PLA
+ccexit		PLA				; Restore the Character
 		RTS
 
 ;-------------- Initialize ColourPET
 
 ColourPET_Init
-		JSR ClearColourRAM		; Clear Colour to RAM
+;		JSR ClearColourRAM		; Clear Colour to RAM
+
 		LDA #7				; Light Cyan
 		STA COLOURFG
 		LDA #0				; Black
@@ -79,6 +80,10 @@ SetColourValue
 		RTS
 
 ;-------------- Clear Colour Ram - Green on Black
+; This was a temporary solution until colour routines were debugged.
+; Not needed now since ColourEraseEOL completed. But might come in handly later.
+; NOTE: This routine clears ALL colour ram INCLUDING areas used for storage!!!!!!
+
 ClearColourRAM
 		LDA #5
 		LDX #0
@@ -146,6 +151,29 @@ ColourPET_Scroll_Dest
 		LDA (COLOURPTR2),Y			; Read Colour from Colour RAM SOURCE	@@@@@@@@@@@@@@@ COLOURPET
 		STA (COLOURPTR),Y			; Write it to Screen DESTINATION	@@@@@@@@@@@@@@@ COLOURPET
 		RTS
+
+;-------------- Erase to End of Line
+
+ColourEraseEOL
+		TYA					; Save the Current offset
+		PHA					; to the stack
+
+		LDA #$20 				; <SPACE>
+CEOL		INY					; next character
+		STA (ScrPtr),Y				; Pointer: Current Screen Line Address @@@@@@@@@@@@@@ ColourPET
+		CPY RigMargin
+		BCC CEOL				; loop up for more
+
+		PLA					; Pull the offset from the stack
+		TAY					; 
+
+		LDA COLOURV				; The current colour
+CEOL2		INY					; next colour ram location
+		STA (COLOURPTR),Y			; Clear Colour RAM
+		CPY RigMargin
+		BCC CEOL2				; loop up for more
+		RTS
+
 
 ;-------------- Colour Codes Table
 ;
