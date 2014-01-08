@@ -1,18 +1,22 @@
 ; PET/CBM EDIT ROM - ColourPET Routines; Init, Change colours, Set Registers
 ; ================
+; Standard C128 colour codes will be used.
+; ------------------------------------------------------------------
+; NOTE: Some code is included for possible future hardware options
+;       Colour key codes (C64 code at E8DA)
+; ------------------------------------------------------------------
 
 !source "copyright-colourpet.asm"
 
-; Standard C128 colour codes will be used.
+;-------------- Check Colour Codes
+;
+; Checks if the character to print is a colour code.
+; If so it sets the proper foreground, background or border COLOUR.
 ; To set colours you can use 1 to 3 contiguous color code characters.
 ; The FIRST code will set the FG colour (normal behaviour)
 ; The SECOND code will set the BG colour
 ; The THIRD code will set the BORDER colour (future hardware)
 ; Any NON-Colour Code will reset the count
-; ------------------------------------------------------------------
-; NOTE: Some code is included for possible future hardware options
-;       Colour key codes (C64 code at E8DA)
-; ------------------------------------------------------------------
 
 CheckColourCodes
 
@@ -49,10 +53,11 @@ ccexit		PLA				; Restore the Character
 		RTS
 
 ;-------------- Initialize ColourPET
+;
+; This is called from the RESET_EDITOR routine.
+; It sets the default foreground, background and border colours.
 
 ColourPET_Init
-;		JSR ClearColourRAM		; Clear Colour to RAM
-
 		LDA #7				; Light Cyan
 		STA COLOURFG
 		LDA #0				; Black
@@ -80,8 +85,9 @@ SetColourValue
 		RTS
 
 ;-------------- Clear Colour Ram - Green on Black
+;
 ; This was a temporary solution until colour routines were debugged.
-; Not needed now since ColourEraseEOL completed. But might come in handly later.
+; Not needed now since Colour Erase_To_EOL completed. But might come in handly later.
 ; NOTE: This routine clears ALL colour ram INCLUDING areas used for storage!!!!!!
 
 ClearColourRAM
@@ -97,7 +103,11 @@ CCRAM1
 		RTS
 
 
-;-------------- Subs for Scrolling/INS/DEL etc
+;-------------- Sync Pointers
+;
+; This takes the current line number in X and then uses the lookup tables
+; to find the screen and colour ram address of the start of the line and stores them
+; in the Character and Colour pointers.
 
 ColourPET_SyncPointers
 		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
@@ -110,6 +120,8 @@ ColourPET_SyncPointers
 		LDA CLine_Addr_Hi-1,X 			; Screen Line address table HI - 1	@@@@@@@@@@@@@@@ COLOURPET
 		STA COLOURPTR2+1			;					@@@@@@@@@@@@@@@ COLOURPET
 		RTS
+
+;-------------- Scroll Left
 
 ColourPET_Scroll_Left
 CPSL1		INY
@@ -124,6 +136,8 @@ CPSL1		INY
 		CPY RigMargin
 		BNE CPSL1
 		RTS
+
+;-------------- Insert
 
 ColourPET_Insert
 CPI1		DEY
@@ -153,8 +167,13 @@ ColourPET_Scroll_Dest
 		RTS
 
 ;-------------- Erase to End of Line
+;
+; Clears ONE line on the screen from current cursor to RIGHT margin
+; Called from WINDOW_CLEAR and WINDOW_SCROLL_UP.
+; Replaces equivilent non-colour routine.
+; Must not modify X since it is used as a line counter in WINDOW_CLEAR.
 
-ColourEraseEOL
+Erase_To_EOL
 		TYA					; Save the Current offset
 		PHA					; to the stack
 
@@ -168,7 +187,7 @@ CEOL		INY					; next character
 		TAY					; 
 
 		LDA COLOURV				; The current colour
-CEOL2		INY					; next colour ram location
+CEOL2		INY					; Next colour ram location
 		STA (COLOURPTR),Y			; Clear Colour RAM
 		CPY RigMargin
 		BCC CEOL2				; loop up for more
@@ -176,6 +195,8 @@ CEOL2		INY					; next colour ram location
 
 
 ;-------------- Colour Codes Table
+;
+; These are the Colour PETSCII codes. We use C128 ordering to be compatible with it.
 ;
 ;	PETSCII Code	C64 colour		C128 colour (*=changed)
 ;       ------------   	----------		-----------
@@ -194,7 +215,7 @@ COLOURS
 	!byte $9C	;4=magenta		11=magenta/purple
 	!byte $95	;9=brown		12=dark yellow*
 	!byte $9E	;7=yellow		13=yellow
-	!byte $9B	;15=light grey	14=light grey
+	!byte $9B	;15=light grey		14=light grey
 	!byte $05	;1=white		15=white
 
 	!byte 0 ; separator

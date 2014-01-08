@@ -226,13 +226,13 @@ Be09b		LDA (SAL),Y				; Pointer: Tape Buffer/ Screen Scrolling
 ; If there is NO key it will return $FF.
 
 GETKEY
-!if DEBUG = 1 { INC $83EE,X }				; DEBUG
+!if DEBUG = 1 { INC DBLINE+2,X }			; DEBUG
 		LDY KEYD				; Get key at start of buffer
 		LDX #0 					; Start at 0
 
 getkey1		LDA KEYD+1,X				; LOOP START - Now shift the next keys in line
 		STA KEYD,X				;     to the front of the buffer
-!if DEBUG = 1 { STA $83D0,X }				; DEBUG - update screen
+!if DEBUG = 1 { STA DBLINE+10,X }				; DEBUG - update screen
 		INX
 		CPX CharsInBuffer			; Num Chars in Keyboard Buffer
 		BNE getkey1				; Done? No, loop for another
@@ -240,7 +240,7 @@ getkey1		LDA KEYD+1,X				; LOOP START - Now shift the next keys in line
 		DEC CharsInBuffer			; Reduce Num Chars in Keyboard Buffer
 
 		TYA					; Put the character in Accumulator
-!if DEBUG = 1 { STA $83c9 }				; DEBUG - 4th chr on bottom line
+!if DEBUG = 1 { STA DBLINE+3 }				; DEBUG - 4th chr on bottom line
 		CLI
 		RTS
 
@@ -253,13 +253,13 @@ getkey1		LDA KEYD+1,X				; LOOP START - Now shift the next keys in line
 
 GetLine		JSR ChrOutMarginBeep			; 
 GetLin10
-!if DEBUG = 1 { INC $83c5 }				; DEBUG - 6th chr on bottom line
+!if DEBUG = 1 { INC DBLINE+5 }				; DEBUG - 6th chr on bottom line
 
 		LDA CharsInBuffer			; Are there any keys waiting?
 		STA Blink 				; 0 chars -> blink cursor
 		BEQ GetLin10 				; loop until char in buffer
 
-!if DEBUG = 1 { INC $83c7 }				; DEBUG - 7th chr on bottom line
+!if DEBUG = 1 { INC DBLINE+6 }				; DEBUG - 7th chr on bottom line
 
 ;************** Got a character, so process it
 
@@ -294,7 +294,7 @@ Be0ea		CMP #13 				; Check if <RETURN> pressed
 ; Parse the line. When the <CR> key is pressed the line where the cursor lives is executed
 ;*******************************************************************************************
 
-;!if DEBUG = 1 { INC $83c6 }				; DEBUG - 7th chr on bottom line
+;!if DEBUG = 1 { INC DBLINE+7 }				; DEBUG - 8th chr on bottom line
 
 		LDY RigMargin				; Physical Screen Line Length
 		STY CRSW 				; # 0 -> Screen Input
@@ -466,19 +466,19 @@ Be1ba		DEC CursorRow				; Current Cursor Physical Line Number
 		JMP UPDATE_CURSOR_ROW			; Set Screen Pointers
 
 ;************** Erase To End of Line
-; update for COLOURPET
+;
+; Called from WINDOW_CLEAR
+; This routine is relocated/updated for COLOURPET
 
-Erase_To_EOL
 !if COLOURPET = 0 {
+Erase_To_EOL
 		LDA #$20 				; <SPACE>
 Be1c3		INY
-		STA (ScrPtr),Y				; Pointer: Current Screen Line Address @@@@@@@@@@@@@@ ColourPET
+		STA (ScrPtr),Y				; Pointer: Current Screen Line Address
 		CPY RigMargin
 		BCC Be1c3
-} ELSE {
-		JSR ColourEraseEOL
-}
 		RTS
+}
 
 ;************** Move Cursor to Left Margin
 
@@ -543,7 +543,7 @@ CHROUT_SCREEN
 ;************** Output Character to Screen		SCROV vector normally points here
 
 ChrOutNormal
-!if DEBUG = 1 { INC $83C0 }				; DEBUG - 1st chr on bottom line
+!if DEBUG = 1 { INC DBLINE }				; DEBUG - 1st chr on bottom line
 		LDA #0
 		STA CRSW				; Flag: INPUT or GET from Keyboard
 
@@ -977,7 +977,7 @@ IRQ_NORMAL
 !if DEBUG = 0 {	JMP ADVANCE_TIMER }			;@@@@@@@@@@@@@@@ waa: JSR ADVANCE_TIMER
 
 IRQ_NORMAL2						;ie458
-!if DEBUG = 1 { INC $83c1 }				; DEBUG - 2nd chr on bottom line
+!if DEBUG = 1 { INC DBLINE+1 }				; DEBUG - 2nd chr on bottom line
 		LDA Blink				; Cursor Blink enable: 0 = Flash Cursor
 		BNE Be474				; skip it
 		DEC BLNCT				; Timer: Countdown to Toggle Cursor

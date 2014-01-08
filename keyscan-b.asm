@@ -7,7 +7,7 @@
 ;--------------- Scan Keyboard (scnkey)
 
 SCAN_KEYBOARD
-;!if DEBUG = 1 { INC $83c5 }		; DEBUG - 6th character on top line
+;!if DEBUG = 1 { INC DBLINE+5 }		; DEBUG - 6th character on top line
 		LDY #$FF		; No Key
 		STY Key_Image		; Key Image
 		INY
@@ -109,8 +109,8 @@ iE563		LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 		CPX XMAX		; Size of Keyboard Buffer
 		BCS iE56F		; Exit if buffer full
 		STA KEYD,X		; Put the key into the buffer
-!if DEBUG = 1 { STA $83D0,X }		; DEBUG - Put on screen!
+!if DEBUG = 1 { STA DBLINE+10,X }		; DEBUG - Put on screen!
 		INX			; Increment character count
 		STX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
-!if DEBUG = 1 { STX $83CF }		; DEBUG
+!if DEBUG = 1 { STX DBLINE+9 }		; DEBUG
 iE56F		RTS

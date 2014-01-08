@@ -15,7 +15,7 @@
 ;----------		-------				-------------			--------------
 EXTENDED  = 0		; ROM Size:			0=2K, 1=4K
 KEYBOARD  = 1		; Keyboard type:		0=N,1=B,2=DIN,3=C64
-COLUMNS   = 40		; Screen Width:			40 or 80
+COLUMNS   = 80		; Screen Width:			40 or 80
 SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes
 REFRESH   = 0		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
 HERTZ     = 50		; Line Frequency (Clock):					50=Euro, 60=NorthAmerica
@@ -41,6 +41,11 @@ DEBUG 	  = 1		; Add debugging			0=No, 1=Yes
 !source "stdkernal.asm"		; $F000-FFFF	Kernal
 
 !if COLOURPET = 1 { !source "colourpet.asm" }
+
+;---------------------- Debug stuff
+
+DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
+
 
 ;---------------------- Standard 2K Edit ROM code here
 ;*=e000				; Target address, normally $e000 for EDIT ROM

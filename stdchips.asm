@@ -4,10 +4,10 @@
 ;--------------------------- Screen RAM $8000-$8FFF
 
 SCREEN_RAM = $8000					; 40 Col = $8000-83FF, 80 Col = $8000-87FF
-COLOUR_RAM = $8400					; for 40 column machines
-								; eventually colour ram will move to $8800
-KBD_MATRIX = $87d0					; First unused byte in SCREEN_RAM
-								; $8000+$7D0 (32768+2000) bytes
+
+KBD_MATRIX = $87d0					; Used with Extended DIN ROM keyboard scanning routine
+							; First unused byte in SCREEN_RAM
+							; $8000+$7D0 (32768+2000) bytes
 
 ;--------------------------- PIA #1 - 6520 Chip
 

@@ -26,16 +26,22 @@
 COLOURPTR	= $C0		; Pointer for screen writes (WAS: Tape Pointer)
 COLOURPTR2	= $C2		; Pointer for scrolling etc (WAS: Tape Pointer)
 
+;---------------- Colour Screen RAM
+
+COLOUR_RAM = $8800		; 40 Col = $8800-8BFF, 80 Col = $8800-8FFF
+
 
 ;---------------- Storage (Currently in Screen RAM - To be moved?)
 
-COLOURV 	= $87F0		; Combined FG and BG value (poke 33776)
-COLOURFG	= $87F1		; Foreground Colour
-COLOURBG	= $87F2		; Background Colour
-COLOURBORDER	= $87F3		; Border Colour
-COLOURCOUNT	= $87F4		; Count to track colour change codes 	(1=FG,2=BG,3=BORDER)
+COLOURSTOR = COLOUR_RAM + 25 * COLUMNS	; Calculate Last visible colour mem
 
-COLOURREGBG	= $87F5		; Colour Background Register		(dummy location for now)
-COLOURREGBORDER = $87F6		; Colour Border Register		(dummy location for now)
-COLOURREGMODE   = $87F7		; Colour Mode Register 			(For future use)
+COLOURV 	= COLOURSTOR+1	; Combined FG and BG value
+COLOURFG	= COLOURSTOR+2	; Foreground Colour
+COLOURBG	= COLOURSTOR+3	; Background Colour
+COLOURBORDER	= COLOURSTOR+4	; Border Colour
+COLOURCOUNT	= COLOURSTOR+5	; Count to track colour change codes 	(1=FG,2=BG,3=BORDER)
+
+COLOURREGBG	= COLOURSTOR+6	; Colour Background Register		(dummy location for now)
+COLOURREGBORDER = COLOURSTOR+7	; Colour Border Register		(dummy location for now)
+COLOURREGMODE   = COLOURSTOR+8	; Colour Mode Register 			(For future use)
 
