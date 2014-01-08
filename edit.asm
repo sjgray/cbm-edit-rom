@@ -17,17 +17,17 @@ EXTENDED  = 0		; ROM Size:			0=2K, 1=4K
 KEYBOARD  = 1		; Keyboard type:		0=N,1=B,2=DIN,3=C64
 COLUMNS   = 80		; Screen Width:			40 or 80
 SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes
-REFRESH   = 0		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
+REFRESH   = 3		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
 HERTZ     = 50		; Line Frequency (Clock):					50=Euro, 60=NorthAmerica
 
-COLOURPET = 1		; ColourPET additions?						0=No, 1=Yes
+COLOURPET = 1		; ColourPET additions?		0=No, 1=Yes, 2=Simple
 REBOOT    = 0		; Add keyboard reboot? 						0=No, 1=Yes
 ESCCODES  = 0		; Add ESC codes? 						0=No, 1=Yes
 EXECUDESK = 0		; Add Execudesk Menu?						0=No, 1=Yes
 SILENT    = 0		; Disable BELL/CHIME		0=Normal, 1=Disabled
 REPEATOPT = 1		; Key Repeat Option		0=No (Always ON), 1=Yes
 
-DEBUG 	  = 1		; Add debugging			0=No, 1=Yes
+DEBUG 	  = 0		; Add debugging			0=No, 1=Yes
 
 ;---------------------- Output filename
 
@@ -40,7 +40,7 @@ DEBUG 	  = 1		; Add debugging			0=No, 1=Yes
 !source "stdchips.asm"		; $E800-E8FF	Chips
 !source "stdkernal.asm"		; $F000-FFFF	Kernal
 
-!if COLOURPET = 1 { !source "colourpet.asm" }
+!if COLOURPET > 0 { !source "colourpet.asm" }
 
 ;---------------------- Debug stuff
 
@@ -59,7 +59,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 	!source "editromext.asm"
 }
 
-!if COLOURPET = 1 {
+!if COLOURPET > 0 {
 	; *=e900		; Extended ROM start address ($e800-e8ff is reserved for IO)
 	!source "colourpetsubs.asm"
 }

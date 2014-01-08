@@ -20,7 +20,7 @@
 
 CheckColourCodes
 
-!if DEBUG = 1 { INC $83E0 }			; DEBUG
+!if DEBUG = 1 { INC DBLINE+9 }			; DEBUG
 
 		PHA				; Save the character
    		LDX #$0F			; Table has 15 entries
@@ -58,6 +58,7 @@ ccexit		PLA				; Restore the Character
 ; It sets the default foreground, background and border colours.
 
 ColourPET_Init
+!IF COLOURPET = 2 { JSR ClearColourRAM }
 		LDA #7				; Light Cyan
 		STA COLOURFG
 		LDA #0				; Black
@@ -98,6 +99,12 @@ CCRAM1
 		STA COLOUR_RAM+$100,X
 		STA COLOUR_RAM+$200,X
 		STA COLOUR_RAM+$300,X
+!IF COLUMNS = 80 {
+		STA COLOUR_RAM+$400,X
+		STA COLOUR_RAM+$500,X
+		STA COLOUR_RAM+$600,X
+		STA COLOUR_RAM+$700,X
+}
 		INX
 		BNE CCRAM1
 		RTS

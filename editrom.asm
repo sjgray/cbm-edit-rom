@@ -23,7 +23,7 @@
 ;    * Soft40 - Simulate a 40 column screen on 80 column hardware
 ;    * Soft-switchable SOFT40
 ;    * Soft-switchable real 40/80 columns (requires hardware mod)
-;    * Extended screen editor - CBM-II compatible ESC sequences
+;    * Extended screen editor - C128 or CBM-II compatible ESC sequences
 ;    * Keyboard soft-reset (kinda like CTRL-ALT-DEL on PC's)
 ;    * Autoboot from default drive
 ;-----------------------------------------------------------------------------------------------
@@ -82,10 +82,12 @@ SET_REPEAT_MODE
 ;************** Reset Editor (Called from Jump Table)
 
 RESET_EDITOR
+
+!if COLOURPET > 0 { JSR ColourPET_Init }			; Initialize ColourPET settings
+
 		JSR INIT_EDITOR
 		JSR CRT_SET_TEXT
 
-!if COLOURPET = 1 { JSR ColourPET_Init }			; Initialize ColourPET settings
 
 
 ;************** Clear Window (Called from Jump Table)
@@ -130,11 +132,13 @@ UPDATE_SCREEN_PTR
 		LDA Line_Addr_Hi,X			; Screen Line Addresses HI		DATA
 		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
 
+;	!if COLOURPET = 2 { NOP }
+
 	!if COLOURPET = 1 {
 		LDA CLine_Addr_Lo,X			; Colour Screen Line Addresses LO	DATA
 		STA COLOURPTR				; Colour Pointer: Current Screen Line Address LO
 		LDA CLine_Addr_Hi,X			; Colour Screen Line Addresses HI	DATA
-		STA COLOURPTR+1      			; Colour Pointer: Current Screen Line Address HI
+		STA COLOURPTR + 1      			; Colour Pointer: Current Screen Line Address HI
 	}		
 		RTS
 }
@@ -1377,12 +1381,17 @@ RUN_String
 !if COLUMNS = 80 {
 		!if REFRESH = 0 { !source "crtc-80-50hz.asm" }
 		!if REFRESH = 1 { !source "crtc-80-60hz.asm" }
+		!if REFRESH = 2 { !source "crtc-80-pal.asm" }
+		!if REFRESH = 3 { !source "crtc-80-ntsc.asm" }
 }
 
 !if COLUMNS = 40 {
 	!if SOFT40 = 1 {
 		!if REFRESH = 0 { !source "crtc-soft40-50hz.asm" }
 		!if REFRESH = 1 { !source "crtc-soft40-60hz.asm" }
+		!if REFRESH = 2 { !source "crtc-soft40-pal.asm" }
+		!if REFRESH = 3 { !source "crtc-soft40-ntsc.asm" }
+
 	} ELSE {
 		!if REFRESH = 0 { !source "crtc-40-50hz.asm" }
 		!if REFRESH = 1 { !source "crtc-40-60hz.asm" }
@@ -1399,12 +1408,12 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e
 
 !if COLUMNS = 80 {
 		!source "screen-80.asm"
-		!if COLOURPET = 1 { !source "screen-80c.asm" }		; Colour address table (future hardware)
+		!if COLOURPET > 0 { !source "screen-80c.asm" }		; Colour address table (future hardware)
 }
 
 !if COLUMNS = 40 {
 		!source "screen-40.asm"
-		!if COLOURPET = 1 { !source "screen-40c.asm" }		; Colour address table
+		!if COLOURPET > 0 { !source "screen-40c.asm" }		; Colour address table
 		;NOTE: If running on real hardware change above to 'screen-40c!.asm'
 }
 

@@ -23,7 +23,7 @@
 ;---------------- Zero Page Storage
 ; NOTE: These locations were used for TAPE. Do not use TAPE on ColourPET!!!!!!!!
 
-COLOURPTR	= $C0		; Pointer for screen writes (WAS: Tape Pointer)
+COLOURPTR	= $C9		; Pointer for screen writes (WAS: Tape Pointer)
 COLOURPTR2	= $C2		; Pointer for scrolling etc (WAS: Tape Pointer)
 
 ;---------------- Colour Screen RAM
