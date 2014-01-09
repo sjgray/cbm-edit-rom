@@ -19,6 +19,7 @@ COLUMNS   = 80		; Screen Width:			40 or 80
 SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes
 REFRESH   = 3		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
 HERTZ     = 50		; Line Frequency (Clock):					50=Euro, 60=NorthAmerica
+BOOTCASE  = 0		; Initial Screen Mode		0=Text, 1=Graphics
 
 COLOURPET = 1		; ColourPET additions?		0=No, 1=Yes, 2=Simple
 REBOOT    = 0		; Add keyboard reboot? 						0=No, 1=Yes

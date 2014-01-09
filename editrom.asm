@@ -88,7 +88,9 @@ RESET_EDITOR
 } ELSE {
 		JSR ColourPET_Init			; Initialize ColourPET settings
 }
-		JSR CRT_SET_TEXT			; Set Screen to TEXT mode
+
+!IF BOOTCASE = 0 { JSR CRT_SET_TEXT }			; Set Screen to TEXT mode
+!IF BOOTCASE = 1 { JSR CRT_SET_GRAPHICS }		; Set Screen to GRAPHICS mode
 
 ;************** Clear Window (Called from Jump Table)
 
