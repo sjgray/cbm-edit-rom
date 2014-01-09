@@ -58,7 +58,11 @@ ccexit		PLA				; Restore the Character
 ; It sets the default foreground, background and border colours.
 
 ColourPET_Init
-!IF COLOURPET = 2 { JSR ClearColourRAM }
+
+		!IF COLOURPET = 2 { JSR ClearColourRAM }
+
+		JSR INIT_EDITOR			; Do Normal Initialization
+
 		LDA #7				; Light Cyan
 		STA COLOURFG
 		LDA #0				; Black
@@ -109,11 +113,28 @@ CCRAM1
 		BNE CCRAM1
 		RTS
 
-
-;-------------- Sync Pointers
+;-------------- Sync Pointers - Current Line
 ;
 ; This takes the current line number in X and then uses the lookup tables
 ; to find the screen and colour ram address of the start of the line and stores them
+; in the Character and Colour pointers.
+
+ColourPET_SyncPointersX
+		STA ScrPtr				; Pointer: Current Screen Line Address LO
+		LDA Line_Addr_Hi,X			; Screen Line Addresses HI
+		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
+
+		LDA CLine_Addr_Lo,X			; Colour Screen Line Addresses LO
+		STA COLOURPTR				; Colour Pointer: Current Screen Line Address LO
+		LDA CLine_Addr_Hi,X			; Colour Screen Line Addresses HI
+		STA COLOURPTR + 1      			; Colour Pointer: Current Screen Line Address HI
+
+		RTS
+
+;-------------- Sync Pointers - Next Line
+;
+; This takes the current line number in X and then uses the lookup tables
+; to find the screen and colour ram address of the start of the NEXT line and stores them
 ; in the Character and Colour pointers.
 
 ColourPET_SyncPointers
@@ -122,10 +143,10 @@ ColourPET_SyncPointers
 		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
 		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
 
-		LDA CLine_Addr_Lo-1,X     		; Screen Line address table LO - 1	@@@@@@@@@@@@@@@ COLOURPET
-		STA COLOURPTR2				; Second Colour RAM Pointer		@@@@@@@@@@@@@@@ COLOURPET
-		LDA CLine_Addr_Hi-1,X 			; Screen Line address table HI - 1	@@@@@@@@@@@@@@@ COLOURPET
-		STA COLOURPTR2+1			;					@@@@@@@@@@@@@@@ COLOURPET
+		LDA CLine_Addr_Lo-1,X     		; Screen Line address table LO - 1
+		STA COLOURPTR2				; Second Colour RAM Pointer
+		LDA CLine_Addr_Hi-1,X 			; Screen Line address table HI - 1
+		STA COLOURPTR2+1			;
 		RTS
 
 ;-------------- Scroll Left

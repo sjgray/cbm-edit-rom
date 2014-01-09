@@ -33,7 +33,7 @@
 
 ;************* Edit ROM Jump Table
 ; Note: Not all KERNAL and BASIC calls go through this table.
-;       There are THREE hard-coded entry points: $E202, $E442, $E600
+;       There are FIVE hard-coded entry points: $E0A7, $E116, $E202, $E442, $E600
 
 EDITOR
 		JMP RESET_EDITOR		; Main Initialization (called from Kernal power up reset 
@@ -83,12 +83,12 @@ SET_REPEAT_MODE
 
 RESET_EDITOR
 
-!if COLOURPET > 0 { JSR ColourPET_Init }			; Initialize ColourPET settings
-
+!if COLOURPET = 0 {
 		JSR INIT_EDITOR
-		JSR CRT_SET_TEXT
-
-
+} ELSE {
+		JSR ColourPET_Init			; Initialize ColourPET settings
+}
+		JSR CRT_SET_TEXT			; Set Screen to TEXT mode
 
 ;************** Clear Window (Called from Jump Table)
 
@@ -128,18 +128,13 @@ UPDATE_CURSOR_R2
 UPDATE_CURSOR_R3
 		LDA Line_Addr_Lo,X			; Screen Line Addresses LO		DATA
 UPDATE_SCREEN_PTR
+	!IF COLOURPET = 0 {
 		STA ScrPtr				; Pointer: Current Screen Line Address LO
 		LDA Line_Addr_Hi,X			; Screen Line Addresses HI		DATA
 		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
-
-;	!if COLOURPET = 2 { NOP }
-
-	!if COLOURPET = 1 {
-		LDA CLine_Addr_Lo,X			; Colour Screen Line Addresses LO	DATA
-		STA COLOURPTR				; Colour Pointer: Current Screen Line Address LO
-		LDA CLine_Addr_Hi,X			; Colour Screen Line Addresses HI	DATA
-		STA COLOURPTR + 1      			; Colour Pointer: Current Screen Line Address HI
-	}		
+	} ELSE {
+		JSR ColourPET_SyncPointersX		; Sync Pointers to Current Line
+	}
 		RTS
 }
 
@@ -225,7 +220,14 @@ Be09b		LDA (SAL),Y				; Pointer: Tape Buffer/ Screen Scrolling
 		RTS
 
 
+;################################################################################################
+		!fill $e0a7-*,$aa	;########################################################
+;################################################################################################
+
+
 ;************** Get a KEY from keyboard buffer (Called from Jump Table)
+; $E0A7 - FIXED ENTRY POINT!!!!!
+;
 ; Reads a character from 'KEYD' then shifts remaining buffer characters
 ; If there is NO key it will return $FF.
 
@@ -323,8 +325,13 @@ Be0fb		INY					; last was not <SPACE> so move ahead one
 		BCC Screen_Input
 		BCS Be144
 
-;************** Input a Character (Called from Jump Table)
+;################################################################################################
+		!fill $e116-*,$aa	; #######################################################
+;################################################################################################
 
+;************** Input a Character (Called from Jump Table)
+; FIXED ENTRY POINT! $E116
+;
 INPUT_CHARACTER
 		TYA
 		PHA
@@ -978,7 +985,7 @@ Be452		JMP (CINV)	; Vector: Hardware Interrupt   [E455] Points to 'IRQ_NORMAL'
 ; Normally: $E455
 
 IRQ_NORMAL
-!if DEBUG = 0 {	JMP ADVANCE_TIMER }			;@@@@@@@@@@@@@@@ waa: JSR ADVANCE_TIMER
+		JMP ADVANCE_TIMER 			;@@@@@@@@@@@@@@@ was: JSR ADVANCE_TIMER  ***** FIX? ******
 
 IRQ_NORMAL2						;ie458
 !if DEBUG = 1 { INC DBLINE+1 }				; DEBUG - 2nd chr on bottom line
@@ -1046,7 +1053,7 @@ Be4aa		JSR SCAN_KEYBOARD			; Scan the keyboard
 		JMP IRQ_END				; Return from Interrupt
 
 ;###########################################################################################
-		!fill $e4be-*,$aa			;###################################
+!if DEBUG = 0 {	!fill $e4be-*,$aa }			;###################################
 ;###########################################################################################
 
 ;************* Keyboard Scanner
