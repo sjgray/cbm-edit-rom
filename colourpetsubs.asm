@@ -1,5 +1,6 @@
-; PET/CBM EDIT ROM - ColourPET Routines; Init, Change colours, Set Registers
+; PET/CBM EDIT ROM - ColourPET Routines; Init, Change colours, Set Registers, Sync Pointers
 ; ================
+;
 ; Standard C128 colour codes will be used.
 ; ------------------------------------------------------------------
 ; NOTE: Some code is included for possible future hardware options

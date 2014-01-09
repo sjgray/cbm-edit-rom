@@ -1417,13 +1417,17 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e
 
 !if COLUMNS = 80 {
 		!source "screen-80.asm"
-		!if COLOURPET > 0 { !source "screen-80c.asm" }		; Colour address table (future hardware)
+		!if COLOURPET > 0 {
+			!IF COLOURVER = 0 { !source "screen-80c.asm" }		; Colour address table (future hardware)
+		}
 }
 
 !if COLUMNS = 40 {
 		!source "screen-40.asm"
-		!if COLOURPET > 0 { !source "screen-40c.asm" }		; Colour address table
-		;NOTE: If running on real hardware change above to 'screen-40c!.asm'
+		!if COLOURPET > 0 {
+			!IF COLOURVER = 0 { !source "screen-40c!.asm" }		; Colour address table
+			!IF COLOURVER = 1 { !source "screen-40c.asm" }		; Colour address table
+		}
 }
 
 

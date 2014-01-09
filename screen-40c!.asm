@@ -3,6 +3,7 @@
 ;
 ; These tables are used to calculate the starting address of each colour line on the screen.
 ; Tables have been offset by 1 to adjust for hardware colour shift problem with current design.
+; Addresses are for ColourPET hardware Ver 1 with colour ram at $8400
 
 ;--------- LO Bytes Table
 

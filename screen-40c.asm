@@ -1,6 +1,7 @@
 ; PET/CBM EDIT ROM - ColourPET - Colour RAM Address Table - 40 Column screen
 ; ================
 ; These tables are used to calculate the starting address of each colour line on the screen
+; Addresses are for ColourPET hardware Ver 2 with colour ram at $8800
 
 ;--------- LO Bytes Table
 
@@ -13,7 +14,7 @@ CLine_Addr_Lo
 ;---------- HI Bytes Table
 
 CLine_Addr_Hi
-	!byte $84,$84,$84,$84,$84,$84,$84,$85
-	!byte $85,$85,$85,$85,$85,$86,$86,$86
-	!byte $86,$86,$86,$86,$87,$87,$87,$87
-	!byte $87
+	!byte $88,$88,$88,$88,$88,$88,$88,$89
+	!byte $89,$89,$89,$89,$89,$8A,$8A,$8A
+	!byte $8A,$8A,$8A,$8A,$8B,$8B,$8B,$8B
+	!byte $8B
