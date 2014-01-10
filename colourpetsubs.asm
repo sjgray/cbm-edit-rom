@@ -49,6 +49,8 @@ cc4		CPX #3				; THIRD?
 		BNE cc5
 		STA COLOURBORDER		; Set the BORDER colour
 		STA COLOURREGBORDER		; Store it in the BORDER register
+		LDA #0
+		STA COLOURCOUNT			; Reset count
 
 cc5		JSR SetColourValue   		; Set the FG/BG value
 ccexit		PLA				; Restore the Character
@@ -65,9 +67,9 @@ ColourPET_Init
 
 		JSR INIT_EDITOR			; Do Normal Initialization
 
-		LDA #7				; Light Cyan
+		LDA #DEFAULTFG			; Green
 		STA COLOURFG
-		LDA #0				; Black
+		LDA #DEFAULTBG			; Black
 		STA COLOURBG			; Background=Black
 		STA COLOURCOUNT			; Reset Colour Count
 		
