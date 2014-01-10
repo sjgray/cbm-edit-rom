@@ -86,6 +86,7 @@ SetColourValue
 		ASL
 		ASL
 		ASL
+		CLC
 		ADC COLOURFG			; Add the FG colour
 		STA COLOURV			; Store it
 		RTS
@@ -144,9 +145,9 @@ ColourPET_SyncPointers
 		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
 		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
 
-		LDA CLine_Addr_Lo-1,X     		; Screen Line address table LO - 1
+		LDA CLine_Addr_Lo+1,X     		; Screen Line address table LO + 1
 		STA COLOURPTR2				; Second Colour RAM Pointer
-		LDA CLine_Addr_Hi-1,X 			; Screen Line address table HI - 1
+		LDA CLine_Addr_Hi+1,X 			; Screen Line address table HI + 1
 		STA COLOURPTR2+1			;
 		RTS
 

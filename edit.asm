@@ -8,15 +8,15 @@
 ; For byte-exact 324243-04 ROM, set EXTENDED=1,KEYBOARD=2,COLUMNS=80,REPEATOPT=0,REFRESH=0,HERTZ=50
 ; For byte-exact 901474-04 ROM, set EXTENDED=0,KEYBOARD=1,COLUMNS=80,REPEATOPT=1,REFRESH=0,HERTZ=50
 ;
-; If there are no valid options it means that supports has not been added yet!
+; If there no options are listed it means that support has not been added yet!
 ; NOTE!: Not all combinations may be valid!!
 ;
 ; DIRECTIVE		FEATURE				VALID OPTIONS			FUTURE OPTIONS
 ;----------		-------				-------------			--------------
 EXTENDED  = 0		; ROM Size:			0=2K, 1=4K
 KEYBOARD  = 1		; Keyboard type:		0=N,1=B,2=DIN,3=C64
-COLUMNS   = 40		; Screen Width:			40 or 80
-SOFT40    = 1		; 40 columns on 8032s?		0=No, 1=Yes
+COLUMNS   = 80		; Screen Width:			40 or 80
+SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes
 BOOTCASE  = 1		; Initial Screen Mode		0=Text, 1=Graphics
 REFRESH   = 3		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
 
@@ -49,20 +49,13 @@ DEBUG 	  = 0		; Add debugging			0=No, 1=Yes
 
 DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 
-
 ;---------------------- Standard 2K Edit ROM code here
 ;*=e000				; Target address, normally $e000 for EDIT ROM
 
 !source "editrom.asm"
 
 ;---------------------- Extended 4K Edit ROM code here
+; *=e900			; Extended ROM start address ($e800-e8ff is reserved for IO)
 
-!if EXTENDED = 1 {
-	; *=e900		; Extended ROM start address ($e800-e8ff is reserved for IO)
-	!source "editromext.asm"
-}
-
-!if COLOURPET > 0 {
-	; *=e900		; Extended ROM start address ($e800-e8ff is reserved for IO)
-	!source "colourpetsubs.asm"
-}
+!if EXTENDED = 1  { !source "editromext.asm" }
+!if COLOURPET > 0 { !source "colourpetsubs.asm" }
