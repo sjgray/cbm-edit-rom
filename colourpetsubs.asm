@@ -35,6 +35,7 @@ ccnotfound	LDX #0				; not found
 		BEQ ccexit			; no match, exit 
 
 ccfound		INC COLOURCOUNT			; Count code
+		TXA
 		LDX COLOURCOUNT			; 
 		CPX #1				; FIRST?
 		BNE cc3		
@@ -42,7 +43,7 @@ ccfound		INC COLOURCOUNT			; Count code
 
 cc3		CPX #2				; SECOND?
 		BNE cc4
-		STA COLOURBG			; Set the BG colour
+		STX COLOURBG			; Set the BG colour
 
 cc4		CPX #3				; THIRD?
 		BNE cc5
