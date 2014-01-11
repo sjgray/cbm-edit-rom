@@ -46,7 +46,7 @@ DEBUG 	  = 0		; Add debugging			0=No, 1=Yes
 !source "stdchips.asm"		; $E800-E8FF	Chips
 !source "stdkernal.asm"		; $F000-FFFF	Kernal
 
-!if COLOURPET > 0 { !source "colourpet.asm" }
+!if COLOURPET = 1 { !source "colourpet.asm" }
 
 ;---------------------- Debug stuff
 
@@ -60,5 +60,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 ;---------------------- Extended 4K Edit ROM code here
 ; *=e900			; Extended ROM start address ($e800-e8ff is reserved for IO)
 
-!if EXTENDED = 1  { !source "editromext.asm" }
-!if COLOURPET > 0 { !source "colourpetsubs.asm" }
+!if EXTENDED  = 1 { !source "editromext.asm" }
+!if COLOURPET = 1 { !source "colourpetsubs.asm" }
+
+!IF EXTENDED + COLOURPET >0 { !fill $F000-*,$FF } ; PAD to 4K ##########################
