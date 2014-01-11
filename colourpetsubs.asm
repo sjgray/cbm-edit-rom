@@ -43,7 +43,7 @@ ccfound		INC COLOURCOUNT			; Count code
 
 cc3		CPX #2				; SECOND?
 		BNE cc4
-		STX COLOURBG			; Set the BG colour
+		STA COLOURBG			; Set the BG colour
 
 cc4		CPX #3				; THIRD?
 		BNE cc5

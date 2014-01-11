@@ -563,6 +563,7 @@ ChrOutNormal
 !if EXTENDED = 0 {
 		LDY CursorCol				; Cursor Column on Current Line
 		LDA DATAX				; Current Character to Print
+!if COLOURPET = 1 { JSR CheckColourCodes }		; Check table of color values @@@@@@@@@@@@@@@@ COLOURPET
 		AND #$7F				; Strip off top bit (REVERSE)
 }
 !if EXTENDED = 1 {
@@ -570,8 +571,6 @@ ChrOutNormal
 		BVS IRQ_EPILOG
 		NOP
 }
-
-!if COLOURPET = 1 { JSR CheckColourCodes }		; Check table of color values @@@@@@@@@@@@@@@@ COLOURPET
 
 		CMP #$1b				; <ESC>		
 		BNE Be21d
