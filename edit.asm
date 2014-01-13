@@ -14,8 +14,8 @@
 ; DIRECTIVE		FEATURE				VALID OPTIONS			FUTURE OPTIONS
 ;----------		-------				-------------			--------------
 EXTENDED  = 0		; ROM Size:			0=2K, 1=4K
-KEYBOARD  = 1		; Keyboard type:		0=N,1=B,2=DIN,3=C64
-COLUMNS   = 80		; Screen Width:			40 or 80
+KEYBOARD  = 0		; Keyboard type:		0=N,1=B,2=DIN,3=C64
+COLUMNS   = 40		; Screen Width:			40 or 80
 SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes
 BOOTCASE  = 1		; Initial Screen Mode		0=Text, 1=Graphics
 REFRESH   = 3		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
@@ -28,7 +28,7 @@ DEFAULTFG = 5		; ColourPET Foreground colour   0 to 15 RGBI
 DEFAULTBG = 0		; ColourPET Background colour   0 to 15 RGBI
 
 REBOOT    = 0		; Add keyboard reboot? 						0=No, 1=Yes
-ESCCODES  = 0		; Add ESC codes? 						0=No, 1=Yes
+ESCCODES  = 1		; Add ESC codes? 						0=No, 1=Yes
 EXECUDESK = 0		; Add Execudesk Menu?						0=No, 1=Yes
 SILENT    = 0		; Disable BELL/CHIME		0=Normal, 1=Disabled
 REPEATOPT = 1		; Key Repeat Option		0=No (Always ON), 1=Yes
@@ -62,5 +62,6 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 
 !if EXTENDED  = 1 { !source "editromext.asm" }
 !if COLOURPET = 1 { !source "colourpetsubs.asm" }
+!if ESCCODES = 1  { !source "escapeseq.asm" }
 
-!IF EXTENDED + COLOURPET >0 { !fill $F000-*,$FF } ; PAD to 4K ##########################
+!IF EXTENDED + COLOURPET + ESCCODES > 0 { !fill $F000-*,$FF } ; PAD to 4K ##########################

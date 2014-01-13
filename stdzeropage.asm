@@ -158,7 +158,14 @@ DELAY		= $e6		; New key marker
 CHIME		= $e7		; Chime Time
 HOMECT		= $e8		; Home count
 SCRIV		= $e9		; Screen Input Vector
-SCROV		= $eb		; Screen Output Vector
+SCROV		= $eb		; Screen Output Vector (EB/EC)
+
+; $ED-F7 			; Part of 40 column wrap table - UNUSED on 80 col!
+
+!IF ESCCODES = 1 {
+LASTCHAR	= $F0		; Last Key Pressed
+}
+
 JIFFY6DIV5	= $f8
 CAS1		= $f9		; Cassette #1 status
 CAS2		= $fa		; Cassette #2 status

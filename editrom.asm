@@ -52,12 +52,11 @@ EDITOR
 		JMP SCAN_KEYBOARD		; Scan Keyboard
 		JMP BEEP			; Ring BELL/CHIME
 
-!if REPEATOPT = 1 {
+!IF REPEATOPT = 1 {
 		JMP SET_REPEAT_MODE		; Set REPEAT MODE
 } else {
 		JMP BEEP			; BEEP
 }
-
 		JMP WINDOW_SET_TOP		; Set Window Top
 		JMP WINDOW_SET_BOTTOM		; Set Window Bottom
 
@@ -553,7 +552,8 @@ CHROUT_SCREEN
 		PHA
 		JMP (SCROV) 				; Via Screen Output Vector (normally 'ChrOutNormal')
 
-;************** Output Character to Screen		SCROV vector normally points here
+;************** Output Character to Screen
+; SCROV vector normally points here
 
 ChrOutNormal
 !if DEBUG = 1 { INC DBLINE }				; DEBUG - 1st chr on bottom line
@@ -572,9 +572,49 @@ ChrOutNormal
 		NOP
 }
 
-		CMP #$1b				; <ESC>		
+!IF ESCCODES = 1 {
+		LDX LASTCHAR 				; ($F0 on C128) Previous character printed
+		CPX #$1B				; <ESC> key?
+		BNE Be21d				; Not <ESC>
+		JSR DoEscapeCode 			; Perform <ESC>+KEY
+} ELSE {
+		CMP #$1b				; <ESC>	key?
 		BNE Be21d
 		JMP Escape				; Cancel RVS/INS/QUOTE modes
+}
+
+; The following ESCAPE CODE entry points need to be assigned.
+; Some additional code must be written
+
+ESCAPE_AT	; Esc-@ Clear Remainder of Screen
+ESCAPE_A	; Esc-a Auto Insert
+ESCAPE_B	; Esc-b Bottom
+ESCAPE_C	; Esc-c Cancel Auto Insert
+ESCAPE_D	; Esc-d Delete Line
+ESCAPE_E	; Esc-e Cursor Non Flash
+ESCAPE_F	; Esc-f Cursor Flash
+ESCAPE_G	; Esc-g Bell Enable
+ESCAPE_H	; Esc-h Bell Disable
+ESCAPE_I	; Esc-i Insert Line
+ESCAPE_J	; Esc-j Start-of-Line
+ESCAPE_K	; Esc-k End-of-Line
+ESCAPE_L	; Esc-l Scroll On
+ESCAPE_M	; Esc-m Scroll Off
+ESCAPE_N	; Esc-n Screen Normal
+ESCAPE_O	; Esc-o (escape) Also: <ESC><ESC>
+ESCAPE_P	; Esc-p Erase Begin
+ESCAPE_Q	; Esc-q Erase End
+ESCAPE_R	; Esc-r Screen Reverse
+ESCAPE_S	; Esc-s Block Cursor
+ESCAPE_T	; Esc-t Top
+ESCAPE_U	; Esc-u Underline Cursor
+ESCAPE_V	; Esc-v Scroll Up
+ESCAPE_W	; Esc-w Scroll Down
+ESCAPE_X	; Esc-x Switch 40/80 Col
+ESCAPE_Y	; Esc-y Set Default Tabs
+ESCAPE_Z	; Esc-z Clear All Tabs
+
+
 
 Be21d		LDA DATAX				; Current Character to Print
 		BPL Be224				; Handle unshifted characters
@@ -1006,6 +1046,7 @@ IRQ_NORMAL2						;ie458
 ie468		STA BLNCT
 		LDY CursorCol				; Column where cursor lives
 		LSR BlinkPhase				; Is it blinking?
+;COLOURPET TODO: save colour at cursor position!
 		LDA (ScrPtr),Y				; Get character from the screen
 		BCS Be470				; Yes, skip
 		INC BlinkPhase				; count
@@ -1064,7 +1105,7 @@ Be4aa		JSR SCAN_KEYBOARD			; Scan the keyboard
 
 
 ;###########################################################################################
-!if EXTENDED = 1 { !fill $e54e-*,$aa }		;###########################################
+!if EXTENDED = 1 { !fill $e54e-*,$aa }			;###################################
 ;###########################################################################################
 
 
@@ -1124,8 +1165,11 @@ Scroll_Or_Select_Charset
 		BNE Be59b
 }
 
-		JSR WINDOW_SCROLL_UP
+!IF COLOURPET = 0 { JSR WINDOW_SCROLL_UP }	; CONFLICT WITH COLOUR CODE!
+
 		JMP Me5d9
+
+
 Be59b		CMP #15 			; <Ctrl> O - Set top left window corner
 		BNE Be5aa
 
@@ -1167,6 +1211,7 @@ ProcControl_C
 		CMP #$19 			; <Ctrl> Y - Scroll window down
 		BNE Be5de
 		JSR WINDOW_SCROLL_DOWN
+
 Me5d9		JSR UPDATE_CURSOR_ROW
 		BNE Be5ea
 Be5de		CMP #15 			; <143> - Set lower right window corner
@@ -1208,7 +1253,7 @@ Restore_Char_at_Cursor
 		LDY CursorCol			; Cursor Column on Current Line		
 		STA (ScrPtr),Y			; Pointer: Current Screen Line Address
 !if COLOURPET = 1 {
-		LDY CursorCol			; Cursor Column on Current Line
+;		LDY CursorCol			; Cursor Column on Current Line
 		LDA COLOURV			; Get current Colour
 		STA (COLOURPTR),Y		; Set the Colour
 }

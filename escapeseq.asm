@@ -2,72 +2,66 @@
 ; ================
 ; Goal is to support as many C128/CBM-II ESC codes as possible
 ;
-;-----------------------------------------------------------------------
-; TODO: Remove opcode bytes. Change storage locations. Change jump table
-;-----------------------------------------------------------------------
 
+;-------------- Kernal Analyze Esc Sequence
 
-;- code to call ESC check
+DoEscapeCode
+		CMP #$1B		; <ESC> again?
+		BNE DoESC2		; No, skip
 
-C74D: A6 F0	LDX $F0 	; Previous character printed (For <ESC> Test)
-C74F: E0 1B	CPX #$1B
-C751: D0 03	BNE $C756
-C753: 4C BE C9	JMP $C9BE	; Analyze Esc Sequence
+;-------------- Do <ESC><ESC>
 
-;-----------------------------------------------------------------------------
-; Analyze Esc Sequence
+DoESC1
+		LSR $EF 		; Current Character to Print
+		JMP ESCAPE_O		; <ESC>+O (escape)
 
-C9BE: 6C 38 03	JMP ($0338)	; Print ESC Sequence Link [C9C1]
+;-------------- Do <ESC>+KEY
 
-;-----------------------------------------------------------------------------
+DoESC2		AND #$7F		; Strip top biy
+		SEC
+		SBC #$40
+		CMP #$1B		; <ESC> ?
+		BCS DoESCDONE
 
-; Kernal Analyze Esc Sequence
+		ASL
+		TAX
+		LDA ESCVECTORS+1,X	; ESC Sequence Vectors
+		PHA
+		LDA ESCVECTORS,X	; ESC Sequence Vectors
+		PHA
 
-C9C1: C9 1B	CMP #$1B
-C9C3: D0 05	BNE $C9CA
-C9C5: 46 EF	LSR $EF 	; Current Character to Print
-C9C7: 4C 7D C7	JMP $C77D	; Esc-o (escape)
+		LDX #0			; Clear Last Character
+		STX LASTCHAR
 
-C9CA: 29 7F	AND #$7F
-C9CC: 38	SEC
-C9CD: E9 40	SBC #$40
-C9CF: C9 1B	CMP #$1B
-C9D1: B0 0A	BCS $C9DD
-C9D3: 0A	ASL A
-C9D4: AA	TAX
-C9D5: BD DF C9	LDA $C9DF,X
-C9D8: 48	PHA
-C9D9: BD DE C9	LDA $C9DE,X	; Esc Sequence Vectors
-C9DC: 48	PHA
-
-C9DD: 60	RTS
+DoESCDONE	RTS
 
 ; Esc Sequence Vectors
 
-C9DE: 9E CA	.WORD $CA9F-1	; Esc-@ Clear Remainder of Screen
-C9E0: EC CA	.WORD $CAED-1	; Esc-a Auto Insert
-C9E2: 15 CA	.WORD $CA16-1	; Esc-b Bottom
-C9E4: E9 CA	.WORD $CAEA-1	; Esc-c Cancel Auto Insert
-C9E6: 51 CA	.WORD $CA52-1	; Esc-d Delete Line
-C9E8: 0A CB	.WORD $CB0B-1	; Esc-e Cursor Non Flash
-C9EA: 20 CB	.WORD $CB21-1	; Esc-f Cursor Flash
-C9EC: 36 CB	.WORD $CB37-1	; Esc-g Bell Enable
-C9EE: 39 CB	.WORD $CB3A-1	; Esc-h Bell Disable
-C9F0: 3C CA	.WORD $CA3D-1	; Esc-i Insert Line
-C9F2: B0 CB	.WORD $CBB1-1	; Esc-j Start-of-Line
-C9F4: 51 CB	.WORD $CB52-1	; Esc-k End-of-Line
-C9F6: E1 CA	.WORD $CAE2-1	; Esc-l Scroll On
-C9F8: E4 CA	.WORD $CAE5-1	; Esc-m Scroll Off
-C9FA: 47 CB	.WORD $CB48-1	; Esc-n Screen Normal
-C9FC: 7C C7	.WORD $C77D-1	; Esc-o (escape)
-C9FE: 8A CA	.WORD $CA8B-1	; Esc-p Erase Begin
-CA00: 75 CA	.WORD $CA76-1	; Esc-q Erase End
-CA02: 3E CB	.WORD $CB3F-1	; Esc-r Screen Reverse
-CA04: F1 CA	.WORD $CAF2-1	; Esc-s Block Cursor
-CA06: 13 CA	.WORD $CA14-1	; Esc-t Top
-CA08: FD CA	.WORD $CAFE-1	; Esc-u Underline Cursor
-CA0A: BB CA	.WORD $CABC-1	; Esc-v Scroll Up
-CA0C: C9 CA	.WORD $CACA-1	; Esc-w Scroll Down
-CA0E: 2B CD	.WORD $CD2C-1	; Esc-x Switch 40/80 Col
-CA10: 82 C9	.WORD $C983-1	; Esc-y Set Default Tabs
-CA12: 7F C9	.WORD $C980-1	; Esc-z Clear All Tabs
+ESCVECTORS
+		!WORD ESCAPE_AT-1	; Esc-@ Clear Remainder of Screen
+		!WORD ESCAPE_A-1	; Esc-a Auto Insert
+		!WORD ESCAPE_B-1	; Esc-b Bottom
+		!WORD ESCAPE_C-1	; Esc-c Cancel Auto Insert
+		!WORD ESCAPE_D-1	; Esc-d Delete Line
+		!WORD ESCAPE_E-1	; Esc-e Cursor Non Flash
+		!WORD ESCAPE_F-1	; Esc-f Cursor Flash
+		!WORD ESCAPE_G-1	; Esc-g Bell Enable
+		!WORD ESCAPE_H-1	; Esc-h Bell Disable
+		!WORD ESCAPE_I-1	; Esc-i Insert Line
+		!WORD ESCAPE_J-1	; Esc-j Start-of-Line
+		!WORD ESCAPE_K-1	; Esc-k End-of-Line
+		!WORD ESCAPE_L-1	; Esc-l Scroll On
+		!WORD ESCAPE_M-1	; Esc-m Scroll Off
+		!WORD ESCAPE_N-1	; Esc-n Screen Normal
+		!WORD ESCAPE_O-1	; Esc-o (escape) Also: <ESC><ESC>
+		!WORD ESCAPE_P-1	; Esc-p Erase Begin
+		!WORD ESCAPE_Q-1	; Esc-q Erase End
+		!WORD ESCAPE_R-1	; Esc-r Screen Reverse
+		!WORD ESCAPE_S-1	; Esc-s Block Cursor
+		!WORD ESCAPE_T-1	; Esc-t Top
+		!WORD ESCAPE_U-1	; Esc-u Underline Cursor
+		!WORD ESCAPE_V-1	; Esc-v Scroll Up
+		!WORD ESCAPE_W-1	; Esc-w Scroll Down
+		!WORD ESCAPE_X-1	; Esc-x Switch 40/80 Col
+		!WORD ESCAPE_Y-1	; Esc-y Set Default Tabs
+		!WORD ESCAPE_Z-1	; Esc-z Clear All Tabs
