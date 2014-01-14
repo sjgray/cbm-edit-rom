@@ -75,8 +75,9 @@ ESCVECTORS
 
 
 ;=============== ESCAPE CODES not in normal PET code
-; The following ESCAPE CODE entry points need to be assigned.
-; Some additional code must be written
+;
+; The following ESCAPE CODE entry points need to be assigned
+; and/or additional code must be written to support them.
 
 ESCAPE_AT	; Esc-@ Clear Remainder of Screen
 ESCAPE_A	; Esc-a Auto Insert
@@ -91,9 +92,12 @@ ESCAPE_M	; Esc-m Scroll Off
 ESCAPE_N	; Esc-n Screen Normal
 ESCAPE_R	; Esc-r Screen Reverse
 ESCAPE_X	; Esc-x Switch 40/80 Col
-		LDX #0
-		STX LASTCHAR				; Clear Last Char
+ESCAPE_Y	; Esc-y Set Default Tabs
+
 		JMP IRQ_EPILOG				; Ignore sequence for now
+
+
+;-------------- New ESC sequence code
 
 ESCAPE_S						; Esc-s Standard Lowercase (was: Block Cursor)
 		JSR CRT_SET_TEXT			; Set Lowercase/Text Mode
@@ -102,16 +106,13 @@ ESCAPE_U						; Esc-u Uppercase (was: Underline Cursor - not supported on PET)
 		JSR CRT_SET_GRAPHICS			; Set Uppercase/Graphics Mode
 		JMP IRQ_EPILOG
 
-ESCAPE_Y						; Esc-y Set Default Tabs
-		RTS
 
+;-------------- Clear Tab Stops (80 bits)
 
-;************** Clear Tab Stops (80 bits)
-
-ESCAPE_Z					; Esc-z Clear All Tabs
+ESCAPE_Z						; Esc-z Clear All Tabs
 		LDX #12
 		LDA #0
-ESCZ1		STA TABS_SET,X			; Table of 80 bits to set TABs
+ESCZ1		STA TABS_SET,X				; Table of 80 bits to set TABs
 		DEX
 		BPL ESCZ1
 		JMP IRQ_EPILOG
