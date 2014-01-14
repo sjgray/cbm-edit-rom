@@ -24,6 +24,7 @@ HERTZ     = 50		; Line Frequency (Clock):					50=Euro, 60=NorthAmerica
 
 COLOURPET = 1		; ColourPET additions?		0=No, 1=Yes
 COLOURVER = 1           ; ColourPET Hardware Version	0=Beta,1=Release
+COLOURMODE= 1		; ColourPET Hardware Type	0=Digital, 1=Analog
 DEFAULTFG = 5		; ColourPET Foreground colour   0 to 15 RGBI
 DEFAULTBG = 0		; ColourPET Background colour   0 to 15 RGBI
 

@@ -80,8 +80,18 @@ SetColourAndBorder
 		STA COLOURREGBORDER		; Store it in the BORDER register
 
 ;-------------- Set Colour
+;
+; COLOURMODE OPTION: 0=DIGITAL, 1=ANALOG
+;
+; DIGITAL: Takes the FG colour and BG colour and combines them into one value
+;          RGBIRGBI - Upper bits for FG, lower for BG
+;
+; ANALOG : Takes the FG colour and uses it as an index to the RGB Conversion table.
+;          RRRGGGBB All bits for FG. Background colour set for entire screen
 
 SetColourValue
+
+!if COLOURMODE=0 {
 		LDA COLOURBG			; Get the BG colour
 		ASL				; move BG colour to upper nibble
 		ASL
@@ -89,6 +99,10 @@ SetColourValue
 		ASL
 		CLC
 		ADC COLOURFG			; Add the FG colour
+} ELSE {
+		LDX COLOURFG			; Get the FG index
+		LDA RGBTABLE,X			; Convert it to Analog RRRGGGBB
+}
 		STA COLOURV			; Store it
 		RTS
 
@@ -251,3 +265,31 @@ COLOURS
 
 	!byte 0 ; separator
 
+!IF COLOURMODE=1 {
+
+;-------------- Analog Colour Conversion Table
+; 
+; Converts colour code index to RRRGGGBB value for Analog ColourPET board
+; R and G have a range of 0 to 7, B has 0 to 3
+; If "I" is off, R and G have values of 4, B is 2.
+; If "I" is on, R and G have values of 7, B is 3.
+
+RGBTABLE
+;              RRRGGGBB
+	!byte %00000000	;0=black
+	!byte %01101101	;1=medium grey
+	!byte %00000010	;2=blue
+	!byte %00000011	;3=light blue
+	!byte %00010000	;4=green
+	!byte %00011100	;5=light green
+	!byte %10010000	;6=dark cyan*
+	!byte %11111100	;7=light cyan*
+	!byte %10000000	;8=red
+	!byte %11100000	;9=light red
+	!byte %10000010	;10=dark purple*
+	!byte %11100011	;11=magenta/purple
+	!byte %00010010	;12=dark yellow*
+	!byte %00011111	;13=yellow
+	!byte %11011010	;14=light grey
+	!byte %11111111	;15=white
+}
