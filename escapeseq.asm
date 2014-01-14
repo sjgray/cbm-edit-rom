@@ -70,8 +70,8 @@ ESCVECTORS
 		!WORD ESCAPE_V-1	; Esc-v Scroll Up
 		!WORD ESCAPE_W-1	; Esc-w Scroll Down
 		!WORD ESCAPE_X-1	; Esc-x Switch 40/80 Col
-		!WORD ESCAPE_Y-1	; Esc-y Set Default Tabs
-		!WORD ESCAPE_Z-1	; Esc-z Clear All Tabs
+		!WORD ESCAPE_Y-1	; Esc-y Normal Chr Set * (was: Set Default Tabs)
+		!WORD ESCAPE_Z-1	; Esc-z Alternate Chr Set * (was: Clear All Tabs)
 
 
 ;=============== ESCAPE CODES not in normal PET code
@@ -87,10 +87,8 @@ ESCAPE_F	; Esc-f Cursor Flash
 ESCAPE_K	; Esc-k End-of-Line
 ESCAPE_L	; Esc-l Scroll On
 ESCAPE_M	; Esc-m Scroll Off
-ESCAPE_N	; Esc-n Screen Normal
-ESCAPE_R	; Esc-r Screen Reverse
+
 ESCAPE_X	; Esc-x Switch 40/80 Col
-ESCAPE_Y	; Esc-y Set Default Tabs
 
 		JMP IRQ_EPILOG				; Ignore sequence for now
 
@@ -118,14 +116,43 @@ ESCAPE_U						; Esc-u Uppercase (was: Underline Cursor - not supported on PET)
 		JSR CRT_SET_GRAPHICS			; Set Uppercase/Graphics Mode
 		JMP IRQ_EPILOG
 
+;-------------- CRTC Chip Functions
+; CRTC controller REGISTER 12 is used for Screen RAM Address HI
+; BIT 4 controls the INVERT line
+; BIT 5 controls the CHR OPTION line
 
-;-------------- Clear Tab Stops (80 bits)
+ESCAPE_N						; Esc-n Screen Normal
+		SEI
+		LDA #12					; CRTC Register#12 - Display Address HI
+		STA CRT_Address				; Select the Register 
+		LDA CRT_Status				; Read the Value
+		AND %11001111				; Clear BITS 4 and 5
+		JMP CRTUPDATE
 
-ESCAPE_Z						; Esc-z Clear All Tabs
-		LDX #12
-		LDA #0
-ESCZ1		STA TABS_SET,X				; Table of 80 bits to set TABs
-		DEX
-		BPL ESCZ1
-		JMP IRQ_EPILOG
+ESCAPE_R						; Esc-r Screen Reverse
+		SEI
+		LDA #12					; CRTC Register#12 - Display Address HI
+		STA CRT_Address				; Select the Register 
+		LDA CRT_Status				; Read the Value
+		ORA %11101111				; Set BIT 4
+		JMP CRTUPDATE
+
+ESCAPE_Y						; Esc-y Normal Chr Set    (B-series). Was: Set Default Tabs (C128)
+		SEI
+		LDA #12					; CRTC Register#12 - Display Address HI
+		STA CRT_Address				; Select the Register 
+		LDA CRT_Status				; Read the Value
+		AND %11011111				; Clear BIT 5
+		JMP CRTUPDATE
+				
+ESCAPE_Z						; Esc-z Alternate Chr Set (B-Series). Was: Clear All Tabs (C128)
+		SEI
+		LDA #12					; CRTC Register#12 - Display Address HI
+		STA CRT_Address				; Select the Register 
+		LDA CRT_Status				; Read the Value
+		ORA %00100000				; Set BIT 5
+CRTUPDATE
+		STA CRT_Status				; Write the Value to previously selected register
+		CLI					; Enable Interrupts
+		JMP IRQ_EPILOG				; Continue
 
