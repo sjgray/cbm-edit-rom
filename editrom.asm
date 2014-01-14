@@ -157,7 +157,6 @@ Me072		INY
 !if EXTENDED = 0 {
 
 ;-------------- Initialize CRTC to TEXT Mode (Called from Jump Table)
-
 CRT_SET_TEXT
 		LDA #<CRT_CONFIG_TEXT			; Point to CRTC Table
 		LDX #>CRT_CONFIG_TEXT			; Point to CRTC Table
@@ -494,7 +493,7 @@ Be1c3		INY
 }
 
 ;************** Move Cursor to Left Margin
-
+ESCAPE_J						; Esc-j Start-of-Line
 CURSOR_TO_LEFT_MARGIN
 		LDY LefMargin				; First column of window
 		STY CursorCol				; Cursor Column on Current Line
@@ -581,32 +580,6 @@ ESC_DONE	STA LASTCHAR				; Save the character
 		BNE Be21d
 		JMP Escape				; Cancel RVS/INS/QUOTE modes
 }
-
-; The following ESCAPE CODE entry points need to be assigned.
-; Some additional code must be written
-
-ESCAPE_AT	; Esc-@ Clear Remainder of Screen
-ESCAPE_A	; Esc-a Auto Insert
-
-ESCAPE_C	; Esc-c Cancel Auto Insert
-
-ESCAPE_E	; Esc-e Cursor Non Flash
-ESCAPE_F	; Esc-f Cursor Flash
-ESCAPE_G	; Esc-g Bell Enable
-ESCAPE_H	; Esc-h Bell Disable
-
-ESCAPE_J	; Esc-j Start-of-Line
-ESCAPE_K	; Esc-k End-of-Line
-ESCAPE_L	; Esc-l Scroll On
-ESCAPE_M	; Esc-m Scroll Off
-ESCAPE_N	; Esc-n Screen Normal
-
-ESCAPE_R	; Esc-r Screen Reverse
-ESCAPE_S	; Esc-s Block Cursor
-
-ESCAPE_U	; Esc-u Underline Cursor
-ESCAPE_X	; Esc-x Switch 40/80 Col
-
 
 ;************** Reload character and check high bit 
 

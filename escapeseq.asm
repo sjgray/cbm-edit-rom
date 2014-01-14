@@ -29,6 +29,9 @@ DoEscapeCode	AND #$7F		; Strip top bit
 		CMP #$1B		; Out of range?
 		BCS DoESCDONE		; Yes, skip
 
+		LDX #0
+		STX LASTCHAR		; Clear Last Char
+
 		ASL
 		TAX
 		LDA ESCVECTORS+1,X	; ESC Sequence Vectors
@@ -39,7 +42,7 @@ DoEscapeCode	AND #$7F		; Strip top bit
 
 DoESCDONE	JMP ESC_DONE
 
-;-------------- Esc Sequence Vectors
+;-------------- Esc Sequence Vectors    (*=changed from C128)
 
 ESCVECTORS
 		!WORD ESCAPE_AT-1	; Esc-@ Clear Remainder of Screen
@@ -61,18 +64,45 @@ ESCVECTORS
 		!WORD ESCAPE_P-1	; Esc-p Erase Begin
 		!WORD ESCAPE_Q-1	; Esc-q Erase End
 		!WORD ESCAPE_R-1	; Esc-r Screen Reverse
-		!WORD ESCAPE_S-1	; Esc-s Block Cursor
+		!WORD ESCAPE_S-1	; Esc-s Text/Lowercase Mode * (was: Block Cursor)
 		!WORD ESCAPE_T-1	; Esc-t Top
-		!WORD ESCAPE_U-1	; Esc-u Underline Cursor
+		!WORD ESCAPE_U-1	; Esc-u Graphics/Uppercase Mode * (was: Underline Cursor)
 		!WORD ESCAPE_V-1	; Esc-v Scroll Up
 		!WORD ESCAPE_W-1	; Esc-w Scroll Down
 		!WORD ESCAPE_X-1	; Esc-x Switch 40/80 Col
 		!WORD ESCAPE_Y-1	; Esc-y Set Default Tabs
 		!WORD ESCAPE_Z-1	; Esc-z Clear All Tabs
 
-;=============== ESCAPE CODES no in normal PET code
 
-ESCAPE_Y	; Esc-y Set Default Tabs
+;=============== ESCAPE CODES not in normal PET code
+; The following ESCAPE CODE entry points need to be assigned.
+; Some additional code must be written
+
+ESCAPE_AT	; Esc-@ Clear Remainder of Screen
+ESCAPE_A	; Esc-a Auto Insert
+ESCAPE_C	; Esc-c Cancel Auto Insert
+ESCAPE_E	; Esc-e Cursor Non Flash
+ESCAPE_F	; Esc-f Cursor Flash
+ESCAPE_G	; Esc-g Bell Enable
+ESCAPE_H	; Esc-h Bell Disable
+ESCAPE_K	; Esc-k End-of-Line
+ESCAPE_L	; Esc-l Scroll On
+ESCAPE_M	; Esc-m Scroll Off
+ESCAPE_N	; Esc-n Screen Normal
+ESCAPE_R	; Esc-r Screen Reverse
+ESCAPE_X	; Esc-x Switch 40/80 Col
+		LDX #0
+		STX LASTCHAR				; Clear Last Char
+		JMP IRQ_EPILOG				; Ignore sequence for now
+
+ESCAPE_S						; Esc-s Standard Lowercase (was: Block Cursor)
+		JSR CRT_SET_TEXT			; Set Lowercase/Text Mode
+		JMP IRQ_EPILOG
+ESCAPE_U						; Esc-u Uppercase (was: Underline Cursor - not supported on PET)
+		JSR CRT_SET_GRAPHICS			; Set Uppercase/Graphics Mode
+		JMP IRQ_EPILOG
+
+ESCAPE_Y						; Esc-y Set Default Tabs
 		RTS
 
 
