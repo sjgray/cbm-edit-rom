@@ -7,8 +7,6 @@
 ;       Colour key codes (C64 code at E8DA)
 ; ------------------------------------------------------------------
 
-!source "copyright-colourpet.asm"
-
 ;-------------- Check Colour Codes
 ;
 ; Checks if the character to print is a colour code.

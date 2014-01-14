@@ -60,8 +60,46 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 ;---------------------- Extended 4K Edit ROM code here
 ; *=e900			; Extended ROM start address ($e800-e8ff is reserved for IO)
 
-!if EXTENDED  = 1 { !source "editromext.asm" }
-!if COLOURPET = 1 { !source "colourpetsubs.asm" }
-!if ESCCODES = 1  { !source "escapeseq.asm" }
+!if EXTENDED  = 1 {
+	!source "editromext.asm" 
+} ELSE {
+	!IF COLOURPET = 1 {
+		!source "copyright-colourpet.asm" }
+		!text ", ColourPET Hardware="
+		!if COLOURVER=0 { !text "BETA" }
+		!if COLOURVER=1 { !text "RELEASE" }
+		
+	!if COLOURPET+ESCCODES>0 {
+		!text ", Keyboard="
+		!if KEYBOARD=0 { !text "N" }
+		!if KEYBOARD=1 { !text "B" }
+		!if KEYBOARD=2 { !text "DIN" }
+		!if KEYBOARD=3 { !text "C64/VIC" }
+
+		!text ", Screen Width="
+		!if COLUMNS=40  { !text "40" }
+		!if COLUMNS=80  { !text "80" }
+		!if SOFT40=1 { !text " (SOFT 40)" }
+
+		!text ", Hertz="
+		!if HERTZ=50 { !text "50" }
+		!if HERTZ=60 { !text "60" }
+
+		!text ", Refresh="
+		!if REFRESH=0 { !text "EURO" }
+ 		!if REFRESH=1 { !text "N.AMERICA" }
+		!if REFRESH=2 { !text "PAL" }
+		!if REFRESH=3 { !text "NTSC" }
+
+		!text ", ESC Codes="
+		!if ESCCODES = 0 { !text "NO" }
+		!if ESCCODES = 1 { !text "YES" }
+
+		!fill $E900-*,$00 
+	}
+
+	!if COLOURPET = 1 { !source "colourpetsubs.asm" }
+	!if ESCCODES = 1  { !source "escapeseq.asm" }
+}
 
 !IF EXTENDED + COLOURPET + ESCCODES > 0 { !fill $F000-*,$FF } ; PAD to 4K ##########################

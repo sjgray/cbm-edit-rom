@@ -6,10 +6,8 @@
 ;*=e800
 ;---------- Copyright Notice or Comments
 
-		!if COLOURPET = 0 { !source "copyright-4v4e.asm" }
-		!if COLOURPET = 1 { !source "copyright-colourpet.asm" }
-
-		!fill $e900-*,$ff  
+	!source "copyright-4v4e.asm"
+	!fill $e900-*,$ff  
 
 ;*=e900
 ;--------- Start of Visible Code
