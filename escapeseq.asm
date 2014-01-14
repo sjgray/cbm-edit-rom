@@ -84,8 +84,6 @@ ESCAPE_A	; Esc-a Auto Insert
 ESCAPE_C	; Esc-c Cancel Auto Insert
 ESCAPE_E	; Esc-e Cursor Non Flash
 ESCAPE_F	; Esc-f Cursor Flash
-ESCAPE_G	; Esc-g Bell Enable
-ESCAPE_H	; Esc-h Bell Disable
 ESCAPE_K	; Esc-k End-of-Line
 ESCAPE_L	; Esc-l Scroll On
 ESCAPE_M	; Esc-m Scroll Off
@@ -97,7 +95,18 @@ ESCAPE_Y	; Esc-y Set Default Tabs
 		JMP IRQ_EPILOG				; Ignore sequence for now
 
 
-;-------------- New ESC sequence code
+;-------------- New ESC sequences
+
+ESCAPE_G						; Esc-g Bell Enable
+		LDA #1
+		STA BELLMODE
+		JMP IRQ_EPILOG
+
+ESCAPE_H						; Esc-h Bell Disable
+		LDA #0
+		STA BELLMODE
+		JMP IRQ_EPILOG
+
 
 ESCAPE_Q						; Esc-q Erase End
 		JSR Erase_To_EOL

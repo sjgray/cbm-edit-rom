@@ -164,6 +164,7 @@ SCROV		= $eb		; Screen Output Vector (EB/EC)
 
 !IF ESCCODES = 1 {
 LASTCHAR	= $F0		; Last Key Pressed
+BELLMODE	= $F1		; 0=Disable, 1=Enable BELL/CHIME
 }
 
 JIFFY6DIV5	= $f8

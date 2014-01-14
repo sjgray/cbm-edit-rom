@@ -32,6 +32,7 @@
 
 
 ;************* Edit ROM Jump Table
+;
 ; Note: Not all KERNAL and BASIC calls go through this table.
 ;       There are FIVE hard-coded entry points: $E0A7, $E116, $E202, $E442, $E600
 
@@ -1315,6 +1316,10 @@ Be66d		STA TABS_SET,X			; Table of 80 bits to set TABs
 		STA SCROV			; Print to screen vector (from E009)
 		STX SCROV+1			; Print to screen vector (from E009)
 
+!IF ESCCODES = 1 {
+		LDA #1
+		STA BELLMODE
+}
 		LDA #16
 		STA CHIME
 		JSR Double_BEEP			; Power-up chimes
@@ -1348,7 +1353,13 @@ BEEP
 		NOP
 		RTS
 }
-		BEQ Be6d0
+
+!IF ESCCODES = 1 {
+		LDA BELLMODE
+		BPL BELLENABLED
+		RTS
+}
+BELLENABLED	BEQ Be6d0
 		LDA #16
 		STA VIA_ACR
 		LDA #15
