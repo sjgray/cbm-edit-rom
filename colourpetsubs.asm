@@ -206,7 +206,6 @@ ColourPET_Scroll_Dest
 ; Replaces equivilent non-colour routine.
 ; Must not modify X since it is used as a line counter in WINDOW_CLEAR.
 
-ESCAPE_Q						; Esc-q Erase End
 Erase_To_EOL
 		TYA					; Save the Current offset
 		PHA					; to the stack

@@ -482,7 +482,7 @@ Be1ba		DEC CursorRow				; Current Cursor Physical Line Number
 ; This routine is relocated/updated for COLOURPET
 
 !if COLOURPET = 0 {
-ESCAPE_Q						; Esc-q Erase End
+
 Erase_To_EOL
 		LDA #$20 				; <SPACE>
 Be1c3		INY

@@ -99,6 +99,9 @@ ESCAPE_Y	; Esc-y Set Default Tabs
 
 ;-------------- New ESC sequence code
 
+ESCAPE_Q						; Esc-q Erase End
+		JSR Erase_To_EOL
+		JMP IRQ_EPILOG
 ESCAPE_S						; Esc-s Standard Lowercase (was: Block Cursor)
 		JSR CRT_SET_TEXT			; Set Lowercase/Text Mode
 		JMP IRQ_EPILOG
