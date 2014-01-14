@@ -14,8 +14,8 @@
 ; DIRECTIVE		FEATURE				VALID OPTIONS			FUTURE OPTIONS
 ;----------		-------				-------------			--------------
 EXTENDED  = 0		; ROM Size:			0=2K, 1=4K
-KEYBOARD  = 0		; Keyboard type:		0=N,1=B,2=DIN,3=C64
-COLUMNS   = 40		; Screen Width:			40 or 80
+KEYBOARD  = 1		; Keyboard type:		0=N,1=B,2=DIN,3=C64
+COLUMNS   = 80		; Screen Width:			40 or 80
 SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes
 BOOTCASE  = 1		; Initial Screen Mode		0=Text, 1=Graphics
 REFRESH   = 3		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC

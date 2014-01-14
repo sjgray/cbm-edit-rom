@@ -206,6 +206,7 @@ ColourPET_Scroll_Dest
 ; Replaces equivilent non-colour routine.
 ; Must not modify X since it is used as a line counter in WINDOW_CLEAR.
 
+ESCAPE_Q						; Esc-q Erase End
 Erase_To_EOL
 		TYA					; Save the Current offset
 		PHA					; to the stack
@@ -239,7 +240,7 @@ COLOURS
 	!byte $1F	;6=blue			2=blue
 	!byte $9A	;14=light blue		3=light blue
 	!byte $1E	;5=green		4=green
-	!byte $99	;13=light green		5=light green
+	!byte $99	;13=light green		5=light green (CONFLICT! PET = SCROLL UP!)
 	!byte $97	;11=dark grey		6=dark cyan*
 	!byte $9F	;3=cyan			7=light cyan*
 	!byte $1C	;2=red			8=red

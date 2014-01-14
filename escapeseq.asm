@@ -3,39 +3,43 @@
 ; Goal is to support as many C128/CBM-II ESC codes as possible
 ;
 
-;-------------- Kernal Analyze Esc Sequence
+CheckESC
+		LDX LASTCHAR 		; Previous character printed
+		CPX #$1B		; <ESC>?
+		BEQ ESC_YES		; Yes, process it
+		JMP ESC_DONE		; No, back to normal checking
 
-DoEscapeCode
-		CMP #$1B		; <ESC> again?
-		BNE DoESC2		; No, skip
+;-------------- Process ESC sequence
+
+ESC_YES		CMP #$1b		; Is current char <ESC>?
+		BEQ DoESCESC		; Yes, Do <ESC><ESC>
+		BNE DoEscapeCode	; No,  Do <ESC>+KEY
 
 ;-------------- Do <ESC><ESC>
 
-DoESC1
-		LSR $EF 		; Current Character to Print
+DoESCESC	;LSR $EF 		; Current Character to Print
 		JMP ESCAPE_O		; <ESC>+O (escape)
 
-;-------------- Do <ESC>+KEY
 
-DoESC2		AND #$7F		; Strip top biy
+;-------------- Do <ESC>+KEY Sequence
+
+DoEscapeCode	AND #$7F		; Strip top bit
 		SEC
 		SBC #$40
-		CMP #$1B		; <ESC> ?
-		BCS DoESCDONE
+		CMP #$1B		; Out of range?
+		BCS DoESCDONE		; Yes, skip
 
 		ASL
 		TAX
 		LDA ESCVECTORS+1,X	; ESC Sequence Vectors
 		PHA
 		LDA ESCVECTORS,X	; ESC Sequence Vectors
-		PHA
+		PHA			; Push address to stack so RTS will jump to selected routine
+		RTS
 
-		LDX #0			; Clear Last Character
-		STX LASTCHAR
+DoESCDONE	JMP ESC_DONE
 
-DoESCDONE	RTS
-
-; Esc Sequence Vectors
+;-------------- Esc Sequence Vectors
 
 ESCVECTORS
 		!WORD ESCAPE_AT-1	; Esc-@ Clear Remainder of Screen
@@ -65,3 +69,20 @@ ESCVECTORS
 		!WORD ESCAPE_X-1	; Esc-x Switch 40/80 Col
 		!WORD ESCAPE_Y-1	; Esc-y Set Default Tabs
 		!WORD ESCAPE_Z-1	; Esc-z Clear All Tabs
+
+;=============== ESCAPE CODES no in normal PET code
+
+ESCAPE_Y	; Esc-y Set Default Tabs
+		RTS
+
+
+;************** Clear Tab Stops (80 bits)
+
+ESCAPE_Z					; Esc-z Clear All Tabs
+		LDX #12
+		LDA #0
+ESCZ1		STA TABS_SET,X			; Table of 80 bits to set TABs
+		DEX
+		BPL ESCZ1
+		JMP IRQ_EPILOG
+

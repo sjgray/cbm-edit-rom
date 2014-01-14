@@ -483,6 +483,7 @@ Be1ba		DEC CursorRow				; Current Cursor Physical Line Number
 ; This routine is relocated/updated for COLOURPET
 
 !if COLOURPET = 0 {
+ESCAPE_Q						; Esc-q Erase End
 Erase_To_EOL
 		LDA #$20 				; <SPACE>
 Be1c3		INY
@@ -520,7 +521,6 @@ FULL_SCREEN_WINDOW
 }
 
 ;************** Set Bottom Right Corner of Window
-
 WINDOW_SET_BOTTOM
 		STA BotMargin				; Last line of window
 		STX RigMargin				; Physical Screen Line Length
@@ -573,10 +573,9 @@ ChrOutNormal
 }
 
 !IF ESCCODES = 1 {
-		LDX LASTCHAR 				; ($F0 on C128) Previous character printed
-		CPX #$1B				; <ESC> key?
-		BNE Be21d				; Not <ESC>
-		JSR DoEscapeCode 			; Perform <ESC>+KEY
+		JMP CheckESC				; Check for ESC as last Char, then ESC as current Char. If so, perform it.
+ESC_DONE	STA LASTCHAR				; Save the character
+
 } ELSE {
 		CMP #$1b				; <ESC>	key?
 		BNE Be21d
@@ -588,33 +587,28 @@ ChrOutNormal
 
 ESCAPE_AT	; Esc-@ Clear Remainder of Screen
 ESCAPE_A	; Esc-a Auto Insert
-ESCAPE_B	; Esc-b Bottom
+
 ESCAPE_C	; Esc-c Cancel Auto Insert
-ESCAPE_D	; Esc-d Delete Line
+
 ESCAPE_E	; Esc-e Cursor Non Flash
 ESCAPE_F	; Esc-f Cursor Flash
 ESCAPE_G	; Esc-g Bell Enable
 ESCAPE_H	; Esc-h Bell Disable
-ESCAPE_I	; Esc-i Insert Line
+
 ESCAPE_J	; Esc-j Start-of-Line
 ESCAPE_K	; Esc-k End-of-Line
 ESCAPE_L	; Esc-l Scroll On
 ESCAPE_M	; Esc-m Scroll Off
 ESCAPE_N	; Esc-n Screen Normal
-ESCAPE_O	; Esc-o (escape) Also: <ESC><ESC>
-ESCAPE_P	; Esc-p Erase Begin
-ESCAPE_Q	; Esc-q Erase End
+
 ESCAPE_R	; Esc-r Screen Reverse
 ESCAPE_S	; Esc-s Block Cursor
-ESCAPE_T	; Esc-t Top
+
 ESCAPE_U	; Esc-u Underline Cursor
-ESCAPE_V	; Esc-v Scroll Up
-ESCAPE_W	; Esc-w Scroll Down
 ESCAPE_X	; Esc-x Switch 40/80 Col
-ESCAPE_Y	; Esc-y Set Default Tabs
-ESCAPE_Z	; Esc-z Clear All Tabs
 
 
+;************** Reload character and check high bit 
 
 Be21d		LDA DATAX				; Current Character to Print
 		BPL Be224				; Handle unshifted characters
@@ -749,6 +743,8 @@ Be2e0		CMP #$15				; <Ctrl U> - DELETE LINE
 		JMP Scroll_Or_Select_Charset
 
 ;************** Delete Line
+
+ESCAPE_D						; Esc-d Delete Line
 DELETE_LINE
 		LDA TopMargin				; Top Line of Window
 		PHA
@@ -849,6 +845,7 @@ Be38f		CMP #$16 				; <Shift Ctrl-V>
 ;************** Erase to Start of Line
 ; TODO: Update for ColourPET
 
+ESCAPE_P						; Esc-p Erase Begin
 ERASE_TO_SOL
 		LDA #$20 				; <SPACE>
 		LDY LefMargin
@@ -879,17 +876,21 @@ ScreenReturn
 
 ;************** Do ESCAPE
 ; Cancels Insert, Reverse and Quote modes
-; TODO: handle CBM-II and C128 ESC sequences here @@@@@@@@@@@@@@@@@@@@@
 
+ESCAPE_O						; Esc-o (escape) Also: <ESC><ESC>
 Escape
 		LDA #0
 		STA INSRT
 		STA ReverseFlag
 		STA QuoteMode
+
+!IF ESCCODES = 1 { STA LASTCHAR }
+
 		JMP IRQ_EPILOG
 
 ;************** Scroll Window DOWN (Called from Jump Table)
 
+ESCAPE_W						; Esc-w Scroll Down
 WINDOW_SCROLL_DOWN
 		LDX BotMargin
 		INX
@@ -928,6 +929,7 @@ Be3d8		INY
 
 ;************** Scroll Window UP (Called from Jump Table)
 
+ESCAPE_V						; Esc-v Scroll Up
 WINDOW_SCROLL_UP
 		LDX TopMargin
 		DEX
@@ -1173,6 +1175,7 @@ Scroll_Or_Select_Charset
 Be59b		CMP #15 			; <Ctrl> O - Set top left window corner
 		BNE Be5aa
 
+ESCAPE_T						; Esc-t Top
 		LDA CursorRow
 		STA TopMargin
 		LDA CursorCol
@@ -1192,9 +1195,12 @@ Be5b3		CMP #7 				; <Ctrl> G - Bell
 ;************** Continue checking codes... 
 
 ProcControl_A
-		CMP #$15 			; <Ctrl> U -> Delete line
-; @@@@@@ BNE ProcControl_B
-		BNE ProcControl_C
+
+
+		CMP #$15 			; <Ctrl> SHIFT-U -> Insert Line						
+		BNE ProcControl_C		; @@@@@@ Was: BNE ProcControl_B
+
+ESCAPE_I					; Esc-i Insert Line
 		LDA TopMargin
 		PHA
 		LDA CursorRow
@@ -1210,17 +1216,22 @@ Me5ca		PLA
 ProcControl_C
 		CMP #$19 			; <Ctrl> Y - Scroll window down
 		BNE Be5de
+;zxcv
 		JSR WINDOW_SCROLL_DOWN
 
 Me5d9		JSR UPDATE_CURSOR_ROW
 		BNE Be5ea
+
 Be5de		CMP #15 			; <143> - Set lower right window corner
 		BNE Be5ed
+
+ESCAPE_B						; Esc-b Bottom
 		LDA CursorRow
 		STA BotMargin
 		LDA CursorCol
 		STA RigMargin
 Be5ea		JMP IRQ_EPILOG
+
 Be5ed		CMP #14 			; <142> - Graphics mode
 		BNE Be5b3
 		JSR CRT_SET_GRAPHICS
