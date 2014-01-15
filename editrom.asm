@@ -788,10 +788,12 @@ Be347		CMP #$11 				; <CURSOR UP>
 		DEC CursorRow
 		JSR UPDATE_CURSOR_ROW
 		BNE Be38c
+
 Be358		CMP #$12 				; <RVS OFF>
 		BNE Be360
 		LDA #0
 		STA ReverseFlag
+
 Be360		CMP #$1d 				; <CURSOR LEFT>
 		BNE Be373
 		LDY LefMargin
@@ -801,10 +803,12 @@ Be360		CMP #$1d 				; <CURSOR LEFT>
 		BNE Be38c				;@@@@@@@@@@@@@@@ was: BPL Be38c
 Be36f		DEC CursorCol
 		BPL Be38c				;@@@@@@@@@@@@@@@ was: BNE Be38c
+
 Be373		CMP #$13 				; <CLR>
 		BNE Be37c
 		JSR WINDOW_CLEAR
 		BNE Be38c
+
 Be37c		CMP #9 					; <Shift TAB>
 		BNE Be38f
 		JSR JUMP_TO_TAB
@@ -812,6 +816,7 @@ Be37c		CMP #9 					; <Shift TAB>
 		EOR DOS_Syntax
 		STA TABS_SET,X
 Be38c		JMP IRQ_EPILOG
+
 Be38f		CMP #$16 				; <Shift Ctrl-V>
 		BEQ ERASE_TO_SOL
 		JMP ProcControl_A
@@ -1004,8 +1009,7 @@ Be452		JMP (CINV)	; Vector: Hardware Interrupt   [E455] Points to 'IRQ_NORMAL'
 IRQ_NORMAL
 		JMP ADVANCE_TIMER 			;@@@@@@@@@@@@@@@ was: JSR ADVANCE_TIMER  ***** FIX? ******
 
-IRQ_NORMAL2						;ie458
-!if DEBUG = 1 { INC DBLINE+1 }				; DEBUG - 2nd chr on bottom line
+IRQ_NORMAL2						; ie458
 		LDA Blink				; Cursor Blink enable: 0 = Flash Cursor
 		BNE Be474				; skip it
 		DEC BLNCT				; Timer: Countdown to Toggle Cursor
@@ -1022,13 +1026,28 @@ IRQ_NORMAL2						;ie458
 ie468		STA BLNCT
 		LDY CursorCol				; Column where cursor lives
 		LSR BlinkPhase				; Is it blinking?
-;COLOURPET TODO: save colour at cursor position!
+!IF COLOURPET = 1 {
+		LDX CursorColour			; Get colour
+}
 		LDA (ScrPtr),Y				; Get character from the screen
 		BCS Be470				; Yes, skip
+
+!IF COLOURPET = 1 {
+		TAX
+		LDA (COLOURPTR),Y			; Get Colour at cursor
+		STA CursorColour			; Save it
+		TXA
+}
 		INC BlinkPhase				; count
 		STA CursorChar				; Remember the character at cursor (to be restored when cursor moves)
+
 Be470		EOR #$80				; Flip the reverse bit
 		STA (ScrPtr),Y				; Put it back on the screen
+
+!IF COLOURPET = 1 {
+		LDA COLOURV				; Get current colour
+		STA (COLOURPTR),Y			; Write it
+}
 
 ;		----------------------------------------- Check IEEE and Cassette status
 
@@ -1040,6 +1059,7 @@ Be474		LDY #0
 		STA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
 		LDA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
 } 
+!IF COLOURPET = 0 {
 		ASL					; Shift upper bits to lower 
 		ASL 
 		ASL 
@@ -1067,6 +1087,8 @@ Be49e		LDA CAS2				; Tape Motor Interlock #2
 		LDA VIA_Port_B
 		AND #$ef
 Be4a7		STA VIA_Port_B
+}
+
 Be4aa		JSR SCAN_KEYBOARD			; Scan the keyboard
 		JMP IRQ_END				; Return from Interrupt
 
@@ -1104,6 +1126,7 @@ ProcControl_B
 		BNE Be567
 		JSR CLEAR_KEYFLAGS_210
 		JMP IRQ_EPILOG
+
 Be567		CMP #2 				; <$82> - Switch to old (PET) char set
 		BNE ProcControl_C
 		JSR CRT_SET_TEXT_OLD
@@ -1149,7 +1172,7 @@ Scroll_Or_Select_Charset
 Be59b		CMP #15 			; <Ctrl> O - Set top left window corner
 		BNE Be5aa
 
-ESCAPE_T						; Esc-t Top
+ESCAPE_T					; Esc-t Top
 		LDA CursorRow
 		STA TopMargin
 		LDA CursorCol
@@ -1422,7 +1445,7 @@ ModifierKeys
 
 RUN_String
 		!byte $44,$cc,$22,$2a,$0d	; dL"*<CR>
-		!byte $52,$55,$4e,$0d		; run<cr>
+		!byte $52,$55,$4e,$0d		; run<CR>
 
 ;************** CRTC Chip Register Setup Tables (2K ROMs)
 

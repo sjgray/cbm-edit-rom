@@ -238,6 +238,40 @@ CEOL2		INY					; Next colour ram location
 		BCC CEOL2				; loop up for more
 		RTS
 
+;============== Routines from C64 - Might be needed (IRQ routine?)
+; TODO: Fix variable names / memory locations
+;
+;============== Display Character 'A' with Colour 'X'
+;
+;Display_Char_A_And_Color_X
+;
+;		TAY               			; copy character
+;		LDA #$02          			; set count to $02, usually $14 ??
+;		STA BLNCT         			; set cursor countdown
+;		JSR Set_COLRAM_Pointer
+;		TYA               			; get character back
+;
+;============== Display Character and Colour
+;
+;Display_Char_And_Color
+;
+;		LDY CSRIDX        			; get cursor column
+;		STA (LINPTR),Y    			; save character from current screen line
+;		TXA               			; copy colour to A
+;		STA (USER),Y				; save to colour RAM
+;		RTS
+;
+;============== Set ColourRAM Pointer
+;
+;Set_COLRAM_Pointer
+;
+;		LDA LINPTR				; get current screen line pointer low byte
+;		STA USER				; save pointer to colour RAM low byte
+;		LDA LINPTR+1				; get current screen line pointer high byte
+;		AND #$03				; mask 0000 00xx, line memory page
+;		ORA #COLRAM_PAGE			; set  1001 01xx, colour memory page
+;		STA USER+1				; save pointer to colour RAM high byte
+;		RTS
 
 ;-------------- Colour Codes Table
 ;

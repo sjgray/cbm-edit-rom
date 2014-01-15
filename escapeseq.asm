@@ -25,8 +25,13 @@ DoESCESC	;LSR $EF 		; Current Character to Print
 
 DoEscapeCode	AND #$7F		; Strip top bit
 		SEC
-		SBC #$40
+!IF COLOURPET = 1 {
+		SBC #$30		; Subtract 30 (Start at "0")
+		CMP #$2B		; Out of range?
+} ELSE {
+		SBC #$40		; Subtract 40 (Start at "@")
 		CMP #$1B		; Out of range?
+}
 		BCS DoESCDONE		; Yes, skip
 
 		LDX #0
@@ -45,6 +50,24 @@ DoESCDONE	JMP ESC_DONE
 ;-------------- Esc Sequence Vectors    (*=changed from C128)
 
 ESCVECTORS
+!IF COLOURPET = 1 {
+		!WORD ESCAPE_NUM-1	; Esc-0 Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-1 Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-2 Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-3 Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-4 Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-5 Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-6 Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-7 Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-8 Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-9 Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-: Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-; Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-< Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-= Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-> Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-? Set Colour
+}
 		!WORD ESCAPE_AT-1	; Esc-@ Clear Remainder of Screen
 		!WORD ESCAPE_A-1	; Esc-a Auto Insert
 		!WORD ESCAPE_B-1	; Esc-b Bottom
@@ -94,6 +117,16 @@ ESCAPE_X	; Esc-x Switch 40/80 Col
 
 
 ;-------------- New ESC sequences
+
+!IF COLOURPET = 1 {
+ESCAPE_NUM
+		LDA DATAX				; Character
+		SEC
+		SBC #$30				; Subtract 30 (Start at "0")
+		STA COLOURFG
+		JSR SetColourValue
+		JMP IRQ_EPILOG
+}
 
 ESCAPE_G						; Esc-g Bell Enable
 		LDA #1

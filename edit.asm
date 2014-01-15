@@ -5,9 +5,6 @@
 ;
 ;----------------------- Assembler directives to choose which features are included
 ;
-; For byte-exact 324243-04 ROM, set EXTENDED=1,KEYBOARD=2,COLUMNS=80,REPEATOPT=0,REFRESH=0,HERTZ=50
-; For byte-exact 901474-04 ROM, set EXTENDED=0,KEYBOARD=1,COLUMNS=80,REPEATOPT=1,REFRESH=0,HERTZ=50
-;
 ; If there no options are listed it means that support has not been added yet!
 ; NOTE!: Not all combinations may be valid!!
 ;
@@ -35,6 +32,13 @@ SILENT    = 0		; Disable BELL/CHIME		0=Normal, 1=Disabled
 REPEATOPT = 1		; Key Repeat Option		0=No (Always ON), 1=Yes
 
 DEBUG 	  = 0		; Add debugging			0=No, 1=Yes
+
+; To generate Edit ROMs that are Byte-exact matches to actual Commodore ROMS set the
+; following options (If an option is not listed assume "0"):
+;
+; 324243-04 ROM: EXTENDED=1,KEYBOARD=2,COLUMNS=80,REPEATOPT=0
+; 901474-04 ROM: EXTENDED=0,KEYBOARD=1,COLUMNS=80,REPEATOPT=1
+
 
 ;---------------------- Output filename
 
