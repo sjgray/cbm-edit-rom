@@ -11,8 +11,8 @@
 ; DIRECTIVE		FEATURE				VALID OPTIONS			FUTURE OPTIONS
 ;----------		-------				-------------			--------------
 EXTENDED  = 0		; ROM Size:			0=2K, 1=4K
-KEYBOARD  = 1		; Keyboard type:		0=N,1=B,2=DIN,3=C64
-COLUMNS   = 80		; Screen Width:			40 or 80
+KEYBOARD  = 4		; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG
+COLUMNS   = 40		; Screen Width:			40 or 80
 SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes
 BOOTCASE  = 1		; Initial Screen Mode		0=Text, 1=Graphics
 REFRESH   = 3		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
@@ -20,8 +20,8 @@ REFRESH   = 3		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
 HERTZ     = 50		; Line Frequency (Clock):					50=Euro, 60=NorthAmerica
 
 COLOURPET = 1		; ColourPET additions?		0=No, 1=Yes
-COLOURVER = 1           ; ColourPET Hardware Version	0=Beta,1=Release
-COLOURMODE= 1		; ColourPET Hardware Type	0=Digital, 1=Analog
+COLOURVER = 0           ; ColourPET Hardware Version	0=Beta,1=Release
+COLOURMODE= 0		; ColourPET Hardware Type	0=Digital, 1=Analog
 DEFAULTFG = 5		; ColourPET Foreground colour   0 to 15 RGBI
 DEFAULTBG = 0		; ColourPET Background colour   0 to 15 RGBI
 
@@ -80,6 +80,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 		!if KEYBOARD=1 { !text "B" }
 		!if KEYBOARD=2 { !text "DIN" }
 		!if KEYBOARD=3 { !text "C64/VIC" }
+		!if KEYBOARD=4 { !text "B-SJG" }
 
 		!text ", Screen Width="
 		!if COLUMNS=40  { !text "40" }

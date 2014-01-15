@@ -5,8 +5,8 @@
 ;---------- Normal (no modifiers) Table
 
 KEYBOARD_NORMAL
-;                                            COL0  COL1  COL2  COL3  COL4  COL5  COL6  COL7  
-;          -------------------------------   ----- ----- ----- ----- ----- ----- ----- -----        
+;                                               COL0  COL1  COL2  COL3  COL4  COL5  COL6  COL7  
+;       -------------------------------------   ----- ----- ----- ----- ----- ----- ----- -----        
 	!byte $16,$04,$3A,$03,$39,$36,$33,$DF ; $$-16 $$-04 :     STOP  9     6     3     BARRW | ROW0 
 	!byte $B1,$2F,$15,$13,$4D,$20,$58,$12 ; 1     ^/    $$-15 HOME  M     SPACE X     RVS   | ROW1 
 	!byte $B2,$10,$0F,$B0,$2C,$4E,$56,$5A ; 2     RPT   $$-0F 0     ,     N     V     Z     | ROW2 
