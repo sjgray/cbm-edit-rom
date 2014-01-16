@@ -29,7 +29,8 @@ CursorColour    = $ED		; Storage for Colour at Cursor position
 
 ;---------------- Colour Screen RAM
 
-COLOUR_RAM = $8800		; 40 Col = $8800-8BFF, 80 Col = $8800-8FFF
+!if COLOURVER = 0 { COLOUR_RAM = $8400 }		; 40 Col = $8400-87FF, 80 Col = $8800-8FFF
+!if COLOURVER = 1 { COLOUR_RAM = $8800 }		; 40 Col = $8800-8BFF, 80 Col = $8800-8FFF
 
 
 ;---------------- Storage (Currently in Screen RAM - To be moved?)

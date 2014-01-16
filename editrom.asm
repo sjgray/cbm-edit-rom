@@ -1439,7 +1439,8 @@ ModifierKeys
 		!if KEYBOARD = 1 { !source "kbd-b.asm" }
 		!if KEYBOARD = 2 { !source "kbd-din1.asm" }
 		!if KEYBOARD = 3 { !source "kbd-c64.asm" }
-		!if KEYBOARD = 4 { !source "kbd-bsjg.asm" }
+		!if KEYBOARD = 4 { !source "kbd-bsjg.asm" } ; Modified layout
+		!if KEYBOARD = 5 { !source "kbd-nsjg.asm" } ; @ replaced by ESC
 }
 
 ;************** SHIFT RUN/STOP string

@@ -1,4 +1,4 @@
-; PET/CBM EDIT ROM - Keyboard Matrix Table
+; PET/CBM EDIT ROM - Keyboard Matrix Table - N keyboard modified for ESC to test ESCAPE sequences
 ; ================
 ; This file contains the keyboard matrix decoding tables.
 ; Normal/Graphic Layout
@@ -8,7 +8,7 @@ KEYBOARD_NORMAL
 ;                                          COL0  COL1  COL2  COL3  COL4  COL5  COL6  COL7
 ;         -------------------------------  ----- ----- ----- ----- ----- ----- ----- -----
     !byte $3d,$2e,$10,$03,$3c,$20,$5b,$12 ; =    .     ????? STOP  <     SPACE [     RVS    
-    !byte $2d,$30,$00,$3e,$ff,$5d,$40,$00 ; -    0     SHIFT >     NONE  ]     @     SHIFT
+    !byte $2d,$30,$00,$3e,$ff,$5d,$9b,$00 ; -    0     SHIFT >     NONE  ]     ESC*  SHIFT    *=Change: ESC was @
     !byte $2b,$32,$ff,$3f,$2c,$4e,$56,$58 ; +    2     NONE  ?     ,     N     V     X
     !byte $33,$31,$0d,$3b,$4d,$42,$43,$5a ; 3    1     RETRN ;     M     B     C     Z
     !byte $2a,$35,$ff,$3a,$4b,$48,$46,$53 ; *    5     NONE  :     K     H     F     S

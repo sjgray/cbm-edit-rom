@@ -3,7 +3,7 @@
 ; This area is not visible, and can be used for comments and/or copyright notice
 
 		!text "** COLOURPET ROM"
-		!text "** 2014-01-13   "
+		!text "** 2014-01-15   "
 
 		
 
