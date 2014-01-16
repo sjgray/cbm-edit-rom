@@ -11,7 +11,7 @@
 ; DIRECTIVE		FEATURE				VALID OPTIONS			FUTURE OPTIONS
 ;----------		-------				-------------			--------------
 EXTENDED  = 0		; ROM Size:			0=2K, 1=4K
-KEYBOARD  = 5		; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG
+KEYBOARD  = 1		; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG
 COLUMNS   = 40		; Screen Width:			40 or 80
 SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes
 BOOTCASE  = 1		; Initial Screen Mode		0=Text, 1=Graphics
@@ -26,7 +26,7 @@ DEFAULTFG = 5		; ColourPET Foreground colour   0 to 15 RGBI
 DEFAULTBG = 0		; ColourPET Background colour   0 to 15 RGBI
 
 REBOOT    = 0		; Add keyboard reboot? 						0=No, 1=Yes
-ESCCODES  = 1		; Add ESC codes? 						0=No, 1=Yes
+ESCCODES  = 1		; Add ESC codes? 		0=No, 1=Yes
 EXECUDESK = 0		; Add Execudesk Menu?						0=No, 1=Yes
 SILENT    = 0		; Disable BELL/CHIME		0=Normal, 1=Disabled
 REPEATOPT = 1		; Key Repeat Option		0=No (Always ON), 1=Yes
@@ -42,7 +42,7 @@ DEBUG 	  = 0		; Add debugging			0=No, 1=Yes
 
 ;---------------------- Output filename
 
-!to "editrom.bin",plain		; Name of output file with no load address
+!to "cpet-40-b-ntsc.bin",plain		; Name of output file with no load address
 
 ;---------------------- These are the symbol definitions for PET/CBM memory and IO chips
 
