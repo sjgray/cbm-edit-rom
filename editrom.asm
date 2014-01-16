@@ -763,11 +763,12 @@ Be322		DEY
 		DEY
 		CPY CursorCol
 		BNE Be322
-		LDA #$20 				; <SPACE>
-		STA (ScrPtr),Y				; Write it to the Screen
 } ELSE {
 		JSR ColourPET_Insert
 }
+		LDA #$20 				; <SPACE>
+		STA (ScrPtr),Y				; Write it to the Screen
+
 		LDA RigMargin				; Physical Screen Line Length
 		SEC
 		SBC CursorCol				; Cursor Column on Current Line
