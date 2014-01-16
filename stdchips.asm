@@ -5,9 +5,9 @@
 
 SCREEN_RAM = $8000					; 40 Col = $8000-83FF, 80 Col = $8000-87FF
 
-KBD_MATRIX = $87d0					; Used with Extended DIN ROM keyboard scanning routine
-							; First unused byte in SCREEN_RAM
-							; $8000+$7D0 (32768+2000) bytes
+!IF COLUMNS = 80 { KBD_MATRIX = $87d0 }			; Used with Extended DIN ROM keyboard scanning routine
+!IF COLUMNS = 40 { KBD_MATRIX = $83e8 }			; First unused byte in SCREEN_RAM
+
 
 ;--------------------------- PIA #1 - 6520 Chip
 

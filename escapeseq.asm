@@ -51,22 +51,22 @@ DoESCDONE	JMP ESC_DONE
 
 ESCVECTORS
 !IF COLOURPET = 1 {
-		!WORD ESCAPE_NUM-1	; Esc-0 Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-1 Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-2 Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-3 Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-4 Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-5 Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-6 Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-7 Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-8 Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-9 Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-: Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-; Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-< Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-= Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-> Set Colour
-		!WORD ESCAPE_NUM-1	; Esc-? Set Colour
+		!WORD ESCAPE_NUM-1	; Esc-0 Set Colour to Black
+		!WORD ESCAPE_NUM-1	; Esc-1 Set Colour to Medium Grey
+		!WORD ESCAPE_NUM-1	; Esc-2 Set Colour to Blue
+		!WORD ESCAPE_NUM-1	; Esc-3 Set Colour to Light Blue
+		!WORD ESCAPE_NUM-1	; Esc-4 Set Colour to Green
+		!WORD ESCAPE_NUM-1	; Esc-5 Set Colour to Light Green
+		!WORD ESCAPE_NUM-1	; Esc-6 Set Colour to Dark Cyan
+		!WORD ESCAPE_NUM-1	; Esc-7 Set Colour to Light Cyan
+		!WORD ESCAPE_NUM-1	; Esc-8 Set Colour to Red
+		!WORD ESCAPE_NUM-1	; Esc-9 Set Colour to Light Red
+		!WORD ESCAPE_NUM-1	; Esc-: Set Colour to Dark Purple
+		!WORD ESCAPE_NUM-1	; Esc-; Set Colour to Purple
+		!WORD ESCAPE_NUM-1	; Esc-< Set Colour to Dark Yellow
+		!WORD ESCAPE_NUM-1	; Esc-= Set Colour to Yellow
+		!WORD ESCAPE_NUM-1	; Esc-> Set Colour to Light Grey
+		!WORD ESCAPE_NUM-1	; Esc-? Set Colour to White
 }
 		!WORD ESCAPE_AT-1	; Esc-@ Clear Remainder of Screen
 		!WORD ESCAPE_A-1	; Esc-a Auto Insert
