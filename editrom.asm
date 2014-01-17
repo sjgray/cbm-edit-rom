@@ -886,7 +886,7 @@ Be3cb		DEX
 		LDA Line_Addr_Hi-1,X 			; Screen Line address table HI - 1
 		STA SAL+1
 	} ELSE {
-		JSR ColourPET_SyncPointers 		; Synchronize Pointers			@@@@@@@@@@@@@@@ COLOURPET
+		JSR ColourPET_SyncPointers2 		; Synchronize Pointers			@@@@@@@@@@@@@@@ COLOURPET
 	}
 }
 
