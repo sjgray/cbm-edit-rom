@@ -17,7 +17,8 @@ ESC_YES		CMP #$1b		; Is current char <ESC>?
 
 ;-------------- Do <ESC><ESC>
 
-DoESCESC	;LSR $EF 		; Current Character to Print
+DoESCESC
+		LDA #0			; Clear character
 		JMP ESCAPE_O		; <ESC>+O (escape)
 
 
@@ -43,6 +44,7 @@ DoEscapeCode	AND #$7F		; Strip top bit
 		PHA
 		LDA ESCVECTORS,X	; ESC Sequence Vectors
 		PHA			; Push address to stack so RTS will jump to selected routine
+		LDA #0			; Clear Character
 		RTS
 
 DoESCDONE	JMP ESC_DONE

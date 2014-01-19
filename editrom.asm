@@ -1165,8 +1165,9 @@ Scroll_Or_Select_Charset
 		BNE Be59b
 }
 
-!IF COLOURPET = 0 { JSR WINDOW_SCROLL_UP }	; CONFLICT WITH COLOUR CODE!
-
+;!IF COLOURPET = 0 {
+		JSR WINDOW_SCROLL_UP 	; CONFLICT WITH COLOUR CODE!
+;}
 		JMP Me5d9
 
 
@@ -1214,9 +1215,9 @@ Me5ca		PLA
 ProcControl_C
 		CMP #$19 			; <Ctrl> Y - Scroll window down
 		BNE Be5de
-;zxcv
-		JSR WINDOW_SCROLL_DOWN
-
+!IF COLOURPET = 0 {
+		JSR WINDOW_SCROLL_DOWN		; CONFLICT with colour code?
+}
 Me5d9		JSR UPDATE_CURSOR_ROW
 		BNE Be5ea
 
