@@ -26,6 +26,8 @@
 ;    * Extended screen editor - C128 or CBM-II compatible ESC sequences
 ;    * Keyboard soft-reset (kinda like CTRL-ALT-DEL on PC's)
 ;    * Autoboot from default drive
+;    * DOS Wedge
+;
 ;-----------------------------------------------------------------------------------------------
 * = $e000	;normal start address. NOT defined in EDIT.ASM
 ;-----------------------------------------------------------------------------------------------
@@ -38,16 +40,16 @@
 
 EDITOR
 		JMP RESET_EDITOR		; Main Initialization (called from Kernal power up reset 
-		JMP GETKEY			; Get Character From Keyboard Buffer
-		JMP INPUT_CHARACTER		; Input From Screen or Keyboard
-		JMP CHROUT_SCREEN		; Output to Screen	(FIXED ENTRY POINT. Must not move!)
-		JMP IRQ_MAIN			; Main IRQ Handler	(FIXED ENTRY POINT. Must not move!)
-		JMP IRQ_NORMAL			; Actual IRQ		(clock, keyboard scan)
-		JMP IRQ_END			; Return From Interrupt	(FIXED ENTRY POINT. Must not move!)
+		JMP GETKEY			; Get Character From Keyboard Buffer (FIXED ENTRY POINT. Must not move!)
+		JMP INPUT_CHARACTER		; Input From Screen or Keyboard	(FIXED ENTRY POINT. Must not move!)
+		JMP CHROUT_SCREEN		; Output to Screen		(FIXED ENTRY POINT. Must not move!)
+		JMP IRQ_MAIN			; Main IRQ Handler		(FIXED ENTRY POINT. Must not move!)
+		JMP IRQ_NORMAL			; Actual IRQ (clock, keyboard scan)
+		JMP IRQ_END			; Return From Interrupt		(FIXED ENTRY POINT. Must not move!)
 		JMP WINDOW_CLEAR		; Clear Window
 		JMP CRT_SET_TEXT		; Set CRTC to TEXT mode
 		JMP CRT_SET_GRAPHICS		; Set CRTC to GRAPHICS mode
-		JMP CRT_PROGRAM			; Program CRTC 		(Table pointer in A/X, chr set in Y)
+		JMP CRT_PROGRAM			; Program CRTC (Table pointer in A/X, chr set in Y)
 		JMP WINDOW_SCROLL_DOWN		; Scroll DOWN
 		JMP WINDOW_SCROLL_UP		; Scroll UP
 		JMP SCAN_KEYBOARD		; Scan Keyboard
@@ -556,14 +558,15 @@ CHROUT_SCREEN
 ; SCROV vector normally points here
 
 ChrOutNormal
-!if DEBUG = 1 { INC DBLINE }				; DEBUG - 1st chr on bottom line
 		LDA #0
 		STA CRSW				; Flag: INPUT or GET from Keyboard
 
 !if EXTENDED = 0 {
 		LDY CursorCol				; Cursor Column on Current Line
 		LDA DATAX				; Current Character to Print
+
 !if COLOURPET = 1 { JSR CheckColourCodes }		; Check table of color values @@@@@@@@@@@@@@@@ COLOURPET
+
 		AND #$7F				; Strip off top bit (REVERSE)
 }
 !if EXTENDED = 1 {
@@ -577,7 +580,7 @@ ChrOutNormal
 ESC_DONE	STA LASTCHAR				; Save the character
 
 } ELSE {
-		CMP #$1b				; <ESC>	key?
+		CMP #$1b				; <ESC>	key? **** Also SHIFT-ESC $9B (Conflicts with COLOUR CODE!)
 		BNE Be21d
 		JMP Escape				; Cancel RVS/INS/QUOTE modes
 }
@@ -1347,6 +1350,9 @@ Be66d		STA TABS_SET,X			; Table of 80 bits to set TABs
 }
 		LDA #16
 		STA CHIME
+
+!if WEDGE=1 { JSR install_wedge }		; Activate WEDGE
+
 		JSR Double_BEEP			; Power-up chimes
 		BEQ Double_BEEP			; More chimes (4 total)
 

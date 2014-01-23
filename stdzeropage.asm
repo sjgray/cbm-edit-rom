@@ -76,6 +76,7 @@ STRPTR		= $6c
 FAC1M5 		= $6d
 TMPPTD 		= $6e
 CHRGET 		= $70
+CHRGETX		= $73		; UNUSED
 CHRGOT 		= $76
 TXTPTR 		= $77
 ISNUM 		= $7d

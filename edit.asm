@@ -11,10 +11,10 @@
 ; DIRECTIVE		FEATURE				VALID OPTIONS			FUTURE OPTIONS
 ;----------		-------				-------------			--------------
 EXTENDED  = 0		; ROM Size:			0=2K, 1=4K
-KEYBOARD  = 1		; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG
-COLUMNS   = 80		; Screen Width:			40 or 80
+KEYBOARD  = 5		; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG
+COLUMNS   = 40		; Screen Width:			40 or 80
 SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes
-BOOTCASE  = 0		; Initial Screen Mode		0=Text, 1=Graphics
+BOOTCASE  = 1		; Initial Screen Mode		0=Text, 1=Graphics
 REFRESH   = 3		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
 
 HERTZ     = 50		; Line Frequency (Clock):					50=Euro, 60=NorthAmerica
@@ -30,6 +30,7 @@ ESCCODES  = 1		; Add ESC codes? 		0=No, 1=Yes
 EXECUDESK = 0		; Add Execudesk Menu?						0=No, 1=Yes
 SILENT    = 0		; Disable BELL/CHIME		0=Normal, 1=Disabled
 REPEATOPT = 0		; Key Repeat Option		0=No (Always ON), 1=Yes
+WEDGE     = 1		; DOS Wedge			0=No, 1=Yes
 
 DEBUG 	  = 0		; Add debugging			0=No, 1=Yes
 
@@ -75,14 +76,14 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 		!if COLOURVER=0 { !text "BETA" }
 		!if COLOURVER=1 { !text "RELEASE" }
 		
-	!if COLOURPET+ESCCODES>0 {
+	!if COLOURPET + ESCCODES + WEDGE > 0 {
 		!text ", Keyboard="
 		!if KEYBOARD=0 { !text "N" }
 		!if KEYBOARD=1 { !text "B" }
 		!if KEYBOARD=2 { !text "DIN" }
 		!if KEYBOARD=3 { !text "C64/VIC" }
-		!if KEYBOARD=4 { !text "B-SJG" }	; Modified layout
-		!if KEYBOARD=5 { !text "N-SJG" }	; @ replaced with ESC
+		!if KEYBOARD=4 { !text "B-SJG" }	; Modified layout - cursor keys, esc etc
+		!if KEYBOARD=5 { !text "N-SJG" }	; Modified layout - @ replaced with ESC
 
 		!text ", Screen Width="
 		!if COLUMNS=40  { !text "40" }
@@ -103,11 +104,16 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 		!if ESCCODES = 0 { !text "NO" }
 		!if ESCCODES = 1 { !text "YES" }
 
+		!text ", Wedge="
+		!if WEDGE = 0 { !text "NO" }
+		!if WEDGE = 1 { !text "YES" }
+
 		!fill $E900-*,$00 
 	}
 
+	!if WEDGE = 1	  { !source "editwedge.asm" }
 	!if COLOURPET = 1 { !source "colourpetsubs.asm" }
 	!if ESCCODES = 1  { !source "escapeseq.asm" }
 }
 
-!IF EXTENDED + COLOURPET + ESCCODES > 0 { !fill $F000-*,$FF } ; PAD to 4K ##########################
+!IF EXTENDED + COLOURPET + ESCCODES + WEDGE > 0 { !fill $F000-*,$FF } ; PAD to 4K ##########################
