@@ -307,25 +307,3 @@ startprg	jsr STXTPT			; reset TXTPTR
 		jmp NEWSTT			; RUN
 
 loaderr		jmp FILENOTFOUND		; FILE NOT FOUND, return to basic
-
-;----------------------------------------------------------------------------
-; STROUTZ:  output zero terminated string of any size
-; in:       A -- lsb pointer to string
-;           Y -- msb pointer to string
-; out:      A = 0
-;           Y = 0
-; changes:  INDEXA, INDEXA + 1
-;----------------------------------------------------------------------------
-
-STROUTZ	    	sta INDEXA			; store pointer to string
-            	sty INDEXA + 1
-            	ldy #0
-
-STROUTLOOP	lda (INDEXA),y			; get next character
-            	beq STROUTDONE			; return on zero character
-            	jsr BSOUT           		; output character
-            	inc INDEXA          		; advance pointer
-            	bne STROUTLOOP
-            	inc INDEXA + 1
-            	bne STROUTLOOP			; and again
-STROUTDONE  	rts

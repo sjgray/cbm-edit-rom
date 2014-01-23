@@ -11,9 +11,8 @@ SCROLD	= $e021	; scroll down
 SCROLU	= $e024	; scroll up
 SPAC2	= $d52e	; write 2 spaces
 SPACE	= $d531	; write space
+STROUTZ	= $bb1d	; A=LSB, Y=MSB			; BASIC4 STROUTZ is broken!
 STROUT	= $bb24	; X=len, STRADR=ptr
-; STROUTZ	= $bb1d	; A=LSB, Y=MSB
-; BASIC4 STROUTZ is broken!
 WROA	= $d717	; write hex address
 HEXOUT	= $d722	; write A as hex
 WROB	= $d731	; write hex byte
