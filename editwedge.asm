@@ -30,8 +30,8 @@
 
 !source "stdbasic4.asm"
 
-;-------------- INSTALL WEDGE
 
+;-------------- INSTALL WEDGE
 
 install_wedge
 		lda #<resident_wedge		; patch CHRGET JMP address
@@ -44,17 +44,50 @@ install_wedge
 		lda #8				; init default device
 		sta CHRGETX			; $73=unused byte in CHRGET
 
-		lda #<WEDGEMSG			; write "wedge active"
-		ldy #>WEDGEMSG
+		lda #<WEDGESTRING		; write "wedge active"
+		ldy #>WEDGESTRING
 		jsr STROUTZ
 	
 		rts				; exit to BASIC
 
 ;-------------- MESSAGE
 
-WEDGEMSG	!byte $0D
-		!text "WEDGE ACTIVE"
-		!byte $0D, 0
+WEDGESTRING	!byte $91			; <UP><UP>
+
+!if WEDGEMSG=1 {
+		!byte $91			; <UP>
+		!text "WEDGE ACTIVE"		; message
+		!byte $0D			; <CR>
+		!text "            "		; erase "READY"
+		!byte $91			; <UP>
+} ELSE {
+		!text "            "		; erase "SYS" message
+		!byte $0D			; <CR>
+		!text "            "		; erase "READY" message
+		!byte $0D			; <CR>
+		!byte $91,$91			; <UP><UP>
+		!byte $91,$91			; <UP><UP>
+}
+		!byte 0
+
+;-------------- Keyboard Stuffer
+
+WEDGE_PREP	LDX #9				; Length of string
+
+WP_LOOP		LDA WEDGE_SYS,X			; Get a key from table
+		STA KEYD,X 			; put it in the Keyboard Buffer
+		DEX
+		BPL WP_LOOP			; loop until done
+
+		LDA #9				; Length of string
+		STA CharsInBuffer		; Set characters in keyboard buffer 
+		RTS
+
+;-------------- TEXT to stuff into keyboard buffer
+
+WEDGE_SYS	!text "SYS59648"
+		!byte $0D
+
 
 ;-------------- Resident part of the universal DOS wedge
 

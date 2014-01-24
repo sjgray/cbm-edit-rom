@@ -11,7 +11,7 @@
 ;-------------- Editor Jump Table
 ; Patch at $E000
 
-		AUTOBOOT_INIT			;modified to point to new routine
+		JMP AUTOBOOT_INIT		; Modified to point to new routine
 
 
 ;-------------- TEXT to stuff into KEYBOARD BUFFER
@@ -40,10 +40,10 @@ AB_LOOP		LDA AB_SYS,X			; Get a key from table
 ; Patch at $E78F
 
 AB_E78F
-		LDA $8E        			;jiffy clock (second byte)
-		BEQ AB_E78F     			; delay loop
+		LDA $8E        			; Jiffy clock (second byte)
+		BEQ AB_E78F     		; Delay loop
 
-		LDA #$33       			;$B433 - this address contains $2A "*"
+		LDA #$33       			; This address ($B433) contains "*"
 		STA FNADR			; Filename pointer
 		LDA #$B4
 		STA FNADR+1 			; Filename pointer
@@ -61,42 +61,42 @@ AB_E78F
 
 AB_E7AB
 		LDA #0
-		STA VERCK			;work area
-		STA STATUS			;IO status
+		STA VERCK			; Work area
+		STA STATUS			; IO status
 		LDA #$60	
-		STA SA				;current file secondary address
-		JSR $F4A5			;open close parameters
-		JSR $F0D2			;send talk/listen
-		LDA SA				;current file secondary address
-		JSR $F143			;send byte and clear ATN
-		JSR $F1C0	     		;input byte from IEEE
-		STA STAL        		;temp pointer
-		LDA STATUS 			;IO status
-		BEQ AB_E7E5			;skip ahead
-		DEC FACTPA			;misc work area
-		BPL AB_E7D0			;skip ahead
-		JMP $B3FF 			;warm start wait for basic command
+		STA SA				; Current file secondary address
+		JSR $F4A5			; Open close parameters
+		JSR $F0D2			; Send talk/listen
+		LDA SA				; Ccurrent file secondary address
+		JSR $F143			; Send byte and clear ATN
+		JSR $F1C0	     		; Input byte from IEEE
+		STA STAL        		; Temp pointer
+		LDA STATUS 			; IO status
+		BEQ AB_E7E5			; Skip ahead
+		DEC FACTPA			; Misc work area
+		BPL AB_E7D0			; Skip ahead
+		JMP $B3FF 			; Warm start wait for basic command
 
 AB_E7D0
-		JSR $F0D5     			;send talk/listen
+		JSR $F0D5     			; Send talk/listen
 		LDA #$6F
-		STA SA				;Current file secondary address
-		JSR $F143			;write timeout/device not present
+		STA SA				; Current file secondary address
+		JSR $F143			; Write timeout/device not present
 		LDA #$49
-		JSR $F19E			;input byte IEEE
-		JSR $F1B9			;input byte IEEE
-		JMP AB_E7AB			;loop back
+		JSR $F19E			; Input byte IEEE
+		JSR $F1B9			; Input byte IEEE
+		JMP AB_E7AB			; Loop back
 
 AB_E7E5
-		JSR $F387			;Perform LOAD
-		LDA $78				;inside CHRGET
-		BNE AB_E7F7			;skip ahead
-		LDA EAL				;get end of program
-		STA VARTAB			;copy to start of variables
-		LDA EAL + 1			;get end of program
-		STA VARTAB + 1			;copy to start of variables
-		JSR $B5E9			;perform CLR
+		JSR $F387			; Perform LOAD
+		LDA $78				; Inside CHRGET
+		BNE AB_E7F7			; Skip ahead
+		LDA EAL				; Get end of program
+		STA VARTAB			; Copy to start of variables
+		LDA EAL + 1			; Get end of program
+		STA VARTAB + 1			; Copy to start of variables
+		JSR $B5E9			; Perform CLR
 AB_E7F7
-		JSR $B622			;Reset BASIC execution to start
-		JSR $B60B			;Perform CLR
+		JSR $B622			; Reset BASIC execution to start
+		JSR $B60B			; Perform CLR
 		JMP $B74A			;
