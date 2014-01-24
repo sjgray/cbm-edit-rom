@@ -11,40 +11,47 @@
 
 ;----- new code in upper edit rom area
 
-IRQ_EDESK	JMP EDESK_IRQ_HANDLER		; L_EC9E
+IRQ_EDESK
+		JMP EDESK_IRQ_HANDLER			; Skip over menu strings
+
 
 ;--------------- Execudesk Menu Strings
 ;
 ; NULL-terminated strings
 
-EDSTRING1	!byte $93,$12			; <CLS><RVS>
-		!text "                                "
+EDSTRING1	!byte $93,$12				; <CLS><RVS>
+		!text "             "
+!if COLUMNS=80 {!text "                   " }
 		!byte $C5,$D8,$C5,$C3,$D5,$20		; <SHIFT>"EXECU 
 		!byte $2D,$20,$C4,$C5,$D3,$CB		; - DESK"
-		!text "                                   "
+		!text "               "
+!if COLUMNS=80 {!text "                    " }
+
 		!byte $0D,$0D,$0D			; <CR>
-		!text "           "
+!if COLUMNS=80 {!text "           " }
 		!byte $12,$20,$31,$20,$92		; <RVS> 1 <RVSOFF>
 		!text "      "
-		!byte $D7			; SHIFT-W
+		!byte $D7				; SHIFT-W
 		!text "ORD "
-		!byte $D0			; SHIFT-P
+		!byte $D0				; SHIFT-P
 		!text "ROCESSOR"
 		!byte $0D,$0D
-		!text "           "
+
+!if COLUMNS=80 {!text "           " }
 		!byte $12,$20,$32,$20,$92		; <RVS> 2 <RVSOFF>
 		!text "      "
-		!byte $D3			; SHIFT-S
+		!byte $D3				; SHIFT-S
 		!text "PREAD "
-		!byte $D3			; SHIFT-S
+		!byte $D3				; SHIFT-S
 		!text "HEET"
 		!byte $0D,$0D
-		!text "           "
+
+!if COLUMNS=80 {!text "           " }
 		!byte $12,$20,$33,$20,$92		; <RVS> 3 <RVSOFF>
 		!text "      "
-		!byte $C4			; SHIFT-D
+		!byte $C4				; SHIFT-D
 		!text "ATA "
-		!byte $C2			; SHIFT-B
+		!byte $C2				; SHIFT-B
 		!text "ASE "
 		!byte $CD
 		!text "ANAGER"
@@ -53,26 +60,29 @@ EDSTRING1	!byte $93,$12			; <CLS><RVS>
 
 ;--------------- STRING
 
-EDSTRING2	!text "           "
-		!byte $12,$20,$34,$20,$92	; <RVS> 4 <RVSOFF>
+EDSTRING2
+!if COLUMNS=80 {!text "           " }
+		!byte $12,$20,$34,$20,$92		; <RVS> 4 <RVSOFF>
 		!text "      "
-		!byte $C6			; SHIFT-F
+		!byte $C6				; SHIFT-F
 		!text "INANCIAL "
-		!byte $C3			; SHIFT-C
+		!byte $C3				; SHIFT-C
 		!text "ALCULATIONS"
 		!byte $0D,$0D
-		!text "           "
-		!byte $12,$20,$35,$20,$92	; <RVS> 5 <RVSOFF>
+
+!if COLUMNS=80 {!text "           " }
+		!byte $12,$20,$35,$20,$92		; <RVS> 5 <RVSOFF>
 		!text "      "
-		!byte $D4			; SHIFT-T
+		!byte $D4				; SHIFT-T
 		!text "ERMINAL "
-		!byte $C3			; SHIFT-C
+		!byte $C3				; SHIFT-C
 		!text "OMMUNICATIONS"
 		!byte $0D,$0D
-		!text "           "
-		!byte $12,$20,$36,$20,$92	; <RVS> 6 <RVSOFF>
+
+!if COLUMNS=80 {!text "           " }
+		!byte $12,$20,$36,$20,$92		; <RVS> 6 <RVSOFF>
 		!text "      "
-		!byte $D3			; SHIFT-S
+		!byte $D3				; SHIFT-S
 		!text "YSTEM "
 		!byte $D5
 		!text "TILITIES"
@@ -81,28 +91,31 @@ EDSTRING2	!text "           "
 
 ;--------------- STRING
 
-EDSTRING3	!text "           "
-		!byte $12,$20,$37,$20,$92	; <RVS> 7 <RVSOFF>
+EDSTRING3
+!if COLUMNS=80 {!text "           "}
+		!byte $12,$20,$37,$20,$92		; <RVS> 7 <RVSOFF>
 		!text "      "
-		!byte $D3			; SHIFT-S
+		!byte $D3				; SHIFT-S
 		!text "YSTEM "
-		!byte $D3			; SHIFT-S
+		!byte $D3				; SHIFT-S
 		!text "HUT "
 		!byte $C4
 		!text "OWN"
 		!byte $0D,$0D
-		!text "           "
-		!byte $12,$20,$38,$20,$92	; <RVS> 8 <RVSOFF>
+
+!if COLUMNS=80 {!text "           "}
+		!byte $12,$20,$38,$20,$92		; <RVS> 8 <RVSOFF>
 		!text "      "
-           	!byte $D5			; SHIFT-U
+           	!byte $D5				; SHIFT-U
 		!text "SER "
-		!byte $D3			; SHIFT-S
+		!byte $D3				; SHIFT-S
 		!text "OFTWARE"
 		!byte $0D,$0D
-		!text "           "	
-		!byte $12,$20,$39,$20,$92	; <RVS> 9 <RVSOFF>
+
+!if COLUMNS=80 {!text "           "}
+		!byte $12,$20,$39,$20,$92		; <RVS> 9 <RVSOFF>
 		!text "      "
-		!byte $C5			; SHIFT-E
+		!byte $C5				; SHIFT-E
 		!text "XIT TO "
 		!byte $C2
 		!text "ASIC"
@@ -111,22 +124,26 @@ EDSTRING3	!text "           "
 
 ;--------------- STRING
 
-EDSTRING4	!byte $0D,$12
-		!text "                          "
-		!byte $D0			; SHIFT-P
+EDSTRING4	!byte $0D,$12				; <RVS>
+		!text "         "
+!if COLUMNS=80 {!text "                 "}
+		!byte $D0				; SHIFT-P
 		!text "RESS "
-		!byte $D3			; SHIFT-S
+		!byte $D3				; SHIFT-S
 		!text "ELECTION "
-		!byte $C1			; SHIFT-A
-		!text "BOVE                               "
-		!byte $92			; <RVSOFF>
+		!byte $C1				; SHIFT-A
+		!text "BOVE"
+		!text "          "
+!if COLUMNS=80 {!text "                     "}
+		!byte $92				; <RVSOFF>
 		!byte 0
 
 ;--------------- STRING
 
-EDSTRING5	!byte $93
+EDSTRING5	!byte $93				; <CLS>
 		!byte $11,$11,$11,$11,$11,$11,$11,$11,$11,$11
-		!text "                      "
+		!text "           "
+!if COLUMNS=80 {!text "           "}
 		!byte $12,$20,$D0			; <RVS> SHIFT-P
 		!text "ROGRAM NOT FOUND ON DISK "
 		!byte $0D
@@ -135,7 +152,8 @@ EDSTRING5	!byte $93
 ;--------------- STRING
 
 EDSTRING6	!byte $11				; <DOWN>
-		!text "                      "		; SPACES
+		!text "           "
+!if COLUMNS=80 {!text "           "}
 		!byte $12,$20,$D3			; <RVS> SHIFT-S
 		!text "TRIKE ANY KEY TO TRY AGAIN "
 		!byte $0D
@@ -145,7 +163,8 @@ EDSTRING6	!byte $11				; <DOWN>
 
 EDSTRING7	!byte $93					; <CLS>
 		!byte $11,$11,$11,$11,$11,$11,$11,$11,$11,$11	; <DOWN>
-		!text "                      "			; SPACES
+		!text "           "
+!if COLUMNS=80 {!text "           "}
 	        !byte $12,$20,$C4				; <RVS> SHIFT-D
 		!text "ISK DRIVE NOT CONNECTED "
 		!byte $0D
@@ -178,12 +197,11 @@ EDTAB7		!text "0:SHUTDOWN,P"
 EDTAB8		!text "0:USER,P"
 		!byte 0
 
-;--------------- String
+;-------------- Disk parameter bytes
 
-ED_TABLE2
-ED_EC36		 !byte $11,$0F,$0C,$0B,$0C,$0D,$0C,$08
+ED_TABLE2	!byte $11,$0F,$0C,$0B,$0C,$0D,$0C,$08
 
-;--------------- String Pointer Table
+;-------------- String Pointer Table
 
 EDMTABLE	!WORD EDTAB1		; String 1 at $EBCA
 		!WORD EDTAB2		; String 2 at $EBDC
@@ -200,7 +218,7 @@ ED_RUN		!text "RUN"
 		!byte $0D
 		!byte 0
 
-ED_EC53		!byte $93					; <CLS>
+ED_MOMENT	!byte $93					; <CLS>
 		!byte $0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D
 		!text "                               "
 		!byte $CF,$CE,$C5,$20				; <SHIFT> ONE
@@ -356,8 +374,8 @@ L_ED56		JSR $FFE4
 		JSR $F1B9
 		JMP L_ECC9
 
-L_ED7D		LDA #$53					; $EC53
-		LDY #$EC
+L_ED7D		LDA #<ED_MOMENT					; $EC53 "ONE MOMENT PLEASE..."
+		LDY #>ED_MOMENT
 		JSR $BB1D					; Print a string
 
 		SEI
