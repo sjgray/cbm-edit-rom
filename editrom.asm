@@ -333,8 +333,9 @@ Be0fb		INY					; last was not <SPACE> so move ahead one
 ;################################################################################################
 
 ;************** Input a Character (Called from Jump Table)
-; FIXED ENTRY POINT! $E116
 ;
+; $E116 > FIXED ENTRY POINT! $E116
+
 INPUT_CHARACTER
 		TYA
 		PHA
@@ -1291,13 +1292,20 @@ Be61a		STA JIFFY_CLOCK,X		; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
 
 !if EXTENDED = 1 { STX KEYFLAGS }		; $FF = Clear all flags
 
-;************** Set IRQ Vector
-; Normally $E455 - (Note: Execudesk changes this to $E900)
-;
-		LDA #<IRQ_NORMAL		; Set IRQ Vector LO
+;-------------- Set IRQ Vector - Normally $E455 or $E900 for Execudesk
+
+!IF EXECUDESK = 0 {
+		LDA #<IRQ_NORMAL		; Normal IRQ Vector LO
 		STA CINV
-		LDA #>IRQ_NORMAL		; Set IRQ Vector HI
+		LDA #>IRQ_NORMAL		; Normal IRQ Vector HI
 		STA CINV+1
+} ELSE {
+		LDA #<IRQ_EDESK			; Execudesk IRQ Vector LO
+		STA CINV
+		LDA #>IRQ_EDESK			; Execudesk IRQ Vector HI
+		STA CINV+1
+}
+
 ;**************
 		LDA #9
 		STA XMAX			; Size of Keyboard Buffer
