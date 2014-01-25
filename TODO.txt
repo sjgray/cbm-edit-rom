@@ -4,7 +4,6 @@ PET/CBM EDIT ROM PROJECT - TODO List
 - The 324243-04 ROM appears to bypass the old screen line address tables, and instead calculates the screen pointer,
   and only supports 80-column screen.
 - We will have to re-instate those tables in order to support soft-switched Soft-40!!!!
-- Extended Keyboard scanner uses 80 column SCREEN RAM to store scan results and WILL NOT WORK on 40 column machines!! oh-oh...
 - Continue to add memory variable descriptions (see Commodore's CBM-II source for 'official' labels)
 - Analyze extended keyboard scanning routine. Have special codes been modified?
 - Document added screen codes for character set switching
@@ -12,12 +11,23 @@ PET/CBM EDIT ROM PROJECT - TODO List
 	- SHIFT tables need fixing (except for DIN, which is the template)
 	- Look into C64 table
 	- Do we need to add additional tables for "C=" (Commodore Key)?
-- Comment Execudesk code, and convert to proper syntax
 - Comment Autoboot code, and convert to proper syntax
 	- Do we want to include the "OLD" routine? (we already have the "OLD" matrix files)
 - Add keyboard reboot codes for other keyboard types B, DIN, C64
 	- Determine if code will interfere with existing keyboardscanner.
-
+- Add code from 40 column edit roms. Currently if you set COLUMNS=40 it uses the 80 column rom code.
+	- 80 Column rom has no code for screen line linking. This restricts basic lines to one screen line.
+	- Caution - screen line linking memory locations might be in use.
+- ColourPET features:
+	- Some ESC codes not working.
+	- Some C128 colour codes conflict with PET/CBM codes (ie: SHIFT-ESC)
+	- BASIC lines with embedded colour codes cause the colour to change when the program is listed.
+	- ColourPET uses ZP variables in TAPE area. Do not use TAPE with ColourPET or find alternate storage locations.
+	- ColourPET hardware needs fixing!
+- CBM-II keyboard support will require hardware modification.
+- Sort out DIN keyboard matrix variations.
+- Look into C64/VIC keyboard scanning routines. Can they be used in PET (allow support for NORMAL,SHIFTED,CTRL and C= keys)
+	
 NOTE: If you are running ColourPET under VICE, please update to the latest experimental release!
       Colour RAM has been relocated to $8800 and hardware will be updated so that 40/80 columns
       can be supported with fixed colour ram locations
