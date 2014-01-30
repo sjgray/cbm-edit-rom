@@ -161,7 +161,7 @@ ESCAPE_N						; Esc-n Screen Normal
 		LDA #12					; CRTC Register#12 - Display Address HI
 		STA CRT_Address				; Select the Register 
 		LDA CRT_Status				; Read the Value
-		AND %11001111				; Clear BITS 4 and 5
+		AND #%11001111				; Clear BITS 4 and 5
 		JMP CRTUPDATE
 
 ESCAPE_R						; Esc-r Screen Reverse
@@ -169,7 +169,7 @@ ESCAPE_R						; Esc-r Screen Reverse
 		LDA #12					; CRTC Register#12 - Display Address HI
 		STA CRT_Address				; Select the Register 
 		LDA CRT_Status				; Read the Value
-		ORA %11101111				; Set BIT 4
+		ORA #%11101111				; Set BIT 4
 		JMP CRTUPDATE
 
 ESCAPE_Y						; Esc-y Normal Chr Set    (B-series). Was: Set Default Tabs (C128)
@@ -177,7 +177,7 @@ ESCAPE_Y						; Esc-y Normal Chr Set    (B-series). Was: Set Default Tabs (C128)
 		LDA #12					; CRTC Register#12 - Display Address HI
 		STA CRT_Address				; Select the Register 
 		LDA CRT_Status				; Read the Value
-		AND %11011111				; Clear BIT 5
+		AND #%11011111				; Clear BIT 5
 		JMP CRTUPDATE
 				
 ESCAPE_Z						; Esc-z Alternate Chr Set (B-Series). Was: Clear All Tabs (C128)
@@ -185,7 +185,7 @@ ESCAPE_Z						; Esc-z Alternate Chr Set (B-Series). Was: Clear All Tabs (C128)
 		LDA #12					; CRTC Register#12 - Display Address HI
 		STA CRT_Address				; Select the Register 
 		LDA CRT_Status				; Read the Value
-		ORA %00100000				; Set BIT 5
+		ORA #%00100000				; Set BIT 5
 CRTUPDATE
 		STA CRT_Status				; Write the Value to previously selected register
 		CLI					; Enable Interrupts
