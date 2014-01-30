@@ -6,7 +6,8 @@
 TABSTOPS
            !byte $50,$48,$40,$38,$30,$28,$20,$18
            !byte $10,$08
-           !fill $ee85-*,$ff			; 560 bytes
+
+           !fill $ee85-*,$ff			; 560 bytes!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ;--------- VOCALS Table
 
@@ -28,7 +29,7 @@ Veeae      !byte $07
 
 ;---------- BIT MASK Table				(local)
 
-BITMASK    !byte $01,$02,$04,$08,$10,$20
+BITMASK    !byte $01,$02,$04,$08,$10,$20	; $EEAF
 
 ;---------- Set V Flag Table
 

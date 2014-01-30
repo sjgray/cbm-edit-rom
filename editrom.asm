@@ -29,7 +29,7 @@
 ;    * DOS Wedge
 ;
 ;-----------------------------------------------------------------------------------------------
-* = $e000	;normal start address. NOT defined in EDIT.ASM
+* = $e000	; Normal start address for EDIT ROM is $E000
 ;-----------------------------------------------------------------------------------------------
 
 
@@ -39,7 +39,7 @@
 ;       There are FIVE hard-coded entry points: $E0A7, $E116, $E202, $E442, $E600
 
 EDITOR
-		JMP RESET_EDITOR		; Main Initialization (called from Kernal power up reset 
+		JMP RESET_EDITOR		; Main Initialization (called from Kernal power up reset) 
 		JMP GETKEY			; Get Character From Keyboard Buffer (FIXED ENTRY POINT. Must not move!)
 		JMP INPUT_CHARACTER		; Input From Screen or Keyboard	(FIXED ENTRY POINT. Must not move!)
 		JMP CHROUT_SCREEN		; Output to Screen		(FIXED ENTRY POINT. Must not move!)
@@ -58,7 +58,7 @@ EDITOR
 !IF REPEATOPT = 1 {
 		JMP SET_REPEAT_MODE		; Set REPEAT MODE
 } else {
-		JMP BEEP			; BEEP
+		JMP BEEP			; Ring BELL/CHIME
 }
 		JMP WINDOW_SET_TOP		; Set Window Top
 		JMP WINDOW_SET_BOTTOM		; Set Window Bottom
@@ -106,6 +106,7 @@ Be054		INX					; Next line
 		BCC Be054				; No, go do next line
 
 ;************** Home the Cursor
+
 CURSOR_HOME
 		LDX TopMargin				; Go to TOP of window
 		STX CursorRow				; put cursor there too
@@ -123,6 +124,7 @@ UPDATE_CURSOR_ROW
 
 !if EXTENDED=0 {
 		JMP UPDATE_CURSOR_R3			;$E06F
+} ;zxcvb Added this!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ;		----------------------------------------
 
@@ -140,7 +142,7 @@ UPDATE_SCREEN_PTR
 		JSR ColourPET_SyncPointersX		; Sync Pointers to Current Line
 	}
 		RTS
-}
+;zxcvb -- was "}" here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 !if EXTENDED = 1 {
            	JMP Update_ScrPtr			; New Screen pointer calculation routine
@@ -155,59 +157,80 @@ Me072		INY
 }
 
 
-;************* Set Screen to TEXT or GRAPHICS MODE
-
-!if EXTENDED = 0 {
+;************** Set Screen to TEXT or GRAPHICS MODE
+;
+; TEXT/GRAPHICS mode determines which font is displayed.
+; - GRAPHICS mode has uppercase and full graphics. Characters take 8 scanlines
+; - TEXT mode has lower case, upper case and limited graphics. Characters take 10 scanlines (normally)
+; 
+; OPTIONS: 'EXTENDED' and 'SS40'
 
 ;-------------- Initialize CRTC to TEXT Mode (Called from Jump Table)
+
 CRT_SET_TEXT
+
+!if EXTENDED=0 {
+	!IF SS40=0 {
 		LDA #<CRT_CONFIG_TEXT			; Point to CRTC Table
 		LDX #>CRT_CONFIG_TEXT			; Point to CRTC Table
-		LDY #$0E				; TEXT
+		LDY #$0E				; Character Set = TEXT
 		BNE CRT_PROGRAM
+	} ELSE {
+		JMP CRT_SET_GRAPHICS_SS40		; Jump to SS40 version (upper rom)
+	}
+}
+
+!IF EXTENDED=1 {
+		JMP CRT_SET_TEXT_EXT			; Jump to EXTENDED version (upper rom)
+		NOP
+		NOP
+		NOP
+		NOP
+		NOP
+}
 
 ;-------------- Initialize CRTC to GRAPHICS Mode (Called from Jump Table)
 
 CRT_SET_GRAPHICS
+
+!if EXTENDED=0 {
+	!IF SS40=0 {
 		LDA #<CRT_CONFIG_GRAPHICS       	; Point to CRTC Table
 		LDX #>CRT_CONFIG_GRAPHICS       	; Point to CRTC Table
-		LDY #$0C				; GRAPHICS
+		LDY #$0C				; Character Set = GRAPHICS
+	} ELSE {
+		JMP CRT_SET_GRAPHICS_SS40		; Jump to SS40 version (upper rom)
+	}
 }
-
-
-!if EXTENDED = 1 {
-
-;-------------- Initialize CRTC to TEXT Mode
-
-CRT_SET_TEXT
-		JMP CRT_SET_TEXT_EXT
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-
-;-------------- Initialize CRTC to GRAPHICS Mode
-
-CRT_SET_GRAPHICS
-		JMP CRT_SET_GRAPHICS_EXT
+!IF EXTENDED=1 {
+		JMP CRT_SET_GRAPHICS_EXT		; Jump to EXTENDED version (upper rom)
 		NOP
 		NOP
 		NOP
 }
 
 ;************** Program CRTC chip for selected screen MODE (Called from Jump Table)
+;
+; The CRTC controller controls the parameters for generating the display on the monitor. The CRTC chip has
+; several registers that must be set properly according to the type of connected display. These set characters on the line,
+; left and right margins, lines on the screen, height of each line and positioning of the top of the screen.
+; The parameters are read from a table and written to the CRTC controller chip. The VIA chip is used to select which of the
+; two fonts from the CHARACTER ROM is used.
+;
 ; Parameters: Table pointer in A/X, CHRSET in Y
+; OPTIONS: 'SS40' uses new routine in upper rom
 
 CRT_PROGRAM
-;		--------------------- Set the character set line
+
+!IF SS40=0 {
+;		--------------------- Set 'Character Set'
 
 		STA SAL					; Pointer LO: Tape Buffer/ Screen Scrolling
 		STX SAL+1				; Pointer HI
 		LDA VIA_PCR				; Get current register byte VIA Register C - CA2	CHIP 
 		AND #$f0				; mask out lower nibble
 		STA FNLEN				; save it to Temp Variable
-		TYA					; Move character set byte to A
+		TYA					; Move 'Character Set' byte to A
 		ORA FNLEN				; update lower nibble in Temp Variable
 		STA VIA_PCR				; write it back to VIA Register C - CA2			CHIP
 
@@ -221,7 +244,9 @@ Be09b		LDA (SAL),Y				; Pointer: Tape Buffer/ Screen Scrolling
 		DEY
 		BPL Be09b				; loop for more
 		RTS
-
+} ELSE {
+		JMP CRT_PROGRAM_SS40			; Jump to Switchable Soft-40 version (upper rom)
+}
 
 ;################################################################################################
 		!fill $e0a7-*,$aa	;########################################################
@@ -240,8 +265,8 @@ GETKEY
 		LDX #0 					; Start at 0
 
 getkey1		LDA KEYD+1,X				; LOOP START - Now shift the next keys in line
-		STA KEYD,X				;     to the front of the buffer
-!if DEBUG = 1 { STA DBLINE+10,X }				; DEBUG - update screen
+		STA KEYD,X				; to the front of the buffer
+!if DEBUG = 1 { STA DBLINE+10,X }			; DEBUG - update screen
 		INX
 		CPX CharsInBuffer			; Num Chars in Keyboard Buffer
 		BNE getkey1				; Done? No, loop for another
@@ -334,7 +359,7 @@ Be0fb		INY					; last was not <SPACE> so move ahead one
 
 ;************** Input a Character (Called from Jump Table)
 ;
-; $E116 > FIXED ENTRY POINT! $E116
+; $E116 - FIXED ENTRY POINT!!!!!
 
 INPUT_CHARACTER
 		TYA
@@ -505,9 +530,11 @@ CURSOR_TO_LEFT_MARGIN
 		RTS
 
 ;************** Set Full Screen (Exit Window)
-; This routine is used to set the screen size parameters for the entire system
-; TODO: Update for 'Software switchable' SOFT40.
-; Q?: Do we want to support VIC-20  22x23 screen as well? OSI 64x32!? Any other usefull format?
+;
+; This routine is used to set the screen size parameters for the printing routines
+; OPTIONS: 'COLUMNS' determines 40 or 80 column screen
+;          'SS40'    when COLUMNS=80 uses col size determined by Soft40 'SCNWIDTH' memory location
+; Note: Changing SCNWIDTH does not change CRTC parameters. Use the ESC-X command!!!
 
 FULL_SCREEN_WINDOW
 		LDA #0					; Top/Left=0
@@ -516,7 +543,11 @@ FULL_SCREEN_WINDOW
 		LDA #24					; 25 lines   (0-24)
 
 !if COLUMNS = 80 {
+	!if SS40=1 {
+		LDX SCNWIDTH				; Current SS40 screen width
+	} ELSE {
 		LDX #$4f 				; 80 columns (0-79)
+	}
 }
 
 !if COLUMNS = 40 {
@@ -524,6 +555,7 @@ FULL_SCREEN_WINDOW
 }
 
 ;************** Set Bottom Right Corner of Window
+
 WINDOW_SET_BOTTOM
 		STA BotMargin				; Last line of window
 		STX RigMargin				; Physical Screen Line Length
@@ -542,9 +574,8 @@ WINDOW_SET_TOP
 
 ; ************ Output Character to Screen Dispatch (Called from Jump Table)
 ;
-; This is a fixed entry point. Some BASIC and KERNAL calls jump directly here rather
-; than going through the jump table.
-;*=$e202
+; $E202 - FIXED ENTRY POINT!!!!!
+; Some BASIC and KERNAL calls jump directly here rather than going through the jump table.
 
 CHROUT_SCREEN
 		PHA
@@ -630,8 +661,10 @@ Be251		INY
 		JSR ColourPET_Scroll_Left		; Scroll both Screen and Colour LEFT	@@@@@@@@@@@@@@ ColourPET
 }
 
-;		-------------------------------- Note: "80240.PRG" jumps here ($E25C)
-; 		Q?: Should we pad here for compatibility, or would including "Soft-40" be ok?
+;-------------------------------------------------------
+; Note: "80240.PRG" jumps here ($E25C)
+; Q?: Should we pad here for compatibility, or would including "Soft-40" be ok?
+;-------------------------------------------------------
 
 Be25c		LDA #$20 				; <SPACE>
 		STA (ScrPtr),Y				; put it on the screen! 
@@ -901,12 +934,12 @@ Be3cb		DEX
 }
 
 Be3d8		INY
-	!if COLOURPET = 0 {
+!if COLOURPET = 0 {
 		LDA (SAL),Y				; Read Character from Screen SOURCE
 		STA (ScrPtr),Y				; Write it to Screen DESTINATION
-	} ELSE {
+} ELSE {
 		JSR ColourPET_Scroll_Dest
-	}
+}
 		CPY RigMargin
 		BCC Be3d8
 		BCS Be3cb
@@ -985,15 +1018,15 @@ ADVANCE_TIMER
 		RTS
 }
 
-;##########################################################################
-		!fill $e442-*,$aa	; 0 bytes ########################## @@@@@@@@@@@@ COLOURPET Additions must fit before this!!!!!!
-;##########################################################################
+;####################################################################################################
+		!fill $e442-*,$aa	; 0 bytes ###################################################
+;                                       ; @@@@@@@@@@@@ COLOURPET Additions must fit before this!!!!!!
+;####################################################################################################
 
 
-;************* Main IRQ Dispatcher (Called from Jump Table)
-;
+;************** Main IRQ Dispatcher (Called from Jump Table)
+; $E442 - FIXED ENTRY POINT!!!!!!!!!!!!
 ; This entry point must not move! It is called directly from KERNAL
-; *=e442
 
 IRQ_MAIN
 		PHA
@@ -1247,9 +1280,9 @@ Be5ed		CMP #14 			; <142> - Graphics mode
 
 
 ;************** End of IRQ (Called from Jump Table)
-;
+; $E600 - FIXED ENTRY POINT!!!!!!!
 ; This entry point must not move! It is called directly from KERNAL
-; *=e600	Do not modify this routine!
+; Do not modify this routine!
 
 IRQ_END		PLA
 		TAY
@@ -1306,7 +1339,12 @@ Be61a		STA JIFFY_CLOCK,X		; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
 		STA CINV+1
 }
 
-;**************
+;-------------- Init SS40
+
+!if SS40=1 {	JSR SS40_INIT80 }		; Initialize Switchable Soft-40
+
+;-------------- 
+
 		LDA #9
 		STA XMAX			; Size of Keyboard Buffer
 		LDA #3
@@ -1359,10 +1397,11 @@ Be66d		STA TABS_SET,X			; Table of 80 bits to set TABs
 		LDA #16
 		STA CHIME
 
-!if WEDGE=1 { JSR WEDGE_PREP }			; stuff keyboard with syste to activate WEDGE
+!if WEDGE=1 { JSR install_wedge }		; Activate WEDGE
 
 		JSR Double_BEEP			; Power-up chimes
 		BEQ Double_BEEP			; More chimes (4 total)
+
 
 ;************** Character Out Margin Beep
 

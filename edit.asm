@@ -11,16 +11,17 @@
 ; DIRECTIVE		FEATURE				VALID OPTIONS			FUTURE OPTIONS
 ;----------		-------				-------------			--------------
 EXTENDED  = 0		; Extended Editor?		0=No, 1=Yes
-KEYBOARD  = 1		; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG
+KEYBOARD  = 2		; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG
 COLUMNS   = 80		; Screen Width:			40 or 80
 SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes
+SS40      = 0		; Software Switchable Soft-40	0=No, 1=Yes
 BOOTCASE  = 0		; Initial Screen Mode		0=Text, 1=Graphics
 REFRESH   = 3		; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
 
 HERTZ     = 50		; Line Frequency (Clock):					50=Euro, 60=NorthAmerica
 
-COLOURPET = 1		; ColourPET additions?		0=No, 1=Yes
-COLOURVER = 1		; ColourPET Hardware Version	0=Beta,1=Release
+COLOURPET = 0		; ColourPET additions?		0=No, 1=Yes
+COLOURVER = 0		; ColourPET Hardware Version	0=Beta,1=Release
 COLOURMODE= 0		; ColourPET Hardware Type	0=Digital, 1=Analog
 DEFAULTFG = 5		; ColourPET Foreground colour   0 to 15 RGBI
 DEFAULTBG = 0		; ColourPET Background colour   0 to 15 RGBI
@@ -29,8 +30,8 @@ REBOOT    = 0		; Add keyboard reboot? 						0=No, 1=Yes
 ESCCODES  = 0		; Add ESC codes? 		0=No, 1=Yes
 EXECUDESK = 0		; Add Execudesk Menu?		0=No, 1=Yes
 SILENT    = 0		; Disable BELL/CHIME		0=Normal, 1=Disabled
-REPEATOPT = 0		; Key Repeat Option		0=No (Always ON), 1=Yes
-WEDGE     = 1		; DOS Wedge			0=No, 1=Yes
+REPEATOPT = 1		; Key Repeat Option		0=No (Always ON), 1=Yes
+WEDGE     = 0		; DOS Wedge			0=No, 1=Yes
 WEDGEMSG  = 1		; Show wedge message?		0=No, 1=Yes
 
 DEBUG 	  = 0		; Add debugging			0=No, 1=Yes

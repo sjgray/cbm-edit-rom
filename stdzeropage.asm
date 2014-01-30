@@ -2,11 +2,11 @@
 ; ================
 ; Descriptions are from Butterfield's memory maps from Transactor
 
-Basic_USR 	= $00		;USR Jump
-USRADD 		= $01		;USR Jump
-CHARAC 		= $03		;Search Character
-ENDCHR 		= $04		;Scan between Quotes Flag
-COUNT 		= $05		;Input buffer pointer. # of subscripts
+Basic_USR 	= $00		; USR Jump
+USRADD 		= $01		; USR Jump
+CHARAC 		= $03		; Search Character
+ENDCHR 		= $04		; Scan between Quotes Flag
+COUNT 		= $05		; Input buffer pointer. # of subscripts
 DIMFLG 		= $06		; Default DIM flag
 VALTYP 		= $07		; Type: FF=string, 00=numeric
 INTFLG 		= $08		; Type: 80=integer, 00=floating point
@@ -164,8 +164,12 @@ SCROV		= $eb		; Screen Output Vector (EB/EC)
 ; $ED-F7 			; Part of 40 column wrap table - UNUSED on 80 col!
 
 !IF ESCCODES = 1 {
-LASTCHAR	= $F0		; Last Key Pressed
-BELLMODE	= $F1		; 0=Disable, 1=Enable BELL/CHIME
+LASTCHAR	= $f0		; Last Key Pressed
+BELLMODE	= $f1		; 0=Disable, 1=Enable BELL/CHIME
+}
+
+!IF SS40=1 {
+SCNWIDTH	= $f2
 }
 
 JIFFY6DIV5	= $f8
