@@ -1397,7 +1397,7 @@ Be66d		STA TABS_SET,X			; Table of 80 bits to set TABs
 		LDA #16
 		STA CHIME
 
-!if WEDGE=1 { JSR install_wedge }		; Activate WEDGE
+!if WEDGE=1 { JSR WEDGE_PREP }		; Activate WEDGE
 
 		JSR Double_BEEP			; Power-up chimes
 		BEQ Double_BEEP			; More chimes (4 total)
