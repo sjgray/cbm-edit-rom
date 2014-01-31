@@ -118,7 +118,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 	!if EXECUDESK = 1 { !source "execudesk.asm" }
 	!if WEDGE = 1	  { !source "editwedge.asm" }
 	!if COLOURPET = 1 { !source "colourpetsubs.asm" }
-	!if ESCCODES = 1  { !source "escapeseq.asm" }
+	!if ESCCODES = 1  { !source "editescape.asm" }
 }
 
 !if EXTENDED + EXECUDESK + COLOURPET + ESCCODES + WEDGE > 0 { !fill $F000-*,$FF } ; PAD to 4K ##########################
