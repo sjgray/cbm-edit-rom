@@ -5,14 +5,14 @@
 ;
 ;----------------------- Assembler directives to choose which features are included
 ;
-; If there no options are listed it means that support has not been added yet!
+; If there no options listed it means that support has not been added yet!
 ; NOTE!: Not all combinations may be valid!!
 ;
 ; DIRECTIVE		FEATURE				VALID OPTIONS			FUTURE OPTIONS
 ;----------		-------				-------------			--------------
 EXTENDED  = 0		; Extended Editor?		0=No, 1=Yes
-KEYBOARD  = 1		; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG
-COLUMNS   = 80		; Screen Width:			40 or 80
+KEYBOARD  = 5		; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG
+COLUMNS   = 40		; Screen Width:			40 or 80
 SOFT40    = 0		; 40 columns on 8032s?		0=No, 1=Yes
 SS40      = 0		; Software Switchable Soft-40	0=No, 1=Yes
 BOOTCASE  = 1		; Initial Screen Mode		0=Text, 1=Graphics
@@ -50,10 +50,10 @@ DEBUG 	  = 0		; Add debugging			0=No, 1=Yes
 
 ;---------------------- These are the symbol definitions for PET/CBM memory and IO chips
 
-!source "stdzeropage.asm"	; $00-FF	Zero Page 
-!source "stdlowmem.asm"		; $0100-03FC	Low Memory
-!source "stdchips.asm"		; $E800-E8FF	Chips
-!source "stdkernal.asm"		; $F000-FFFF	Kernal
+!source "memzeropage.asm"	; $00-FF	Zero Page 
+!source "memlow.asm"		; $0100-03FC	Low Memory
+!source "memchips.asm"		; $E800-E8FF	Chips
+!source "memkernal.asm"		; $F000-FFFF	Kernal
 
 !if COLOURPET = 1 { !source "colourpet.asm" }
 

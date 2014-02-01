@@ -153,15 +153,15 @@ ESCAPE_U						; Esc-u Uppercase (was: Underline Cursor - not supported on PET)
 
 ;-------------- CRTC Chip Functions
 ; CRTC controller REGISTER 12 is used for Screen RAM Address HI
-; BIT 4 controls the INVERT line
-; BIT 5 controls the CHR OPTION line
+; BIT 4 controls the INVERT line     (normal=1,rvs=0)
+; BIT 5 controls the CHR OPTION line (normal=0,alternate=1)
 
 ESCAPE_N						; Esc-n Screen Normal
 		SEI
 		LDA #12					; CRTC Register#12 - Display Address HI
 		STA CRT_Address				; Select the Register 
 		LDA CRT_Status				; Read the Value
-		AND #%11001111				; Clear BITS 4 and 5
+		ORA #%00010000				; Set BIT 4
 		JMP CRTUPDATE
 
 ESCAPE_R						; Esc-r Screen Reverse
@@ -169,7 +169,7 @@ ESCAPE_R						; Esc-r Screen Reverse
 		LDA #12					; CRTC Register#12 - Display Address HI
 		STA CRT_Address				; Select the Register 
 		LDA CRT_Status				; Read the Value
-		ORA #%11101111				; Set BIT 4
+		AND #%11101111				; Clear BIT 4
 		JMP CRTUPDATE
 
 ESCAPE_Y						; Esc-y Normal Chr Set    (B-series). Was: Set Default Tabs (C128)

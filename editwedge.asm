@@ -28,10 +28,11 @@
 ;				@D1=0			- Duplicate disk (dual drive units only). Target drive first, then source.
 ;------------------------------------------------------------------------------------------------------------------------------------------
 
-!source "stdbasic4.asm"
+!source "membasic4.asm"
 
 
 ;-------------- INSTALL WEDGE
+; Make sure 'install_wedge' is assembled to $E900 so SYS can start it properly!
 
 install_wedge
 		lda #<resident_wedge		; patch CHRGET JMP address
@@ -85,7 +86,7 @@ WP_LOOP		LDA WEDGE_SYS,X			; Get a key from table
 
 ;-------------- TEXT to stuff into keyboard buffer
 
-WEDGE_SYS	!text "SYS59648"
+WEDGE_SYS	!text "SYS59648"		; Make sure WEDGE is loaded at $E900!
 		!byte $0D
 
 
@@ -125,6 +126,7 @@ testchar	lda (TXTPTR),y
 		bne nospace
 		inc TXTPTR
 		bne testchar
+
 nospace		cmp #$3e			; '>'
 		beq command_or_status
 		cmp #$40			; '@'
@@ -227,7 +229,6 @@ GS_DONE		jsr SCROUT			; write char to screen
 ;----------------------------------------------------------------------------
 ;###### TODO: if we have quotes in our string, then they should handled here
 ;----------------------------------------------------------------------------
-
 prepare_fn
 		iny				; count filename length
 		lda (TXTPTR),y
@@ -312,16 +313,17 @@ stoplisting	jsr CLSEI			; close file with $E0, unlisten
 		pla 
 		jmp READY			; BASIC warm start
 
-;------ LOAD / RUN
+;-------------- LOAD / RUN
 
 loadrun
-		lda #0
+		lda #0				; Clear status byte
 		sta STATUS
 		sta VERCK			; LOAD=0, VERIFY=1
 		jsr LOADOP			; LOAD without pointer change
-		lda STATUS
+
+		lda STATUS			; Did it load?
 		and #$10
-		bne loaderr
+		bne loaderr			; No, exit out
 
 		lda EAL+1			; end of program MSB
 		sta VARTAB+1			; start of basic variables MSB
@@ -331,6 +333,7 @@ loadrun
 		jsr CRLF
 		jsr RSTXCLR			; reset TXTPTR and perform CLR
 		jsr LINKPRG			; rebuild chaining of BASIC lines
+
 		lda wedge_char
 		cmp #$2f			; if '/' then load only, omit RUN
 		bne startprg			; '^' --> RUN
