@@ -137,7 +137,7 @@ SCAN_SHIFT	ORA #$80		; Set upper bit for Graphics Symbol
 
 SCAN_NORM	LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 		CPX XMAX		; Size of Keyboard Buffer
-		BCS iE56F		; Exit if buffer full
+		BCS SCAN_OUT		; Exit if buffer full
 		STA KEYD,X		; Put the key into the buffer
 		INX			; Increment character count
 		STX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)

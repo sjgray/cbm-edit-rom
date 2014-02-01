@@ -1091,9 +1091,11 @@ Be470		EOR #$80				; Flip the reverse bit
 
 Be474		LDY #0
 		LDA PIA1_Port_A 			; Keyboard ROW select - PIA#1, Register 0
+							; Upper bits: IEEE and Cassette
+							; Lower bits: Keyboard ROW select
 
 !if EXTENDED = 0 {
-		AND #$F0				; Mask off lower 4 bits
+		AND #$F0				; Mask off lower 4 bits (reset keyboard scan row)
 		STA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
 		LDA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
 } 
@@ -1128,6 +1130,9 @@ Be4a7		STA VIA_Port_B
 }
 
 Be4aa		JSR SCAN_KEYBOARD			; Scan the keyboard
+
+!if REBOOT=1 {  JSR CheckReboot }			; Check for soft reset
+
 		JMP IRQ_END				; Return from Interrupt
 
 ;###########################################################################################

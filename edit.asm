@@ -26,7 +26,7 @@ COLOURMODE= 0		; ColourPET Hardware Type	0=Digital, 1=Analog
 DEFAULTFG = 5		; ColourPET Foreground colour   0 to 15 RGBI
 DEFAULTBG = 0		; ColourPET Background colour   0 to 15 RGBI
 
-REBOOT    = 0		; Add keyboard reboot? 						0=No, 1=Yes
+REBOOT    = 1		; Add keyboard reboot? 						0=No, 1=Yes
 ESCCODES  = 1		; Add ESC codes? 		0=No, 1=Yes
 EXECUDESK = 0		; Add Execudesk Menu?		0=No, 1=Yes
 SILENT    = 0		; Disable BELL/CHIME		0=Normal, 1=Disabled
@@ -110,6 +110,10 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 		!if WEDGE=0 { !text "NO" }
 		!if WEDGE=1 { !text "YES" }
 
+		!text ", Reboot="
+		!if REBOOT=0 { !text "NO" }
+		!if REBOOT=1 { !text "YES" }
+
 		!if EXECUDESK=1 { !text ", Execudesk=YES" }
 
 		!fill $E900-*,$00 
@@ -119,6 +123,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 	!if WEDGE = 1	  { !source "editwedge.asm" }
 	!if COLOURPET = 1 { !source "colourpetsubs.asm" }
 	!if ESCCODES = 1  { !source "editescape.asm" }
+	!if REBOOT = 1    { !source "editreboot.asm" }
 }
 
 !if EXTENDED + EXECUDESK + COLOURPET + ESCCODES + WEDGE > 0 { !fill $F000-*,$FF } ; PAD to 4K ##########################
