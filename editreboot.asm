@@ -53,7 +53,7 @@ RebootCodes
 		!byte %11111111	; ROW 0
 }
 
-;		----------------- DIN Keyboard: To be determined
+;		----------------- DIN Keyboard: ESC-SHIFT-SHIFT-DEL
 !if KEYBOARD=2 { 
 		!byte %11011111	; ROW 9 - DEL
 		!byte %11111111	; ROW 8
@@ -77,6 +77,21 @@ RebootCodes
 		!byte %11111111	; ROW 4
 		!byte %11111111	; ROW 3
 		!byte %11111111	; ROW 2
+		!byte %11111111	; ROW 1 - row not connected
+		!byte %11111111	; ROW 0 - row not connected
+}
+
+;		--------------- B modified Keyboard: ESC-SHIFT-SHIFT-DEL
+!if KEYBOARD=4 { 
+		!byte %11111111	; ROW 9
+		!byte %11111111	; ROW 8
+		!byte %11111111	; ROW 7
+		!byte %11111111	; ROW 6
+		!byte %11111111	; ROW 5
+		!byte %11111111	; ROW 4
+		!byte %10111110	; ROW 3 - SHIFT, SHIFT
+		!byte %11111111	; ROW 2
 		!byte %11111111	; ROW 1
-		!byte %11111111	; ROW 0
+		!byte %11101110	; ROW 0 - DEL, ESC
+
 }
