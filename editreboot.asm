@@ -21,59 +21,62 @@ CheckLoop
 
 CheckOut	RTS
 
+;-------------- Reboot Code Table
+; Note: Rows are entered in reverse order compared to the keyboard matrix
+
 RebootCodes
 ;		----------------- Normal/Graphic Keyboard: @-SHIFT-SHIFT-DEL
 !if (KEYBOARD=0) OR (KEYBOARD=5) {
-		!byte $ff	; ROW 0 - No keys
-		!byte $7f	; ROW 1 - <DEL>
-		!byte $ff	; ROW 2 - No keys
-		!byte $ff	; ROW 3 - No keys
-		!byte $ff	; ROW 4 - No keys
-		!byte $ff	; ROW 5 - No keys
-		!byte $ff	; ROW 6 - No keys
-		!byte $ff	; ROW 7 - No keys
-		!byte $dc	; ROW 8 - @ + Both Shifts
 		!byte $ff	; ROW 9 - No keys
+		!byte $7f	; ROW 8 - <DEL>
+		!byte $ff	; ROW 7 - No keys
+		!byte $ff	; ROW 6 - No keys
+		!byte $ff	; ROW 5 - No keys
+		!byte $ff	; ROW 4 - No keys
+		!byte $ff	; ROW 3 - No keys
+		!byte $ff	; ROW 2 - No keys
+		!byte $dc	; ROW 1 - @ + Both Shifts
+		!byte $ff	; ROW 0 - No keys
 }
 
-;		----------------- Business Keyboard: To be determined
+;		----------------- Business Keyboard: ESC-SHIFT-SHIFT-DEL
 !if (KEYBOARD=1) OR (KEYBOARD=4) {
-		!byte $0	; ROW 0 - No keys
-		!byte $0	; ROW 1 - No keys
-		!byte $0	; ROW 2 - No keys
-		!byte $0	; ROW 3 - No keys
-		!byte $0	; ROW 4 - No keys
-		!byte $0	; ROW 5 - No keys
-		!byte $0	; ROW 6 - No keys
-		!byte $0	; ROW 7 - No keys
-		!byte $0	; ROW 8 - No keys
-		!byte $0	; ROW 9 - No keys
+		!byte %11111111	; ROW 9
+		!byte %11111111	; ROW 8
+		!byte %11111110	; ROW 7 - ESC
+		!byte %11111111	; ROW 6
+		!byte %01111111	; ROW 5 - DEL
+		!byte %11111111	; ROW 4
+		!byte %10111110	; ROW 3 - SHIFT, SHIFT
+		!byte %11111111	; ROW 2
+		!byte %11111111	; ROW 1
+		!byte %11111111	; ROW 0
 }
 
 ;		----------------- DIN Keyboard: To be determined
 !if KEYBOARD=2 { 
-		!byte $0	; ROW 0 - No keys
-		!byte $0	; ROW 1 - No keys
-		!byte $0	; ROW 2 - No keys
-		!byte $0	; ROW 3 - No keys
-		!byte $0	; ROW 4 - No keys
-		!byte $0	; ROW 5 - No keys
-		!byte $0	; ROW 6 - No keys
-		!byte $0	; ROW 7 - No keys
-		!byte $0	; ROW 8 - No keys
-		!byte $0	; ROW 9 - No keys
+		!byte %11011111	; ROW 9 - DEL
+		!byte %11111111	; ROW 8
+		!byte %11111110	; ROW 7 - ESC
+		!byte %11111111	; ROW 6
+		!byte %11111111	; ROW 5
+		!byte %11111111	; ROW 4
+		!byte %10111110	; ROW 3 - SHIFT, SHIFT
+		!byte %11111111	; ROW 2
+		!byte %11111111	; ROW 1
+		!byte %11111111	; ROW 0
 }
 
-;		--------------- C64 Keyboard: To be determined
+;		--------------- C64 Keyboard: CTRL-SHIFT-SHIFT-DEL
 !if KEYBOARD=3 { 
-		!byte $0	; ROW 0 - No keys
-		!byte $0	; ROW 1 - No keys
-		!byte $0	; ROW 2 - No keys
-		!byte $0	; ROW 3 - No keys
-		!byte $0	; ROW 4 - No keys
-		!byte $0	; ROW 5 - No keys
-		!byte $0	; ROW 6 - No keys
-		!byte $0	; ROW 7 - No keys
-		!byte $0	; ROW 8 - No keys
-		!byte $0	; ROW 9 - No keys
+		!byte %01111111	; ROW 9 - DEL
+		!byte %11111111	; ROW 8
+		!byte %11111110	; ROW 7 - CTRL
+		!byte %11111101	; ROW 6 - SHIFT
+		!byte %10111111	; ROW 5 - SHIFT
+		!byte %11111111	; ROW 4
+		!byte %11111111	; ROW 3
+		!byte %11111111	; ROW 2
+		!byte %11111111	; ROW 1
+		!byte %11111111	; ROW 0
 }

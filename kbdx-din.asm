@@ -1,10 +1,10 @@
 ; PET/CBM EDIT ROM - Extended Keyboard Matrix Table
 ; ================   German DIN
-; Notes: "(KP)"=Keypad, "S-"=Shift, "Gr"=Graphic Code
+; Notes: "(KP)"=Keypad, "S-"=Shift, "Gr"=Graphic Code, NONE=No key (uses SHIFT code)
 
 KEYBOARD_NORMAL
 ;					-------	-------	-------	-------	-------	-------	-------	-------
-!byte $16,$00,$BE,$13,$39,$36,$33,$3C	;Ctrl V SHIFT	SZ	STOP	9	6	3	<
+!byte $16,$00,$BE,$13,$39,$36,$33,$3C	;Ctrl V NONE	SZ	STOP	9	6	3	<
 !byte $31,$2D,$15,$14,$4D,$20,$58,$00	;1 (KP)	-	Ctrl U	RIGHT	m	SPACE	x	CTRL
 !byte $32,$03,$0F,$30,$2C,$4E,$56,$59	;2 (KP)	DOWN	Ctrl O 	0 (KP)	,	n	v       y
 !byte $33,$00,$19,$2E,$2E,$42,$43,$00	;3	RSHIFT	Ctrl Y	. (KP)	.	b	c	LSHIFT
@@ -12,8 +12,8 @@ KEYBOARD_NORMAL
 !byte $5D,$50,$49,$2B,$5A,$52,$57,$09	;]	p	i	+	z	r	w	TAB
 !byte $36,$BB,$4C,$0D,$4A,$47,$44,$41	;6 (KP)	Grph-OE	l	RETURN	j	g	d	a
 !byte $35,$BC,$4B,$23,$48,$46,$53,$1B	;5 (KP)	Grph-OE	k	#	h	f	s	ESC
-!byte $39,$00,$11,$37,$30,$37,$34,$31	;9 (KP)	SHIFT	HOME	7 (KP)	0	7	4	1
-!byte $00,$0E,$1D,$38,$AF,$38,$35,$32	;SHIFT	Ctrl N	DEL	8 (KP)	ACUTE	8	5	2
+!byte $39,$00,$11,$37,$30,$37,$34,$31	;9 (KP)	NONE	HOME	7 (KP)	0	7	4	1
+!byte $00,$0E,$1D,$38,$AF,$38,$35,$32	;NONE	Ctrl N	DEL	8 (KP)	ACUTE	8	5	2
 
 ;--------- Shifted Table
 ;					-------	-------	-------	-------	-------	-------	-------	-------
