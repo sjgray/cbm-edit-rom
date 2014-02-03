@@ -157,6 +157,7 @@ ESCAPE_U						; Esc-u Uppercase (was: Underline Cursor - not supported on PET)
 		JSR CRT_SET_GRAPHICS			; Set Uppercase/Graphics Mode
 		JMP IRQ_EPILOG
 
+!IF EUROKEYS=1{
 ;-------------- Eurokey Functions
 ;
 ; These functions SET or CLEAR the EUROFLAG location.
@@ -191,6 +192,8 @@ EUROSWAP2	CMP #'Y'		; Is it "Y"?
 		BNE EUROSWAP_OUT
 		LDA #'Z'		; Yes, swap with "Z"
 EUROSWAP_OUT	JMP SCAN_NORM2		; Return to keyboard routine
+
+}
 
 
 ;-------------- CRTC Chip Functions
