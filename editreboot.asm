@@ -40,7 +40,7 @@ RebootCodes
 }
 
 ;		----------------- Business Keyboard: ESC-SHIFT-SHIFT-DEL
-!if (KEYBOARD=1) OR (KEYBOARD=4) {
+!if (KEYBOARD=1) OR (KEYBOARD=4) OR (KEYBOARD=6) {
 		!byte %11111111	; ROW 9
 		!byte %11111111	; ROW 8
 		!byte %11111110	; ROW 7 - ESC
