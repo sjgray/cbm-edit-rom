@@ -1496,11 +1496,12 @@ ModifierKeys
 ;************** Keyboard Decoding Table
 !if EXTENDED = 0 {
 		!if KEYBOARD = 0 { !source "kbd-n.asm" }
-		!if KEYBOARD = 1 { !source "kbd-b.asm" }
+		!if KEYBOARD = 1 { !source "kbd-b.asm" }	; QWERTY layout
 		!if KEYBOARD = 2 { !source "kbd-din1.asm" }
 		!if KEYBOARD = 3 { !source "kbd-c64.asm" }
-		!if KEYBOARD = 4 { !source "kbd-bsjg.asm" } ; Modified layout
-		!if KEYBOARD = 5 { !source "kbd-nsjg.asm" } ; @ replaced by ESC
+		!if KEYBOARD = 4 { !source "kbd-bsjg.asm" }	; Modified layout
+		!if KEYBOARD = 5 { !source "kbd-nsjg.asm" }	; @ replaced by ESC
+		!if KEYBOARD = 6 { !source "kbd-bz.asm" }	; QWERTZ layout
 }
 
 ;************** SHIFT RUN/STOP string
