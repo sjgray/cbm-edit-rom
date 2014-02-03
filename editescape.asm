@@ -28,10 +28,12 @@ DoEscapeCode	AND #$7F		; Strip top bit
 		SEC
 !IF COLOURPET = 1 {
 		SBC #$30		; Subtract 30 (Start at "0")
-		CMP #$2B		; Out of range?
+	!IF EUROKEYS = 0 { CMP #$2B }	; Greater than "Z"?
+	!IF EUROKEYS = 1 { CMP #$2E }   ; Greater than "]"?
 } ELSE {
 		SBC #$40		; Subtract 40 (Start at "@")
-		CMP #$1B		; Out of range?
+	!IF EUROKEYS = 0 { CMP #$1B }	; Greater than "Z"?
+	!IF EUROKEYS = 1 { CMP #$1E }   ; Greater than "]"?
 }
 		BCS DoESCDONE		; Yes, skip
 
@@ -97,7 +99,11 @@ ESCVECTORS
 		!WORD ESCAPE_X-1	; Esc-x Switch 40/80 Col
 		!WORD ESCAPE_Y-1	; Esc-y Normal Chr Set * (was: Set Default Tabs)
 		!WORD ESCAPE_Z-1	; Esc-z Alternate Chr Set * (was: Clear All Tabs)
-
+!if EUROKEYS=1 {
+		!WORD ESCAPE_LB-1	; Esc-[ Use ASCII
+		!WORD ESCAPE_BS-1	; Esc-\ Toggle ASCII / DIN
+		!WORD ESCAPE_RB-1	; Esc-] Use DIN
+}
 
 ;=============== ESCAPE CODES not in normal PET code
 ;
@@ -126,7 +132,7 @@ ESCAPE_NUM
 		SEC
 		SBC #$30				; Subtract 30 (Start at "0")
 		STA COLOURFG
-		JSR SetColourValue
+		JSR SetColourValue			; TODO: Can we insert CHR code when INS Mode is active?
 		JMP IRQ_EPILOG
 }
 
@@ -150,6 +156,42 @@ ESCAPE_S						; Esc-s Standard Lowercase (was: Block Cursor)
 ESCAPE_U						; Esc-u Uppercase (was: Underline Cursor - not supported on PET)
 		JSR CRT_SET_GRAPHICS			; Set Uppercase/Graphics Mode
 		JMP IRQ_EPILOG
+
+;-------------- Eurokey Functions
+;
+; These functions SET or CLEAR the EUROFLAG location.
+; A '0' means use ASCII layout. A '1' means use DIN layout (swap Y and Z)
+
+ESCAPE_LB	LDA #0
+		BEQ EuroSet
+
+ESCAPE_RB	LDA #1
+		BNE EuroSet		
+
+ESCAPE_BS	LDA EUROFLAG
+		EOR #1
+
+EuroSet		STA EUROFLAG
+		JSR BEEP
+		JMP IRQ_EPILOG
+
+;-------------- Check if Euro keys need swapping
+;
+; .A contains character to add to keyboard buffer. If EUROFLAG=1 then check if Y or Z need swapping.
+
+EUROSWAP
+		LDX EUROFLAG		; Flag to swap Z and Y keys; 1=Swap
+		BEQ EUROSWAP_OUT
+
+		CMP #'Z'		; Is it "Z"?
+		BNE EUROSWAP2
+		LDA #'Y'		; Yes, swap with "Y"
+		BNE EUROSWAP_OUT
+EUROSWAP2	CMP #'Y'		; Is it "Y"?
+		BNE EUROSWAP_OUT
+		LDA #'Z'		; Yes, swap with "Z"
+EUROSWAP_OUT	JMP SCAN_NORM2		; Return to keyboard routine
+
 
 ;-------------- CRTC Chip Functions
 ; CRTC controller REGISTER 12 is used for Screen RAM Address HI

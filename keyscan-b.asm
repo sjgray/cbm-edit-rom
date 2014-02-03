@@ -135,7 +135,11 @@ SCAN_SHIFT	ORA #$80		; Set upper bit for Graphics Symbol
 
 ;-------------- Put the KEY into the Buffer (Key in accumulator)
 
-SCAN_NORM	LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
+SCAN_NORM
+
+!IF EUROKEYS=1 { JMP EUROSWAP }		; Check if Eurokeys need swapping
+
+SCAN_NORM2	LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 		CPX XMAX		; Size of Keyboard Buffer
 		BCS SCAN_OUT		; Exit if buffer full
 		STA KEYD,X		; Put the key into the buffer

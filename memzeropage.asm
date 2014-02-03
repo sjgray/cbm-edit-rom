@@ -163,14 +163,16 @@ SCROV		= $eb		; Screen Output Vector (EB/EC)
 
 ; $ED-F7 			; Part of 40 column wrap table - UNUSED on 80 col!
 
-!IF ESCCODES = 1 {
-LASTCHAR	= $f0		; Last Key Pressed
-BELLMODE	= $f1		; 0=Disable, 1=Enable BELL/CHIME
+!IF SS40=1 {
+SCNWIDTH	= $f0
 }
 
-!IF SS40=1 {
-SCNWIDTH	= $f2
+!IF ESCCODES = 1 {
+LASTCHAR	= $f1		; Last Key Pressed
+BELLMODE	= $f2		; 0=Disable, 1=Enable BELL/CHIME
+EUROFLAG        = $f3		; 0=ASCI, 1=DIN
 }
+
 
 JIFFY6DIV5	= $f8
 CAS1		= $f9		; Cassette #1 status
