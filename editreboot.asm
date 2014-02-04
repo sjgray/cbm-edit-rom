@@ -22,28 +22,31 @@ CheckLoop
 CheckOut	RTS
 
 ;-------------- Reboot Code Table
+;
 ; Note: Rows are entered in reverse order compared to the keyboard matrix
+; IMPORTANT!: Be aware of keyboard "ghosting", which means pressing multiple keys
+; can sometimes cause other keys to appear pressed.
 
 RebootCodes
 ;		----------------- Normal/Graphic Keyboard: @-SHIFT-SHIFT-DEL
 !if (KEYBOARD=0) OR (KEYBOARD=5) {
-		!byte $ff	; ROW 9 - No keys
-		!byte $7f	; ROW 8 - <DEL>
-		!byte $ff	; ROW 7 - No keys
-		!byte $ff	; ROW 6 - No keys
-		!byte $ff	; ROW 5 - No keys
-		!byte $ff	; ROW 4 - No keys
-		!byte $ff	; ROW 3 - No keys
-		!byte $ff	; ROW 2 - No keys
-		!byte $dc	; ROW 1 - @ + Both Shifts
-		!byte $ff	; ROW 0 - No keys
+		!byte %11111111	; ROW 9 - No keys
+		!byte %01111111	; ROW 8 - <DEL>
+		!byte %11111111	; ROW 7 - No keys
+		!byte %11111111	; ROW 6 - No keys
+		!byte %11111111	; ROW 5 - No keys
+		!byte %11111111	; ROW 4 - No keys
+		!byte %11111111	; ROW 3 - No keys
+		!byte %11111111	; ROW 2 - No keys
+		!byte %11011100	; ROW 1 - @ + Both Shifts
+		!byte %11111111	; ROW 0 - No keys
 }
 
 ;		----------------- Business Keyboard: ESC-SHIFT-SHIFT-DEL
 !if (KEYBOARD=1) OR (KEYBOARD=4) OR (KEYBOARD=6) {
 		!byte %11111111	; ROW 9
 		!byte %11111111	; ROW 8
-		!byte %11111110	; ROW 7 - ESC
+		!byte %10111110	; ROW 7 - (ghost), ESC
 		!byte %11111111	; ROW 6
 		!byte %01111111	; ROW 5 - DEL
 		!byte %11111111	; ROW 4
@@ -57,7 +60,7 @@ RebootCodes
 !if KEYBOARD=2 { 
 		!byte %11011111	; ROW 9 - DEL
 		!byte %11111111	; ROW 8
-		!byte %11111110	; ROW 7 - ESC
+		!byte %10111110	; ROW 7 - (ghost), ESC
 		!byte %11111111	; ROW 6
 		!byte %11111111	; ROW 5
 		!byte %11111111	; ROW 4
@@ -89,9 +92,9 @@ RebootCodes
 		!byte %11111111	; ROW 6
 		!byte %11111111	; ROW 5
 		!byte %11111111	; ROW 4
-		!byte %10111110	; ROW 3 - SHIFT, SHIFT
+		!byte %10101110	; ROW 3 - SHIFT, (ghost), SHIFT
 		!byte %11111111	; ROW 2
 		!byte %11111111	; ROW 1
-		!byte %11101110	; ROW 0 - DEL, ESC
+		!byte %10101110	; ROW 0 - (ghost), DEL, ESC
 
 }
