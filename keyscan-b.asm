@@ -137,7 +137,7 @@ SCAN_SHIFT	ORA #$80		; Set upper bit for Graphics Symbol
 
 SCAN_NORM
 
-!IF EUROKEYS=1 { JMP EUROSWAP }		; Check if Eurokeys need swapping
+!IF ESCCODES=1 { JMP EUROSWAP }		; Check if Eurokeys need swapping
 
 SCAN_NORM2	LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 		CPX XMAX		; Size of Keyboard Buffer

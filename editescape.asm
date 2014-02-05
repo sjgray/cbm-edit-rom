@@ -28,12 +28,10 @@ DoEscapeCode	AND #$7F		; Strip top bit
 		SEC
 !IF COLOURPET = 1 {
 		SBC #$30		; Subtract 30 (Start at "0")
-	!IF EUROKEYS = 0 { CMP #$2B }	; Greater than "Z"?
-	!IF EUROKEYS = 1 { CMP #$2E }   ; Greater than "]"?
+		CMP #$2F		; Greater than "uparrow"?
 } ELSE {
 		SBC #$40		; Subtract 40 (Start at "@")
-	!IF EUROKEYS = 0 { CMP #$1B }	; Greater than "Z"?
-	!IF EUROKEYS = 1 { CMP #$1E }   ; Greater than "]"?
+		CMP #$1F		; Greater than "uparrow"?
 }
 		BCS DoESCDONE		; Yes, skip
 
@@ -99,11 +97,12 @@ ESCVECTORS
 		!WORD ESCAPE_X-1	; Esc-x Switch 40/80 Col
 		!WORD ESCAPE_Y-1	; Esc-y Normal Chr Set * (was: Set Default Tabs)
 		!WORD ESCAPE_Z-1	; Esc-z Alternate Chr Set * (was: Clear All Tabs)
-!if EUROKEYS=1 {
-		!WORD ESCAPE_LB-1	; Esc-[ Use ASCII
+		!WORD ESCAPE_LB-1	; Esc-[ Mark Start
 		!WORD ESCAPE_BS-1	; Esc-\ Toggle ASCII / DIN
-		!WORD ESCAPE_RB-1	; Esc-] Use DIN
-}
+		!WORD ESCAPE_RB-1	; Esc-] Mark End (Copy)
+		!WORD ESCAPE_UA-1	; Esc-UPARROW Paste
+
+;		!WORD ESCAPE_BA-1	; Esc-BACKARROW
 
 ;=============== ESCAPE CODES not in normal PET code
 ;
@@ -157,17 +156,102 @@ ESCAPE_U						; Esc-u Uppercase (was: Underline Cursor - not supported on PET)
 		JSR CRT_SET_GRAPHICS			; Set Uppercase/Graphics Mode
 		JMP IRQ_EPILOG
 
-!IF EUROKEYS=1{
+;-------------- Copy/Paste function
+; These functions use Tape Buffer#1 to store copied byte(s)
+; TAPEB1   - Set to "ESC" character to indicate valid Start Marker
+; TAPEB+1  - Length of string (Max 160 characters)
+; TAPEB+2/3- Pointer to screen marked starting position 
+; TAPEB+4..- Buffer
+;
+; TODO: Add check for buffer start > buffer end !!!!
+
+;-------------- ESC-[ Mark Start
+
+ESCAPE_LB
+		LDA TAPEB1				; Read Buffer Identifier
+		CMP #27					; is it ESC?
+		BEQ ESCLB_SET				; Yes, Start Mark, so skip initialize
+
+		LDA #0					; Initialize buffer -
+		STA TAPEB1+1				; Set Buffer Length to zero
+		LDA #27					; Buffer identifier = ESC
+		STA TAPEB1				; Set Buffer identifier
+ESCLB_SET	
+		LDA ScrPtr				; Copy current screen pointer
+		STA TAPEB1+2				;   to buffer
+		LDA ScrPtr+1
+		STA TAPEB1+3
+		JMP IRQ_EPILOG				; Return
+
+;--------------- ESC-] Mark End (Copy to buffer)
+
+ESCAPE_RB	
+		LDA TAPEB1				; Read Buffer Identifier
+		CMP #27					; is it ESC?
+		BNE ESCRB_EXIT				; No Start Mark, so exit out
+		
+ESCRB_INIT	LDA TAPEB1+2
+		STA SAL					; copy buffer pointer to work pointer
+		LDA TAPEB1+3
+		STA SAL+1
+
+		LDX #0					; length counter
+		LDY #0					; loop counter
+ESCRB_LOOP
+		LDA (SAL),Y				; read byte from screen (SAL is updated, y never changes)
+		STA TAPEB1+4,X				; Store in buffer (x is index)
+		INX
+		INC SAL					; Increment pointer LO byte
+		LDA SAL					; read it
+		BNE ESCRB2				; is byte 0? No, skip hi byte
+		INC SAL+1				; yes, increment hi byte
+ESCRB2		LDA SAL
+		CMP ScrPtr				; do low bytes match?
+		BNE ESCRB_CHECK				; no, keep going
+		LDA SAL+1				; Get HI byte
+		CMP ScrPtr+1				; Does it match?
+		BEQ ESCRB_DONE				; yes, finish up
+
+ESCRB_CHECK	CPX #160				; Are we at maximum buffer length?
+		BNE ESCRB_LOOP				; No, loop back for more
+
+ESCRB_DONE	STX TAPEB1+1				; Store string length
+		LDA #0
+		STA TAPEB1+4,X				; Store a ZERO at end for STROUT routine
+ESCRB_EXIT	JMP IRQ_EPILOG				; Return
+
+;--------------- ESC-UPARROW - Copy from buffer to screen
+ESCAPE_UA	
+
+		LDA TAPEB1				; Read Buffer Identifier
+		CMP #27					; is it ESC?
+		BEQ ESCUA_OUT				; Yes, no Start Mark, so exit out
+
+		lda #<TAPEB1+4				; setup string address
+		ldy #>TAPEB1+4
+		jsr STROUTZ
+ESCUA_OUT	JMP IRQ_EPILOG				; Return		
+
+
+
+;		LDA TAPEB1+1				; Read Buffer length
+;		BEQ ESCUA_OUT				; Is it zero? Yes, exit out
+;
+;		LDY #0					; counter
+;
+;ESCUA_LOOP	LDA TAPEB1+4,Y				; get byte from buffer
+;		JSR BSOUT				; print it
+;		INY
+;		CPY TAPEB1+1				; Are we done?
+;		BNE ESCUA_LOOP				; No, loop back for more
+;		
+;ESCUA_OUT	JMP IRQ_EPILOG				; Return
+		
+
 ;-------------- Eurokey Functions
 ;
 ; These functions SET or CLEAR the EUROFLAG location.
 ; A '0' means use ASCII layout. A '1' means use DIN layout (swap Y and Z)
-
-ESCAPE_LB	LDA #0
-		BEQ EuroSet
-
-ESCAPE_RB	LDA #1
-		BNE EuroSet		
 
 ESCAPE_BS	LDA EUROFLAG
 		EOR #1
@@ -193,10 +277,9 @@ EUROSWAP2	CMP #'Y'		; Is it "Y"?
 		LDA #'Z'		; Yes, swap with "Z"
 EUROSWAP_OUT	JMP SCAN_NORM2		; Return to keyboard routine
 
-}
-
 
 ;-------------- CRTC Chip Functions
+;
 ; CRTC controller REGISTER 12 is used for Screen RAM Address HI
 ; BIT 4 controls the INVERT line     (normal=1,rvs=0)
 ; BIT 5 controls the CHR OPTION line (normal=0,alternate=1)

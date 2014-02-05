@@ -11,12 +11,12 @@
 ; DIRECTIVE	  FEATURE			VALID OPTIONS			NOTES / FUTURE OPTIONS
 ;----------	  -------			-------------			----------------------
 EXTENDED  = 0	; Extended Editor?		0=No, 1=Yes
-KEYBOARD  = 5	; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG,6=BZ
+KEYBOARD  = 1	; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG,6=BZ
 COLUMNS   = 40	; Screen Width:			40 or 80
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes
 SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes
-BOOTCASE  = 1	; Initial Screen Mode		0=Text, 1=Graphics
-REFRESH   = 3	; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
+BOOTCASE  = 0	; Initial Screen Mode		0=Text, 1=Graphics
+REFRESH   = 1	; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
 
 HERTZ     = 50	; Line Frequency (Clock):					50=Euro, 60=NorthAmerica
 
@@ -33,7 +33,7 @@ SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
 REPEATOPT = 1	; Key Repeat Option		0=No (Always ON), 1=Yes
 WEDGE     = 1	; DOS Wedge			0=No, 1=Yes
 WEDGEMSG  = 1	; Show wedge message?		0=No, 1=Yes			Only valid when WEDGE=1
-EUROKEYS  = 1	; ESC options for ASCII/DIN	0=No, 1=Yes			Only valid when ESCCODES=1
+
 DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
 
 ; To generate Edit ROMs that are Byte-exact matches to actual Commodore ROMS set the
