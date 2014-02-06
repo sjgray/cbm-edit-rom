@@ -596,9 +596,6 @@ ChrOutNormal
 !if EXTENDED = 0 {
 		LDY CursorCol				; Cursor Column on Current Line
 		LDA DATAX				; Current Character to Print
-
-!if COLOURPET = 1 { JSR CheckColourCodes }		; Check table of color values @@@@@@@@@@@@@@@@ COLOURPET
-
 		AND #$7F				; Strip off top bit (REVERSE)
 }
 !if EXTENDED = 1 {
@@ -606,6 +603,8 @@ ChrOutNormal
 		BVS IRQ_EPILOG
 		NOP
 }
+
+;************** CHECK HERE FOR ESC CODES
 
 !IF ESCCODES = 1 {
 		JMP CheckESC				; Check for ESC as last Char, then ESC as current Char. If so, perform it.
@@ -617,9 +616,13 @@ ESC_DONE	STA LASTCHAR				; Save the character
 		JMP Escape				; Cancel RVS/INS/QUOTE modes
 }
 
+ESC_DONE2
+
 ;************** Reload character and check high bit 
 
 Be21d		LDA DATAX				; Current Character to Print
+!if COLOURPET = 1 { JSR CheckColourCodes }		; Check table of color values @@@@@@@@@@@@@@@@ COLOURPET
+
 		BPL Be224				; Handle unshifted characters
 		JMP ChrOutHighBitSet			; Handle shifted characters
 

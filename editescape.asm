@@ -3,11 +3,25 @@
 ; Goal is to support as many C128/CBM-II ESC codes as possible
 ;
 
+;-------------- Check for ESC as LAST character
+;
+; NOTE: We JMP here from EDITROM.ASM. Accumulator holds code of CURRENT character
+;       If we want to continue processing as normal we need to JMP ESC_DONE.
+;       If we need to modify the action we set DATAX with the new character.
+;       If we want to skip the rest of the character processing we should JMP IRQ_EPILOG .
+
 CheckESC
 		LDX LASTCHAR 		; Previous character printed
 		CPX #$1B		; <ESC>?
 		BEQ ESC_YES		; Yes, process it
+		CMP #$1B		; Is current Chr ESC?
+		BEQ ESC_NOW		; Yes, 
 		JMP ESC_DONE		; No, back to normal checking
+
+;-------------- ESC is current Chr
+
+ESC_NOW		STA LASTCHAR		; Remember it
+		JMP IRQ_EPILOG		; don't process anything
 
 ;-------------- Process ESC sequence
 
@@ -44,7 +58,7 @@ DoEscapeCode	AND #$7F		; Strip top bit
 		PHA
 		LDA ESCVECTORS,X	; ESC Sequence Vectors
 		PHA			; Push address to stack so RTS will jump to selected routine
-		LDA #0			; Clear Character
+;		LDA #0			; Clear Character
 		RTS
 
 DoESCDONE	JMP ESC_DONE
@@ -130,9 +144,21 @@ ESCAPE_NUM
 		LDA DATAX				; Character
 		SEC
 		SBC #$30				; Subtract 30 (Start at "0")
-		STA COLOURFG
-		JSR SetColourValue			; TODO: Can we insert CHR code when INS Mode is active?
-		JMP IRQ_EPILOG
+
+;		LDX QuoteMode				; Check if inside quotes
+;		BPL ESC_NUM2				; Yes, go convert it
+;
+;		STA COLOURFG				; No, just change it immediately
+;		JSR SetColourValue			; Set the colour
+;		JMP IRQ_EPILOG				; no need to process more
+
+ESC_NUM2
+		TAX					; The Colour number becomes the index
+		LDA COLOURS,X				; Lookup the correct PETSCII code
+		STA DATAX				; replace ESC code with colour code
+		LDA #0					;
+		JMP ESC_DONE2				; return and process
+
 }
 
 ESCAPE_G						; Esc-g Bell Enable
@@ -156,7 +182,8 @@ ESCAPE_U						; Esc-u Uppercase (was: Underline Cursor - not supported on PET)
 		JSR CRT_SET_GRAPHICS			; Set Uppercase/Graphics Mode
 		JMP IRQ_EPILOG
 
-;-------------- Copy/Paste function
+;-------------- Copy/Paste functions
+;
 ; These functions use Tape Buffer#1 to store copied byte(s)
 ; TAPEB1   - Set to "ESC" character to indicate valid Start Marker
 ; TAPEB+1  - Length of string (Max 160 characters)
@@ -177,11 +204,15 @@ ESCAPE_LB
 		LDA #27					; Buffer identifier = ESC
 		STA TAPEB1				; Set Buffer identifier
 ESCLB_SET	
-		LDA ScrPtr				; Copy current screen pointer
+		LDA ScrPtr+1				; Copy HI byte of line pointer
+		STA TAPEB1+3				; to buffer
+		LDA ScrPtr				; Get LO byte of line pointer
+		CLC
+		ADC CursorCol				; Add cursor offset
 		STA TAPEB1+2				;   to buffer
-		LDA ScrPtr+1
-		STA TAPEB1+3
-		JMP IRQ_EPILOG				; Return
+		BCC ESCLB_SKIP				; do we need to update HI byte?
+		INC TAPEB1+3				; yes, increment it
+ESCLB_SKIP	JMP IRQ_EPILOG				; Return
 
 ;--------------- ESC-] Mark End (Copy to buffer)
 
@@ -190,63 +221,72 @@ ESCAPE_RB
 		CMP #27					; is it ESC?
 		BNE ESCRB_EXIT				; No Start Mark, so exit out
 		
-ESCRB_INIT	LDA TAPEB1+2
-		STA SAL					; copy buffer pointer to work pointer
-		LDA TAPEB1+3
-		STA SAL+1
+ESCRB_INIT
+		LDA TAPEB1+3				; Copy Hi byte of paste buffer pointer
+		STA SAL+1				;   to work pointer
+		LDA TAPEB1+2				; Copy Lo byte of paste buffer pointer
+		STA SAL					;   to work pointer
 
-		LDX #0					; length counter
-		LDY #0					; loop counter
+		LDA ScrPtr+1				; Copy Hi byte of screen pointer
+		STA EAL+1				;   to work pointer 2
+		LDA ScrPtr				; Copy Lo byte of screen pointer
+		CLC
+		ADC CursorCol				; Add cursor position
+		STA EAL					;   to work pointer 2
+		BCC ESCRB_SKIP				; do we need to update Hi byte?
+		INC EAL+1				; yes, increment it
+
+ESCRB_SKIP	LDX #0					; length counter
+		LDY #0					; offet for pointer
 ESCRB_LOOP
 		LDA (SAL),Y				; read byte from screen (SAL is updated, y never changes)
 		STA TAPEB1+4,X				; Store in buffer (x is index)
-		INX
+
+		LDA SAL+1				; Get HI byte
+		CMP EAL+1				; Does it match?
+		BNE ESCRB_CHECK				; no, keep going
+		LDA SAL					; get lo byte of pointer
+		CMP EAL					; does it match?
+
+		BCS ESCRB_DONE				; yes, finish up
+
+ESCRB_CHECK	INX
 		INC SAL					; Increment pointer LO byte
 		LDA SAL					; read it
 		BNE ESCRB2				; is byte 0? No, skip hi byte
 		INC SAL+1				; yes, increment hi byte
-ESCRB2		LDA SAL
-		CMP ScrPtr				; do low bytes match?
-		BNE ESCRB_CHECK				; no, keep going
-		LDA SAL+1				; Get HI byte
-		CMP ScrPtr+1				; Does it match?
-		BEQ ESCRB_DONE				; yes, finish up
 
-ESCRB_CHECK	CPX #160				; Are we at maximum buffer length?
+ESCRB2		CPX #160				; Are we at maximum buffer length?
 		BNE ESCRB_LOOP				; No, loop back for more
 
 ESCRB_DONE	STX TAPEB1+1				; Store string length
 		LDA #0
-		STA TAPEB1+4,X				; Store a ZERO at end for STROUT routine
+		STA TAPEB1+5,X				; Store a ZERO at end for STROUT routine
 ESCRB_EXIT	JMP IRQ_EPILOG				; Return
 
 ;--------------- ESC-UPARROW - Copy from buffer to screen
 ESCAPE_UA	
-
 		LDA TAPEB1				; Read Buffer Identifier
 		CMP #27					; is it ESC?
-		BEQ ESCUA_OUT				; Yes, no Start Mark, so exit out
+		BNE ESCUA_OUT				; No Start Mark, so exit out
 
+		JSR BEEP
 		lda #<TAPEB1+4				; setup string address
+		STA SAL
 		ldy #>TAPEB1+4
-		jsr STROUTZ
+		STA SAL+1
+
+ESCUA_LOOP	LDY #0					; counter
+		LDA (SAL),Y				; get byte from buffer
+		BEQ ESCUA_OUT
+		JSR BSOUT				; print it
+		INC SAL
+		BNE ESCUA_LOOP
+		INC SAL+1
+		BNE ESCUA_LOOP
+
 ESCUA_OUT	JMP IRQ_EPILOG				; Return		
 
-
-
-;		LDA TAPEB1+1				; Read Buffer length
-;		BEQ ESCUA_OUT				; Is it zero? Yes, exit out
-;
-;		LDY #0					; counter
-;
-;ESCUA_LOOP	LDA TAPEB1+4,Y				; get byte from buffer
-;		JSR BSOUT				; print it
-;		INY
-;		CPY TAPEB1+1				; Are we done?
-;		BNE ESCUA_LOOP				; No, loop back for more
-;		
-;ESCUA_OUT	JMP IRQ_EPILOG				; Return
-		
 
 ;-------------- Eurokey Functions
 ;
