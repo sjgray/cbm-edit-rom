@@ -32,7 +32,7 @@ EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
 REPEATOPT = 1	; Key Repeat Option		0=No (Always ON), 1=Yes
 WEDGE     = 1	; DOS Wedge			0=No, 1=Yes
-WEDGEMSG  = 1	; Show wedge message?		0=No, 1=Yes			Only valid when WEDGE=1
+WEDGEMSG  = 2	; Show wedge message?		0=No, 1=Yes,2=Custom		Only valid when WEDGE=1
 
 DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
 

@@ -53,15 +53,37 @@ install_wedge
 
 ;-------------- MESSAGE
 
-WEDGESTRING	!byte $91			; <UP><UP>
+WEDGESTRING	
 
+!if WEDGEMSG=2 {
+		!byte $93,$5			; <CLS><WHT>
+		!pet "*** "
+		!byte $9f			; <LTCYN>
+		!pet "Commodore "
+		!byte $1c			; <RED>
+		!pet "Co"
+		!byte $99			; <GRN>
+		!pet "lo"
+		!byte $9a			; <BLU>
+		!pet "ur"
+		!byte $9e			; <YEL>
+		!pet "PET"
+		!byte $5			; <WHT>
+		!pet " ***"
+		!byte 11,11
+		!byte $d,0			; <cr>
+}
+		
 !if WEDGEMSG=1 {
-		!byte $91			; <UP>
+		!byte $91,$91			; <UP><UP>
 		!text "WEDGE ACTIVE"		; message
 		!byte $0D			; <CR>
 		!text "            "		; erase "READY"
 		!byte $91			; <UP>
-} ELSE {
+}
+
+!if WEDGEMSG=0 {
+		!byte $91			; <UP>
 		!text "            "		; erase "SYS" message
 		!byte $0D			; <CR>
 		!text "            "		; erase "READY" message

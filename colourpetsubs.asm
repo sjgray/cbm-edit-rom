@@ -298,14 +298,14 @@ COLOURS
 	!byte $1F	;6=blue			2=blue
 	!byte $9A	;14=light blue		3=light blue
 	!byte $1E	;5=green		4=green
-	!byte $99	;13=light green		5=light green (CONFLICT! PET = SCROLL UP!)
+	!byte $99	;13=light green		5=light green	(CONFLICT! PET = SCROLL UP!)
 	!byte $97	;11=dark grey		6=dark cyan*
 	!byte $9F	;3=cyan			7=light cyan*
 	!byte $1C	;2=red			8=red
-	!byte $96	;10=light red		9=light red
+	!byte $96	;10=light red		9=light red	(CONFLICT! PET = ERASE END!)
 	!byte $81	;8=orange		10=dark purple*
 	!byte $9C	;4=magenta		11=magenta/purple
-	!byte $95	;9=brown		12=dark yellow*
+	!byte $95	;9=brown		12=dark yellow* (CONFLICT! PET = INS LINE!)
 	!byte $9E	;7=yellow		13=yellow
 	!byte $9B	;15=light grey		14=light grey
 	!byte $05	;1=white		15=white
