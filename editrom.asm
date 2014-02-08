@@ -85,14 +85,14 @@ SET_REPEAT_MODE
 
 RESET_EDITOR
 
-!if COLOURPET = 0 {
+!if COLOURPET=0 {
 		JSR INIT_EDITOR
 } ELSE {
 		JSR ColourPET_Init			; Initialize ColourPET settings
 }
 
-!IF BOOTCASE = 0 { JSR CRT_SET_TEXT }			; Set Screen to TEXT mode
-!IF BOOTCASE = 1 { JSR CRT_SET_GRAPHICS }		; Set Screen to GRAPHICS mode
+!IF BOOTCASE=0 { JSR CRT_SET_TEXT }			; Set Screen to TEXT mode
+!IF BOOTCASE=1 { JSR CRT_SET_GRAPHICS }		; Set Screen to GRAPHICS mode
 
 ;************** Clear Window (Called from Jump Table)
 
@@ -134,7 +134,7 @@ UPDATE_CURSOR_R2
 UPDATE_CURSOR_R3
 		LDA Line_Addr_Lo,X			; Screen Line Addresses LO		DATA
 UPDATE_SCREEN_PTR
-	!IF COLOURPET = 0 {
+	!IF COLOURPET=0 {
 		STA ScrPtr				; Pointer: Current Screen Line Address LO
 		LDA Line_Addr_Hi,X			; Screen Line Addresses HI		DATA
 		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
@@ -144,7 +144,7 @@ UPDATE_SCREEN_PTR
 		RTS
 ;zxcvb -- was "}" here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-!if EXTENDED = 1 {
+!if EXTENDED=1 {
            	JMP Update_ScrPtr			; New Screen pointer calculation routine
            	JMP Cursor_BOL				; HOW DO WE GET TO THIS CODE?
 UPDATE_PNT
@@ -260,13 +260,13 @@ Be09b		LDA (SAL),Y				; Pointer: Tape Buffer/ Screen Scrolling
 ; If there is NO key it will return $FF.
 
 GETKEY
-!if DEBUG = 1 { INC DBLINE+2,X }			; DEBUG
+!if DEBUG=1 { INC DBLINE+2,X }			; DEBUG
 		LDY KEYD				; Get key at start of buffer
 		LDX #0 					; Start at 0
 
 getkey1		LDA KEYD+1,X				; LOOP START - Now shift the next keys in line
 		STA KEYD,X				; to the front of the buffer
-!if DEBUG = 1 { STA DBLINE+10,X }			; DEBUG - update screen
+!if DEBUG=1 { STA DBLINE+10,X }			; DEBUG - update screen
 		INX
 		CPX CharsInBuffer			; Num Chars in Keyboard Buffer
 		BNE getkey1				; Done? No, loop for another
@@ -274,7 +274,7 @@ getkey1		LDA KEYD+1,X				; LOOP START - Now shift the next keys in line
 		DEC CharsInBuffer			; Reduce Num Chars in Keyboard Buffer
 
 		TYA					; Put the character in Accumulator
-!if DEBUG = 1 { STA DBLINE+3 }				; DEBUG - 4th chr on bottom line
+!if DEBUG=1 { STA DBLINE+3 }				; DEBUG - 4th chr on bottom line
 		CLI
 		RTS
 
@@ -287,13 +287,13 @@ getkey1		LDA KEYD+1,X				; LOOP START - Now shift the next keys in line
 
 GetLine		JSR ChrOutMarginBeep			; 
 GetLin10
-!if DEBUG = 1 { INC DBLINE+5 }				; DEBUG - 6th chr on bottom line
+!if DEBUG=1 { INC DBLINE+5 }				; DEBUG - 6th chr on bottom line
 
 		LDA CharsInBuffer			; Are there any keys waiting?
 		STA Blink 				; 0 chars -> blink cursor
 		BEQ GetLin10 				; loop until char in buffer
 
-!if DEBUG = 1 { INC DBLINE+6 }				; DEBUG - 7th chr on bottom line
+!if DEBUG=1 { INC DBLINE+6 }				; DEBUG - 7th chr on bottom line
 
 ;************** Got a character, so process it
 
@@ -328,7 +328,7 @@ Be0ea		CMP #13 				; Check if <RETURN> pressed
 ; Parse the line. When the <CR> key is pressed the line where the cursor lives is executed
 ;*******************************************************************************************
 
-;!if DEBUG = 1 { INC DBLINE+7 }				; DEBUG - 8th chr on bottom line
+;!if DEBUG=1 { INC DBLINE+7 }				; DEBUG - 8th chr on bottom line
 
 		LDY RigMargin				; Physical Screen Line Length
 		STY CRSW 				; # 0 -> Screen Input
@@ -378,7 +378,7 @@ DEFAULT_SCREEN_VECTOR
 
 Screen_Input
 
-!if EXTENDED = 0 {
+!if EXTENDED=0 {
 iE121		LDY CursorCol				; Cursor Column on Current Line
 		LDA (ScrPtr),Y				; Pointer: Current Screen Line Address
 		STA DATAX				; Current Character to Print
@@ -399,9 +399,9 @@ Be137		BVS Be13b
 		ORA #$40 				; '@'
 Be13b
 
-!if EXTENDED = 0 { INC CursorCol }			; Cursor Column on Current Line
+!if EXTENDED=0 { INC CursorCol }			; Cursor Column on Current Line
 
-!if EXTENDED = 1 {
+!if EXTENDED=1 {
 		NOP					; PATCH for conditional cursor?
 		NOP
 }
@@ -450,13 +450,13 @@ Me179		LDX ReverseFlag
 Me17d		ORA #$80
 Be17f
 
-!if EXTENDED = 0 {
+!if EXTENDED=0 {
 		LDX INSRT				; Flag: Insert Mode, >0 = # INSTs
 		BEQ iE185
 		DEC INSRT				; Flag: Insert Mode, >0 = # INSTs
 }
 
-!if EXTENDED = 1 {		
+!if EXTENDED=1 {		
 		JSR CHROUT_WITH_DIACRITICS		; PATCH (located in EDITROMEXT.ASM)
 		BVS IRQ_EPILOG				; Do not print character! Character pending
 		NOP
@@ -510,7 +510,7 @@ Be1ba		DEC CursorRow				; Current Cursor Physical Line Number
 ; Called from WINDOW_CLEAR
 ; This routine is relocated/updated for COLOURPET
 
-!if COLOURPET = 0 {
+!if COLOURPET=0 {
 
 Erase_To_EOL
 		LDA #$20 				; <SPACE>
@@ -542,7 +542,7 @@ FULL_SCREEN_WINDOW
 		JSR WINDOW_SET_TOP			; Set Window Top
 		LDA #24					; 25 lines   (0-24)
 
-!if COLUMNS = 80 {
+!if COLUMNS=80 {
 	!if SS40=1 {
 		LDX SCNWIDTH				; Current SS40 screen width
 	} ELSE {
@@ -550,7 +550,7 @@ FULL_SCREEN_WINDOW
 	}
 }
 
-!if COLUMNS = 40 {
+!if COLUMNS=40 {
 		LDX #$27				; 40 columns (0-39)
 }
 
@@ -593,12 +593,12 @@ ChrOutNormal
 		LDA #0
 		STA CRSW				; Flag: INPUT or GET from Keyboard
 
-!if EXTENDED = 0 {
+!if EXTENDED=0 {
 		LDY CursorCol				; Cursor Column on Current Line
 		LDA DATAX				; Current Character to Print
 		AND #$7F				; Strip off top bit (REVERSE)
 }
-!if EXTENDED = 1 {
+!if EXTENDED=1 {
 		JSR CONDITIONAL_LR_CURSOR		; PATCH for conditional
 		BVS IRQ_EPILOG
 		NOP
@@ -606,7 +606,7 @@ ChrOutNormal
 
 ;************** CHECK HERE FOR ESC CODES
 
-!IF ESCCODES = 1 {
+!IF ESCCODES=1 {
 		JMP CheckESC				; Check for ESC as last Char, then ESC as current Char. If so, perform it.
 ESC_DONE	STA LASTCHAR				; Save the character
 
@@ -621,7 +621,7 @@ ESC_DONE2
 ;************** Reload character and check high bit 
 
 Be21d		LDA DATAX				; Current Character to Print
-!if COLOURPET = 1 { JSR CheckColourCodes }		; Check table of color values @@@@@@@@@@@@@@@@ COLOURPET
+!if COLOURPET=1 { JSR CheckColourCodes }		; Check table of color values @@@@@@@@@@@@@@@@ COLOURPET
 
 		BPL Be224				; Handle unshifted characters
 		JMP ChrOutHighBitSet			; Handle shifted characters
@@ -652,7 +652,7 @@ Be23e		CMP #$14 				; <DEL>
 Be24d		DEC CursorCol				; Cursor Column on Current Line
 		LDY CursorCol				; Cursor Column on Current Line
 
-!if COLOURPET = 0 {
+!if COLOURPET=0 {
 Be251		INY
 		LDA (ScrPtr),Y				; Read Character from Screen RAM
 		DEY					; move to the left
@@ -671,7 +671,7 @@ Be251		INY
 
 Be25c		LDA #$20 				; <SPACE>
 		STA (ScrPtr),Y				; put it on the screen! 
-!if COLOURPET = 1 {
+!if COLOURPET=1 {
 		LDA COLOURV				; Get the current Colour	@@@@@@@@@@@@@@@ ColourPET
 		STA (COLOURPTR),Y			; put it to Colour MEM		@@@@@@@@@@@@@@@ ColourPET
 }
@@ -730,7 +730,7 @@ Be2c5		LDA TABS_SET,X				; Get TAB from table
 		AND DOS_Syntax				; temp var
 		BEQ Be2a3
 
-!if EXTENDED = 0 {
+!if EXTENDED=0 {
 		INY
 		STY CursorCol
 } ELSE {
@@ -744,7 +744,7 @@ Be2d0		CMP #$16 				; <Ctrl V> : Erase to EOL
 
 Be2d7		INY
 		STA (ScrPtr),Y				; Write it to the screen
-!if COLOURPET = 1 {
+!if COLOURPET=1 {
 		LDA COLOURV				; Current Colour		@@@@@@@@@@@@@@ COLOURPET
 		STA (COLOURPTR),Y			; Write it to Colour RAM	@@@@@@@@@@@@@@ COLOURPET
 }
@@ -795,7 +795,7 @@ Be30a		LDX QuoteMode
 		BEQ Be38c
 		LDY RigMargin
 
-!if COLOURPET = 0 {
+!if COLOURPET=0 {
 Be322		DEY
 		LDA (ScrPtr),Y				; Read it from the Screen
 		INY
@@ -919,8 +919,8 @@ Be3cb		DEX
 		CPX TopMargin
 		BEQ Be3fe
 
-!if EXTENDED = 0 {
-	!if COLOURPET = 0 {
+!if EXTENDED=0 {
+	!if COLOURPET=0 {
 		LDA Line_Addr_Lo-1,X     		; Screen Line address table LO - 1
 		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
 		LDA Line_Addr_Hi-1,X 			; Screen Line address table HI - 1
@@ -930,14 +930,14 @@ Be3cb		DEX
 	}
 }
 
-!if EXTENDED = 1 {
+!if EXTENDED=1 {
 		DEX
 		JSR Set_Screen_SAL			;PATCH to calculate screen pointer
 		INX
 }
 
 Be3d8		INY
-!if COLOURPET = 0 {
+!if COLOURPET=0 {
 		LDA (SAL),Y				; Read Character from Screen SOURCE
 		STA (ScrPtr),Y				; Write it to Screen DESTINATION
 } ELSE {
@@ -958,8 +958,8 @@ Be3e6		INX
 		CPX BotMargin
 		BCS Be3fe
 
-!if EXTENDED = 0 {
-	!if COLOURPET = 0 {	
+!if EXTENDED=0 {
+	!if COLOURPET=0 {	
 		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
 		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
 		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
@@ -969,14 +969,14 @@ Be3e6		INX
 	}
 
 }
-!if EXTENDED = 1 {
+!if EXTENDED=1 {
 		INX
 		JSR Set_Screen_SAL			;PATCH to calculate screen pointer
 		DEX
 }
 
 Be3f3		INY
-!if COLOURPET = 0 {
+!if COLOURPET=0 {
 		LDA (SAL),Y				; Read Character from Screen SOURCE
 		STA (ScrPtr),Y				; Write to Screen DESTINATION
 } ELSE {
@@ -990,8 +990,8 @@ Be3fe		JSR Erase_To_EOL			; Clear the bottom line
 
 ;************** Check Keyboard Scroll Control
 
-!if EXTENDED = 0 { !source "scrollpause-b.asm" }
-!if EXTENDED = 1 { !source "scrollpause-din.asm" }
+!if EXTENDED=0 { !source "scrollpause-b.asm" }
+!if EXTENDED=1 { !source "scrollpause-din.asm" }
 
 
 ;************** Correct Jiffy Clock Timer
@@ -999,7 +999,7 @@ Be3fe		JSR Erase_To_EOL			; Clear the bottom line
 ; TODO: Analyze JIFFY CLOCK differences from older ROMs
 ; TODO: make selectable
 
-!if EXTENDED = 0 {
+!if EXTENDED=0 {
 ADVANCE_TIMER
 		JSR UDTIME			; $FFEA / jmp $f768	udtim	Update System Jiffy Clock
 		INC JIFFY6DIV5			; Counter to speed TI by 6/5
@@ -1067,13 +1067,13 @@ IRQ_NORMAL2						; ie458
 ie468		STA BLNCT
 		LDY CursorCol				; Column where cursor lives
 		LSR BlinkPhase				; Is it blinking?
-!IF COLOURPET = 1 {
+!IF COLOURPET=1 {
 		LDX CursorColour			; Get colour
 }
 		LDA (ScrPtr),Y				; Get character from the screen
 		BCS Be470				; Yes, skip
 
-!IF COLOURPET = 1 {
+!IF COLOURPET=1 {
 		TAX
 		LDA (COLOURPTR),Y			; Get Colour at cursor
 		STA CursorColour			; Save it
@@ -1085,7 +1085,7 @@ ie468		STA BLNCT
 Be470		EOR #$80				; Flip the reverse bit
 		STA (ScrPtr),Y				; Put it back on the screen
 
-!IF COLOURPET = 1 {
+!IF COLOURPET=1 {
 		LDA COLOURV				; Get current colour
 		STA (COLOURPTR),Y			; Write it
 }
@@ -1097,12 +1097,12 @@ Be474		LDY #0
 							; Upper bits: IEEE and Cassette
 							; Lower bits: Keyboard ROW select
 
-!if EXTENDED = 0 {
+!if EXTENDED=0 {
 		AND #$F0				; Mask off lower 4 bits (reset keyboard scan row)
 		STA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
 		LDA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
 } 
-!IF COLOURPET = 0 {
+!IF COLOURPET=0 {
 		ASL					; Shift upper bits to lower 
 		ASL 
 		ASL 
@@ -1139,22 +1139,22 @@ Be4aa		JSR SCAN_KEYBOARD			; Scan the keyboard
 		JMP IRQ_END				; Return from Interrupt
 
 ;###########################################################################################
-;!if DEBUG = 0 {	!fill $e4be-*,$aa }			;###################################
+;!if DEBUG=0 {	!fill $e4be-*,$aa }			;###################################
 ;###########################################################################################
 
 ;************* Keyboard Scanner
 
-!if EXTENDED = 0 { !source "keyscan-b.asm" }
-!if EXTENDED = 1 { !source "keyscan-din.asm" }
+!if EXTENDED=0 { !source "keyscan-b.asm" }
+!if EXTENDED=1 { !source "keyscan-din.asm" }
 
 
 ;###########################################################################################
-!if EXTENDED = 1 { !fill $e54e-*,$aa }			;###################################
+!if EXTENDED=1 { !fill $e54e-*,$aa }			;###################################
 ;###########################################################################################
 
 
 ;************** Select Character Set
-!if EXTENDED = 1 {
+!if EXTENDED=1 {
 
 SELECT_CHAR_SET
 		CMP #1
@@ -1204,13 +1204,13 @@ Be590		RTS
 Scroll_Or_Select_Charset
 		CMP #$19 			; <Ctrl> Y - Scroll window up
 
-!if EXTENDED = 1 {
+!if EXTENDED=1 {
 		BNE SELECT_CHAR_SET
 } ELSE {
 		BNE Be59b
 }
 
-;!IF COLOURPET = 0 {
+;!IF COLOURPET=0 {
 		JSR WINDOW_SCROLL_UP 	; CONFLICT WITH COLOUR CODE!
 ;}
 		JMP Me5d9
@@ -1260,7 +1260,7 @@ Me5ca		PLA
 ProcControl_C
 		CMP #$19 			; <Ctrl> Y - Scroll window down
 		BNE Be5de
-!IF COLOURPET = 0 {
+!IF COLOURPET=0 {
 		JSR WINDOW_SCROLL_DOWN		; CONFLICT with colour code?
 }
 Me5d9		JSR UPDATE_CURSOR_ROW
@@ -1269,7 +1269,7 @@ Me5d9		JSR UPDATE_CURSOR_ROW
 Be5de		CMP #15 			; <143> - Set lower right window corner
 		BNE Be5ed
 
-ESCAPE_B						; Esc-b Bottom
+ESCAPE_B					; Esc-b Bottom
 		LDA CursorRow
 		STA BotMargin
 		LDA CursorCol
@@ -1307,7 +1307,7 @@ IRQ_END		PLA
 Restore_Char_at_Cursor
 		LDY CursorCol			; Cursor Column on Current Line		
 		STA (ScrPtr),Y			; Pointer: Current Screen Line Address
-!if COLOURPET = 1 {
+!if COLOURPET=1 {
 ;		LDY CursorCol			; Cursor Column on Current Line
 		LDA COLOURV			; Get current Colour
 		STA (COLOURPTR),Y		; Set the Colour
@@ -1331,11 +1331,11 @@ Be61a		STA JIFFY_CLOCK,X		; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
 		DEX
 		BPL Be61a
 
-!if EXTENDED = 1 { STX KEYFLAGS }		; $FF = Clear all flags
+!if EXTENDED=1 { STX KEYFLAGS }		; $FF = Clear all flags
 
 ;-------------- Set IRQ Vector - Normally $E455 or $E900 for Execudesk
 
-!IF EXECUDESK = 0 {
+!IF EXECUDESK=0 {
 		LDA #<IRQ_NORMAL		; Normal IRQ Vector LO
 		STA CINV
 		LDA #>IRQ_NORMAL		; Normal IRQ Vector HI
@@ -1398,14 +1398,14 @@ Be66d		STA TABS_SET,X			; Table of 80 bits to set TABs
 		STA SCROV			; Print to screen vector (from E009)
 		STX SCROV+1			; Print to screen vector (from E009)
 
-!IF ESCCODES = 1 {
+!IF ESCCODES=1 {
 		LDA #1
 		STA BELLMODE
 }
 		LDA #16
 		STA CHIME
 
-!if WEDGE=1 { JSR WEDGE_PREP }		; Activate WEDGE
+!if WEDGE=1 {	JSR WEDGE_PREP }		; Activate WEDGE
 
 		JSR Double_BEEP			; Power-up chimes
 		BEQ Double_BEEP			; More chimes (4 total)
@@ -1433,14 +1433,14 @@ ChrOutMarginBeep
 Double_BEEP
 		JSR BEEP
 BEEP
-!if SILENT = 0 {
+!if SILENT=0 {
 		LDY CHIME			; Chime Time FLAG
 } ELSE {
 		NOP
 		RTS
 }
 
-!IF ESCCODES = 1 {
+!IF ESCCODES=1 {
 		LDA BELLMODE
 		BPL BELLENABLED
 		RTS
@@ -1466,7 +1466,7 @@ Be6bf		DEY
 		STX VIA_ACR
 Be6d0		RTS
 
-!if EXTENDED = 1 {
+!if EXTENDED=1 {
 
 ;************** Set Screen SAL (for EXTENDED ROM)
 Set_Screen_SAL
@@ -1493,18 +1493,18 @@ ModifierKeys
 }
 
 ;###################################################################################
-!if EXTENDED = 1 { !fill $e721-*, $aa }		;###################################
+!if EXTENDED=1 { !fill $e721-*, $aa }		;###################################
 ;###################################################################################
 
 ;************** Keyboard Decoding Table
-!if EXTENDED = 0 {
-		!if KEYBOARD = 0 { !source "kbd-n.asm" }
-		!if KEYBOARD = 1 { !source "kbd-b.asm" }	; QWERTY layout
-		!if KEYBOARD = 2 { !source "kbd-din1.asm" }
-		!if KEYBOARD = 3 { !source "kbd-c64.asm" }
-		!if KEYBOARD = 4 { !source "kbd-bsjg.asm" }	; Modified layout
-		!if KEYBOARD = 5 { !source "kbd-nsjg.asm" }	; @ replaced by ESC
-		!if KEYBOARD = 6 { !source "kbd-bz.asm" }	; QWERTZ layout
+!if EXTENDED=0 {
+		!if KEYBOARD= 0 { !source "kbd-n.asm" }
+		!if KEYBOARD= 1 { !source "kbd-b.asm" }	; QWERTY layout
+		!if KEYBOARD= 2 { !source "kbd-din1.asm" }
+		!if KEYBOARD= 3 { !source "kbd-c64.asm" }
+		!if KEYBOARD= 4 { !source "kbd-bsjg.asm" }	; Modified layout
+		!if KEYBOARD= 5 { !source "kbd-nsjg.asm" }	; @ replaced by ESC
+		!if KEYBOARD= 6 { !source "kbd-bz.asm" }	; QWERTZ layout
 }
 
 ;************** SHIFT RUN/STOP string
@@ -1515,15 +1515,15 @@ RUN_String
 
 ;************** CRTC Chip Register Setup Tables (2K ROMs)
 
-!if COLUMNS = 80 {
+!if COLUMNS=80 {
 		!if REFRESH = 0 { !source "crtc-80-50hz.asm" }
 		!if REFRESH = 1 { !source "crtc-80-60hz.asm" }
 		!if REFRESH = 2 { !source "crtc-80-pal.asm" }
 		!if REFRESH = 3 { !source "crtc-80-ntsc.asm" }
 }
 
-!if COLUMNS = 40 {
-	!if SOFT40 = 1 {
+!if COLUMNS=40 {
+	!if SOFT40=1 {
 		!if REFRESH = 0 { !source "crtc-soft40-50hz.asm" }
 		!if REFRESH = 1 { !source "crtc-soft40-60hz.asm" }
 		!if REFRESH = 2 { !source "crtc-soft40-pal.asm" }
@@ -1543,14 +1543,14 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e
 
 ;************* Screen Line Address Tables
 
-!if COLUMNS = 80 {
+!if COLUMNS=80 {
 		!source "screen-80.asm"
 		!if COLOURPET > 0 {
 			!SOURCE "screen-80c.asm" 		; Colour address table (future hardware)
 		}
 }
 
-!if COLUMNS = 40 {
+!if COLUMNS=40 {
 		!source "screen-40.asm"
 		!if COLOURPET > 0 {
 			!IF COLOURVER = 0 { !SOURCE "screen-40c!.asm" }		; Colour address table
@@ -1560,7 +1560,7 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e
 
 
 ;##############################################################################
-!if EXTENDED = 0 {
+!if EXTENDED=0 {
 		!byte $cd		; to match 901474-04 ##################
 		!fill $e800-*,$aa	; 78 bytes - Fill to end of 2K ########
 } ELSE {
