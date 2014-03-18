@@ -53,8 +53,29 @@ install_wedge
 
 ;-------------- MESSAGE
 
-WEDGESTRING	
+WEDGESTRING
 
+; Custom ColourPET message courtesy Christian Dirk - For GRAPHICS MODE startup screen
+!if WEDGEMSG=3 {				
+         	!byte $13            		; <HOME> 
+         	!byte $1d,$1d,$1d,$1d
+         	!byte $1c            		; <RED>
+         	!pet "co"
+         	!byte $99            		; <GRN>
+         	!pet "lo"
+         	!byte $9a            		; <BLU>
+         	!pet "ur"
+         	!byte $9e            		; <YEL>
+         	!pet "pet"
+         	!byte $99            		; <GRN>
+         	!byte $0D,$0D,$0D,$0D           ; <CR>
+         	!text "*** WEDGE ACTIVE ***"    ; message
+         	!byte $0D            		; <CR>
+         	!text "            "        	; erase "READY"
+         	!byte $0D            		; <CR>
+}
+
+; Custom ColourPET message for TEXT MODE startup screen
 !if WEDGEMSG=2 {
 		!byte $93,$5			; <CLS><WHT>
 		!pet "*** "
@@ -73,7 +94,8 @@ WEDGESTRING
 		!byte 11,11
 		!byte $d,0			; <cr>
 }
-		
+
+; Wedge-only activation message		
 !if WEDGEMSG=1 {
 		!byte $91,$91			; <UP><UP>
 		!text "WEDGE ACTIVE"		; message
@@ -82,6 +104,7 @@ WEDGESTRING
 		!byte $91			; <UP>
 }
 
+; No message. Erase the SYS and READY prompts.
 !if WEDGEMSG=0 {
 		!byte $91			; <UP>
 		!text "            "		; erase "SYS" message

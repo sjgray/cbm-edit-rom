@@ -132,11 +132,11 @@ UPDATE_CURSOR_R2
 		LDY LefMargin				; First column of window
 		DEY
 UPDATE_CURSOR_R3
-		LDA Line_Addr_Lo,X			; Screen Line Addresses LO		DATA
+		LDA Line_Addr_Lo,X			; Screen Line Addresses LO
 UPDATE_SCREEN_PTR
 	!IF COLOURPET=0 {
 		STA ScrPtr				; Pointer: Current Screen Line Address LO
-		LDA Line_Addr_Hi,X			; Screen Line Addresses HI		DATA
+		LDA Line_Addr_Hi,X			; Screen Line Addresses HI
 		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
 	} ELSE {
 		JSR ColourPET_SyncPointersX		; Sync Pointers to Current Line
@@ -1202,36 +1202,33 @@ Be590		RTS
 ;************** More character code checking
 
 Scroll_Or_Select_Charset
-		CMP #$19 			; <Ctrl> Y - Scroll window up
+		CMP #$19 			; <Ctrl> Y = $19 = 25 = Scroll window up
 
 !if EXTENDED=1 {
 		BNE SELECT_CHAR_SET
 } ELSE {
 		BNE Be59b
 }
-
-;!IF COLOURPET=0 {
-		JSR WINDOW_SCROLL_UP 	; CONFLICT WITH COLOUR CODE!
-;}
+		JSR WINDOW_SCROLL_UP 		; Window Scroll Up
 		JMP Me5d9
 
 
-Be59b		CMP #15 			; <Ctrl> O - Set top left window corner
+Be59b		CMP #15 			; <CTRL> O = $0F = 15 = Set top left window corner
 		BNE Be5aa
 
-ESCAPE_T					; Esc-t Top
+ESCAPE_T					; ESC-T = Set Window Top
 		LDA CursorRow
 		STA TopMargin
 		LDA CursorCol
 		STA LefMargin
 Be5a7		JMP IRQ_EPILOG
 
-Be5aa		CMP #14 			; <Ctrl> N - Text mode
+Be5aa		CMP #14 			; <CTRL> N = $0E = 14 = Text mode
 		BNE Be5b3
 		JSR CRT_SET_TEXT
 		BMI Be5a7
 
-Be5b3		CMP #7 				; <Ctrl> G - Bell
+Be5b3		CMP #7 				; <CTRL> G = $07 = 07 = Ring Bell
 		BNE Be5a7
 		JSR BEEP
 		BEQ Be5a7
@@ -1239,44 +1236,42 @@ Be5b3		CMP #7 				; <Ctrl> G - Bell
 ;************** Continue checking codes... 
 
 ProcControl_A
-
-
-		CMP #$15 			; <Ctrl> SHIFT-U -> Insert Line						
+		CMP #$15 			; <CTRL> SHIFT-U = Insert Line						
 		BNE ProcControl_C		; @@@@@@ Was: BNE ProcControl_B
 
-ESCAPE_I					; Esc-i Insert Line
+ESCAPE_I					; ESC-I = Insert Line
 		LDA TopMargin
 		PHA
 		LDA CursorRow
 		STA TopMargin
-		JSR WINDOW_SCROLL_DOWN
+		JSR WINDOW_SCROLL_DOWN		; Scroll Window Down
 Me5ca		PLA
 		STA TopMargin
 		JSR CURSOR_LEFT_MARGIN
 		BNE Be5ea
 
-;**************
+;************** Handle additional Codes > 127
 
 ProcControl_C
-		CMP #$19 			; <Ctrl> Y - Scroll window down
+		CMP #$19 			; <CTRL> SHIFT-Y = $99 = 153 = Scroll window up
 		BNE Be5de
 !IF COLOURPET=0 {
-		JSR WINDOW_SCROLL_DOWN		; CONFLICT with colour code?
+		JSR WINDOW_SCROLL_DOWN		; CONFLICT with colour code = LT GREEN
 }
 Me5d9		JSR UPDATE_CURSOR_ROW
 		BNE Be5ea
 
-Be5de		CMP #15 			; <143> - Set lower right window corner
+Be5de		CMP #15 			; <CTRL> SHIFT-O = $8F = 143 = Set Window Bottom
 		BNE Be5ed
 
-ESCAPE_B					; Esc-b Bottom
+ESCAPE_B					; ESC-B = Set Window Bottom
 		LDA CursorRow
 		STA BotMargin
 		LDA CursorCol
 		STA RigMargin
 Be5ea		JMP IRQ_EPILOG
 
-Be5ed		CMP #14 			; <142> - Graphics mode
+Be5ed		CMP #14 			; <CTRL> SHIFT-N = $8E = 142 = Graphics mode
 		BNE Be5b3
 		JSR CRT_SET_GRAPHICS
 		BMI Be5ea
