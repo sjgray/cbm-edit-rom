@@ -89,8 +89,8 @@ ESCVECTORS
 		!WORD ESCAPE_B-1	; Esc-b Bottom
 		!WORD ESCAPE_C-1	; Esc-c Cancel Auto Insert
 		!WORD ESCAPE_D-1	; Esc-d Delete Line
-		!WORD ESCAPE_E-1	; Esc-e Cursor Non Flash
-		!WORD ESCAPE_F-1	; Esc-f Cursor Flash
+		!WORD ESCAPE_E-1	; Esc-e Cursor Non Flash (re-assign?)
+		!WORD ESCAPE_F-1	; Esc-f Flash/Fill (was: Cursor Flash)
 		!WORD ESCAPE_G-1	; Esc-g Bell Enable
 		!WORD ESCAPE_H-1	; Esc-h Bell Disable
 		!WORD ESCAPE_I-1	; Esc-i Insert Line
@@ -99,7 +99,7 @@ ESCVECTORS
 		!WORD ESCAPE_L-1	; Esc-l Scroll On
 		!WORD ESCAPE_M-1	; Esc-m Scroll Off
 		!WORD ESCAPE_N-1	; Esc-n Screen Normal
-		!WORD ESCAPE_O-1	; Esc-o (escape) Also: <ESC><ESC>
+		!WORD ESCAPE_O-1	; Esc-o Escape all modes (Also: <ESC><ESC>)
 		!WORD ESCAPE_P-1	; Esc-p Erase Begin
 		!WORD ESCAPE_Q-1	; Esc-q Erase End
 		!WORD ESCAPE_R-1	; Esc-r Screen Reverse
@@ -127,7 +127,6 @@ ESCAPE_AT	; Esc-@ Clear Remainder of Screen
 ESCAPE_A	; Esc-a Auto Insert
 ESCAPE_C	; Esc-c Cancel Auto Insert
 ESCAPE_E	; Esc-e Cursor Non Flash
-ESCAPE_F	; Esc-f Cursor Flash
 ESCAPE_K	; Esc-k End-of-Line
 ESCAPE_L	; Esc-l Scroll On
 ESCAPE_M	; Esc-m Scroll Off
@@ -144,14 +143,6 @@ ESCAPE_NUM
 		LDA DATAX				; Character
 		SEC
 		SBC #$30				; Subtract 30 (Start at "0")
-
-;		LDX QuoteMode				; Check if inside quotes
-;		BPL ESC_NUM2				; Yes, go convert it
-;
-;		STA COLOURFG				; No, just change it immediately
-;		JSR SetColourValue			; Set the colour
-;		JMP IRQ_EPILOG				; no need to process more
-
 ESC_NUM2
 		TAX					; The Colour number becomes the index
 		LDA COLOURS,X				; Lookup the correct PETSCII code
@@ -160,6 +151,31 @@ ESC_NUM2
 		JMP ESC_DONE2				; return and process
 
 }
+
+ESCAPE_F	; ESC-F = Flash Screen / Fill Colour-ColourPET (was: Cursor Flash)
+		; For NormalPET this will toggle the REVERSE bit (bit 7) of each character on the screen (ignores window)
+		; For ColourPET this will fill the screen with the current colour (ignores window)
+!if COLOURPET=1 {
+		LDX #0
+		LDA COLOURV
+ESCFLoop
+		STA COLOUR_RAM,X
+		STA COLOUR_RAM+$100,X
+		STA COLOUR_RAM+$200,X
+		STA COLOUR_RAM+$300-24,X	; don't overwrite non-visible locations (used for storage)
+!IF COLUMNS = 80 {
+		STA COLOUR_RAM+$400-24,X
+		STA COLOUR_RAM+$500-24,X
+		STA COLOUR_RAM+$600-24,X
+		STA COLOUR_RAM+$700-48,X	; don't overwrite non-visible locations (used for storage)
+}
+		INX
+		BNE ESCFLoop
+
+} else {
+
+}
+		JMP IRQ_EPILOG
 
 ESCAPE_G						; Esc-g Bell Enable
 		LDA #1
