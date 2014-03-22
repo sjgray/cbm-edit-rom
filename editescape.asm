@@ -89,7 +89,7 @@ ESCVECTORS
 		!WORD ESCAPE_B-1	; Esc-b Bottom
 		!WORD ESCAPE_C-1	; Esc-c Cancel Auto Insert
 		!WORD ESCAPE_D-1	; Esc-d Delete Line
-		!WORD ESCAPE_E-1	; Esc-e Cursor Non Flash (re-assign?)
+		!WORD ESCAPE_E-1	; Esc-e ?/BG Fill    (was: Cursor Non Flash)
 		!WORD ESCAPE_F-1	; Esc-f Flash/Fill (was: Cursor Flash)
 		!WORD ESCAPE_G-1	; Esc-g Bell Enable
 		!WORD ESCAPE_H-1	; Esc-h Bell Disable
@@ -126,7 +126,6 @@ ESCVECTORS
 ESCAPE_AT	; Esc-@ Clear Remainder of Screen
 ESCAPE_A	; Esc-a Auto Insert
 ESCAPE_C	; Esc-c Cancel Auto Insert
-ESCAPE_E	; Esc-e Cursor Non Flash
 ESCAPE_K	; Esc-k End-of-Line
 ESCAPE_L	; Esc-l Scroll On
 ESCAPE_M	; Esc-m Scroll Off
@@ -151,6 +150,68 @@ ESC_NUM2
 		JMP ESC_DONE2				; return and process
 
 }
+
+; ESC-E = Set BG Colour
+; For NormalPET ?
+; For ColourPET will set the BG colour of the entire screen to the current BG colour (ignores window)
+
+ESCAPE_E
+
+!if COLOURPET=1 {
+		LDA COLOURV
+		AND #$F0
+		STA TMPZB7
+		LDX #0
+ESCELoop
+		LDA COLOUR_RAM,X
+		AND #$0F
+		ORA TMPZB7
+		STA COLOUR_RAM,X
+
+		LDA COLOUR_RAM+250,X
+		AND #$0F
+		ORA TMPZB7
+		STA COLOUR_RAM+250,X
+
+		LDA COLOUR_RAM+500,X
+		AND #$0F
+		ORA TMPZB7
+		STA COLOUR_RAM+500,X
+
+		LDA COLOUR_RAM+750,X
+		AND #$0F
+		ORA TMPZB7
+		STA COLOUR_RAM+750,X	; don't overwrite non-visible locations (used for storage)
+
+!IF COLUMNS = 80 {
+		LDA COLOUR_RAM+1000,X
+		AND #$0F
+		ORA TMPZB7
+		STA COLOUR_RAM+1000,X
+
+		LDA COLOUR_RAM+1250,X
+		AND #$0F
+		ORA TMPZB7
+		STA COLOUR_RAM+1250,X
+
+		LDA COLOUR_RAM+1500,X
+		AND #$0F
+		ORA TMPZB7
+		STA COLOUR_RAM+1500,X
+
+		LDA COLOUR_RAM+1750,X
+		AND #$0F
+		ORA TMPZB7
+		STA COLOUR_RAM+1750,X	; don't overwrite non-visible locations (used for storage)
+}
+		INX
+		CPX #250
+		BNE ESCELoop
+
+}
+		JMP IRQ_EPILOG
+
+
 
 ; ESC-F = Flash Screen / Fill Colour-ColourPET (was: Cursor Flash)
 ; For NormalPET this will toggle the REVERSE bit (bit 7) of each character on the screen (ignores window)
