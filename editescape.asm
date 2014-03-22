@@ -152,9 +152,13 @@ ESC_NUM2
 
 }
 
-ESCAPE_F	; ESC-F = Flash Screen / Fill Colour-ColourPET (was: Cursor Flash)
-		; For NormalPET this will toggle the REVERSE bit (bit 7) of each character on the screen (ignores window)
-		; For ColourPET this will fill the screen with the current colour (ignores window)
+; ESC-F = Flash Screen / Fill Colour-ColourPET (was: Cursor Flash)
+; For NormalPET this will toggle the REVERSE bit (bit 7) of each character on the screen (ignores window)
+; For ColourPET this will fill the screen with the current colour (ignores window)
+; Note: This might be changed in the future to work with windows!
+
+ESCAPE_F
+
 !if COLOURPET=1 {
 		LDX #0
 		LDA COLOURV
@@ -171,8 +175,47 @@ ESCFLoop
 }
 		INX
 		BNE ESCFLoop
+}
 
-} else {
+!if COLOURPET=0 {
+		LDX #0
+ESCFLoop2
+		LDA SCREEN_RAM,X
+		EOR #$80
+		STA SCREEN_RAM,X
+
+		LDA SCREEN_RAM+250,X
+		EOR #$80
+		STA SCREEN_RAM+250,X
+
+		LDA SCREEN_RAM+500,X
+		EOR #$80
+		STA SCREEN_RAM+500,X
+
+		LDA SCREEN_RAM+750,X
+		EOR #$80
+		STA SCREEN_RAM+750,X	; don't overwrite non-visible locations (used for storage)
+
+!IF COLUMNS = 80 {
+		LDA SCREEN_RAM+1000,X
+		EOR #$80
+		STA SCREEN_RAM+1000,X
+
+		LDA SCREEN_RAM+1250,X
+		EOR #$80
+		STA SCREEN_RAM+1250,X
+
+		LDA SCREEN_RAM+1500,X
+		EOR #$80
+		STA SCREEN_RAM+1500,X
+
+		LDA SCREEN_RAM+1750,X
+		EOR #$80
+		STA SCREEN_RAM+1750,X	; don't overwrite non-visible locations (used for storage)
+}
+		INX
+		CPX #250
+		BNE ESCFLoop2
 
 }
 		JMP IRQ_EPILOG
