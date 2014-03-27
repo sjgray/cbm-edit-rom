@@ -89,8 +89,8 @@ ESCVECTORS
 		!WORD ESCAPE_B-1	; Esc-b Bottom
 		!WORD ESCAPE_C-1	; Esc-c Cancel Auto Insert
 		!WORD ESCAPE_D-1	; Esc-d Delete Line
-		!WORD ESCAPE_E-1	; Esc-e ?/BG Fill    (was: Cursor Non Flash)
-		!WORD ESCAPE_F-1	; Esc-f Flash/Fill (was: Cursor Flash)
+		!WORD ESCAPE_E-1	; Esc-e ?     / Fill BG    (was: Cursor Non Flash)
+		!WORD ESCAPE_F-1	; Esc-f Flash / Fill FG+BG (was: Cursor Flash)
 		!WORD ESCAPE_G-1	; Esc-g Bell Enable
 		!WORD ESCAPE_H-1	; Esc-h Bell Disable
 		!WORD ESCAPE_I-1	; Esc-i Insert Line
@@ -151,9 +151,11 @@ ESC_NUM2
 
 }
 
-; ESC-E = Set BG Colour
+; ESC-E = Fill BG Colour
 ; For NormalPET ?
-; For ColourPET will set the BG colour of the entire screen to the current BG colour (ignores window)
+; For ColourPET will fill the screen with the current BG colour (ignores window)
+;               The FG of each character is not changed.
+; Note: This might be changed in the future to work with windows!
 
 ESCAPE_E
 
@@ -213,9 +215,9 @@ ESCELoop
 
 
 
-; ESC-F = Flash Screen / Fill Colour-ColourPET (was: Cursor Flash)
+; ESC-F = Flash Screen / Fill FG+BG Colour (was: Cursor Flash)
 ; For NormalPET this will toggle the REVERSE bit (bit 7) of each character on the screen (ignores window)
-; For ColourPET this will fill the screen with the current colour (ignores window)
+; For ColourPET this will fill the screen with the current colour FG+BG (ignores window)
 ; Note: This might be changed in the future to work with windows!
 
 ESCAPE_F
