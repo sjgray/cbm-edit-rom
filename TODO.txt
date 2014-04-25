@@ -26,6 +26,11 @@ PET/CBM EDIT ROM PROJECT - TODO List
 - CBM-II keyboard support will require hardware modification.
 - Sort out DIN keyboard matrix variations.
 - Look into C64/VIC keyboard scanning routines. Can they be used in PET (allow support for NORMAL,SHIFTED,CTRL and C= keys)
+
+- Investigate CRTC parameters for use with RGB/CGA to VGA adapters. Hervé connected his PET to a
+  GB8220 board and says the sync width needs adjusting to get a stable picture. His 8032 CRTC
+  is initialized with the following registers: 63,40,53,33,33,7,25,32,0,8
+
 	
 NOTE: If you are running ColourPET under VICE, please update to the latest experimental release!
       Colour RAM has been relocated to $8800 and hardware will be updated so that 40/80 columns
