@@ -7,15 +7,19 @@ PET/CBM EDIT ROM PROJECT - TODO List
 - Continue to add memory variable descriptions (see Commodore's CBM-II source for 'official' labels)
 - Analyze extended keyboard scanning routine. Have special codes been modified?
 - Document added screen codes for character set switching
+
 - Update extended keyboard matrix tables
 	- SHIFT tables need fixing (except for DIN, which is the template)
 	- Look into C64 table
 	- Do we need to add additional tables for "C=" (Commodore Key)?
+
 - Comment Autoboot code, and convert to proper syntax
 	- Do we want to include the "OLD" routine? (we already have the "OLD" matrix files)
+
 - Add code from 40 column edit roms. Currently if you set COLUMNS=40 it uses the 80 column rom code.
 	- 80 Column rom has no code for screen line linking. This restricts basic lines to one screen line.
 	- Caution - screen line linking memory locations might be in use.
+
 - ColourPET features:
 	- Fix cursor changing colour of existing text when cursoring around
 	- Some ESC codes not working.
@@ -23,6 +27,7 @@ PET/CBM EDIT ROM PROJECT - TODO List
 	- BASIC lines with embedded colour codes cause the colour to change when the program is listed.
 	- ColourPET uses ZP variables in TAPE area. Do not use TAPE with ColourPET or find alternate storage locations.
 	- ColourPET hardware needs fixing!
+
 - CBM-II keyboard support will require hardware modification.
 - Sort out DIN keyboard matrix variations.
 - Look into C64/VIC keyboard scanning routines. Can they be used in PET (allow support for NORMAL,SHIFTED,CTRL and C= keys)
@@ -31,6 +36,7 @@ PET/CBM EDIT ROM PROJECT - TODO List
   GB8220 board and says the sync width needs adjusting to get a stable picture. His 8032 CRTC
   is initialized with the following registers: 63,40,53,33,33,7,25,32,0,8
 
+- Request: Toggle internal/external monitor settings. Hardware control for internal monitor shutoff
 	
 NOTE: If you are running ColourPET under VICE, please update to the latest experimental release!
       Colour RAM has been relocated to $8800 and hardware will be updated so that 40/80 columns

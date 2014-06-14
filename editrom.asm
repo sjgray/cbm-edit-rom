@@ -1500,6 +1500,7 @@ ModifierKeys
 		!if KEYBOARD= 4 { !source "kbd-bsjg.asm" }	; Modified layout
 		!if KEYBOARD= 5 { !source "kbd-nsjg.asm" }	; @ replaced by ESC
 		!if KEYBOARD= 6 { !source "kbd-bz.asm" }	; QWERTZ layout
+		!if KEYBOARD= 7 { !source "kbd-cbm2.asm" }	; CBM-II layout (requires hardware mod)
 }
 
 ;************** SHIFT RUN/STOP string

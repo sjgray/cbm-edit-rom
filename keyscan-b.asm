@@ -2,9 +2,11 @@
 ; ================
 ; Standard Business Keyboard scanner. Requires one keyboard table.
 ;
+; OPTIONS: KEYBOARD=7 modifies scanner for CBM-II keyboard (16x6 matrix)
 
 ;--------------- Scan Keyboard (scnkey)
 ; NOTE: The keyboard ROW select is reset to zero in IRQ routine
+; PUZZLE: Where does it check that we hit the last row (10 for normal keyboards)?
 
 SCAN_KEYBOARD
 ;!if DEBUG = 1 { INC DBLINE+5 }		; DEBUG - 6th character on top line
@@ -16,14 +18,25 @@ SCAN_KEYBOARD
 		LDA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
 		AND #$7F
 		STA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
-		LDX #$50		; 80 bytes in table. X is used as offset into the table
+		!IF KEYBOARD=7 {
+			LDX #$60	; 96 bytes in table. X is used as offset into the table (CBM-II keyboard)
+		} ELSE {
+			LDX #$50	; 80 bytes in table. X is used as offset into the table (normal keyboards)
+		}
 
-SCAN_ROW	LDY #$08
+SCAN_ROW
+		!IF KEYBOARD=7 {
+			 LDY #$06	; Number of Columns to check = 6 (CBM-II keyboard only)
+		} ELSE {
+			 LDY #$08	; Number of Columns to check = 8 (normal keyboards)
+		}
+
+SCAN_COL
 		LDA PIA1_Port_B 	; Keyboard COL result
 		CMP PIA1_Port_B 	; Keyboard COL result
 		BNE SCAN_COL		; Debounce
 
-SCAN_COL	LSR			; Shift the value right
+		LSR			; Shift the value right
 		BCS SCAN_NEXT2		; If the bit was "1" then key is NOT down. Skip
 
 ;-------------- We have a key press. Look it up in the keyboard matrix
@@ -66,7 +79,7 @@ SCAN_NEXT2	DEX			; Decrement keyboard table offset
 
 ;-------------- Completed all bits in ROW, Increment ROW
 
-		INC PIA1_Port_A		; Next Keyboard ROW
+		INC PIA1_Port_A		; Next Keyboard ROW (PUZZLE! Row counts up. How do we know we hit ROW 10?)
 		BNE SCAN_ROW		; More? Yes, loop back
 
 ;-------------- Process Key Image
