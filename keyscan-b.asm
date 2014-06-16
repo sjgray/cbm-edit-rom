@@ -72,7 +72,7 @@ SCAN_NORPT	CMP #$FF		; Is it "no key"?
 
 SCAN_NEXT	PLA			; Restore value from keyboard scan for next loop
 SCAN_NEXT2	DEX			; Decrement keyboard table offset
-		BEQ SCAN_GOT		; Process Key Image
+		BEQ SCAN_GOT		; If 0 we have completed the entire matrix...Process Key Image
 
 		DEY			; Next COLUMN
 		BNE SCAN_COL		; Go back up for next column bit
