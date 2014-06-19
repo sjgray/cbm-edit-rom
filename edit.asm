@@ -8,6 +8,9 @@
 ; If there no options listed it means that support has not been added yet!
 ; NOTE!: Not all combinations may be valid!!
 ;
+; Note: It seems that SuperPET's are NOT compatible with 4K edit roms.
+;       More investigation is needed.
+;
 ; DIRECTIVE	  FEATURE			VALID OPTIONS			NOTES / FUTURE OPTIONS
 ;----------	  -------			-------------			----------------------
 EXTENDED  = 0	; Extended Editor?		0=No, 1=Yes
