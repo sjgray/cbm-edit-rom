@@ -31,12 +31,11 @@ SCAN_ROW
 			 LDY #$08	; Number of Columns to check = 8 (normal keyboards)
 		}
 
-SCAN_COL
 		LDA PIA1_Port_B 	; Keyboard COL result
 		CMP PIA1_Port_B 	; Keyboard COL result
-		BNE SCAN_COL		; Debounce
+		BNE SCAN_ROW		; Debounce
 
-		LSR			; Shift the value right
+SCAN_COL	LSR			; Shift the value right
 		BCS SCAN_NEXT2		; If the bit was "1" then key is NOT down. Skip
 
 ;-------------- We have a key press. Look it up in the keyboard matrix
