@@ -41,6 +41,7 @@ SS40_SET80
 		JSR SS40_INIT80				; Set to 80
 
 SS40_DOIT	JSR CRT_SET_TEXT_SS40			; Program CRTC for Text mode
+		JSR FULL_SCREEN_WINDOW			; Clear windows
 		JSR WINDOW_CLEAR			; Clear the screen
 		RTS		
 

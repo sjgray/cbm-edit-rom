@@ -140,7 +140,7 @@ UPDATE_SCREEN_PTR
 		JSR ColourPET_SyncPointersX		; Sync Pointers to Current Line
 	} ELSE {
 		!IF SS40=1 {
-			JSR SS40_ScreenPointers		; Update screen pointers based on current screen width
+			JSR SS40_SyncPointersX		; Update screen pointers based on current screen width
 		} ELSE {
 			STA ScrPtr			; Pointer: Current Screen Line Address LO
 			LDA Line_Addr_Hi,X		; Screen Line Addresses HI
