@@ -118,6 +118,8 @@ CURSOR_LEFT_MARGIN
 		STY CursorCol				; Set cursor there
 
 ;************** Update Cursor ROW - Get pointer from Screen Line Address Tables (and Colour)
+; TODO: Update for Soft40 (check screen width and set pointer from appropriate table)
+; ----
 
 UPDATE_CURSOR_ROW
 		LDX CursorRow				;$E06C Current Cursor Physical Line Number
@@ -134,15 +136,18 @@ UPDATE_CURSOR_R2
 UPDATE_CURSOR_R3
 		LDA Line_Addr_Lo,X			; Screen Line Addresses LO
 UPDATE_SCREEN_PTR
-	!IF COLOURPET=0 {
-		STA ScrPtr				; Pointer: Current Screen Line Address LO
-		LDA Line_Addr_Hi,X			; Screen Line Addresses HI
-		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
-	} ELSE {
+	!IF COLOURPET=1 {
 		JSR ColourPET_SyncPointersX		; Sync Pointers to Current Line
+	} ELSE {
+		!IF SS40=1 {
+			JSR SS40_ScreenPointers		; Update screen pointers based on current screen width
+		} ELSE {
+			STA ScrPtr			; Pointer: Current Screen Line Address LO
+			LDA Line_Addr_Hi,X		; Screen Line Addresses HI
+			STA ScrPtr+1         		; Pointer: Current Screen Line Address HI
+		}
 	}
 		RTS
-;zxcvb -- was "}" here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 !if EXTENDED=1 {
            	JMP Update_ScrPtr			; New Screen pointer calculation routine

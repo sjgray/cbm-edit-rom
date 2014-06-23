@@ -73,13 +73,36 @@ SS40Loop	LDA (SAL),Y				; Pointer: Tape Buffer/ Screen Scrolling
 
 
 ;************** Screen Line Pointers
+;
+; This routine looks at the current screen width then sets the
+; screen line pointer from the appropriate table (40 or 80)
 
 SS40_Pointers
+		LDA SCNWIDTH			; What is current screen width?
+		CMP #40				; Is it 40?
+		BEQ SS40_Pointer40
+
+SS40_Pointer80
+		LDA Line_Addr_Lo,X		; Screen Line Addresses LO (80 column table)
+		STA ScrPtr			; Pointer: Current Screen Line Address LO
+		LDA Line_Addr_Hi,X		; Screen Line Addresses HI (80 column table)
+		STA ScrPtr+1         		; Pointer: Current Screen Line Address HI
+		RTS
+
+SS40_Pointer40
+		LDA Line_Addr_Lo2,X		; Screen Line Addresses LO (additional 40 column table)
+		STA ScrPtr			; Pointer: Current Screen Line Address LO
+		LDA Line_Addr_Hi2,X		; Screen Line Addresses HI (additional 40 column table)
+		STA ScrPtr+1         		; Pointer: Current Screen Line Address HI
 		RTS
 
 
 ;************** Additional Screen Line Address Tables
+;
+; The primary screen line table will be set to 80 column, so the additional
+; table is for the 40 column screen
 
 !SOURCE "screen2-40.asm"				; Add the Character RAM table
+
 !IF COLOURPET=1 { !SOURCE "screen2-40c.asm" }		; Add the Colour RAM table
 
