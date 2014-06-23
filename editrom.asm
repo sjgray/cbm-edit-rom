@@ -926,10 +926,14 @@ Be3cb		DEX
 
 !if EXTENDED=0 {
 	!if COLOURPET=0 {
-		LDA Line_Addr_Lo-1,X     		; Screen Line address table LO - 1
-		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
-		LDA Line_Addr_Hi-1,X 			; Screen Line address table HI - 1
-		STA SAL+1
+		!IF SS40=0 {
+			LDA Line_Addr_Lo-1,X     		; Screen Line address table LO - 1
+			STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
+			LDA Line_Addr_Hi-1,X 			; Screen Line address table HI - 1
+			STA SAL+1
+		} ELSE {
+			JSR SS40_SyncPointers2
+		}
 	} ELSE {
 		JSR ColourPET_SyncPointers2 		; Synchronize Pointers			@@@@@@@@@@@@@@@ COLOURPET
 	}
@@ -964,11 +968,15 @@ Be3e6		INX
 		BCS Be3fe
 
 !if EXTENDED=0 {
-	!if COLOURPET=0 {	
-		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
-		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
-		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
-		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
+	!if COLOURPET=0 {
+		!IF SS40=0 {	
+			LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
+			STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
+			LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
+			STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
+		} ELSE {
+			JSR SS40_SyncPointers
+		}
 	} ELSE {
 		JSR ColourPET_SyncPointers		; Synchronize Pointers			@@@@@@@@@@@@@@@ COLOURPET
 	}

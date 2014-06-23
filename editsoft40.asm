@@ -41,6 +41,7 @@ SS40_SET80
 		JSR SS40_INIT80				; Set to 80
 
 SS40_DOIT	JSR CRT_SET_TEXT_SS40			; Program CRTC for Text mode
+		JSR WINDOW_CLEAR			; Clear the screen
 		RTS		
 
 ;************* Set Screen to TEXT or GRAPHICS MODE
@@ -99,7 +100,7 @@ SS40Loop	LDA (SAL),Y				; Pointer: Tape Buffer/ Screen Scrolling
 SS40_ScreenPointers
 		LDA SCNWIDTH			; What is current screen width?
 		CMP #40				; Is it 40?
-		BEQ SS40_Pointer40
+		BEQ SS40_Pointer40		; Yes, skip down
 
 SS40_Pointer80
 		LDA Line_Addr_Lo,X		; Screen Line Addresses LO (80 column table)
@@ -114,6 +115,76 @@ SS40_Pointer40
 		LDA Line_Addr_Hi2,X		; Screen Line Addresses HI (additional 40 column table)
 		STA ScrPtr+1         		; Pointer: Current Screen Line Address HI
 		RTS
+
+;-------------- Sync Pointers - Current Line
+;
+; This takes the current line number in X and then uses the lookup tables
+; to find the screen address of the start of the line and stores them
+; in the Character pointers.
+
+SS40_SyncPointersX
+		LDA SCNWIDTH				; What is current screen width?
+		CMP #40					; Is it 40?
+		BEQ SS40_SPX40				; Yes, skip down
+SS40_SPX80
+		LDA Line_Addr_Lo,X			; Screen Line Addresses LO (80 COL)
+		STA ScrPtr				; Pointer: Current Screen Line Address LO
+		LDA Line_Addr_Hi,X			; Screen Line Addresses HI (80 COL)
+		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
+		RTS
+
+SS40_SPX40
+		LDA Line_Addr_Lo2,X			; Screen Line Addresses LO (40 COL)
+		STA ScrPtr				; Pointer: Current Screen Line Address LO
+		LDA Line_Addr_Hi2,X			; Screen Line Addresses HI (40 COL)
+		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
+		RTS
+
+
+;-------------- Sync Pointers - Next Line
+;
+; This takes the current line number in X and then uses the lookup tables
+; to find the screen address of the start of the NEXT line and stores them
+; in the Character pointers.
+
+SS40_SyncPointers
+		LDA SCNWIDTH				; What is current screen width?
+		CMP #40					; Is it 40?
+		BEQ SS40_SP40				; Yes, skip down
+SS40_SP80
+		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1 (80 COL)
+		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
+		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1 (80 COL)
+		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
+		RTS
+
+SS40_SP40
+		LDA Line_Addr_Lo2+1,X			; Screen line address table LO + 1 (40 COL)
+		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
+		LDA Line_Addr_Hi2+1,X			; Screen line address table HI + 1 (40 COL)
+		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
+		RTS
+
+;-------------- 
+
+SS40_SyncPointers2
+		LDA SCNWIDTH				; What is current screen width?
+		CMP #40					; Is it 40?
+		BEQ SS40_SP240				; Yes, skip down
+SS40_SP280
+		LDA Line_Addr_Lo-1,X			; Screen line address table LO + 1 (80 COL)
+		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
+		LDA Line_Addr_Hi-1,X			; Screen line address table HI + 1 (80 COL)
+		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
+		RTS
+
+SS40_SP240
+		LDA Line_Addr_Lo2-1,X			; Screen line address table LO + 1 (40 COL)
+		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
+		LDA Line_Addr_Hi2-1,X			; Screen line address table HI + 1 (40 COL)
+		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
+		RTS
+
 
 ;************** Additional CRTC Setup Table
 
