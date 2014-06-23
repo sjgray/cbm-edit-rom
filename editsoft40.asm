@@ -10,6 +10,8 @@
 ; * FULL_SCREEN_WINDOW	- Sets the screen dimensions (Usually hardcoded to 80x25 or 40x25)
 ; * UPDATE_CURSOR_ROW   - Sets screen pointers
 ;
+; To switch between 40/80 column we also need to include ESC codes (ESC-X to switch)
+;
 ; ZP Usage:
 ; * SCNWIDTH = $f2					; 40 or 80
 
@@ -23,6 +25,23 @@ SS40_INIT40
 		LDA #40					; Set 40 column mode
 		STA SCNWIDTH				; Store it
 		RTS
+
+;************** Switch Modes
+
+SS40_SwapModes
+		LDA SCNWIDTH				; Check current screen width
+		CMP #40					; Is it 40?
+		BEQ SS40_SET80				; Yes, switch it to 80
+
+SS40_SET40
+		JSR SS40_INIT40				; No, switch it to 40
+		JMP SS40_DOIT
+
+SS40_SET80
+		JSR SS40_INIT80				; Set to 80
+
+SS40_DOIT	JSR CRT_SET_TEXT_SS40			; Program CRTC for Text mode
+		RTS		
 
 ;************* Set Screen to TEXT or GRAPHICS MODE
 
@@ -77,7 +96,7 @@ SS40Loop	LDA (SAL),Y				; Pointer: Tape Buffer/ Screen Scrolling
 ; This routine looks at the current screen width then sets the
 ; screen line pointer from the appropriate table (40 or 80)
 
-SS40_Pointers
+SS40_ScreenPointers
 		LDA SCNWIDTH			; What is current screen width?
 		CMP #40				; Is it 40?
 		BEQ SS40_Pointer40
@@ -96,6 +115,12 @@ SS40_Pointer40
 		STA ScrPtr+1         		; Pointer: Current Screen Line Address HI
 		RTS
 
+;************** Additional CRTC Setup Table
+
+		!if REFRESH = 0 { !source "crtc-ss40-50hz.asm" }
+		!if REFRESH = 1 { !source "crtc-ss40-60hz.asm" }
+		!if REFRESH = 2 { !source "crtc-ss40-pal.asm" }
+		!if REFRESH = 3 { !source "crtc-ss40-ntsc.asm" }
 
 ;************** Additional Screen Line Address Tables
 ;

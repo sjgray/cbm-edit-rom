@@ -130,7 +130,9 @@ ESCAPE_K	; Esc-k End-of-Line
 ESCAPE_L	; Esc-l Scroll On
 ESCAPE_M	; Esc-m Scroll Off
 
+!IF SS40=0 {
 ESCAPE_X	; Esc-x Switch 40/80 Col
+}
 
 		JMP IRQ_EPILOG				; Ignore sequence for now
 
@@ -439,6 +441,19 @@ EUROSWAP2	CMP #'Y'		; Is it "Y"?
 		LDA #'Z'		; Yes, swap with "Z"
 EUROSWAP_OUT	JMP SCAN_NORM2		; Return to keyboard routine
 
+
+;-------------- Switchable 40/80 column Functions
+;
+; When SS40=1, ESC-X switches between 40/80 column mode.
+; Currently this is done with SOFT40 method where the 80 column screen is
+; reprogrammed to 40 column by increasing the left and right margins.
+; With future hardware we may be able to switch between REAL 40/80 column mode.
+
+!IF SS40=1 {
+ESCAPE_X	
+		JSR SS40_SwapModes	; Swap 40/80 Modes
+		JMP IRQ_EPILOG		
+}
 
 ;-------------- CRTC Chip Functions
 ;
