@@ -20,7 +20,7 @@ COLUMNS   = 80	; Screen Width:			40 or 80
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes
 SS40      = 1	; Software Switchable Soft-40	0=No, 1=Yes
 BOOTCASE  = 0	; Initial Screen Mode		0=Text, 1=Graphics
-REFRESH   = 3	; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
+REFRESH   = 1	; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
 
 HERTZ     = 50	; Line Frequency (Clock):					50=Euro, 60=NorthAmerica
 
@@ -77,12 +77,15 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 	!source "editromext.asm" 
 } ELSE {
 	!IF COLOURPET = 1 {
-		!source "copyright-colourpet.asm" }
+		!source "copyright-colourpet.asm" 
 		!text ", ColourPET Hardware="
 		!if COLOURVER=0 { !text "BETA" }
 		!if COLOURVER=1 { !text "RELEASE" }
+	} else {
+		!text " CBM EDIT ROM PROJECT "
+	}
 		
-	!if COLOURPET + ESCCODES + WEDGE + EXECUDESK > 0 {
+	!if COLOURPET + ESCCODES + WEDGE + EXECUDESK + SS40 + SOFT40 > 0 {
 		!text ", Keyboard="
 		!if KEYBOARD=0 { !text "N" }
 		!if KEYBOARD=1 { !text "B" }		; QWERTY layout

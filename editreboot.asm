@@ -1,14 +1,20 @@
 ; PET/CBM EDIT ROM - Soft Reboot (C)2013 Steve J. Gray
 ; ================
 ; Soft Reboot - Hold down a combination of keys to reset the computer.
-; The RebootCodes table holds 10 values, one for each keyboard ROW. All
+; The RebootCodes table holds 10 or 16 values, one for each keyboard ROW. All
 ; values must match to trigger the reset. Note the values are RAW Keyboard
 ; column bits NOT PETSCII. When a key is DOWN the bit in that column is ZERO.
 ; IE, $FF means NO keys are down. Do not fill table with all $FF's or the 
 ; machine will reboot constantly.
+;
+; OPTIONS: KEYBOARD selects reboot matrix
 
 CheckReboot
-		LDY #9					; ROW=9
+		!IF KEYBOARD=7 {
+			LDY #15				; ROW=15
+		} ELSE {
+			LDY #9				; ROW=9
+		}
 CheckLoop
 		STY PIA1_Port_A 			; Keyboard row select
 		LDA PIA1_Port_B				; Keyboard col - keypressed
@@ -96,5 +102,26 @@ RebootCodes
 		!byte %11111111	; ROW 2
 		!byte %11111111	; ROW 1
 		!byte %10101110	; ROW 0 - (ghost), DEL, ESC
+}
 
+;		--------------- CBM-II Keyboard (16 ROWS): ?
+;		Note: The CBM-II keyboard is 16x6. Two columns are not connected
+;		TODO: Development is in progress; wiring is TBD
+!if KEYBOARD=7 { 
+		!byte %11111111	; ROW 15
+		!byte %11111111	; ROW 14
+		!byte %11111111	; ROW 13
+		!byte %11111111	; ROW 12
+		!byte %11111111	; ROW 11
+		!byte %11111111	; ROW 10
+		!byte %11111111	; ROW 9
+		!byte %11111111	; ROW 8
+		!byte %11111111	; ROW 7
+		!byte %11111111	; ROW 6
+		!byte %11111111	; ROW 5
+		!byte %11111111	; ROW 4
+		!byte %11111110	; ROW 3
+		!byte %11111111	; ROW 2
+		!byte %11111111	; ROW 1
+		!byte %11111111	; ROW 0
 }
