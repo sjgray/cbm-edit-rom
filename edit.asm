@@ -14,7 +14,7 @@
 ; DIRECTIVE	  FEATURE			VALID OPTIONS			NOTES / FUTURE OPTIONS
 ;----------	  -------			-------------			----------------------
 EXTENDED  = 0	; Extended Editor?		0=No, 1=Yes
-KEYBOARD  = 4	; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG,6=BZ
+KEYBOARD  = 5	; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG,6=BZ
 ;                                               7=CBM-II (requires hardware mod)
 COLUMNS   = 40	; Screen Width:			40 or 80
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes
@@ -25,7 +25,7 @@ REFRESH   = 3	; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
 HERTZ     = 50	; Line Frequency (Clock):					50=Euro, 60=NorthAmerica
 
 COLOURPET = 1	; ColourPET additions?		0=No, 1=Yes
-COLOURVER = 0	; ColourPET Hardware Version	0=Beta,1=Release
+COLOURVER = 1	; ColourPET Hardware Version	0=Beta,1=Release
 COLOURMODE= 0	; ColourPET Hardware Type	0=Digital, 1=Analog
 DEFAULTFG = 5	; ColourPET Foreground colour   0 to 15 RGBI
 DEFAULTBG = 0	; ColourPET Background colour   0 to 15 RGBI
@@ -50,7 +50,7 @@ DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
 ;---------------------- Output filename
 
 ;!TO "editrom.bin",plain			; Generic output file with no load address
-!TO "cpet-40-bsjg-ntsc.bin",plain		; ColourPET output file with no load address
+!TO "cpet-40-nsjg-ntsc.bin",plain		; ColourPET output file with no load address
 
 ;---------------------- These are the symbol definitions for PET/CBM memory and IO chips
 
@@ -75,59 +75,8 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 
 !if EXTENDED  = 1 {
 	!source "editromext.asm" 
-} ELSE {
-	!IF COLOURPET = 1 {
-		!source "copyright-colourpet.asm" 
-		!text ", ColourPET Hardware="
-		!if COLOURVER=0 { !text "BETA" }
-		!if COLOURVER=1 { !text "RELEASE" }
-	} else {
-		!text " CBM EDIT ROM PROJECT "
-	}
-		
-	!if COLOURPET + ESCCODES + WEDGE + EXECUDESK + SS40 + SOFT40 > 0 {
-		!text ", Keyboard="
-		!if KEYBOARD=0 { !text "N" }
-		!if KEYBOARD=1 { !text "B" }		; QWERTY layout
-		!if KEYBOARD=2 { !text "DIN" }
-		!if KEYBOARD=3 { !text "C64/VIC" }
-		!if KEYBOARD=4 { !text "B-SJG" }	; Modified layout - cursor keys, esc etc
-		!if KEYBOARD=5 { !text "N-SJG" }	; Modified layout - @ replaced with ESC
-		!if KEYBOARD=6 { !text "BZ" }		; QWERTZ layout
-		!if KEYBOARD=7 { !text "CBM-II" }	; CBM-II keyboard (requires hardware mod)
-
-		!text ", Screen Width="
-		!if COLUMNS=40  { !text "40" }
-		!if COLUMNS=80  { !text "80" }
-		!if SOFT40=1    { !text " (SOFT 40)" }
-		!if SS40=1      { !text " (Switchable 40)" }
-
-		!text ", Hertz="
-		!if HERTZ=50 { !text "50" }
-		!if HERTZ=60 { !text "60" }
-
-		!text ", Refresh="
-		!if REFRESH=0 { !text "EURO" }
- 		!if REFRESH=1 { !text "N.AMERICA" }
-		!if REFRESH=2 { !text "PAL" }
-		!if REFRESH=3 { !text "NTSC" }
-
-		!text ", ESC Codes="
-		!if ESCCODES=0 { !text "NO" }
-		!if ESCCODES=1 { !text "YES" }
-
-		!text ", Wedge="
-		!if WEDGE=0 { !text "NO" }
-		!if WEDGE=1 { !text "YES" }
-
-		!text ", Reboot="
-		!if REBOOT=0 { !text "NO" }
-		!if REBOOT=1 { !text "YES" }
-
-		!if EXECUDESK=1 { !text ", Execudesk=YES" }
-
-		!fill $E900-*,$00 
-	}
+} ELSE {		
+	!if COLOURPET + ESCCODES + WEDGE + EXECUDESK + SS40 + SOFT40 > 0 { !source "io.asm"}
 
 	!if EXECUDESK = 1 { !source "execudesk.asm" }
 	!if WEDGE = 1	  { !source "editwedge.asm" }
