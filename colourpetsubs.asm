@@ -84,7 +84,7 @@ SetColourAndBorder
 ; COLOURMODE OPTION: 0=DIGITAL, 1=ANALOG
 ;
 ; DIGITAL: Takes the FG colour and BG colour and combines them into one value
-;          RGBIRGBI - Upper bits for FG, lower for BG
+;          RGBIRGBI - Lower bits for FG, Upper bits for BG
 ;
 ; ANALOG : Takes the FG colour and uses it as an index to the RGB Conversion table.
 ;          RRRGGGBB All bits for FG. Background colour set for entire screen
