@@ -1,0 +1,1568 @@
+;Disassembly of: Execudesk-UE9.bin
+;Created with CBMXfer 0.33 (test version), Feb 2, 2013
+;
+;----- Equates
+;
+INTVEC = $0090   ;hardware interrupt vector LO
+INTVEC+1 = $0091   ;hardware interupt vector HI
+BRKVEC = $0092   ;BRK vector
+STATUS = $0096   ;IO status
+KEYBUF = $026F   ;Keyboard Input Buffer
+KEYBUF+1 = $0270   ;Keyboard Input Buffer
+SCREEN = $8000   ;start of screen ram
+PIA1ROW = $E810   ;PIA#1 Keyboard Row Select
+PIA1COL = $E812   ;PIA#1 Keyboard Columns Read
+PIA2NDAC = $E821   ;PIA#2 IEEE NDAC control
+PIA2IOUT = $E822   ;PIA#2 IEEE Output
+PIA2DAV = $E823   ;PIA#2 IEEE DAV control
+VIAPB = $E840   ;VIA PortB
+VIADB = $E842   ;VIA Data Direction Register for PortB
+VIAT1H = $E845   ;VIA Timer 1 Hi
+VIAT2L = $E848   ;VIA Timer 2 Lo
+VIASHR = $E84A   ;VIA Shift Register
+VIACTRL = $E84B   ;VIA Control Register
+VIA0C = $E84C   ;VIA Register C
+VIA0E = $E84E   ;VIA Register E
+CRTCA = $E880   ;CRTC Controller Register Select
+CRTCB = $E881   ;CRTC Controller Data
+RSTIO = $FFCC   ;Kernal Restore IO devices
+CHROUT = $FFD2   ;Kernal Print a byte
+;
+* = $E000
+;
+;----- Code
+;
+$E000: 4C 4B E0  JMP  L_E04B
+$E003: 4C A7 E0  JMP  L_E0A7
+$E006: 4C 16 E1  JMP  L_E116
+$E009: 4C 02 E2  JMP  L_E202
+$E00C: 4C 42 E4  JMP  L_E442
+$E00F: 4C 55 E4  JMP  L_E455
+$E012: 4C 00 E6  JMP  L_E600
+$E015: 4C 51 E0  JMP  L_E051
+$E018: 4C 7A E0  JMP  L_E07A
+$E01B: 4C 82 E0  JMP  L_E082
+$E01E: 4C 88 E0  JMP  L_E088
+$E021: 4C C8 E3  JMP  L_E3C8
+$E024: 4C E8 E3  JMP  L_E3E8
+$E027: 4C BE E4  JMP  L_E4BE
+$E02A: 4C A7 E6  JMP  L_E6A7
+$E02D: 4C 36 E0  JMP  L_E036
+$E030: 4C E1 E1  JMP  L_E1E1
+$E033: 4C DC E1  JMP  L_E1DC
+L_E036:
+$E036: 85 E4     STA $E4
+$E038: 60        RTS
+$E039:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E041:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E049:           .BYT AA,AA ;filler
+L_E04B:
+$E04B: 20 0F E6  JSR  L_E60F
+$E04E: 20 7A E0  JSR  L_E07A
+L_E051:
+$E051: A6 E0     LDX $E0
+$E053: CA        DEX
+L_E054:
+$E054: E8        INX
+$E055: 20 6C E0  JSR  L_E06C
+$E058: 20 C1 E1  JSR  L_E1C1
+$E05B: E4 E1     CPX $E1
+$E05D: 90 F5     BCC L_E054
+L_E05F:
+$E05F: A6 E0     LDX $E0
+$E061: 86 D8     STX $D8
+L_E063:
+$E063: A4 E2     LDY $E2
+$E065: 84 C6     STY $C6
+L_E067:
+$E067: A6 D8     LDX $D8
+$E069: 4C 6F E0  JMP  L_E06F
+L_E06C:
+$E06C: A4 E2     LDY $E2
+$E06E: 88        DEY
+L_E06F:
+$E06F: BD 55 E7  LDA $E755,X
+$E072: 85 C4     STA $C4
+$E074: BD 6E E7  LDA $E76E,X
+$E077: 85 C5     STA $C5
+$E079: 60        RTS
+L_E07A:
+$E07A: A9 2A     LDA #$2A
+$E07C: A2 E7     LDX #$E7
+$E07E: A0 0E     LDY #$0E
+$E080: D0 06     BNE L_E088
+L_E082:
+$E082: A9 3C     LDA #$3C
+$E084: A2 E7     LDX #$E7
+$E086: A0 0C     LDY #$0C
+L_E088:
+$E088: 85 C7     STA $C7
+$E08A: 86 C8     STX $C8
+$E08C: AD 4C E8  LDA VIA0C ;VIA Register C
+$E08F: 29 F0     AND #$F0
+$E091: 85 D1     STA $D1
+$E093: 98        TYA
+$E094: 05 D1     ORA $D1
+$E096: 8D 4C E8  STA VIA0C ;VIA Register C
+$E099: A0 11     LDY #$11
+L_E09B:
+$E09B: B1 C7     LDA ($C7),Y
+$E09D: 8C 80 E8  STY CRTCA ;CRTC Controller Register Select
+$E0A0: 8D 81 E8  STA CRTCB ;CRTC Controller Data
+$E0A3: 88        DEY
+$E0A4: 10 F5     BPL L_E09B
+$E0A6: 60        RTS
+L_E0A7:
+$E0A7: AC 6F 02  LDY KEYBUF ;Keyboard Input Buffer
+$E0AA: A2 00     LDX #$00
+L_E0AC:
+$E0AC: BD 70 02  LDA KEYBUF+1,X ;Keyboard Input Buffer
+$E0AF: 9D 6F 02  STA KEYBUF,X ;Keyboard Input Buffer
+$E0B2: E8        INX
+$E0B3: E4 9E     CPX $9E
+$E0B5: D0 F5     BNE L_E0AC
+$E0B7: C6 9E     DEC $9E
+$E0B9: 98        TYA
+$E0BA: 58        CLI
+$E0BB: 60        RTS
+L_E0BC:
+$E0BC: 20 8C E6  JSR  L_E68C
+L_E0BF:
+$E0BF: A5 9E     LDA $9E
+$E0C1: 85 A7     STA $A7
+$E0C3: F0 FA     BEQ L_E0BF
+$E0C5: 78        SEI
+$E0C6: A5 AA     LDA $AA
+$E0C8: F0 09     BEQ L_E0D3
+$E0CA: A5 A9     LDA $A9
+$E0CC: A0 00     LDY #$00
+$E0CE: 84 AA     STY $AA
+$E0D0: 20 06 E6  JSR  L_E606
+L_E0D3:
+$E0D3: 20 A7 E0  JSR  L_E0A7
+$E0D6: C9 83     CMP #$83
+$E0D8: D0 10     BNE L_E0EA
+$E0DA: 78        SEI
+$E0DB: A2 09     LDX #$09
+$E0DD: 86 9E     STX $9E
+L_E0DF:
+$E0DF: BD 20 E7  LDA $E720,X
+$E0E2: 9D 6E 02  STA $026E,X
+$E0E5: CA        DEX
+$E0E6: D0 F7     BNE L_E0DF
+$E0E8: F0 D5     BEQ L_E0BF
+L_E0EA:
+$E0EA: C9 0D     CMP #$0D
+$E0EC: D0 CE     BNE L_E0BC
+$E0EE: A4 D5     LDY $D5
+$E0F0: 84 AC     STY $AC
+L_E0F2:
+$E0F2: B1 C4     LDA ($C4),Y
+$E0F4: C9 20     CMP #$20
+$E0F6: D0 03     BNE L_E0FB
+$E0F8: 88        DEY
+$E0F9: D0 F7     BNE L_E0F2
+L_E0FB:
+$E0FB: C8        INY
+$E0FC: 84 A1     STY $A1
+$E0FE: 20 CB E1  JSR  L_E1CB
+$E101: EA        NOP
+$E102: 84 CD     STY $CD
+$E104: A5 A3     LDA $A3
+$E106: 30 19     BMI L_E121
+$E108: C5 D8     CMP $D8
+$E10A: D0 15     BNE L_E121
+$E10C: A5 A4     LDA $A4
+$E10E: 85 C6     STA $C6
+$E110: C5 A1     CMP $A1
+$E112: 90 0D     BCC L_E121
+$E114: B0 2E     BCS L_E144
+L_E116:
+$E116: 98        TYA
+$E117: 48        PHA
+$E118: 8A        TXA
+$E119: 48        PHA
+$E11A: 6C E9 00  JMP ( $00E9)
+$E11D: A5 AC     LDA $AC
+$E11F: F0 9E     BEQ L_E0BF
+L_E121:
+$E121: A4 C6     LDY $C6
+$E123: B1 C4     LDA ($C4),Y
+$E125: 85 D9     STA $D9
+$E127: 29 3F     AND #$3F
+$E129: 06 D9     ASL $D9
+$E12B: 24 D9     BIT $D9
+$E12D: 10 02     BPL L_E131
+$E12F: 09 80     ORA #$80
+L_E131:
+$E131: 90 04     BCC L_E137
+$E133: A6 CD     LDX $CD
+$E135: D0 04     BNE L_E13B
+L_E137:
+$E137: 70 02     BVS L_E13B
+$E139: 09 40     ORA #$40
+L_E13B:
+$E13B: E6 C6     INC $C6
+$E13D: 20 6A E1  JSR  L_E16A
+$E140: C4 A1     CPY $A1
+$E142: D0 17     BNE L_E15B
+L_E144:
+$E144: A9 00     LDA #$00
+$E146: 85 AC     STA $AC
+$E148: A9 0D     LDA #$0D
+$E14A: A6 AF     LDX $AF
+$E14C: E0 03     CPX #$03
+$E14E: F0 06     BEQ L_E156
+$E150: A6 B0     LDX $B0
+$E152: E0 03     CPX #$03
+$E154: F0 03     BEQ L_E159
+L_E156:
+$E156: 20 02 E2  JSR  L_E202
+L_E159:
+$E159: A9 0D     LDA #$0D
+L_E15B:
+$E15B: 85 D9     STA $D9
+$E15D: 68        PLA
+$E15E: AA        TAX
+$E15F: 68        PLA
+$E160: A8        TAY
+$E161: A5 D9     LDA $D9
+$E163: C9 DE     CMP #$DE
+$E165: D0 02     BNE L_E169
+$E167: A9 FF     LDA #$FF
+L_E169:
+$E169: 60        RTS
+L_E16A:
+$E16A: C9 22     CMP #$22
+$E16C: D0 08     BNE L_E176
+$E16E: A5 CD     LDA $CD
+$E170: 49 01     EOR #$01
+$E172: 85 CD     STA $CD
+$E174: A9 22     LDA #$22
+L_E176:
+$E176: 60        RTS
+L_E177:
+$E177: 09 40     ORA #$40
+L_E179:
+$E179: A6 9F     LDX $9F
+$E17B: F0 02     BEQ L_E17F
+L_E17D:
+$E17D: 09 80     ORA #$80
+L_E17F:
+$E17F: A6 DC     LDX $DC
+$E181: F0 02     BEQ L_E185
+$E183: C6 DC     DEC $DC
+L_E185:
+$E185: 20 06 E6  JSR  L_E606
+$E188: E6 C6     INC $C6
+$E18A: A4 D5     LDY $D5
+$E18C: C4 C6     CPY $C6
+$E18E: B0 09     BCS L_E199
+$E190: A6 D8     LDX $D8
+L_E192:
+$E192: 20 A3 E3  JSR  L_E3A3
+$E195: A4 E2     LDY $E2
+$E197: 84 C6     STY $C6
+L_E199:
+$E199: A9 00     LDA #$00
+$E19B: 85 E8     STA $E8
+L_E19D:
+$E19D: 68        PLA
+$E19E: A8        TAY
+$E19F: A5 DC     LDA $DC
+$E1A1: F0 02     BEQ L_E1A5
+$E1A3: 46 CD     LSR $CD
+L_E1A5:
+$E1A5: 68        PLA
+$E1A6: AA        TAX
+$E1A7: 68        PLA
+$E1A8: 58        CLI
+$E1A9: 60        RTS
+L_E1AA:
+$E1AA: A4 D5     LDY $D5
+$E1AC: A6 E0     LDX $E0
+$E1AE: E4 D8     CPX $D8
+$E1B0: 90 08     BCC L_E1BA
+$E1B2: A4 E2     LDY $E2
+$E1B4: 84 C6     STY $C6
+$E1B6: 68        PLA
+$E1B7: 68        PLA
+$E1B8: D0 DF     BNE L_E199
+L_E1BA:
+$E1BA: C6 D8     DEC $D8
+$E1BC: 84 C6     STY $C6
+$E1BE: 4C 67 E0  JMP  L_E067
+L_E1C1:
+$E1C1: A9 20     LDA #$20
+L_E1C3:
+$E1C3: C8        INY
+$E1C4: 91 C4     STA ($C4),Y
+$E1C6: C4 D5     CPY $D5
+$E1C8: 90 F9     BCC L_E1C3
+$E1CA: 60        RTS
+L_E1CB:
+$E1CB: A4 E2     LDY $E2
+$E1CD: 84 C6     STY $C6
+$E1CF: A0 00     LDY #$00
+$E1D1: 60        RTS
+L_E1D2:
+$E1D2: A9 00     LDA #$00
+$E1D4: AA        TAX
+$E1D5: 20 E1 E1  JSR  L_E1E1
+$E1D8: A9 18     LDA #$18
+$E1DA: A2 4F     LDX #$4F
+L_E1DC:
+$E1DC: 85 E1     STA $E1
+$E1DE: 86 D5     STX $D5
+$E1E0: 60        RTS
+L_E1E1:
+$E1E1: 85 E0     STA $E0
+$E1E3: 86 E2     STX $E2
+$E1E5: 60        RTS
+$E1E6:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E1EE:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E1F6:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E1FE:           .BYT AA,AA,AA,AA ;filler
+L_E202:
+$E202: 48        PHA
+$E203: 85 D9     STA $D9
+$E205: 8A        TXA
+$E206: 48        PHA
+$E207: 98        TYA
+$E208: 48        PHA
+$E209: 6C EB 00  JMP ( $00EB)
+$E20C: A9 00     LDA #$00
+$E20E: 85 AC     STA $AC
+$E210: A4 C6     LDY $C6
+$E212: A5 D9     LDA $D9
+$E214: 29 7F     AND #$7F
+$E216: C9 1B     CMP #$1B
+$E218: D0 03     BNE L_E21D
+$E21A: 4C BD E3  JMP  L_E3BD
+L_E21D:
+$E21D: A5 D9     LDA $D9
+$E21F: 10 03     BPL L_E224
+$E221: 4C F4 E2  JMP  L_E2F4
+L_E224:
+$E224: C9 0D     CMP #$0D
+$E226: D0 03     BNE L_E22B
+$E228: 4C B6 E3  JMP  L_E3B6
+L_E22B:
+$E22B: C9 20     CMP #$20
+$E22D: 90 08     BCC L_E237
+$E22F: 29 3F     AND #$3F
+$E231: 20 6A E1  JSR  L_E16A
+$E234: 4C 79 E1  JMP  L_E179
+L_E237:
+$E237: A6 DC     LDX $DC
+$E239: F0 03     BEQ L_E23E
+$E23B: 4C 7D E1  JMP  L_E17D
+L_E23E:
+$E23E: C9 14     CMP #$14
+$E240: D0 20     BNE L_E262
+$E242: A4 E2     LDY $E2
+$E244: C4 C6     CPY $C6
+$E246: 90 05     BCC L_E24D
+$E248: 20 AA E1  JSR  L_E1AA
+$E24B: D0 0F     BNE L_E25C
+L_E24D:
+$E24D: C6 C6     DEC $C6
+$E24F: A4 C6     LDY $C6
+L_E251:
+$E251: C8        INY
+$E252: B1 C4     LDA ($C4),Y
+$E254: 88        DEY
+$E255: 91 C4     STA ($C4),Y
+$E257: C8        INY
+$E258: C4 D5     CPY $D5
+$E25A: D0 F5     BNE L_E251
+L_E25C:
+$E25C: A9 20     LDA #$20
+$E25E: 91 C4     STA ($C4),Y
+$E260: D0 37     BNE L_E299
+L_E262:
+$E262: A6 CD     LDX $CD
+$E264: F0 03     BEQ L_E269
+$E266: 4C 7D E1  JMP  L_E17D
+L_E269:
+$E269: C9 12     CMP #$12
+$E26B: D0 02     BNE L_E26F
+$E26D: 85 9F     STA $9F
+L_E26F:
+$E26F: C9 13     CMP #$13
+$E271: D0 10     BNE L_E283
+$E273: A5 E8     LDA $E8
+$E275: 10 04     BPL L_E27B
+$E277: 20 D2 E1  JSR  L_E1D2
+$E27A: 18        CLC
+L_E27B:
+$E27B: 66 E8     ROR $E8
+$E27D: 20 5F E0  JSR  L_E05F
+$E280: 4C 9D E1  JMP  L_E19D
+L_E283:
+$E283: C9 1D     CMP #$1D
+$E285: D0 0B     BNE L_E292
+$E287: C8        INY
+$E288: 84 C6     STY $C6
+$E28A: 88        DEY
+$E28B: C4 D5     CPY $D5
+$E28D: 90 0A     BCC L_E299
+$E28F: 4C 92 E1  JMP  L_E192
+L_E292:
+$E292: C9 11     CMP #$11
+$E294: D0 06     BNE L_E29C
+$E296: 20 A3 E3  JSR  L_E3A3
+L_E299:
+$E299: 4C 99 E1  JMP  L_E199
+L_E29C:
+$E29C: C9 09     CMP #$09
+$E29E: D0 30     BNE L_E2D0
+$E2A0: 20 70 E5  JSR  L_E570
+L_E2A3:
+$E2A3: AC 3A 03  LDY $033A
+$E2A6: EE 3A 03  INC $033A
+$E2A9: C4 D5     CPY $D5
+$E2AB: 90 09     BCC L_E2B6
+$E2AD: A5 D5     LDA $D5
+$E2AF: 85 C6     STA $C6
+$E2B1: CE 3A 03  DEC $033A
+$E2B4: D0 E3     BNE L_E299
+L_E2B6:
+$E2B6: 0E 3E 03  ASL $033E
+$E2B9: D0 0A     BNE L_E2C5
+$E2BB: E8        INX
+$E2BC: E0 0A     CPX #$0A
+$E2BE: F0 D9     BEQ L_E299
+$E2C0: A9 01     LDA #$01
+$E2C2: 8D 3E 03  STA $033E
+L_E2C5:
+$E2C5: BD EE 03  LDA $03EE,X
+$E2C8: 2D 3E 03  AND $033E
+$E2CB: F0 D6     BEQ L_E2A3
+$E2CD: C8        INY
+$E2CE: 84 C6     STY $C6
+L_E2D0:
+$E2D0: C9 16     CMP #$16
+$E2D2: D0 0C     BNE L_E2E0
+$E2D4: A9 20     LDA #$20
+$E2D6: 88        DEY
+L_E2D7:
+$E2D7: C8        INY
+$E2D8: 91 C4     STA ($C4),Y
+$E2DA: C4 D5     CPY $D5
+$E2DC: 90 F9     BCC L_E2D7
+$E2DE: B0 B9     BCS L_E299
+L_E2E0:
+$E2E0: C9 15     CMP #$15
+$E2E2: F0 03     BEQ L_E2E7
+$E2E4: 4C 91 E5  JMP  L_E591
+L_E2E7:
+$E2E7: A5 E0     LDA $E0
+$E2E9: 48        PHA
+$E2EA: A5 D8     LDA $D8
+$E2EC: 85 E0     STA $E0
+$E2EE: 20 E8 E3  JSR  L_E3E8
+$E2F1: 4C CA E5  JMP  L_E5CA
+L_E2F4:
+$E2F4: 29 7F     AND #$7F
+$E2F6: C9 7F     CMP #$7F
+$E2F8: D0 02     BNE L_E2FC
+$E2FA: A9 5E     LDA #$5E
+L_E2FC:
+$E2FC: C9 20     CMP #$20
+$E2FE: 90 03     BCC L_E303
+$E300: 4C 77 E1  JMP  L_E177
+L_E303:
+$E303: C9 0D     CMP #$0D
+$E305: D0 03     BNE L_E30A
+$E307: 4C B6 E3  JMP  L_E3B6
+L_E30A:
+$E30A: A6 CD     LDX $CD
+$E30C: D0 34     BNE L_E342
+$E30E: C9 14     CMP #$14
+$E310: D0 2C     BNE L_E33E
+$E312: A4 D5     LDY $D5
+$E314: B1 C4     LDA ($C4),Y
+$E316: C9 20     CMP #$20
+$E318: D0 72     BNE L_E38C
+$E31A: C4 C6     CPY $C6
+$E31C: 90 6E     BCC L_E38C
+$E31E: F0 6C     BEQ L_E38C
+$E320: A4 D5     LDY $D5
+L_E322:
+$E322: 88        DEY
+$E323: B1 C4     LDA ($C4),Y
+$E325: C8        INY
+$E326: 91 C4     STA ($C4),Y
+$E328: 88        DEY
+$E329: C4 C6     CPY $C6
+$E32B: D0 F5     BNE L_E322
+$E32D: A9 20     LDA #$20
+$E32F: 91 C4     STA ($C4),Y
+$E331: A5 D5     LDA $D5
+$E333: 38        SEC
+$E334: E5 C6     SBC $C6
+$E336: E5 DC     SBC $DC
+$E338: 30 52     BMI L_E38C
+$E33A: E6 DC     INC $DC
+$E33C: D0 4E     BNE L_E38C
+L_E33E:
+$E33E: A6 DC     LDX $DC
+$E340: F0 05     BEQ L_E347
+L_E342:
+$E342: 09 40     ORA #$40
+$E344: 4C 7D E1  JMP  L_E17D
+L_E347:
+$E347: C9 11     CMP #$11
+$E349: D0 0D     BNE L_E358
+$E34B: A6 E0     LDX $E0
+$E34D: E4 D8     CPX $D8
+$E34F: B0 3B     BCS L_E38C
+$E351: C6 D8     DEC $D8
+$E353: 20 67 E0  JSR  L_E067
+$E356: D0 34     BNE L_E38C
+L_E358:
+$E358: C9 12     CMP #$12
+$E35A: D0 04     BNE L_E360
+$E35C: A9 00     LDA #$00
+$E35E: 85 9F     STA $9F
+L_E360:
+$E360: C9 1D     CMP #$1D
+$E362: D0 0F     BNE L_E373
+$E364: A4 E2     LDY $E2
+$E366: C4 C6     CPY $C6
+$E368: 90 05     BCC L_E36F
+$E36A: 20 AA E1  JSR  L_E1AA
+$E36D: D0 1D     BNE L_E38C
+L_E36F:
+$E36F: C6 C6     DEC $C6
+$E371: 10 19     BPL L_E38C
+L_E373:
+$E373: C9 13     CMP #$13
+$E375: D0 05     BNE L_E37C
+$E377: 20 51 E0  JSR  L_E051
+$E37A: D0 10     BNE L_E38C
+L_E37C:
+$E37C: C9 09     CMP #$09
+$E37E: D0 0F     BNE L_E38F
+$E380: 20 70 E5  JSR  L_E570
+$E383: BD EE 03  LDA $03EE,X
+$E386: 4D 3E 03  EOR $033E
+$E389: 9D EE 03  STA $03EE,X
+L_E38C:
+$E38C: 4C 99 E1  JMP  L_E199
+L_E38F:
+$E38F: C9 16     CMP #$16
+$E391: F0 03     BEQ L_E396
+$E393: 4C BC E5  JMP  L_E5BC
+L_E396:
+$E396: A9 20     LDA #$20
+$E398: A4 E2     LDY $E2
+L_E39A:
+$E39A: C4 C6     CPY $C6
+$E39C: B0 EE     BCS L_E38C
+$E39E: 91 C4     STA ($C4),Y
+$E3A0: C8        INY
+$E3A1: D0 F7     BNE L_E39A
+L_E3A3:
+$E3A3: 46 A3     LSR $A3
+$E3A5: A6 D8     LDX $D8
+$E3A7: E4 E1     CPX $E1
+$E3A9: 90 06     BCC L_E3B1
+$E3AB: 20 E8 E3  JSR  L_E3E8
+$E3AE: 4C 67 E0  JMP  L_E067
+L_E3B1:
+$E3B1: E6 D8     INC $D8
+$E3B3: 4C 67 E0  JMP  L_E067
+L_E3B6:
+$E3B6: A4 E2     LDY $E2
+$E3B8: 84 C6     STY $C6
+$E3BA: 20 A3 E3  JSR  L_E3A3
+L_E3BD:
+$E3BD: A9 00     LDA #$00
+$E3BF: 85 DC     STA $DC
+$E3C1: 85 9F     STA $9F
+$E3C3: 85 CD     STA $CD
+$E3C5: 4C 99 E1  JMP  L_E199
+L_E3C8:
+$E3C8: A6 E1     LDX $E1
+$E3CA: E8        INX
+L_E3CB:
+$E3CB: CA        DEX
+$E3CC: 20 6C E0  JSR  L_E06C
+$E3CF: E4 E0     CPX $E0
+$E3D1: F0 35     BEQ L_E408
+$E3D3: BD 54 E7  LDA $E754,X
+$E3D6: 85 C7     STA $C7
+$E3D8: BD 6D E7  LDA $E76D,X
+$E3DB: 85 C8     STA $C8
+L_E3DD:
+$E3DD: C8        INY
+$E3DE: B1 C7     LDA ($C7),Y
+$E3E0: 91 C4     STA ($C4),Y
+$E3E2: C4 D5     CPY $D5
+$E3E4: 90 F7     BCC L_E3DD
+$E3E6: B0 E3     BCS L_E3CB
+L_E3E8:
+$E3E8: A6 E0     LDX $E0
+$E3EA: CA        DEX
+L_E3EB:
+$E3EB: E8        INX
+$E3EC: 20 6C E0  JSR  L_E06C
+$E3EF: E4 E1     CPX $E1
+$E3F1: B0 15     BCS L_E408
+$E3F3: BD 56 E7  LDA $E756,X
+$E3F6: 85 C7     STA $C7
+$E3F8: BD 6F E7  LDA $E76F,X
+$E3FB: 85 C8     STA $C8
+L_E3FD:
+$E3FD: C8        INY
+$E3FE: B1 C7     LDA ($C7),Y
+$E400: 91 C4     STA ($C4),Y
+$E402: C4 D5     CPY $D5
+$E404: 90 F7     BCC L_E3FD
+$E406: B0 E3     BCS L_E3EB
+L_E408:
+$E408: 20 C1 E1  JSR  L_E1C1
+$E40B: AD 12 E8  LDA PIA1COL ;PIA#1 Keyboard Columns Read
+$E40E: C9 FE     CMP #$FE
+$E410: D0 0E     BNE L_E420
+$E412: A0 00     LDY #$00
+L_E414:
+$E414: EA        NOP
+$E415: CA        DEX
+$E416: D0 FC     BNE L_E414
+$E418: 88        DEY
+$E419: D0 F9     BNE L_E414
+L_E41B:
+$E41B: A0 00     LDY #$00
+$E41D: 84 9E     STY $9E
+L_E41F:
+$E41F: 60        RTS
+L_E420:
+$E420: C9 DF     CMP #$DF
+$E422: D0 FB     BNE L_E41F
+L_E424:
+$E424: AD 12 E8  LDA PIA1COL ;PIA#1 Keyboard Columns Read
+$E427: C9 DF     CMP #$DF
+$E429: F0 F9     BEQ L_E424
+$E42B: C9 FF     CMP #$FF
+$E42D: F0 F5     BEQ L_E424
+$E42F: D0 EA     BNE L_E41B
+$E431: AA        TAX
+$E432: AA        TAX
+$E433: AA        TAX
+$E434: AA        TAX
+$E435: AA        TAX
+$E436: AA        TAX
+$E437: AA        TAX
+$E438: AA        TAX
+$E439: AA        TAX
+$E43A: AA        TAX
+$E43B: AA        TAX
+$E43C: AA        TAX
+$E43D: AA        TAX
+$E43E: AA        TAX
+$E43F: AA        TAX
+$E440: AA        TAX
+$E441: AA        TAX
+L_E442:
+$E442: 48        PHA
+$E443: 8A        TXA
+$E444: 48        PHA
+$E445: 98        TYA
+$E446: 48        PHA
+$E447: BA        TSX
+$E448: BD 04 01  LDA $0104,X
+$E44B: 29 10     AND #$10
+$E44D: F0 03     BEQ L_E452
+$E44F: 6C 92 00  JMP ( $0092) ;BRK vector
+L_E452:
+$E452: 6C 90 00  JMP ( $0090) ;hardware interrupt vector LO
+L_E455:
+$E455: 20 EA FF  JSR  $FFEA
+$E458: A5 A7     LDA $A7
+$E45A: D0 1E     BNE L_E47A
+$E45C: C6 A8     DEC $A8
+$E45E: D0 1A     BNE L_E47A
+$E460: A9 14     LDA #$14
+$E462: 24 E4     BIT $E4
+$E464: 10 02     BPL L_E468
+$E466: A9 02     LDA #$02
+L_E468:
+$E468: 85 A8     STA $A8
+$E46A: A4 C6     LDY $C6
+$E46C: 46 AA     LSR $AA
+$E46E: B1 C4     LDA ($C4),Y
+$E470: B0 04     BCS L_E476
+$E472: E6 AA     INC $AA
+$E474: 85 A9     STA $A9
+L_E476:
+$E476: 49 80     EOR #$80
+$E478: 91 C4     STA ($C4),Y
+L_E47A:
+$E47A: A0 00     LDY #$00
+$E47C: AD 10 E8  LDA PIA1ROW ;PIA#1 Keyboard Row Select
+$E47F: 29 F0     AND #$F0
+$E481: 8D 10 E8  STA PIA1ROW ;PIA#1 Keyboard Row Select
+$E484: AD 10 E8  LDA PIA1ROW ;PIA#1 Keyboard Row Select
+$E487: 0A        ASL A
+$E488: 0A        ASL A
+$E489: 0A        ASL A
+$E48A: 10 09     BPL L_E495
+$E48C: 84 F9     STY $F9
+$E48E: AD 13 E8  LDA $E813
+$E491: 09 08     ORA #$08
+$E493: D0 09     BNE L_E49E
+L_E495:
+$E495: A5 F9     LDA $F9
+$E497: D0 08     BNE L_E4A1
+$E499: AD 13 E8  LDA $E813
+$E49C: 29 F7     AND #$F7
+L_E49E:
+$E49E: 8D 13 E8  STA $E813
+L_E4A1:
+$E4A1: 90 09     BCC L_E4AC
+$E4A3: 84 FA     STY $FA
+$E4A5: AD 40 E8  LDA VIAPB ;VIA PortB
+$E4A8: 09 10     ORA #$10
+$E4AA: D0 09     BNE L_E4B5
+L_E4AC:
+$E4AC: A5 FA     LDA $FA
+$E4AE: D0 08     BNE L_E4B8
+$E4B0: AD 40 E8  LDA VIAPB ;VIA PortB
+$E4B3: 29 EF     AND #$EF
+L_E4B5:
+$E4B5: 8D 40 E8  STA VIAPB ;VIA PortB
+L_E4B8:
+$E4B8: 20 BE E4  JSR  L_E4BE
+$E4BB: 4C 00 E6  JMP  L_E600
+L_E4BE:
+$E4BE: A0 FF     LDY #$FF
+$E4C0: 84 A6     STY $A6
+$E4C2: C8        INY
+$E4C3: 84 98     STY $98
+$E4C5: A5 E4     LDA $E4
+$E4C7: 29 7F     AND #$7F
+$E4C9: 85 E4     STA $E4
+$E4CB: A2 50     LDX #$50
+L_E4CD:
+$E4CD: A0 08     LDY #$08
+$E4CF: AD 12 E8  LDA PIA1COL ;PIA#1 Keyboard Columns Read
+$E4D2: CD 12 E8  CMP PIA1COL ;PIA#1 Keyboard Columns Read
+$E4D5: D0 F6     BNE L_E4CD
+L_E4D7:
+$E4D7: 4A        LSR A
+$E4D8: B0 1F     BCS L_E4F9
+$E4DA: 48        PHA
+$E4DB: BD D0 E6  LDA $E6D0,X
+$E4DE: D0 06     BNE L_E4E6
+$E4E0: A9 01     LDA #$01
+$E4E2: 85 98     STA $98
+$E4E4: D0 12     BNE L_E4F8
+L_E4E6:
+$E4E6: C9 10     CMP #$10
+$E4E8: D0 08     BNE L_E4F2
+$E4EA: A5 E4     LDA $E4
+$E4EC: 09 80     ORA #$80
+$E4EE: 85 E4     STA $E4
+$E4F0: 30 06     BMI L_E4F8
+L_E4F2:
+$E4F2: C9 FF     CMP #$FF
+$E4F4: F0 02     BEQ L_E4F8
+$E4F6: 85 A6     STA $A6
+L_E4F8:
+$E4F8: 68        PLA
+L_E4F9:
+$E4F9: CA        DEX
+$E4FA: F0 08     BEQ L_E504
+$E4FC: 88        DEY
+$E4FD: D0 D8     BNE L_E4D7
+$E4FF: EE 10 E8  INC PIA1ROW ;PIA#1 Keyboard Row Select
+$E502: D0 C9     BNE L_E4CD
+L_E504:
+$E504: A5 A6     LDA $A6
+$E506: C5 97     CMP $97
+$E508: F0 06     BEQ L_E510
+$E50A: A2 10     LDX #$10
+$E50C: 86 E6     STX $E6
+$E50E: D0 2F     BNE L_E53F
+L_E510:
+$E510: 24 E4     BIT $E4
+$E512: 30 1E     BMI L_E532
+$E514: 70 59     BVS L_E56F
+$E516: C9 FF     CMP #$FF
+$E518: F0 55     BEQ L_E56F
+$E51A: C9 14     CMP #$14
+$E51C: F0 0C     BEQ L_E52A
+$E51E: C9 20     CMP #$20
+$E520: F0 08     BEQ L_E52A
+$E522: C9 1D     CMP #$1D
+$E524: F0 04     BEQ L_E52A
+$E526: C9 11     CMP #$11
+$E528: D0 45     BNE L_E56F
+L_E52A:
+$E52A: A6 E6     LDX $E6
+$E52C: F0 04     BEQ L_E532
+$E52E: C6 E6     DEC $E6
+$E530: D0 3D     BNE L_E56F
+L_E532:
+$E532: C6 E5     DEC $E5
+$E534: D0 39     BNE L_E56F
+$E536: A2 04     LDX #$04
+$E538: 86 E5     STX $E5
+$E53A: A6 9E     LDX $9E
+$E53C: CA        DEX
+$E53D: 10 30     BPL L_E56F
+L_E53F:
+$E53F: 85 97     STA $97
+$E541: C9 FF     CMP #$FF
+$E543: F0 2A     BEQ L_E56F
+$E545: AA        TAX
+$E546: 08        PHP
+$E547: 29 7F     AND #$7F
+$E549: 28        PLP
+$E54A: 30 17     BMI L_E563
+$E54C: 46 98     LSR $98
+$E54E: 90 13     BCC L_E563
+$E550: C9 2C     CMP #$2C
+$E552: 90 0D     BCC L_E561
+$E554: C9 3C     CMP #$3C
+$E556: B0 09     BCS L_E561
+$E558: E9 0F     SBC #$0F
+$E55A: C9 20     CMP #$20
+$E55C: B0 05     BCS L_E563
+$E55E: 69 20     ADC #$20
+$E560: 2C 09 80  BIT $8009
+L_E563:
+$E563: A6 9E     LDX $9E
+$E565: E4 E3     CPX $E3
+$E567: B0 06     BCS L_E56F
+$E569: 9D 6F 02  STA KEYBUF,X ;Keyboard Input Buffer
+$E56C: E8        INX
+$E56D: 86 9E     STX $9E
+L_E56F:
+$E56F: 60        RTS
+L_E570:
+$E570: A5 C6     LDA $C6
+$E572: 29 F8     AND #$F8
+$E574: 8D 3A 03  STA $033A
+$E577: 4A        LSR A
+$E578: 4A        LSR A
+$E579: 4A        LSR A
+$E57A: AA        TAX
+$E57B: A9 01     LDA #$01
+$E57D: 8D 3E 03  STA $033E
+$E580: A4 C6     LDY $C6
+L_E582:
+$E582: CC 3A 03  CPY $033A
+$E585: F0 09     BEQ L_E590
+$E587: 0E 3E 03  ASL $033E
+$E58A: EE 3A 03  INC $033A
+$E58D: 4C 82 E5  JMP  L_E582
+L_E590:
+$E590: 60        RTS
+L_E591:
+$E591: C9 19     CMP #$19
+$E593: D0 06     BNE L_E59B
+$E595: 20 E8 E3  JSR  L_E3E8
+$E598: 4C D9 E5  JMP  L_E5D9
+L_E59B:
+$E59B: C9 0F     CMP #$0F
+$E59D: D0 0B     BNE L_E5AA
+$E59F: A5 D8     LDA $D8
+$E5A1: 85 E0     STA $E0
+$E5A3: A5 C6     LDA $C6
+$E5A5: 85 E2     STA $E2
+L_E5A7:
+$E5A7: 4C 99 E1  JMP  L_E199
+L_E5AA:
+$E5AA: C9 0E     CMP #$0E
+$E5AC: D0 05     BNE L_E5B3
+$E5AE: 20 7A E0  JSR  L_E07A
+$E5B1: 30 F4     BMI L_E5A7
+L_E5B3:
+$E5B3: C9 07     CMP #$07
+$E5B5: D0 F0     BNE L_E5A7
+$E5B7: 20 A7 E6  JSR  L_E6A7
+$E5BA: F0 EB     BEQ L_E5A7
+L_E5BC:
+$E5BC: C9 15     CMP #$15
+$E5BE: D0 12     BNE L_E5D2
+$E5C0: A5 E0     LDA $E0
+$E5C2: 48        PHA
+$E5C3: A5 D8     LDA $D8
+$E5C5: 85 E0     STA $E0
+$E5C7: 20 C8 E3  JSR  L_E3C8
+L_E5CA:
+$E5CA: 68        PLA
+$E5CB: 85 E0     STA $E0
+$E5CD: 20 63 E0  JSR  L_E063
+$E5D0: D0 18     BNE L_E5EA
+L_E5D2:
+$E5D2: C9 19     CMP #$19
+$E5D4: D0 08     BNE L_E5DE
+$E5D6: 20 C8 E3  JSR  L_E3C8
+L_E5D9:
+$E5D9: 20 67 E0  JSR  L_E067
+$E5DC: D0 0C     BNE L_E5EA
+L_E5DE:
+$E5DE: C9 0F     CMP #$0F
+$E5E0: D0 0B     BNE L_E5ED
+$E5E2: A5 D8     LDA $D8
+$E5E4: 85 E1     STA $E1
+$E5E6: A5 C6     LDA $C6
+$E5E8: 85 D5     STA $D5
+L_E5EA:
+$E5EA: 4C 99 E1  JMP  L_E199
+L_E5ED:
+$E5ED: C9 0E     CMP #$0E
+$E5EF: D0 C2     BNE L_E5B3
+$E5F1: 20 82 E0  JSR  L_E082
+$E5F4: 30 F4     BMI L_E5EA
+$E5F6: AA        TAX
+$E5F7: AA        TAX
+$E5F8: AA        TAX
+$E5F9: AA        TAX
+$E5FA: AA        TAX
+$E5FB: AA        TAX
+$E5FC: AA        TAX
+$E5FD: AA        TAX
+$E5FE: AA        TAX
+$E5FF: AA        TAX
+L_E600:
+$E600: 68        PLA
+$E601: A8        TAY
+$E602: 68        PLA
+$E603: AA        TAX
+$E604: 68        PLA
+$E605: 40        RTI
+L_E606:
+$E606: A4 C6     LDY $C6
+$E608: 91 C4     STA ($C4),Y
+$E60A: A9 02     LDA #$02
+$E60C: 85 A8     STA $A8
+$E60E: 60        RTS
+L_E60F:
+$E60F: A9 7F     LDA #$7F
+$E611: 8D 4E E8  STA VIA0E ;VIA Register E
+$E614: A2 6D     LDX #$6D
+$E616: A9 00     LDA #$00
+$E618: 85 E8     STA $E8
+$E61A: 85 E4     STA $E4
+L_E61C:
+$E61C: 95 8D     STA $8D,X
+$E61E: CA        DEX
+$E61F: 10 FB     BPL L_E61C
+$E621: A9 00     LDA #$00
+$E623: 85 90     STA $<INTVEC ;hardware interrupt vector LO
+$E625: A9 E9     LDA #$E9
+$E627: 85 91     STA $<INTVEC+1 ;hardware interupt vector HI
+$E629: A9 09     LDA #$09
+$E62B: 85 E3     STA $E3
+$E62D: A9 03     LDA #$03
+$E62F: 85 B0     STA $B0
+$E631: A9 0F     LDA #$0F
+$E633: 8D 10 E8  STA PIA1ROW ;PIA#1 Keyboard Row Select
+$E636: 0A        ASL A
+$E637: 8D 40 E8  STA VIAPB ;VIA PortB
+$E63A: 8D 42 E8  STA VIADB ;VIA Data Direction Register for PortB
+$E63D: 8E 22 E8  STX PIA2IOUT ;PIA#2 IEEE Output
+$E640: 8E 45 E8  STX VIAT1H ;VIA Timer 1 Hi
+$E643: A9 3D     LDA #$3D
+$E645: 8D 13 E8  STA $E813
+$E648: 2C 12 E8  BIT PIA1COL ;PIA#1 Keyboard Columns Read
+$E64B: A9 3C     LDA #$3C
+$E64D: 8D 21 E8  STA PIA2NDAC ;PIA#2 IEEE NDAC control
+$E650: 8D 23 E8  STA PIA2DAV ;PIA#2 IEEE DAV control
+$E653: 8D 11 E8  STA $E811
+$E656: 8E 22 E8  STX PIA2IOUT ;PIA#2 IEEE Output
+$E659: A9 0E     LDA #$0E
+$E65B: 85 A8     STA $A8
+$E65D: 85 A7     STA $A7
+$E65F: 85 E6     STA $E6
+$E661: 85 E5     STA $E5
+$E663: 8D 4E E8  STA VIA0E ;VIA Register E
+$E666: 20 D2 E1  JSR  L_E1D2
+$E669: A2 0C     LDX #$0C
+$E66B: A9 00     LDA #$00
+L_E66D:
+$E66D: 9D EE 03  STA $03EE,X
+$E670: CA        DEX
+$E671: 10 FA     BPL L_E66D
+$E673: A9 1D     LDA #$1D
+$E675: A2 E1     LDX #$E1
+$E677: 85 E9     STA $E9
+$E679: 86 EA     STX $EA
+$E67B: A9 0C     LDA #$0C
+$E67D: A2 E2     LDX #$E2
+$E67F: 85 EB     STA $EB
+$E681: 86 EC     STX $EC
+$E683: A9 10     LDA #$10
+$E685: 85 E7     STA $E7
+$E687: 20 A4 E6  JSR  L_E6A4
+$E68A: F0 18     BEQ L_E6A4
+L_E68C:
+$E68C: 20 02 E2  JSR  L_E202
+$E68F: AA        TAX
+$E690: A5 D5     LDA $D5
+$E692: 38        SEC
+$E693: E5 C6     SBC $C6
+$E695: C9 05     CMP #$05
+$E697: D0 37     BNE L_E6D0
+$E699: 8A        TXA
+$E69A: C9 1D     CMP #$1D
+$E69C: F0 06     BEQ L_E6A4
+$E69E: 29 7F     AND #$7F
+$E6A0: C9 20     CMP #$20
+$E6A2: 90 2C     BCC L_E6D0
+L_E6A4:
+$E6A4: 20 A7 E6  JSR  L_E6A7
+L_E6A7:
+$E6A7: A4 E7     LDY $E7
+$E6A9: F0 25     BEQ L_E6D0
+$E6AB: A9 10     LDA #$10
+$E6AD: 8D 4B E8  STA VIACTRL ;VIA Control Register
+$E6B0: A9 0F     LDA #$0F
+$E6B2: 8D 4A E8  STA VIASHR ;VIA Shift Register
+$E6B5: A2 07     LDX #$07
+L_E6B7:
+$E6B7: BD 4D E7  LDA $E74D,X
+$E6BA: 8D 48 E8  STA VIAT2L ;VIA Timer 2 Lo
+$E6BD: A5 E7     LDA $E7
+L_E6BF:
+$E6BF: 88        DEY
+$E6C0: D0 FD     BNE L_E6BF
+$E6C2: 38        SEC
+$E6C3: E9 01     SBC #$01
+$E6C5: D0 F8     BNE L_E6BF
+$E6C7: CA        DEX
+$E6C8: D0 ED     BNE L_E6B7
+$E6CA: 8E 4A E8  STX VIASHR ;VIA Shift Register
+$E6CD: 8E 4B E8  STX VIACTRL ;VIA Control Register
+L_E6D0:
+$E6D0: 60        RTS
+
+$E6D1:           .BYT 16,04,3A,03,39,36,33,DF ;keyboard table
+$E6D9:           .BYT B1,2F,15,13,4D,20,58,12 ;keyboard table
+$E6E1:           .BYT B2,10,0F,B0,2C,4E,56,5A ;keyboard table
+$E6E9:           .BYT B3,00,19,AE,2E,42,43,00 ;keyboard table
+$E6F1:           .BYT B4,DB,4F,11,55,54,45,51 ;keyboard table
+$E6F9:           .BYT 14,50,49,DC,59,52,57,09 ;keyboard table
+$E701:           .BYT B6,C0,4C,0D,4A,47,44,41 ;keyboard table
+$E709:           .BYT B5,3B,4B,DD,48,46,53,9B ;keyboard table
+$E711:           .BYT B9,06,DE,B7,B0,37,34,31 ;keyboard table
+$E719:           .BYT 05,0E,1D,B8,2D,38,35,32 ;keyboard table
+
+$E721:           .BYT 44,CC,22,2A,0D,52,55,4E ;shift-run string
+$E729:           .BYT 0D ;shift-run string
+
+;---------------- Video Chip Setup table - TEXT MODE (60 Hz)
+
+$E72A:           .BYT 31,28,29,0F,20,03,19,1D ;crtc chip setup-text
+$E732:           .BYT 00,09,00,00,10,00,00,00 ;crtc chip setup-text
+$E73A:           .BYT 00,00 ;crtc chip setup-text
+
+;---------------- Video Chip Setup table - GRAPHICS MODE (60 Hz)
+
+$E73C:           .BYT 31,28,29,0F,28,05,19,21 ;crtc register setup - graphics
+$E744:           .BYT 00,07,00,00,10,00,00,00 ;crtc register setup - graphics
+$E74C:           .BYT 00 ;crtc register setup - graphics
+
+$E74D:           .BYT 00,0E,1E,3E,7E,3E,1E,0E ;timer2 lo values
+
+$E755:           .BYT 00,50,A0,F0,40,90,E0,30 ;screeen line addesses lo
+$E75D:           .BYT 80,D0,20,70,C0,10,60,B0 ;screeen line addesses lo
+$E765:           .BYT 00,50,A0,F0,40,90,E0,30 ;screeen line addesses lo
+$E76D:           .BYT 80 ;screeen line addesses lo
+
+$E76E:           .BYT 80,80,80,80,81,81,81,82 ;screen line addresses hi
+$E776:           .BYT 82,82,83,83,83,84,84,84 ;screen line addresses hi
+$E77E:           .BYT 85,85,85,85,86,86,86,87 ;screen line addresses hi
+$E786:           .BYT 87,20 ;screen line addresses hi
+
+$E788:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E790:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E798:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E7A0:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E7A8:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E7B0:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E7B8:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E7C0:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E7C8:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E7D0:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E7D8:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E7E0:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E7E8:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E7F0:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E7F8:           .BYT AA ;filler
+$E7F9:           .BYT AA,AA,AA,AA,AA,AA,AA ;filler
+$E800:           .BYT E8,E8,E8,E8,E8,E8,E8,E8 ;IO SPACE (ROM not accessable)
+$E808:           .BYT E8,E8,E8,E8,E8,E8,E8,E8 ;IO SPACE (ROM not accessable)
+$E810:           .BYT F9,3C,FF,3D,F9,3C,FF,3D ;IO SPACE (ROM not accessable)
+$E818:           .BYT F9,3C,FF,3D,F9,3C,FF,3D ;IO SPACE (ROM not accessable)
+$E820:           .BYT FF,BC,FF,3C,FF,BC,FF,3C ;IO SPACE (ROM not accessable)
+$E828:           .BYT FF,BC,FF,3C,FF,BC,FF,3C ;IO SPACE (ROM not accessable)
+$E830:           .BYT F9,3C,FF,3C,F9,3C,FF,3C ;IO SPACE (ROM not accessable)
+$E838:           .BYT F9,3C,FF,3C,F9,3C,FF,3C ;IO SPACE (ROM not accessable)
+$E840:           .BYT FF,FF,1E,FF,1F,ED,95,FF ;IO SPACE (ROM not accessable)
+$E848:           .BYT E4,38,00,00,0E,00,80,FF ;IO SPACE (ROM not accessable)
+$E850:           .BYT FF,FF,1E,FF,06,E7,95,FF ;IO SPACE (ROM not accessable)
+$E858:           .BYT D5,C8,00,00,0E,00,80,FF ;IO SPACE (ROM not accessable)
+$E860:           .BYT FF,FF,1E,FF,1F,ED,95,FF ;IO SPACE (ROM not accessable)
+$E868:           .BYT A6,60,00,00,0E,00,80,FF ;IO SPACE (ROM not accessable)
+$E870:           .BYT FF,BC,1E,3D,06,A4,95,3D ;IO SPACE (ROM not accessable)
+$E878:           .BYT 98,AC,00,00,0E,00,80,3D ;IO SPACE (ROM not accessable)
+$E880:           .BYT 40,00,60,00,40,00,40,00 ;IO SPACE (ROM not accessable)
+$E888:           .BYT 60,00,40,00,40,00,40,00 ;IO SPACE (ROM not accessable)
+$E890:           .BYT 40,00,40,00,40,00,40,00 ;IO SPACE (ROM not accessable)
+$E898:           .BYT 40,00,40,00,40,00,40,00 ;IO SPACE (ROM not accessable)
+$E8A0:           .BYT 40,00,40,00,40,00,40,00 ;IO SPACE (ROM not accessable)
+$E8A8:           .BYT 40,00,40,00,40,00,60,00 ;IO SPACE (ROM not accessable)
+$E8B0:           .BYT 40,00,40,00,60,00,40,00 ;IO SPACE (ROM not accessable)
+$E8B8:           .BYT 40,00,60,00,40,00,40,00 ;IO SPACE (ROM not accessable)
+$E8C0:           .BYT FE,FE,48,FE,48,E6,F4,FE ;IO SPACE (ROM not accessable)
+$E8C8:           .BYT E0,E0,40,00,40,00,C0,FE ;IO SPACE (ROM not accessable)
+$E8D0:           .BYT F9,3C,5E,3D,59,2C,D5,3D ;IO SPACE (ROM not accessable)
+$E8D8:           .BYT C9,30,40,00,48,00,C0,3D ;IO SPACE (ROM not accessable)
+$E8E0:           .BYT FF,BC,5E,3C,46,A4,F5,3C ;IO SPACE (ROM not accessable)
+$E8E8:           .BYT 49,08,40,00,4E,00,E0,3C ;IO SPACE (ROM not accessable)
+$E8F0:           .BYT F9,3C,5E,3C,68,2C,D5,3C ;IO SPACE (ROM not accessable)
+$E8F8:           .BYT 68,08,40,00,48,00,C0,3C ;IO SPACE (ROM not accessable)
+$E900: 4C 9E EC  JMP  L_EC9E
+$E903:           .BYT 93,12,20,20,20,20,20,20 ;exudesk menu
+$E90B:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$E913:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$E91B:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$E923:           .BYT 20,20,C5,D8,C5,C3,D5,20 ;exudesk menu
+$E92B:           .BYT 2D,20,C4,C5,D3,CB,20,20 ;exudesk menu
+$E933:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$E93B:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$E943:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$E94B:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$E953:           .BYT 20,0D,0D,0D,20,20,20,20 ;exudesk menu
+$E95B:           .BYT 20,20,20,20,20,20,20,12 ;exudesk menu
+$E963:           .BYT 20,31,20,92,20,20,20,20 ;exudesk menu
+$E96B:           .BYT 20,20,D7,4F,52,44,20,D0 ;exudesk menu
+$E973:           .BYT 52,4F,43,45,53,53,4F,52 ;exudesk menu
+$E97B:           .BYT 0D,0D,20,20,20,20,20,20 ;exudesk menu
+$E983:           .BYT 20,20,20,20,20,12,20,32 ;exudesk menu
+$E98B:           .BYT 20,92,20,20,20,20,20,20 ;exudesk menu
+$E993:           .BYT D3,50,52,45,41,44,20,D3 ;exudesk menu
+$E99B:           .BYT 48,45,45,54,0D,0D,20,20 ;exudesk menu
+$E9A3:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$E9AB:           .BYT 20,12,20,33,20,92,20,20 ;exudesk menu
+$E9B3:           .BYT 20,20,20,20,C4,41,54,41 ;exudesk menu
+$E9BB:           .BYT 20,C2,41,53,45,20,CD,41 ;exudesk menu
+$E9C3:           .BYT 4E,41,47,45,52,0D,0D,00 ;exudesk menu
+$E9CB:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$E9D3:           .BYT 20,20,20,12,20,34,20,92 ;exudesk menu
+$E9DB:           .BYT 20,20,20,20,20,20,C6,49 ;exudesk menu
+$E9E3:           .BYT 4E,41,4E,43,49,41,4C,20 ;exudesk menu
+$E9EB:           .BYT C3,41,4C,43,55,4C,41,54 ;exudesk menu
+$E9F3:           .BYT 49,4F,4E,53,0D,0D,20,20 ;exudesk menu
+$E9FB:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EA03:           .BYT 20,12,20,35,20,92,20,20 ;exudesk menu
+$EA0B:           .BYT 20,20,20,20,D4,45,52,4D ;exudesk menu
+$EA13:           .BYT 49,4E,41,4C,20,C3,4F,4D ;exudesk menu
+$EA1B:           .BYT 4D,55,4E,49,43,41,54,49 ;exudesk menu
+$EA23:           .BYT 4F,4E,53,0D,0D,20,20,20 ;exudesk menu
+$EA2B:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EA33:           .BYT 12,20,36,20,92,20,20,20 ;exudesk menu
+$EA3B:           .BYT 20,20,20,D3,59,53,54,45 ;exudesk menu
+$EA43:           .BYT 4D,20,D5,54,49,4C,49,54 ;exudesk menu
+$EA4B:           .BYT 49,45,53,0D,0D,00,20,20 ;exudesk menu
+$EA53:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EA5B:           .BYT 20,12,20,37,20,92,20,20 ;exudesk menu
+$EA63:           .BYT 20,20,20,20,D3,59,53,54 ;exudesk menu
+$EA6B:           .BYT 45,4D,20,D3,48,55,54,20 ;exudesk menu
+$EA73:           .BYT C4,4F,57,4E,0D,0D,20,20 ;exudesk menu
+$EA7B:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EA83:           .BYT 20,12,20,38,20,92,20,20 ;exudesk menu
+$EA8B:           .BYT 20,20,20,20,D5,53,45,52 ;exudesk menu
+$EA93:           .BYT 20,D3,4F,46,54,57,41,52 ;exudesk menu
+$EA9B:           .BYT 45,0D,0D,20,20,20,20,20 ;exudesk menu
+$EAA3:           .BYT 20,20,20,20,20,20,12,20 ;exudesk menu
+$EAAB:           .BYT 39,20,92,20,20,20,20,20 ;exudesk menu
+$EAB3:           .BYT 20,C5,58,49,54,20,54,4F ;exudesk menu
+$EABB:           .BYT 20,C2,41,53,49,43,0D,0D ;exudesk menu
+$EAC3:           .BYT 00,0D,12,20,20,20,20,20 ;exudesk menu
+$EACB:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EAD3:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EADB:           .BYT 20,20,20,20,20,D0,52,45 ;exudesk menu
+$EAE3:           .BYT 53,53,20,D3,45,4C,45,43 ;exudesk menu
+$EAEB:           .BYT 54,49,4F,4E,20,C1,42,4F ;exudesk menu
+$EAF3:           .BYT 56,45,20,20,20,20,20,20 ;exudesk menu
+$EAFB:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EB03:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EB0B:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EB13:           .BYT 20,92,00,93,11,11,11,11 ;exudesk menu
+$EB1B:           .BYT 11,11,11,11,11,11,20,20 ;exudesk menu
+$EB23:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EB2B:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EB33:           .BYT 20,20,20,20,12,20,D0,52 ;exudesk menu
+$EB3B:           .BYT 4F,47,52,41,4D,20,4E,4F ;exudesk menu
+$EB43:           .BYT 54,20,46,4F,55,4E,44,20 ;exudesk menu
+$EB4B:           .BYT 4F,4E,20,44,49,53,4B,20 ;exudesk menu
+$EB53:           .BYT 0D,00,11,20,20,20,20,20 ;exudesk menu
+$EB5B:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EB63:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EB6B:           .BYT 20,12,20,D3,54,52,49,4B ;exudesk menu
+$EB73:           .BYT 45,20,41,4E,59,20,4B,45 ;exudesk menu
+$EB7B:           .BYT 59,20,54,4F,20,54,52,59 ;exudesk menu
+$EB83:           .BYT 20,41,47,41,49,4E,20,0D ;exudesk menu
+$EB8B:           .BYT 00,93,11,11,11,11,11,11 ;exudesk menu
+$EB93:           .BYT 11,11,11,11,20,20,20,20 ;exudesk menu
+$EB9B:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EBA3:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EBAB:           .BYT 20,20,12,20,C4,49,53,4B ;exudesk menu
+$EBB3:           .BYT 20,44,52,49,56,45,20,4E ;exudesk menu
+$EBBB:           .BYT 4F,54,20,43,4F,4E,4E,45 ;exudesk menu
+$EBC3:           .BYT 43,54,45,44,20,0D,00,30 ;exudesk menu
+$EBCB:           .BYT 3A,57,4F,52,44,50,52,4F ;exudesk menu
+$EBD3:           .BYT 43,45,53,53,4F,52,2C,50 ;exudesk menu
+$EBDB:           .BYT 00,30,3A,53,50,52,45,41 ;exudesk menu
+$EBE3:           .BYT 44,53,48,45,45,54,2C,50 ;exudesk menu
+$EBEB:           .BYT 00,30,3A,44,41,54,41,42 ;exudesk menu
+$EBF3:           .BYT 41,53,45,2C,50,00,30,3A ;exudesk menu
+$EBFB:           .BYT 46,49,4E,41,4E,43,45,2C ;exudesk menu
+$EC03:           .BYT 50,00,30,3A,54,45,52,4D ;exudesk menu
+$EC0B:           .BYT 49,4E,41,4C,2C,50,00,30 ;exudesk menu
+$EC13:           .BYT 3A,55,54,49,4C,49,54,49 ;exudesk menu
+$EC1B:           .BYT 45,53,2C,50,00,30,3A,53 ;exudesk menu
+$EC23:           .BYT 48,55,54,44,4F,57,4E,2C ;exudesk menu
+$EC2B:           .BYT 50,00,30,3A,55,53,45,52 ;exudesk menu
+$EC33:           .BYT 2C,50,00,11,0F,0C,0B,0C ;exudesk menu
+$EC3B:           .BYT 0D,0C,08,CA,EB,DC,EB,EC ;exudesk menu
+$EC43:           .BYT EB,F9,EB,05,EC,12,EC,20 ;exudesk menu
+$EC4B:           .BYT EC,2D,EC,52,55,4E,0D,00 ;exudesk menu
+$EC53:           .BYT 93,0D,0D,0D,0D,0D,0D,0D ;exudesk menu
+$EC5B:           .BYT 0D,0D,0D,0D,20,20,20,20 ;exudesk menu
+$EC63:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EC6B:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EC73:           .BYT 20,20,20,20,20,20,20,20 ;exudesk menu
+$EC7B:           .BYT 20,20,20,CF,CE,C5,20,CD ;exudesk menu
+$EC83:           .BYT CF,CD,C5,CE,D4,20,D0,CC ;exudesk menu
+$EC8B:           .BYT C5,C1,D3,C5,20,2E,2E,2E ;exudesk menu
+$EC93:           .BYT 0D,0D,0D,0D,0D,0D,0D,0D ;exudesk menu
+$EC9B:           .BYT 0D,0D,00 ;exudesk menu
+L_EC9E:
+$EC9E: 48        PHA
+$EC9F: AD 00 80  LDA SCREEN ;start of screen ram
+$ECA2: C9 2A     CMP #$2A
+$ECA4: F0 04     BEQ L_ECAA
+$ECA6: 68        PLA
+$ECA7: 4C 55 E4  JMP  L_E455
+L_ECAA:
+$ECAA: 78        SEI
+$ECAB: A9 55     LDA #$55
+$ECAD: 85 90     STA $<INTVEC ;hardware interrupt vector LO
+$ECAF: A9 E4     LDA #$E4
+$ECB1: 85 91     STA $<INTVEC+1 ;hardware interupt vector HI
+$ECB3: 68        PLA
+$ECB4: 68        PLA
+$ECB5: 68        PLA
+$ECB6: 68        PLA
+$ECB7: 68        PLA
+$ECB8: 68        PLA
+$ECB9: 68        PLA
+$ECBA: A9 EC     LDA #$EC
+$ECBC: 48        PHA
+$ECBD: A9 C9     LDA #$C9
+$ECBF: 48        PHA
+$ECC0: A9 00     LDA #$00
+$ECC2: 48        PHA
+$ECC3: 48        PHA
+$ECC4: 48        PHA
+$ECC5: 48        PHA
+$ECC6: 4C 55 E4  JMP  L_E455
+L_ECC9:
+$ECC9: A9 03     LDA #$03
+$ECCB: A0 E9     LDY #$E9
+$ECCD: 20 1D BB  JSR  $BB1D
+$ECD0: A9 CB     LDA #$CB
+$ECD2: A0 E9     LDY #$E9
+$ECD4: 20 1D BB  JSR  $BB1D
+$ECD7: A9 51     LDA #$51
+$ECD9: A0 EA     LDY #$EA
+$ECDB: 20 1D BB  JSR  $BB1D
+$ECDE: A9 C4     LDA #$C4
+$ECE0: A0 EA     LDY #$EA
+$ECE2: 20 1D BB  JSR  $BB1D
+L_ECE5:
+$ECE5: 20 E4 FF  JSR  $FFE4
+$ECE8: F0 FB     BEQ L_ECE5
+$ECEA: C9 31     CMP #$31
+$ECEC: 90 F7     BCC L_ECE5
+$ECEE: C9 3A     CMP #$3A
+$ECF0: B0 F3     BCS L_ECE5
+$ECF2: 48        PHA
+$ECF3: A9 93     LDA #$93
+$ECF5: 20 D2 FF  JSR  $FFD2 ;Kernal Print a byte
+$ECF8: 68        PLA
+$ECF9: C9 39     CMP #$39
+$ECFB: D0 03     BNE L_ED00
+$ECFD: 4C 2A D4  JMP  $D42A
+L_ED00:
+$ED00: 48        PHA
+$ED01: 29 0F     AND #$0F
+$ED03: 0A        ASL A
+$ED04: AA        TAX
+$ED05: E8        INX
+$ED06: BD 3E EC  LDA $EC3E,X
+$ED09: A8        TAY
+$ED0A: CA        DEX
+$ED0B: BD 3E EC  LDA $EC3E,X
+$ED0E: AA        TAX
+$ED0F: 68        PLA
+$ED10: 86 01     STX $01
+$ED12: 84 02     STY $02
+$ED14: 29 0F     AND #$0F
+$ED16: AA        TAX
+$ED17: CA        DEX
+$ED18: 86 3A     STX $3A
+$ED1A: 20 7C EE  JSR  L_EE7C
+$ED1D: A9 08     LDA #$08
+$ED1F: 20 D2 F0  JSR  $F0D2
+$ED22: A5 96     LDA $<STATUS ;IO status
+$ED24: 10 03     BPL L_ED29
+$ED26: 4C 3E ED  JMP  L_ED3E
+L_ED29:
+$ED29: 20 63 F5  JSR  $F563
+$ED2C: 20 0D EE  JSR  L_EE0D
+$ED2F: C9 00     CMP #$00
+$ED31: F0 4A     BEQ L_ED7D
+$ED33: 48        PHA
+$ED34: A9 01     LDA #$01
+$ED36: 20 E2 F2  JSR  $F2E2
+$ED39: 68        PLA
+$ED3A: C9 74     CMP #$74
+$ED3C: D0 0A     BNE L_ED48
+L_ED3E:
+$ED3E: A9 8C     LDA #$8C
+$ED40: A0 EB     LDY #$EB
+$ED42: 20 1D BB  JSR  $BB1D
+$ED45: 4C 4F ED  JMP  L_ED4F
+L_ED48:
+$ED48: A9 16     LDA #$16
+$ED4A: A0 EB     LDY #$EB
+$ED4C: 20 1D BB  JSR  $BB1D
+L_ED4F:
+$ED4F: A9 55     LDA #$55
+$ED51: A0 EB     LDY #$EB
+$ED53: 20 1D BB  JSR  $BB1D
+L_ED56:
+$ED56: 20 E4 FF  JSR  $FFE4
+$ED59: F0 FB     BEQ L_ED56
+$ED5B: 68        PLA
+$ED5C: 68        PLA
+$ED5D: A9 08     LDA #$08
+$ED5F: 85 D4     STA $D4
+$ED61: A9 6F     LDA #$6F
+$ED63: 85 D3     STA $D3
+$ED65: 20 D5 F0  JSR  $F0D5
+$ED68: A5 D3     LDA $D3
+$ED6A: 20 43 F1  JSR  $F143
+$ED6D: A9 55     LDA #$55
+$ED6F: 20 9E F1  JSR  $F19E
+$ED72: A9 4A     LDA #$4A
+$ED74: 20 9E F1  JSR  $F19E
+$ED77: 20 B9 F1  JSR  $F1B9
+$ED7A: 4C C9 EC  JMP  L_ECC9
+L_ED7D:
+$ED7D: A9 53     LDA #$53
+$ED7F: A0 EC     LDY #$EC
+$ED81: 20 1D BB  JSR  $BB1D
+$ED84: 78        SEI
+$ED85: A2 00     LDX #$00
+L_ED87:
+$ED87: BD 4E EC  LDA $EC4E,X
+$ED8A: F0 06     BEQ L_ED92
+$ED8C: 9D 6F 02  STA KEYBUF,X ;Keyboard Input Buffer
+$ED8F: E8        INX
+$ED90: D0 F5     BNE L_ED87
+L_ED92:
+$ED92: 86 9E     STX $9E
+$ED94: 58        CLI
+$ED95: 20 CC FF  JSR  $FFCC ;Kernal Restore IO devices
+$ED98: A9 01     LDA #$01
+$ED9A: 20 E2 F2  JSR  $F2E2
+$ED9D: A6 3A     LDX $3A
+$ED9F: BD 36 EC  LDA $EC36,X
+$EDA2: 85 D1     STA $D1
+$EDA4: 8A        TXA
+$EDA5: 0A        ASL A
+$EDA6: AA        TAX
+$EDA7: BD 3E EC  LDA $EC3E,X
+$EDAA: 85 DA     STA $DA
+$EDAC: E8        INX
+$EDAD: BD 3E EC  LDA $EC3E,X
+$EDB0: 85 DB     STA $DB
+$EDB2: A9 08     LDA #$08
+$EDB4: 85 D2     STA $D2
+$EDB6: 85 D3     STA $D3
+$EDB8: 85 D4     STA $D4
+$EDBA: 20 63 F5  JSR  $F563
+$EDBD: A2 08     LDX #$08
+$EDBF: 20 C6 FF  JSR  $FFC6
+$EDC2: 20 E4 FF  JSR  $FFE4
+$EDC5: 85 01     STA $01
+$EDC7: 20 E4 FF  JSR  $FFE4
+$EDCA: 85 02     STA $02
+$EDCC: A0 00     LDY #$00
+$EDCE: 84 96     STY $<STATUS ;IO status
+L_EDD0:
+$EDD0: 20 E4 FF  JSR  $FFE4
+$EDD3: 91 01     STA ($01),Y
+$EDD5: E6 01     INC $01
+$EDD7: D0 02     BNE L_EDDB
+$EDD9: E6 02     INC $02
+L_EDDB:
+$EDDB: A5 96     LDA $<STATUS ;IO status
+$EDDD: 29 40     AND #$40
+$EDDF: F0 EF     BEQ L_EDD0
+$EDE1: E6 01     INC $01
+$EDE3: D0 02     BNE L_EDE7
+$EDE5: E6 02     INC $02
+L_EDE7:
+$EDE7: A5 01     LDA $01
+$EDE9: 85 2A     STA $2A
+$EDEB: 85 2C     STA $2C
+$EDED: 85 2E     STA $2E
+$EDEF: A5 02     LDA $02
+$EDF1: 85 2B     STA $2B
+$EDF3: 85 2D     STA $2D
+$EDF5: 85 2F     STA $2F
+$EDF7: A9 04     LDA #$04
+$EDF9: 85 29     STA $29
+$EDFB: A9 01     LDA #$01
+$EDFD: 85 28     STA $28
+$EDFF: 20 CC FF  JSR  $FFCC ;Kernal Restore IO devices
+$EE02: A9 08     LDA #$08
+$EE04: 20 E2 F2  JSR  $F2E2
+$EE07: A2 FF     LDX #$FF
+$EE09: 9A        TXS
+$EE0A: 4C 06 B4  JMP  $B406
+L_EE0D:
+$EE0D: A0 00     LDY #$00
+$EE0F: 84 96     STY $<STATUS ;IO status
+$EE11: A9 08     LDA #$08
+$EE13: 20 D2 F0  JSR  $F0D2
+$EE16: A5 96     LDA $<STATUS ;IO status
+$EE18: F0 01     BEQ L_EE1B
+$EE1A: 60        RTS
+L_EE1B:
+$EE1B: A9 6F     LDA #$6F
+$EE1D: 20 93 F1  JSR  $F193
+$EE20: A5 96     LDA $<STATUS ;IO status
+$EE22: F0 01     BEQ L_EE25
+$EE24: 60        RTS
+L_EE25:
+$EE25: A0 00     LDY #$00
+$EE27: 84 96     STY $<STATUS ;IO status
+$EE29: 20 C1 F1  JSR  $F1C1
+$EE2C: 8D 3B 03  STA $033B
+$EE2F: 29 0F     AND #$0F
+$EE31: 0A        ASL A
+$EE32: 0A        ASL A
+$EE33: 0A        ASL A
+$EE34: 0A        ASL A
+$EE35: 8D 7E 02  STA $027E
+$EE38: A5 96     LDA $<STATUS ;IO status
+$EE3A: F0 01     BEQ L_EE3D
+$EE3C: 60        RTS
+L_EE3D:
+$EE3D: A0 00     LDY #$00
+$EE3F: 84 96     STY $<STATUS ;IO status
+$EE41: 20 C1 F1  JSR  $F1C1
+$EE44: 8D 3C 03  STA $033C
+$EE47: 29 0F     AND #$0F
+$EE49: 0D 7E 02  ORA $027E
+$EE4C: 48        PHA
+$EE4D: A2 02     LDX #$02
+$EE4F: 8E 7D 02  STX $027D
+L_EE52:
+$EE52: A0 00     LDY #$00
+$EE54: 84 96     STY $<STATUS ;IO status
+$EE56: 20 C1 F1  JSR  $F1C1
+$EE59: C9 0D     CMP #$0D
+$EE5B: D0 02     BNE L_EE5F
+$EE5D: A9 20     LDA #$20
+L_EE5F:
+$EE5F: AE 7D 02  LDX $027D
+$EE62: 9D 3B 03  STA $033B,X
+$EE65: E0 27     CPX #$27
+$EE67: F0 09     BEQ L_EE72
+$EE69: EE 7D 02  INC $027D
+$EE6C: A5 96     LDA $<STATUS ;IO status
+$EE6E: C9 40     CMP #$40
+$EE70: D0 E0     BNE L_EE52
+L_EE72:
+$EE72: A9 00     LDA #$00
+$EE74: 9D 3B 03  STA $033B,X
+$EE77: 20 AE F1  JSR  $F1AE
+$EE7A: 68        PLA
+$EE7B: 60        RTS
+L_EE7C:
+$EE7C: BD 36 EC  LDA $EC36,X
+$EE7F: 85 D1     STA $D1
+$EE81: 8A        TXA
+$EE82: 0A        ASL A
+$EE83: AA        TAX
+$EE84: BD 3E EC  LDA $EC3E,X
+$EE87: 85 DA     STA $DA
+$EE89: E8        INX
+$EE8A: BD 3E EC  LDA $EC3E,X
+$EE8D: 85 DB     STA $DB
+$EE8F: A2 01     LDX #$01
+$EE91: 86 D2     STX $D2
+$EE93: E8        INX
+$EE94: 86 D3     STX $D3
+$EE96: A2 08     LDX #$08
+$EE98: 86 D4     STX $D4
+$EE9A: 60        RTS
+$EE9B:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EEA3:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EEAB:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EEB3:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EEBB:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EEC3:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EECB:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EED3:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EEDB:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EEE3:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EEEB:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EEF3:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EEFB:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF03:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF0B:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF13:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF1B:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF23:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF2B:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF33:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF3B:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF43:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF4B:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF53:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF5B:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF63:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF6B:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF73:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF7B:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF83:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF8B:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF93:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EF9B:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EFA3:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EFAB:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EFB3:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EFBB:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EFC3:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EFCB:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EFD3:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EFDB:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EFE3:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EFEB:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EFF3:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$EFFB:           .BYT AA,AA,AA,AA ;filler

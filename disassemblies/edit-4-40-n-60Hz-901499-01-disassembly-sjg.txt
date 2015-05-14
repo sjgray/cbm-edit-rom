@@ -1,0 +1,1359 @@
+;Disassembly of: edit-4-40-n-60Hz-901499-01.bin  by Steve J. Gray
+;==============================================
+
+;--------------- ZERO PAGE STORAGE
+
+USRADD = $0001   ;USR Address Low Byte / High Byte
+CHARAC = $0003   ;Search Character
+ENDCHR = $0004   ;Flag: Scan for Quote at End of String
+COUNT  = $0005   ;Input Buffer Pointer / No. of Subscripts
+DIMFLG = $0006   ;Flag: Default Array DiMension / array name initial / AND
+VAUYP  = $0007   ;Data Type: $FF = String
+INTFLG = $0008   ;Data Type: $80 = Integer
+GARBFL = $0009   ;Flag: DATA scan/LlST quote/Garbage Coll
+SUBFLG = $000A   ;Flag: Subscript Ref / User Function Call
+INPFLG = $000B   ;Flag: $00 = INPUT
+TANSGN = $000C   ;Flag TAN sign / Comparison Result
+DSTAT  = $000D   ;Disk Status DS$ descriptor
+FNUM   = $0010   ;File# of current I/O device (when non-zero suppresses INPUT prompt etc)
+LINNUM = $0011   ;Temp: Integer Value
+TEMPPT = $0013   ;Pointer Temporary String
+LASTPT = $0014   ;Last Temp String Address
+TEMPST = $0016   ;Stack for Temporary Strings
+INDEX  = $001F   ;Utility Pointer Area
+TXTTAB = $0028   ;Pointer: Start of BASIC Text
+ARYTAB = $002C   ;Pointer: Start of BASIC Arrays
+STREND = $002E   ;Pointer End of BASIC Arrays (+1)
+FRETOP = $0030   ;Pointer: Bottom of String Storage
+OLDTXT = $003A   ;Pointer: BASIC Statement for CONT
+TEMPF2 = $0059   ;Temporary storage for FLPT value. 
+TIME   = $008D   ;Real-Time Jiffy Clock (approx) 1/60 Sec
+CINV   = $0090   ;Vector: Hardware Interrupt
+CBINV  = $0092   ;Vector: BRK Instr. Interrupt
+  
+LSTX   = $0097   ;Current Key Pressed: 255 = No Key
+SFDX   = $0098   ;Flag: Print Shifted Chars.
+NDX    = $009E   ;No. of Chars. in Keyboard Buffer (Queue)
+RVS    = $009F   ;Flag: Print Reverse Chars. -1=Yes
+INDX   = $00A1   ;Pointer: End of Logical Line for INPUT
+LXSP   = $00A3   ;Cursor Y-X Pos. at Start of INPUT
+KEYIMG = $00A6   ;Key Image
+BLNSW  = $00A7   ;Cursor Blink enable: 0 = Flash Cursor
+BLNCT  = $00A8   ;Timer: Countdown to Toggle Cursor
+GDBLN  = $00A9   ;Character Under Cursor
+BLNON  = $00AA   ;Flag: Last Cursor Blink On/Off
+CRSW   = $00AC   ;Flag: INPUT or GET from Keyboard
+DFLTN  = $00AF   ;Default Input Device (0)
+DFLTO  = $00B0   ;Default Output (CMD) Device (3)
+BUFP2  = $00BC   ;Pointer: Tape I/O Buffer #2
+FNMIDX = $00C0   ;Index to Cassette File name/Header ID for Tape write.
+PNT    = $00C4   ;Pointer: Current Screen Line Address
+PNTR   = $00C6   ;Cursor Column on Current Line
+SAL    = $00C7   ;Pointer: Tape Buffer/ Screen Scrolling
+QTSW   = $00CD   ;Flag: Editor in Quote Mode
+BITTS  = $00CE   ;Cassette Temp (64#00B4): Tape read timer flag=IRQ enabled for Timer 1
+FNLEN  = $00D1   ;Length of Current File Name
+SA     = $00D3   ;Current Secondary Address
+LNMX   = $00D5   ;Physical Screen Line Length
+TAPE1  = $00D6   ;Pointer: Start of Tape Buffer
+TBLX   = $00D8   ;Current Cursor Physical Line Number
+DATAX  = $00D9   ;Current Character to Print
+FNADR  = $00DA   ;Pointer: Current File Name
+INSRT  = $00DC   ;Flag: Insert Mode
+MYCH   = $00DF   ;Serial Word Buffer
+LDTB1  = $00E0   ;Screen Line Link Table ($E0-$F8)
+
+CAS1   = $00F9   ;Tape Motor Interlock #1
+CAS2   = $00FA   ;Tape Motor Interlock #2
+STAL   = $00FB   ;I/O Start Address
+MEMUSS = $00FD   ;Tape Load Temps
+
+;---------------- LOW RAM STORAGE
+
+KEYD   = $026F   ;Keyboard Buffer Queue (FIFO)
+DELAY4 = $03E9   ;Repeat key countdown (40col)
+KOUNT4 = $03EA   ;Delay between repeats (40col)
+XMAX4  = $03EB   ;Max keyboard buffer size (40 col)
+CHIME4 = $03EC   ;Chime Time 0=off (40col)
+TIADJ  = $03ED   ;Counter to speed TI by 6/5 (40col)
+RPTFLG4= $03EE   ;Repeat Flag (40 col)
+TABS   = $03EF   ;Table of 80 bits to set TABs (80col)
+
+;----------------- SCREEN
+
+SCREEN1 = $8000   ;Screen RAM page 1
+SCREEN2 = $8100   ;Screen RAM page 2
+SCREEN3 = $8200   ;Screen RAM page 3
+SCREEN4 = $8300	  ;Screen RAM page 4
+
+;----------------- CHIPS
+
+PIA1_ROW = $E810   ;Keyboard ROW select
+PIA1_COL = $E812   ;Keyboard COL read
+PIA1_13  = $E813   ;PIA#1 Register 13 (Retrace flag and interrupt
+VIA_0    = $E840   ;VIA Register 0 (flags)
+VIA_C    = $E84C   ;VIA Register C (cb2
+CRTCREG  = $E880   ;CRTC Register select
+CRTCDAT  = $E881   ;CRTC Data
+
+* = $E000
+
+;----- EDIT ROM JUMP TABLE
+;
+$E000: 4C 36 E0  JMP  L_E036 	; Main Initialization (called from Kernal power up reset $FD16) 
+$E003: 4C A7 E0  JMP  L_E0A7 	; Get Character From Keyboard Buffer
+$E006: 4C 16 E1  JMP  L_E116 	; Input From Screen or Keyboard
+$E009: 4C 02 E2  JMP  L_E202 	; Output to Screen
+$E00C: 4C 42 E4  JMP  L_E442 	; Main IRQ Handler (this is hardcoded in kernal $FFFE!)
+$E00F: 4C 55 E4  JMP  L_E455 	; Actual IRQ (clock, keyboard scan)
+$E012: 4C 00 E6  JMP  L_E600 	; Return From Interrupt
+$E015: 4C 42 E0  JMP  L_E042 	; Clear Screen
+$E018: 4C 0F E6  JMP  L_E60F 	; Initialize CRTC to TEXT mode
+$E01B: 4C 17 E6  JMP  L_E617 	; Initialize CRTC to GRAPHICS mode
+$E01E: 4C 1D E6  JMP  L_E61D 	; Initialize CRTC (table ptr in A/X, chr set in Y)
+$E021: 4C EA E6  JMP  L_E6EA 	; Scroll Down
+$E024: 4C D1 E3  JMP  L_E3D1 	; Scroll Screen
+$E027: 4C BF E4  JMP  L_E4BF 	; Scan Keyboard
+$E02A: 4C 57 E6  JMP  L_E657 	; Ring BELL
+$E02D: 4C 98 E0  JMP  L_E098 	; Set REPEAT Flag   (Function Not supported)
+$E030: 4C 98 E0  JMP  L_E098 	; Set Window Top    (Function Not supported)
+$E033: 4C 98 E0  JMP  L_E098 	; Set Window Bottom (Function Not supported)
+
+;---------------- Main Initialization
+L_E036:
+$E036: 20 83 E6  JSR L_E683	; Initialize EDITOR
+$E039: 20 17 E6  JSR L_E617 	; Initialize CRTC to GRAPHICS mode
+$E03C: 20 54 E6  JSR L_E654 	; Ring BELL
+$E03F: 20 54 E6  JSR L_E654 	; Ring BELL
+
+;--------------- Clear Screen (reset line links)
+L_E042:
+$E042: A2 18     LDX #$18	; 24 lines
+$E044: A9 C0     LDA #$C0	; $83C0 = Address of first character on last line of screen?
+$E046: A0 83     LDY #$83	;
+
+L_E048:
+$E048: 94 E0     STY LDTB1,X	; Screen Line Link Table
+$E04A: 38        SEC
+$E04B: E9 28     SBC #$28	; Subtract 40 characters (one physical line)
+$E04D: B0 01     BCS L_E050	; did we move past page? No, skip DEY
+$E04F: 88        DEY		; Yes,
+L_E050:
+$E050: CA        DEX		; previous line
+$E051: 10 F5     BPL L_E048	; Loop up for more
+
+$E053: 84 C5     STY PNT+1	; Pointer: Current Screen Line Address HI
+$E055: E8        INX
+$E056: 86 9F     STX RVS    	; Flag: Print Reverse Chars. -1=Yes
+$E058: 86 C4     STX PNT    	; Pointer: Current Screen Line Address LO
+
+;--------------- Clear the screen (write all spaces)
+
+$E05A: A9 20     LDA #$20	; <SPACE>
+L_E05C:
+$E05C: 9D 00 80  STA SCREEN1,X	; Screen RAM page 1
+$E05F: 9D 00 81  STA SCREEN2,X	; Screen RAM page 2
+$E062: 9D 00 82  STA SCREEN3,X	; Screen RAM page 3
+$E065: 9D 00 83  STA SCREEN4,X	; Screen RAM page 4
+$E068: E8        INX		; next character
+$E069: D0 F1     BNE L_E05C	; loop back for more
+
+;--------------- Cursor to start of line
+L_E06B:
+$E06B: A0 00     LDY #$00
+$E06D: 84 C6     STY PNTR   	; Cursor Column on Current Line
+$E06F: 84 D8     STY TBLX   	; Current Cursor Physical Line Number
+
+L_E071:
+$E071: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
+$E073: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E075: 09 80     ORA #$80
+$E077: 85 C5     STA PNT+1
+$E079: BD 98 E7  LDA $E798,X
+$E07C: 85 C4     STA PNT    	; Pointer: Current Screen Line Address LO
+$E07E: A9 27     LDA #$27
+$E080: 85 D5     STA LNMX   	; Physical Screen Line Length
+$E082: E0 18     CPX #$18	; Line 24? (0-24)
+$E084: F0 08     BEQ L_E08E
+$E086: B5 E1     LDA LDTB1+1,X 	; Screen line link table
+$E088: 30 04     BMI L_E08E
+$E08A: A9 4F     LDA #$4F
+$E08C: 85 D5     STA LNMX   	; Physical Screen Line Length
+L_E08E:
+$E08E: A5 C6     LDA PNTR   	; Cursor Column on Current Line
+$E090: C9 28     CMP #$28
+$E092: 90 04     BCC L_E098
+$E094: E9 28     SBC #$28
+$E096: 85 C6     STA PNTR   	; Cursor Column on Current Line
+
+;--------------- Unsupported Functions Jump Here
+L_E098:
+$E098: 60        RTS
+
+;---------------------------------------------------------------------
+
+$E099:           .BYT AA,AA,AA,AA,AA,AA,AA,AA	;filler
+$E0A1:           .BYT AA,AA,AA,AA,AA,AA 	;filler
+
+;--------------- Get character from keyboard buffer
+
+L_E0A7:
+$E0A7: AC 6F 02  LDY KEYD	; Keyboard Buffer
+$E0AA: A2 00     LDX #$00	; First character
+L_E0AC:
+$E0AC: BD 70 02  LDA KEYD+1,X	; Keyboard Buffer
+$E0AF: 9D 6F 02  STA KEYD,X	; Keyboard Buffer
+$E0B2: E8        INX
+$E0B3: E4 9E     CPX NDX	; Num of chars in Keyboard Buffer
+$E0B5: D0 F5     BNE L_E0AC
+$E0B7: C6 9E     DEC NDX    	; Num of Chars in Keyboard Buffer
+$E0B9: 98        TYA
+$E0BA: 58        CLI
+$E0BB: 60        RTS
+
+;--------------- Input from Keyboard
+;
+; Wait for keys to be pressed and print them.
+; Check for special keys like <RUN> or <CR> and loop back here for more.
+
+L_E0BC:
+$E0BC: 20 3C E6  JSR L_E63C
+
+L_E0BF:
+$E0BF: A5 9E     LDA NDX    	; No. of Chars. in Keyboard Buffer (Queue)
+$E0C1: 85 A7     STA BLNSW  	; Cursor Blink enable: 0 = Flash Cursor
+$E0C3: F0 FA     BEQ L_E0BF
+$E0C5: 78        SEI
+$E0C6: A5 AA     LDA BLNON  	; Flag: Last Cursor Blink On/Off
+$E0C8: F0 09     BEQ L_E0D3
+$E0CA: A5 A9     LDA GDBLN  	; Character Under Cursor
+$E0CC: A0 00     LDY #$00
+$E0CE: 84 AA     STY BLNON  	; Flag: Last Cursor Blink On/Off
+$E0D0: 20 06 E6  JSR L_E606	; put character on screen
+L_E0D3:
+$E0D3: 20 A7 E0  JSR L_E0A7	; Get character from keyboard buffer
+$E0D6: C9 83     CMP #$83	; <RUN>?
+$E0D8: D0 10     BNE L_E0EA
+
+;--------------- Perform SHIFT <RUN/STOP>
+
+$E0DA: 78        SEI
+$E0DB: A2 09     LDX #$09	; 9 characters to copy
+$E0DD: 86 9E     STX NDX    	; No. of Chars. in Keyboard Buffer (Queue)
+
+L_E0DF:				; LOOP[
+$E0DF: BD 8E E7  LDA $E78E,X	; String: dL"*<CR>run<CR>
+$E0E2: 9D 6E 02  STA $026E,X	; Put in buffer
+$E0E5: CA        DEX		; next character
+$E0E6: D0 F7     BNE L_E0DF	; loop back for more
+$E0E8: F0 D5     BEQ L_E0BF
+
+;--------------- Check for RETURN
+L_E0EA:
+$E0EA: C9 0D     CMP #$0D	; <CR>?
+$E0EC: D0 CE     BNE L_E0BC	; No, Loop back up
+
+;--------------- Do RETURN	[ Find last character on line ]
+
+$E0EE: A4 D5     LDY LNMX   	; Physical Screen Line Length
+$E0F0: 84 AC     STY CRSW   	; Flag: INPUT or GET from Keyboard
+
+L_E0F2:				; LOOP[
+$E0F2: B1 C4     LDA (PNT),Y	; Pointer: Current Screen Line Address
+$E0F4: C9 20     CMP #$20	; Is it <SPACE>?
+$E0F6: D0 03     BNE L_E0FB	; No, non-space is end of the line. Jump out.
+$E0F8: 88        DEY		; move to previous character
+$E0F9: D0 F7     BNE L_E0F2	; loop back for more
+
+;--------------- Process line
+L_E0FB:
+$E0FB: C8        INY		; last checked was not space so move one forward
+$E0FC: 84 A1     STY INDX	; Pointer: End of Logical Line for INPUT
+$E0FE: A0 00     LDY #$00
+$E100: 84 C6     STY PNTR   	; Cursor Column on Current Line
+$E102: 84 CD     STY QTSW   	; Flag: Editor in Quote Mode
+$E104: A5 A3     LDA LXSP   	; Cursor Y-X Pos. at Start of INPUT
+$E106: 30 16     BMI L_E11E
+$E108: C5 D8     CMP TBLX   	; Current Cursor Physical Line Number
+$E10A: D0 12     BNE L_E11E
+$E10C: A5 A4     LDA INDX+1
+$E10E: 85 C6     STA PNTR   	; Cursor Column on Current Line
+$E110: C5 A1     CMP INDX   	; Pointer: End of Logical Line for INPUT
+$E112: 90 0A     BCC L_E11E
+$E114: B0 2B     BCS L_E141
+
+;--------------- Input from screen or keyboard
+L_E116:
+$E116: 98        TYA
+$E117: 48        PHA
+$E118: 8A        TXA
+$E119: 48        PHA
+$E11A: A5 AC     LDA CRSW   	;Flag: INPUT or GET from Keyboard
+$E11C: F0 A1     BEQ L_E0BF
+L_E11E:
+$E11E: A4 C6     LDY PNTR	;Cursor Column on Current Line
+$E120: B1 C4     LDA (PNT),Y	;Pointer: Current Screen Line Address
+$E122: 85 D9     STA DATAX	;Current Character to Print
+$E124: 29 3F     AND #$3F
+$E126: 06 D9     ASL DATAX	;Current Character to Print
+$E128: 24 D9     BIT DATAX	;Current Character to Print
+$E12A: 10 02     BPL L_E12E
+$E12C: 09 80     ORA #$80
+L_E12E:
+$E12E: 90 04     BCC L_E134
+$E130: A6 CD     LDX QTSW	;Flag: Editor in Quote Mode
+$E132: D0 04     BNE L_E138
+L_E134:
+$E134: 70 02     BVS L_E138
+$E136: 09 40     ORA #$40
+L_E138:
+$E138: E6 C6     INC PNTR	; Cursor Column on Current Line
+$E13A: 20 67 E1  JSR L_E167
+$E13D: C4 A1     CPY INDX	; Pointer: End of Logical Line for INPUT
+$E13F: D0 17     BNE L_E158
+L_E141:
+$E141: A9 00     LDA #$00
+$E143: 85 AC     STA CRSW	; Flag: INPUT or GET from Keyboard
+$E145: A9 0D     LDA #$0D
+$E147: A6 AF     LDX DFLTN	; Default Input Device (0)
+$E149: E0 03     CPX #$03	; 3=SCREEN
+$E14B: F0 06     BEQ L_E153
+$E14D: A6 B0     LDX DFLTO	; Default Output (CMD) Device (3)
+$E14F: E0 03     CPX #$03
+$E151: F0 03     BEQ L_E156
+L_E153:
+$E153: 20 02 E2  JSR L_E202	; output to screen
+L_E156:
+$E156: A9 0D     LDA #$0D	; <CR>
+L_E158:
+$E158: 85 D9     STA DATAX  	; Current Character to Print
+$E15A: 68        PLA
+$E15B: AA        TAX
+$E15C: 68        PLA
+$E15D: A8        TAY
+$E15E: A5 D9     LDA DATAX  	; Current Character to Print
+$E160: C9 DE     CMP #$DE	; <PI>?
+$E162: D0 02     BNE L_E166
+$E164: A9 FF     LDA #$FF	; Substitute screen code
+L_E166:
+$E166: 60        RTS
+
+;--------------- Switch Quote Flag if Quote found
+
+L_E167:
+$E167: C9 22     CMP #$22	; <QUOTE>
+$E169: D0 08     BNE L_E173
+$E16B: A5 CD     LDA QTSW   	; Flag: Editor in Quote Mode
+$E16D: 49 01     EOR #$01	; toggle it
+$E16F: 85 CD     STA QTSW   	; Flag: Editor in Quote Mode
+$E171: A9 22     LDA #$22	; reload the <QUOTE>
+L_E173:
+$E173: 60        RTS
+
+;--------------- Print Screen character, update cursor
+;
+; After characters have been processed, come here to print them
+
+L_E174:
+$E174: 09 40     ORA #$40
+L_E176:
+$E176: A6 9F     LDX RVS    	; Flag: Print Reverse Chars. -1=Yes
+$E178: F0 02     BEQ L_E17C
+L_E17A:
+$E17A: 09 80     ORA #$80	; toggle the upper bit (reverse characters)
+L_E17C:
+$E17C: A6 DC     LDX INSRT  	; Flag: Insert Mode
+$E17E: F0 02     BEQ L_E182
+$E180: C6 DC     DEC INSRT  	; Flag: Insert Mode
+L_E182:
+$E182: 20 06 E6  JSR L_E606
+$E185: E6 C6     INC PNTR   	; Cursor Column on Current Line
+$E187: A4 D5     LDY LNMX   	; Physical Screen Line Length
+$E189: C4 C6     CPY PNTR   	; Cursor Column on Current Line
+$E18B: B0 19     BCS L_E1A6
+$E18D: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
+$E18F: C0 4F     CPY #$4F
+$E191: D0 0C     BNE L_E19F
+$E193: 20 B3 E1  JSR L_E1B3
+$E196: 20 A9 E3  JSR L_E3A9
+$E199: A9 00     LDA #$00	; First character on line
+$E19B: 85 C6     STA PNTR   	; Cursor Column on Current Line
+$E19D: F0 07     BEQ L_E1A6
+
+L_E19F:
+$E19F: E0 18     CPX #$18	; Last screen line?
+$E1A1: D0 1B     BNE L_E1BE	; No, continue
+$E1A3: 20 C4 E1  JSR L_E1C4	; Yes,
+
+;--------------- finish up?
+L_E1A6:
+$E1A6: 68        PLA
+$E1A7: A8        TAY
+$E1A8: A5 DC     LDA INSRT	; Flag: Insert Mode
+$E1AA: F0 02     BEQ L_E1AE
+$E1AC: 46 CD     LSR QTSW	; Flag: Editor in Quote Mode
+L_E1AE:
+$E1AE: 68        PLA
+$E1AF: AA        TAX
+$E1B0: 68        PLA
+$E1B1: 58        CLI
+$E1B2: 60        RTS
+
+;--------------- Set 80-character line indicator
+; X hold physical line#
+
+L_E1B3:
+$E1B3: E0 17     CPX #$17	; Are we at end of the line - offset 39 ?
+$E1B5: B0 06     BCS L_E1BD	; No, skip out
+$E1B7: B5 E2     LDA LDTB1+2,X	; Yes, link the next line to this one
+$E1B9: 09 80     ORA #$80	; set the upper bit
+$E1BB: 95 E2     STA LDTB1+2,X	; set line link
+L_E1BD:
+$E1BD: 60        RTS
+
+;--------------- Convert 40 character line to 80 characters
+
+L_E1BE:
+$E1BE: 20 CD E1  JSR L_E1CD
+$E1C1: 4C A6 E1  JMP L_E1A6	; finish up?
+
+;--------------- SUB
+L_E1C4:
+$E1C4: 20 D1 E3  JSR L_E3D1
+$E1C7: C6 A3     DEC LXSP   	; Cursor Y-X Pos. at Start of INPUT
+$E1C9: C6 D8     DEC TBLX   	; Current Cursor Physical Line Number
+$E1CB: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
+
+;--------------- SUB
+L_E1CD:
+$E1CD: 16 E1     ASL LDTB1+1,X 	;
+$E1CF: 56 E1     LSR LDTB1+1,X 	;
+$E1D1: 20 B3 E1  JSR L_E1B3	; set line link
+$E1D4: A5 C6     LDA PNTR   	; Cursor Column on Current Line
+$E1D6: 48        PHA
+$E1D7: 20 71 E0  JSR L_E071
+$E1DA: 68        PLA
+$E1DB: 85 C6     STA PNTR   	; Cursor Column on Current Line
+$E1DD: 60        RTS
+
+;--------------- Back to previous line when actioning DEL or LEFT
+
+L_E1DE:
+$E1DE: A0 27     LDY #$27
+$E1E0: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
+$E1E2: D0 06     BNE L_E1EA
+$E1E4: 86 C6     STX PNTR   	; Cursor Column on Current Line
+$E1E6: 68        PLA
+$E1E7: 68        PLA
+$E1E8: D0 BC     BNE L_E1A6
+L_E1EA:
+$E1EA: B5 DF     LDA MYCH,X	; Serial Word Buffer
+$E1EC: 30 05     BMI L_E1F3
+$E1EE: CA        DEX
+$E1EF: B5 DF     LDA MYCH,X	; Serial Word Buffer
+$E1F1: A0 4F     LDY #$4F
+L_E1F3:
+$E1F3: CA        DEX
+$E1F4: 86 D8     STX TBLX   	; Current Cursor Physical Line Number
+$E1F6: 85 C5     STA PNT+1
+$E1F8: BD 98 E7  LDA $E798,X
+$E1FB: 85 C4     STA PNT    	; Pointer: Current Screen Line Address
+$E1FD: 84 C6     STY PNTR   	; Cursor Column on Current Line
+$E1FF: 84 D5     STY LNMX   	; Physical Screen Line Length
+$E201: 60        RTS
+
+;--------------- Print PETSCII character to screen
+
+L_E202:
+$E202: 48        PHA
+$E203: 85 D9     STA DATAX  	; Current Character to Print
+$E205: 8A        TXA
+$E206: 48        PHA
+$E207: 98        TYA
+$E208: 48        PHA
+$E209: A9 00     LDA #$00
+$E20B: 85 AC     STA CRSW   	; Flag: INPUT or GET from Keyboard
+$E20D: A4 C6     LDY PNTR   	; Cursor Column on Current Line
+$E20F: A5 D9     LDA DATAX  	; Current Character to Print
+$E211: 29 7F     AND #$7F	; Mask off top bit (graphics characters)
+$E213: C9 1B     CMP #$1B	; <ESC>?
+$E215: D0 03     BNE L_E21A
+$E217: 4C C6 E3  JMP L_E3C6	; Cansel INS/RVS/Quote
+L_E21A:
+$E21A: A5 D9     LDA DATAX  	; Current Character to Print
+$E21C: 10 03     BPL L_E221	; Is top bit set?
+$E21E: 4C D5 E2  JMP L_E2D5	; Yes
+
+;--------------- Handle UNSHIFTED Characters
+
+L_E221:
+$E221: C9 0D     CMP #$0D	; <CR>?
+$E223: D0 03     BNE L_E228
+$E225: 4C BF E3  JMP L_E3BF
+
+L_E228:
+$E228: C9 20     CMP #$20	; <SPACE>?
+$E22A: 90 08     BCC L_E234
+$E22C: 29 3F     AND #$3F
+$E22E: 20 67 E1  JSR L_E167
+$E231: 4C 76 E1  JMP L_E176
+
+L_E234:
+$E234: A6 DC     LDX INSRT  	; Flag: Insert Mode
+$E236: F0 03     BEQ L_E23B
+$E238: 4C 7A E1  JMP L_E17A
+
+L_E23B:
+$E23B: C9 14     CMP #$14	; <DEL>?
+$E23D: D0 1C     BNE L_E25B
+$E23F: 88        DEY
+$E240: 84 C6     STY PNTR   	; Cursor Column on Current Line
+$E242: 10 06     BPL L_E24A
+$E244: 20 DE E1  JSR L_E1DE	; Back to previous line
+$E247: 4C 55 E2  JMP  L_E255
+
+L_E24A:
+$E24A: C8        INY
+$E24B: B1 C4     LDA (PNT),Y	; Pointer: Current Screen Line Address
+$E24D: 88        DEY
+$E24E: 91 C4     STA (PNT),Y	; Pointer: Current Screen Line Address
+$E250: C8        INY
+$E251: C4 D5     CPY LNMX   	; Physical Screen Line Length
+$E253: D0 F5     BNE L_E24A
+L_E255:
+$E255: A9 20     LDA #$20	; SPACE>
+$E257: 91 C4     STA (PNT),Y	; Pointer: Current Screen Line Address
+$E259: D0 29     BNE L_E284
+L_E25B:
+$E25B: A6 CD     LDX QTSW   	; Flag: Editor in Quote Mode
+$E25D: F0 03     BEQ L_E262
+$E25F: 4C 7A E1  JMP L_E17A
+L_E262:
+$E262: C9 12     CMP #$12	; <RVS>?
+$E264: D0 04     BNE L_E26A
+$E266: 85 9F     STA RVS    	; Flag: Print Reverse Chars. -1=Yes
+$E268: F0 1A     BEQ L_E284
+L_E26A:
+$E26A: C9 13     CMP #$13	; <HOME>?
+$E26C: D0 03     BNE L_E271
+$E26E: 20 6B E0  JSR L_E06B	; cursor to start of line
+L_E271:
+$E271: C9 1D     CMP #$1D	; <RIGHT>?
+$E273: D0 12     BNE L_E287
+$E275: C8        INY
+$E276: 84 C6     STY PNTR   	; Cursor Column on Current Line
+$E278: 88        DEY
+$E279: C4 D5     CPY LNMX   	; Physical Screen Line Length
+$E27B: 90 07     BCC L_E284
+$E27D: 20 A9 E3  JSR L_E3A9
+$E280: A0 00     LDY #$00
+L_E282:
+$E282: 84 C6     STY PNTR   	; Cursor Column on Current Line
+L_E284:
+$E284: 4C A6 E1  JMP L_E1A6
+L_E287:
+$E287: C9 11     CMP #$11	; <DOWN>?
+$E289: D0 11     BNE L_E29C
+$E28B: 18        CLC
+$E28C: 98        TYA
+$E28D: 69 28     ADC #$28
+$E28F: A8        TAY
+$E290: C5 D5     CMP LNMX   	; Physical Screen Line Length
+$E292: 90 EE     BCC L_E282
+$E294: F0 EC     BEQ L_E282
+$E296: 20 A9 E3  JSR L_E3A9
+L_E299:
+$E299: 4C A6 E1  JMP L_E1A6
+L_E29C:
+$E29C: C9 10     CMP #$10	;
+$E29E: D0 0C     BNE L_E2AC
+$E2A0: A9 20     LDA #$20	; <SPACE>
+$E2A2: 88        DEY
+L_E2A3:
+$E2A3: C8        INY
+$E2A4: 91 C4     STA (PNT),Y	; Pointer: Current Screen Line Address
+$E2A6: C4 D5     CPY LNMX	; Physical Screen Line Length
+$E2A8: 90 F9     BCC L_E2A3
+$E2AA: B0 ED     BCS L_E299
+L_E2AC:
+$E2AC: C9 0E     CMP #$0E	;
+$E2AE: D0 05     BNE L_E2B5
+$E2B0: 20 0F E6  JSR L_E60F	; Set screen to TEXT mode
+$E2B3: 30 E4     BMI L_E299
+L_E2B5:
+$E2B5: C9 07     CMP #$07	; <BELL>?
+$E2B7: D0 05     BNE L_E2BE
+$E2B9: 20 57 E6  JSR L_E657	; Ring BELL
+$E2BC: F0 DB     BEQ L_E299
+L_E2BE:
+$E2BE: C9 09     CMP #$09	; <TAB>?
+$E2C0: D0 D7     BNE L_E299
+L_E2C2:
+$E2C2: C4 D5     CPY LNMX   	; Physical Screen Line Length
+$E2C4: 90 07     BCC L_E2CD
+$E2C6: A4 D5     LDY LNMX   	; Physical Screen Line Length
+L_E2C8:
+$E2C8: 84 C6     STY PNTR   	; Cursor Column on Current Line
+$E2CA: 4C A6 E1  JMP L_E1A6
+L_E2CD:
+$E2CD: C8        INY
+$E2CE: 20 88 E5  JSR L_E588
+$E2D1: F0 EF     BEQ L_E2C2
+$E2D3: D0 F3     BNE L_E2C8
+
+;--------------- Handle HI-BIT (SHIFTED) Characters
+
+L_E2D5:
+$E2D5: 29 7F     AND #$7F	; strip off top bit
+$E2D7: C9 7F     CMP #$7F	; is it $FF?
+$E2D9: D0 02     BNE L_E2DD	; No, skip
+$E2DB: A9 5E     LDA #$5E	; Yes, substitute with $5E (PI character)
+L_E2DD:
+$E2DD: C9 20     CMP #$20	; 32?
+$E2DF: 90 03     BCC L_E2E4	; Less? Yes, skip ahead and check more
+$E2E1: 4C 74 E1  JMP L_E174	; 32 to 127 -> 160-255. Jump and print it
+L_E2E4:
+$E2E4: C9 0D     CMP #$0D	; <CR>?
+$E2E6: D0 03     BNE L_E2EB	; No, skip ahead (continue)
+$E2E8: 4C BF E3  JMP L_E3BF	; Yes,
+L_E2EB:
+$E2EB: A6 CD     LDX QTSW   	; Flag: Editor in Quote Mode
+$E2ED: D0 30     BNE L_E31F
+$E2EF: C9 14     CMP #$14
+$E2F1: D0 28     BNE L_E31B
+$E2F3: A4 D5     LDY LNMX   	; Physical Screen Line Length
+$E2F5: B1 C4     LDA (PNT),Y	; Pointer: Current Screen Line Address
+$E2F7: C9 20     CMP #$20
+$E2F9: D0 04     BNE L_E2FF
+$E2FB: C4 C6     CPY PNTR	; Cursor Column on Current Line
+$E2FD: D0 07     BNE L_E306
+L_E2FF:
+$E2FF: C0 4F     CPY #$4F
+$E301: F0 81     BEQ L_E284
+$E303: 20 EA E6  JSR L_E6EA
+L_E306:
+$E306: A4 D5     LDY LNMX   	; Physical Screen Line Length
+L_E308:
+$E308: 88        DEY
+$E309: B1 C4     LDA (PNT),Y 	; Pointer: Current Screen Line Address
+$E30B: C8        INY
+$E30C: 91 C4     STA (PNT),Y	; Pointer: Current Screen Line Address
+$E30E: 88        DEY
+$E30F: C4 C6     CPY PNTR   	; Cursor Column on Current Line
+$E311: D0 F5     BNE L_E308
+$E313: A9 20     LDA #$20
+$E315: 91 C4     STA (PNT),Y 	; Pointer: Current Screen Line Address
+$E317: E6 DC     INC INSRT	; Flag: Insert Mode
+$E319: D0 58     BNE L_E373
+L_E31B:
+$E31B: A6 DC     LDX INSRT  	; Flag: Insert Mode
+$E31D: F0 05     BEQ L_E324
+L_E31F:
+$E31F: 09 40     ORA #$40
+$E321: 4C 7A E1  JMP L_E17A
+L_E324:
+$E324: C9 11     CMP #$11
+$E326: D0 2B     BNE L_E353
+$E328: A5 C6     LDA PNTR   	; Cursor Column on Current Line
+$E32A: C9 28     CMP #$28
+$E32C: 90 06     BCC L_E334
+$E32E: E9 28     SBC #$28
+$E330: 85 C6     STA PNTR   	; Cursor Column on Current Line
+$E332: B0 3F     BCS L_E373
+L_E334:
+$E334: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
+$E336: F0 3B     BEQ L_E373
+$E338: B5 DF     LDA MYCH,X	; Serial Word Buffer
+$E33A: 10 07     BPL L_E343
+$E33C: C6 D8     DEC TBLX   	; Current Cursor Physical Line Number
+$E33E: 20 71 E0  JSR L_E071
+$E341: 90 30     BCC L_E373
+L_E343:
+$E343: CA        DEX
+$E344: CA        DEX
+$E345: 86 D8     STX TBLX   	; Current Cursor Physical Line Number
+$E347: 20 71 E0  JSR L_E071
+$E34A: A5 C6     LDA PNTR   	; Cursor Column on Current Line
+$E34C: 18        CLC
+$E34D: 69 28     ADC #$28
+$E34F: 85 C6     STA PNTR	; Cursor Column on Current Line
+$E351: D0 20     BNE L_E373
+L_E353:
+$E353: C9 12     CMP #$12	; SHIFT<RVS> = <RVSOFF>?
+$E355: D0 06     BNE L_E35D
+$E357: A9 00     LDA #$00	; OFF
+$E359: 85 9F     STA RVS    	; Flag: Print Reverse Chars. -1=Yes
+$E35B: F0 16     BEQ L_E373
+L_E35D:
+$E35D: C9 1D     CMP #$1D	; SHIFT<RIGHT> = <LEFT>?
+$E35F: D0 0B     BNE L_E36C
+$E361: 88        DEY
+$E362: 84 C6     STY PNTR   	; Cursor Column on Current Line
+$E364: 10 0D     BPL L_E373
+$E366: 20 DE E1  JSR L_E1DE
+$E369: 4C A6 E1  JMP L_E1A6
+
+L_E36C:
+$E36C: C9 13     CMP #$13	; SHIFT<HOME>=<CLS>?
+$E36E: D0 06     BNE L_E376
+$E370: 20 42 E0  JSR L_E042	; Clear Screen
+
+L_E373:
+$E373: 4C A6 E1  JMP L_E1A6
+
+L_E376:
+$E376: C9 16     CMP #$16	; SHIFT-<ERASE START> = <ERASE END>?
+$E378: D0 0D     BNE L_E387
+$E37A: A9 20     LDA #$20
+$E37C: A0 00     LDY #$00
+
+L_E37E:				; LOOP[
+$E37E: C4 C6     CPY PNTR   	; Cursor Column on Current Line
+$E380: B0 F1     BCS L_E373
+$E382: 91 C4     STA (PNT),Y	; Pointer: Current Screen Line Address
+$E384: C8        INY
+$E385: D0 F7     BNE L_E37E	; loop back for more
+L_E387:
+$E387: C9 0E     CMP #$0E	; SHIFT<TEXT> = <GRAPHICS>?
+$E389: D0 05     BNE L_E390
+$E38B: 20 17 E6  JSR L_E617
+$E38E: 30 E3     BMI L_E373
+L_E390:
+$E390: C9 07     CMP #$07
+$E392: D0 05     BNE L_E399
+$E394: 20 54 E6  JSR L_E654
+$E397: F0 DA     BEQ L_E373
+L_E399:
+$E399: C9 09     CMP #$09
+$E39B: D0 D6     BNE L_E373
+$E39D: 20 88 E5  JSR L_E588
+$E3A0: 4D EF 03  EOR TABS   	; Table of 80 bits to set TABs (80col)
+$E3A3: 9D F0 03  STA $03F0,X
+$E3A6: 4C A6 E1  JMP L_E1A6
+
+L_E3A9:
+$E3A9: 38        SEC
+$E3AA: 46 A3     LSR LXSP   	; Cursor Y-X Pos. at Start of INPUT
+$E3AC: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
+L_E3AE:
+$E3AE: E8        INX
+$E3AF: E0 19     CPX #$19	; Last line of screen?
+$E3B1: D0 03     BNE L_E3B6
+$E3B3: 20 D1 E3  JSR L_E3D1
+L_E3B6:
+$E3B6: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E3B8: 10 F4     BPL L_E3AE
+$E3BA: 86 D8     STX TBLX   	; Current Cursor Physical Line Number
+$E3BC: 4C 71 E0  JMP L_E071
+
+L_E3BF:
+$E3BF: 20 A9 E3  JSR L_E3A9
+$E3C2: A9 00     LDA #$00
+$E3C4: 85 C6     STA PNTR   	; Cursor Column on Current Line
+
+;--------------- Cancel Insert, Reverse, and Quote modes
+L_E3C6:
+$E3C6: A9 00     LDA #$00
+$E3C8: 85 DC     STA INSRT  	; Flag: Insert Mode
+$E3CA: 85 9F     STA RVS    	; Flag: Print Reverse Chars. -1=Yes
+$E3CC: 85 CD     STA QTSW   	; Flag: Editor in Quote Mode
+$E3CE: 4C A6 E1  JMP L_E1A6
+
+;--------------- Scroll Screen UP
+L_E3D1:
+$E3D1: A2 19     LDX #$19	; 25 screen lines
+$E3D3: 86 D8     STX TBLX   	; Current Cursor Physical Line Number
+
+L_E3D5:				; Loop[
+$E3D5: A2 FF     LDX #$FF
+L_E3D7:
+$E3D7: E8        INX		; Loop[
+$E3D8: BD 98 E7  LDA $E798,X	; Screen line address table
+$E3DB: 85 C4     STA PNT    	; Pointer: Current Screen Line Address LO
+$E3DD: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E3DF: 09 80     ORA #$80
+$E3E1: 85 C5     STA PNT+1	; Pointer: Current Screen Line Address HI
+$E3E3: E0 18     CPX #$18	; Last Line?
+$E3E5: B0 1D     BCS L_E404
+$E3E7: B4 E1     LDY LDTB1+1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E3E9: 30 02     BMI L_E3ED
+$E3EB: 29 7F     AND #$7F
+L_E3ED:
+$E3ED: 95 E0     STA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E3EF: 98        TYA
+$E3F0: 09 80     ORA #$80	; Set Hi bit
+$E3F2: 85 C8     STA SAL+1	;$C8
+$E3F4: BD 99 E7  LDA $E799,X	; Screen line address table
+$E3F7: 85 C7     STA SAL    	; Pointer: Tape Buffer/ Screen Scrolling
+
+$E3F9: A0 27     LDY #$27	; 40 characters per line
+
+L_E3FB:				; Loop[
+$E3FB: B1 C7     LDA (SAL),Y 	; Read character from screen
+$E3FD: 91 C4     STA (PNT),Y 	; Write it back
+$E3FF: 88        DEY
+$E400: 10 F9     BPL L_E3FB	; ]] Loop back for more
+$E402: 30 D3     BMI L_E3D7	; ] Loop back for more
+
+L_E404:
+$E404: 95 E0     STA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+
+;--------------- Clear the last screen line
+
+$E406: A0 27     LDY #$27	; 40 characters on line
+$E408: A9 20     LDA #$20	; <SPACE>
+
+L_E40A:				; Loop[
+$E40A: 91 C4     STA (PNT),Y 	; Write <SPACE> to the screen
+$E40C: 88        DEY
+$E40D: 10 FB     BPL L_E40A	; ] Loop back for more
+
+;--------------- 
+$E40F: C6 D8     DEC TBLX   	; Current Cursor Physical Line Number
+$E411: A5 E0     LDA LDTB1	; Screen Line Link Table / Editor Temps (40 col)
+$E413: 10 C0     BPL L_E3D5	; ] Loop back for more
+
+;--------------- Check for Scroll Delay
+
+$E415: AD 12 E8  LDA PIA1_COL	; Keyboard COL read
+$E418: C9 FE     CMP #$FE	; Is KEY held down?
+$E41A: D0 0B     BNE L_E427	; No, skip over delay
+
+;--------------- Scroll delay
+
+$E41C: A0 00     LDY #$00
+L_E41E:				; Loop [
+$E41E: EA        NOP
+$E41F: CA        DEX
+$E420: D0 FC     BNE L_E41E	; ] Loop back for more
+$E422: 88        DEY
+$E423: D0 F9     BNE L_E41E	; ] Loop back for more
+
+$E425: 84 9E     STY NDX    	; No. of Chars. in Keyboard Buffer (Queue)
+
+;--------------- Scroll complete
+
+L_E427:
+$E427: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
+$E429: 60        RTS
+
+$E42A: AA        TAX
+$E42B: AA        TAX
+$E42C: AA        TAX
+$E42D: AA        TAX
+
+;--------------- IRQ Clock Adjust
+L_E42E:
+$E42E: 20 EA FF  JSR $FFEA	; Advance Clock
+$E431: EE ED 03  INC TIADJ	; Counter to speed TI by 6/5 (40col)
+$E434: AD ED 03  LDA TIADJ	; Counter to speed TI by 6/5 (40col)
+$E437: C9 06     CMP #$06	; 6 IRQ's?
+$E439: D0 1D     BNE L_E458	; No, do normal IRQ
+$E43B: A9 00     LDA #$00	; Reset IRQ adjustment counter
+$E43D: 8D ED 03  STA TIADJ  	; Counter to speed TI by 6/5 (40col)
+$E440: F0 EC     BEQ L_E42E	; Do normal IRQ
+
+;--------------- Main IRQ Dispatch
+L_E442:
+$E442: 48        PHA
+$E443: 8A        TXA
+$E444: 48        PHA
+$E445: 98        TYA
+$E446: 48        PHA
+$E447: BA        TSX
+$E448: BD 04 01  LDA $0104,X	; Stack
+$E44B: 29 10     AND #$10	;
+$E44D: F0 03     BEQ L_E452	; skip to hardware IRQ
+
+$E44F: 6C 92 00  JMP ($0092) 	; Vector: BRK Instruction Interrupt  
+L_E452:
+$E452: 6C 90 00  JMP ($0090) 	; Vector: Hardware Interrupt
+
+;=============== IRQ Handler
+L_E455:
+$E455: 20 EA FF  JSR $FFEA
+
+;--------------- Blink the cursor
+L_E458:
+$E458: A5 A7     LDA BLNSW	; Cursor Blink enable: 0 = Flash Cursor
+$E45A: D0 1F     BNE L_E47B	; Is >0? Yes, skip
+$E45C: C6 A8     DEC BLNCT	; Timer: Countdown to Toggle Cursor
+$E45E: D0 1B     BNE L_E47B	; Is >0? Yes, skip
+
+$E460: A9 14     LDA #$14	; Normal blink rate
+$E462: 2C EE 03  BIT RPTFLG4 	; Repeat Flag (40 col)
+$E465: 10 02     BPL L_E469
+$E467: A9 02     LDA #$02	; Fast blink rate
+L_E469:
+$E469: 85 A8     STA BLNCT  	; Timer: Countdown to Toggle Cursor
+$E46B: A4 C6     LDY PNTR   	; Cursor Column on Current Line
+$E46D: 46 AA     LSR BLNON  	; Flag: Last Cursor Blink On/Off
+$E46F: B1 C4     LDA (PNT),Y	; Pointer: Current Screen Line Address
+$E471: B0 04     BCS L_E477	; Is Hi bit set? Yes, skip ahead
+
+$E473: E6 AA     INC BLNON  	; Flag: Last Cursor Blink On/Off
+$E475: 85 A9     STA GDBLN  	; Save the character Under Cursor
+L_E477:
+$E477: 49 80     EOR #$80	; Flip the top bit (reverse character bit)
+$E479: 91 C4     STA (PNT),Y	; Pointer: Current Screen Line Address
+
+;--------------- Prep for keyboard scanning
+L_E47B:
+$E47B: A0 00     LDY #$00
+$E47D: AD 10 E8  LDA PIA1_ROW 	; Keyboard ROW select
+$E480: 29 F0     AND #$F0
+$E482: 8D 10 E8  STA PIA1_ROW 	; Keyboard ROW select
+$E485: AD 10 E8  LDA PIA1_ROW 	; Keyboard ROW select
+
+;--------------- Check tape and IEEE
+$E488: 0A        ASL
+$E489: 0A        ASL
+$E48A: 0A        ASL
+$E48B: 10 09     BPL L_E496
+$E48D: 84 F9     STY CAS1   	; Tape Motor Interlock #1
+$E48F: AD 13 E8  LDA PIA1_13 	; PIA#1 Register 13 (Retrace flag and interrupt
+$E492: 09 08     ORA #$08
+$E494: D0 09     BNE L_E49F
+L_E496:
+$E496: A5 F9     LDA CAS1   	; Tape Motor Interlock #1
+$E498: D0 08     BNE L_E4A2
+$E49A: AD 13 E8  LDA PIA1_13 	; PIA#1 Register 13 (Retrace flag and interrupt
+$E49D: 29 F7     AND #$F7
+L_E49F:
+$E49F: 8D 13 E8  STA PIA1_13 	; PIA#1 Register 13 (Retrace flag and interrupt
+L_E4A2:
+$E4A2: 90 09     BCC L_E4AD
+$E4A4: 84 FA     STY CAS2   	; Tape Motor Interlock #2
+$E4A6: AD 40 E8  LDA VIA_0 	; VIA Register 0 (flags)
+$E4A9: 09 10     ORA #$10
+$E4AB: D0 09     BNE L_E4B6
+L_E4AD:
+$E4AD: A5 FA     LDA CAS2   	; Tape Motor Interlock #2
+$E4AF: D0 08     BNE L_E4B9
+$E4B1: AD 40 E8  LDA VIA_0 	; VIA Register 0 (flags)
+$E4B4: 29 EF     AND #$EF
+L_E4B6:
+$E4B6: 8D 40 E8  STA VIA_0 	; VIA Register 0 (flags)
+L_E4B9:
+$E4B9: 20 BF E4  JSR L_E4BF
+$E4BC: 4C 00 E6  JMP  L_E600
+
+;--------------- Scan the keyboard
+L_E4BF:
+$E4BF: A0 FF     LDY #$FF
+$E4C1: 84 A6     STY KEYIMG 	; Key Image
+$E4C3: C8        INY
+$E4C4: 84 98     STY SFDX   	; Flag: Print Shifted Chars.
+$E4C6: AD EE 03  LDA RPTFLG4	; Repeat Flag (40 col)
+$E4C9: 29 7F     AND #$7F
+$E4CB: 8D EE 03  STA RPTFLG4 	; Repeat Flag (40 col)
+$E4CE: A2 50     LDX #$50
+L_E4D0:
+$E4D0: A0 08     LDY #$08
+$E4D2: AD 12 E8  LDA PIA1_COL	; Keyboard COL read
+$E4D5: CD 12 E8  CMP PIA1_COL	; Keyboard COL read
+$E4D8: D0 F6     BNE L_E4D0
+$E4DA: C9 FF     CMP #$FF
+$E4DC: D0 09     BNE L_E4E7
+$E4DE: 8A        TXA
+$E4DF: 38        SEC
+$E4E0: E9 08     SBC #$08
+$E4E2: AA        TAX
+$E4E3: D0 2C     BNE L_E511
+$E4E5: F0 2F     BEQ L_E516
+L_E4E7:
+$E4E7: 4A        LSR
+$E4E8: B0 21     BCS L_E50B
+$E4EA: 48        PHA
+$E4EB: BD 3E E7  LDA $E73E,X
+$E4EE: D0 06     BNE L_E4F6
+$E4F0: A9 01     LDA #$01
+$E4F2: 85 98     STA SFDX   	; Flag: Print Shifted Chars.
+$E4F4: D0 14     BNE L_E50A
+L_E4F6:
+$E4F6: C9 10     CMP #$10
+$E4F8: D0 0A     BNE L_E504
+$E4FA: AD EE 03  LDA RPTFLG4	; Repeat Flag (40 col)
+$E4FD: 09 80     ORA #$80
+$E4FF: 8D EE 03  STA RPTFLG4 	; Repeat Flag (40 col)
+$E502: 30 06     BMI L_E50A
+L_E504:
+$E504: C9 FF     CMP #$FF
+$E506: F0 02     BEQ L_E50A
+$E508: 85 A6     STA KEYIMG 	; Key Image
+L_E50A:
+$E50A: 68        PLA
+L_E50B:
+$E50B: CA        DEX
+$E50C: F0 08     BEQ L_E516
+$E50E: 88        DEY
+$E50F: D0 D6     BNE L_E4E7
+L_E511:
+$E511: EE 10 E8  INC PIA1_ROW 	; Keyboard ROW select
+$E514: D0 BA     BNE L_E4D0
+L_E516:
+$E516: A5 A6     LDA KEYIMG 	; Key Image
+$E518: C5 97     CMP LSTX   	; Current Key Pressed: 255 = No Key
+$E51A: F0 07     BEQ L_E523
+$E51C: A2 10     LDX #$10
+$E51E: 8E E9 03  STX DELAY4 	; Repeat key countdown (40col)
+$E521: D0 33     BNE L_E556
+L_E523:
+$E523: 2C EE 03  BIT RPTFLG4 	; Repeat Flag (40 col)
+$E526: 30 20     BMI L_E548
+$E528: 70 5D     BVS L_E587
+$E52A: C9 FF     CMP #$FF
+$E52C: F0 59     BEQ L_E587
+$E52E: C9 14     CMP #$14
+$E530: F0 0C     BEQ L_E53E
+$E532: C9 20     CMP #$20
+$E534: F0 08     BEQ L_E53E
+$E536: C9 1D     CMP #$1D
+$E538: F0 04     BEQ L_E53E
+$E53A: C9 11     CMP #$11
+$E53C: D0 49     BNE L_E587
+L_E53E:
+$E53E: AE E9 03  LDX DELAY4 	; Repeat key countdown (40col)
+$E541: F0 05     BEQ L_E548
+$E543: CE E9 03  DEC DELAY4 	; Repeat key countdown (40col)
+$E546: D0 3F     BNE L_E587
+L_E548:
+$E548: CE EA 03  DEC KOUNT4 	; Delay between repeats (40col)
+$E54B: D0 3A     BNE L_E587
+$E54D: A2 04     LDX #$04
+$E54F: 8E EA 03  STX KOUNT4 	; Delay between repeats (40col)
+$E552: A6 9E     LDX NDX    	; No. of Chars. in Keyboard Buffer (Queue)
+$E554: D0 31     BNE L_E587
+L_E556:
+$E556: 85 97     STA LSTX   	; Current Key Pressed: 255 = No Key
+$E558: C9 FF     CMP #$FF
+$E55A: F0 2B     BEQ L_E587
+$E55C: EA        NOP
+$E55D: EA        NOP
+$E55E: EA        NOP
+$E55F: EA        NOP
+$E560: EA        NOP
+$E561: EA        NOP
+$E562: EA        NOP
+$E563: 46 98     LSR SFDX   	; Flag: Print Shifted Chars.
+$E565: 90 13     BCC L_E57A
+$E567: EA        NOP
+$E568: EA        NOP
+$E569: EA        NOP
+$E56A: EA        NOP
+$E56B: EA        NOP
+$E56C: EA        NOP
+$E56D: EA        NOP
+$E56E: EA        NOP
+$E56F: EA        NOP
+$E570: EA        NOP
+$E571: EA        NOP
+$E572: EA        NOP
+$E573: EA        NOP
+$E574: EA        NOP
+$E575: EA        NOP
+$E576: EA        NOP
+$E577: EA        NOP
+$E578: 09 80     ORA #$80
+L_E57A:
+$E57A: A6 9E     LDX NDX    	; No. of Chars. in Keyboard Buffer (Queue)
+$E57C: EC EB 03  CPX XMAX4  	; Max keyboard buffer size (40 col)
+$E57F: B0 06     BCS L_E587
+$E581: 9D 6F 02  STA $026F,X
+$E584: E8        INX
+$E585: 86 9E     STX NDX    	; No. of Chars. in Keyboard Buffer (Queue)
+L_E587:
+$E587: 60        RTS
+L_E588:
+$E588: 98        TYA
+$E589: 29 07     AND #$07
+$E58B: AA        TAX
+$E58C: BD DC E7  LDA $E7DC,X
+$E58F: 8D EF 03  STA TABS   	; Table of 80 bits to set TABs (80col)
+$E592: 98        TYA
+$E593: 4A        LSR
+$E594: 4A        LSR
+$E595: 4A        LSR
+$E596: AA        TAX
+$E597: BD F0 03  LDA $03F0,X
+$E59A: 2C EF 03  BIT TABS   	; Table of 80 bits to set TABs (80col)
+$E59D: 60        RTS
+
+;--------------- Filler
+
+$E59E:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E5A6:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E5AE:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E5B6:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E5BE:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E5C6:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E5CE:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E5D6:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E5DE:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E5E6:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E5EE:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E5F6:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
+$E5FE:           .BYT AA,AA ;filler
+
+;--------------- IRQ epilog
+L_E600:
+$E600: 68        PLA
+$E601: A8        TAY
+$E602: 68        PLA
+$E603: AA        TAX
+$E604: 68        PLA
+$E605: 40        RTI
+
+;--------------- 
+L_E606:
+$E606: A4 C6     LDY PNTR  	; Cursor Column on Current Line
+$E608: 91 C4     STA (PNT),Y	; Pointer: Current Screen Line Address
+$E60A: A9 02     LDA #$02
+$E60C: 85 A8     STA BLNCT  	; Timer: Countdown to Toggle Cursor
+$E60E: 60        RTS
+
+;--------------- Set Screen to Text Mode
+L_E60F:
+$E60F: A9 B1     LDA #$B1	; $E7B1 - CRT REGISTER TABLE (Text)
+$E611: A2 E7     LDX #$E7
+$E613: A0 0E     LDY #$0E	; 
+$E615: D0 06     BNE L_E61D
+
+;--------------- Set Screen to Graphics Mode
+L_E617:
+$E617: A9 C3     LDA #$C3	; $E7C3 - CRT REGISTER TABLE (Graphics)
+$E619: A2 E7     LDX #$E7
+$E61B: A0 0C     LDY #$0C
+
+;--------------- Program the CRTC chip for specified mode
+; A/X contain address of setup table. Y contains character set
+
+L_E61D:
+$E61D: 85 C7     STA SAL    	; Set table address LO
+$E61F: 86 C8     STX SAL+1	; Set table address HI
+$E621: AD 4C E8  LDA VIA_C	; VIA Register C (cb2)
+$E624: 29 F0     AND #$F0	; mask off lower 4 bits
+$E626: 85 D1     STA FNLEN  	; temp pointer
+$E628: 98        TYA
+$E629: 05 D1     ORA FNLEN  	; temp pointer
+$E62B: 8D 4C E8  STA VIA_C 	; set the character set - VIA Register C
+
+$E62E: A0 11     LDY #$11	; 17 registers to load
+L_E630:
+$E630: B1 C7     LDA (SAL),Y	; Pointer: Tape Buffer/ Screen Scrolling
+$E632: 8C 80 E8  STY CRTCREG 	; CRTC Register select
+$E635: 8D 81 E8  STA CRTCDAT 	; CRTC Data
+$E638: 88        DEY
+$E639: 10 F5     BPL L_E630	; Loop back for more
+$E63B: 60        RTS
+
+;--------------- Check for BELL at and of line
+L_E63C:
+$E63C: 20 02 E2  JSR L_E202	; output to screen
+$E63F: AA        TAX
+$E640: A5 D5     LDA LNMX   	; Physical Screen Line Length
+$E642: 38        SEC
+$E643: E5 C6     SBC PNTR   	; Cursor Column on Current Line
+$E645: C9 05     CMP #$05	; Are we at the 5th last character on the line?
+$E647: D0 39     BNE L_E682	; No,exit out
+$E649: 8A        TXA		; Yes, reload the character to print
+$E64A: C9 1D     CMP #$1D	; Is it <RIGHT>?
+$E64C: F0 06     BEQ L_E654	; Yes,
+$E64E: 29 7F     AND #$7F	; mask off hi bit
+$E650: C9 20     CMP #$20	; is it a control code?
+$E652: 90 2E     BCC L_E682	; yes, exit out
+
+;--------------- Double Bell
+L_E654:
+$E654: 20 57 E6  JSR L_E657	; Chime the BELL
+
+;--------------- Bell
+L_E657:
+$E657: AC EC 03  LDY CHIME4 	; Is BELL enabled? 0=off
+$E65A: F0 26     BEQ L_E682	; Yes, exit out
+
+$E65C: A9 10     LDA #$10
+$E65E: 8D 4B E8  STA $E84B	; VIA Register B
+$E661: A9 0F     LDA #$0F
+$E663: 8D 4A E8  STA $E84A	; VIA Register A - shift register
+
+$E666: A2 07     LDX #$07	; 7 bytes in BELL table
+
+L_E668:				; Loop [
+$E668: BD D4 E7  LDA $E7D4,X	; BELL table
+$E66B: 8D 48 E8  STA $E848	
+$E66E: AD EC 03  LDA CHIME4 	; Chime Time 0=off (40col)
+
+L_E671:				; Loop [[
+$E671: 88        DEY
+$E672: D0 FD     BNE L_E671	; ]] Loop back for more
+$E674: 38        SEC
+$E675: E9 01     SBC #$01
+$E677: D0 F8     BNE L_E671	; ]] Loop back for more
+$E679: CA        DEX		; next byte in table
+$E67A: D0 EC     BNE L_E668	; ] Loop back for next BELL byte
+
+$E67C: 8E 4A E8  STX $E84A	; reset VIA register A
+$E67F: 8E 4B E8  STX $E84B	; reset VIA register B
+L_E682:
+$E682: 60        RTS
+
+;--------------- INITIALIZE EDITOR
+
+L_E683:
+$E683: A9 7F     LDA #$7F
+$E685: 8D 4E E8  STA $E84E
+$E688: A2 6D     LDX #$6D
+$E68A: A9 00     LDA #$00
+L_E68C:
+$E68C: 95 8D     STA TIME,X 	; Real-Time Jiffy Clock (approx) 1/60 Sec
+$E68E: CA        DEX
+$E68F: 10 FB     BPL L_E68C
+$E691: A2 0A     LDX #$0A	; 10 bytes to set
+L_E693:
+$E693: 9D F0 03  STA $03F0,X	; Loop [   TAB table???
+$E696: CA        DEX
+$E697: 10 FA     BPL L_E693	; ] Loop back for more
+
+$E699: 8D EE 03  STA RPTFLG4	; Repeat Flag
+$E69C: A9 55     LDA #$55	; $E455
+$E69E: 85 90     STA CINV   	; Vector: Hardware Interrupt LO
+$E6A0: A9 E4     LDA #$E4
+$E6A2: 85 91     STA CINV+1	; Vector: Hardware Interrupt HI
+
+$E6A4: A9 03     LDA #$03	; 3=Screen
+$E6A6: 85 B0     STA DFLTO  	; Set Default Output (CMD) to Screen
+$E6A8: A9 0F     LDA #$0F
+$E6AA: 8D 10 E8  STA PIA1_ROW 	; Keyboard ROW select
+$E6AD: 0A        ASL
+$E6AE: 8D 40 E8  STA VIA_0	; VIA Register 0 (flags)
+$E6B1: 8D 42 E8  STA $E842
+$E6B4: 8E 22 E8  STX $E822
+$E6B7: 8E 45 E8  STX $E845
+
+$E6BA: A9 3D     LDA #$3D
+$E6BC: 8D 13 E8  STA PIA1_13 	; PIA#1 Register 13 (Retrace flag and interrupt)
+$E6BF: 2C 12 E8  BIT PIA1_COL 	; Keyboard COL read
+
+$E6C2: A9 3C     LDA #$3C
+$E6C4: 8D 21 E8  STA $E821
+$E6C7: 8D 23 E8  STA $E823
+$E6CA: 8D 11 E8  STA $E811
+$E6CD: 8E 22 E8  STX $E822
+
+$E6D0: A9 0C     LDA #$0C
+$E6D2: 8D 4C E8  STA VIA_C 	; VIA Register C (cb2)
+$E6D5: 85 A8     STA BLNCT  	; Timer: Countdown to Toggle Cursor
+$E6D7: 85 A7     STA BLNSW  	; Cursor Blink enable: 0 = Flash Cursor
+
+$E6D9: A9 09     LDA #$09
+$E6DB: 8D EB 03  STA XMAX4  	; Max keyboard buffer size (40 col)
+
+$E6DE: A9 10     LDA #$10
+$E6E0: 8D EC 03  STA CHIME4 	; Chime Time 0=off (40col)
+$E6E3: 8D E9 03  STA DELAY4	; Repeat key countdown (40col)
+$E6E6: 8D EA 03  STA KOUNT4 	; Delay between repeats (40col)
+$E6E9: 60        RTS
+L_E6EA:
+$E6EA: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
+$E6EC: E8        INX
+$E6ED: E0 18     CPX #$18
+$E6EF: F0 33     BEQ L_E724
+$E6F1: 90 03     BCC L_E6F6
+$E6F3: 4C C4 E1  JMP L_E1C4
+L_E6F6:
+$E6F6: A2 17     LDX #$17	; 24 screen lines
+
+L_E6F8:				; Loop[
+$E6F8: B5 E1     LDA LDTB1+1,X	; Line link table
+$E6FA: 09 80     ORA #$80
+$E6FC: 85 C8     STA SAL+1
+$E6FE: B4 E0     LDY LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E700: 30 02     BMI L_E704
+$E702: 29 7F     AND #$7F
+L_E704:
+$E704: 95 E1     STA LDTB1+1 ,X ; Line link table
+$E706: 98        TYA
+$E707: 09 80     ORA #$80
+$E709: 85 C5     STA PNT+1
+$E70B: A0 27     LDY #$27
+$E70D: BD 99 E7  LDA $E799,X	; Screen line address table
+$E710: 85 C7     STA SAL    	; Pointer: Tape Buffer/ Screen Scrolling
+$E712: BD 98 E7  LDA $E798,X	; Screen line address table
+$E715: 85 C4     STA PNT    	; Pointer: Current Screen Line Address
+
+L_E717:				; Loop[[
+$E717: B1 C4     LDA (PNT),Y 	; Pointer: Current Screen Line Address
+$E719: 91 C7     STA (SAL),Y	; Pointer: Tape Buffer/ Screen Scrolling
+$E71B: 88        DEY
+$E71C: 10 F9     BPL L_E717	; ]] Loop back for more
+$E71E: CA        DEX
+$E71F: E4 D8     CPX TBLX   	; Current Cursor Physical Line Number
+$E721: D0 D5     BNE L_E6F8	; ] Loop back for more
+$E723: E8        INX
+L_E724:
+$E724: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E726: 09 80     ORA #$80
+$E728: 85 C5     STA PNT+1
+$E72A: 29 7F     AND #$7F
+$E72C: 95 E0     STA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E72E: BD 98 E7  LDA $E798,X    ; Screen line address table 
+$E731: 85 C4     STA PNT    	; Pointer: Current Screen Line Address
+$E733: A0 27     LDY #$27
+$E735: A9 20     LDA #$20	; <SPACE>
+
+L_E737:				; LOOP [
+$E737: 91 C4     STA (PNT),Y	; Pointer: Current Screen Line Address
+$E739: 88        DEY
+$E73A: 10 FB     BPL L_E737	; Loop back for more.
+
+$E73C: 4C 71 E0  JMP L_E071
+
+;--------------- KEYBOARD DECODE TABLE
+; Graphic "N" keyboard
+
+$E73F:           .BYT 3D,2E,10,03,3C,20,5B,12	; keyboard decode table - graphic keyboard
+$E747:           .BYT 2D,30,00,3E,FF,5D,40,00	; keyboard decode table - graphic keyboard
+$E74F:           .BYT 2B,32,FF,3F,2C,4E,56,58	; keyboard decode table - graphic keyboard
+$E757:           .BYT 33,31,0D,3B,4D,42,43,5A	; keyboard decode table - graphic keyboard
+$E75F:           .BYT 2A,35,FF,3A,4B,48,46,53	; keyboard decode table - graphic keyboard
+$E767:           .BYT 36,34,FF,4C,4A,47,44,41	; keyboard decode table - graphic keyboard
+$E76F:           .BYT 2F,38,FF,50,49,59,52,57	; keyboard decode table - graphic keyboard
+$E777:           .BYT 39,37,5E,4F,55,54,45,51	; keyboard decode table - graphic keyboard
+$E77F:           .BYT 14,11,09,29,5C,27,24,22	; keyboard decode table - graphic keyboard
+$E787:           .BYT 1D,13,5F,28,26,25,23,21 	; keyboard decode table - graphic keyboard
+
+;--------------- KEYSTROKE TABLE FOR <RUN> KEY
+
+$E78F:           .BYT 44,CC,22,2A,0D,52,55,4E	; SHIFT-RUN/STOP keystrokes for buffer
+$E797:           .BYT 0D 			; SHIFT-RUN/STOP keystrokes for buffer
+
+;--------------- SCREEN ADDRESS TABLE
+
+$E798:           .BYT 00,28,50,78,A0,C8,F0,18	; screen address - lo
+$E7A0:           .BYT 40,68,90,B8,E0,08,30,58	; screen address - lo
+$E7A8:           .BYT 80,A8,D0,F8,20,48,70,98	; screen address - lo
+$E7B0:           .BYT C0 			; screen address - lo
+
+;--------------- CRTC SETUP TABLES
+
+$E7B1:           .BYT 31,28,29,0F,20,03,19,1D	; CRTC register data -  40 COL TEXT mode
+$E7B9:           .BYT 00,09,00,00,10,00,00,00	; CRTC register data -  40 COL TEXT mode
+$E7C1:           .BYT 00,00			; CRTC register data -  40 COL TEXT mode
+
+$E7C3:           .BYT 31,28,29,0F,28,05,19,21	; CRTC register data -  40 COL GRAPHICS mode
+$E7CB:           .BYT 00,07,00,00,10,00,00,00	; CRTC register data -  40 COL GRAPHICS mode
+$E7D3:           .BYT 00,00 			; CRTC register data -  40 COL GRAPHICS mode
+
+$E7D5:           .BYT 0E,1E,3E,7E,3E,1E,0E	; BELL chime values
+
+;--------------- POWERS OF 2 TABLE (doesn't seem to be referenced anywhere)
+
+$E7DC:           .BYT 80,40,20,10,08,04,02,01	; BIT table
+
+;--------------- FILLER
+
+$E7E4:           .BYT BB,AA,AA,AA,AA,AA,AA,AA	; filler
+$E7EC:           .BYT AA,AA,AA,AA,AA,AA,AA,AA	; filler
+$E7F4:           .BYT AA,AA,AA,AA,AA,AA,AA,AA	; filler
+$E7FC:           .BYT AA,AA,AA 			; filler
