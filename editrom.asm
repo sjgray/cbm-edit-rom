@@ -671,7 +671,7 @@ Be251		INY
 
 ;-------------------------------------------------------
 ; Note: "80240.PRG" jumps here ($E25C)
-; Q?: Should we pad here for compatibility, or would including "Soft-40" be ok?
+; Question: Should we pad here for compatibility, or would including "Soft-40" be ok?
 ;-------------------------------------------------------
 
 Be25c		LDA #$20 				; <SPACE>
@@ -1157,8 +1157,11 @@ Be4aa		JSR SCAN_KEYBOARD			; Scan the keyboard
 
 ;************* Keyboard Scanner
 
-!if EXTENDED=0 { !source "keyscan-b.asm" }
-!if EXTENDED=1 { !source "keyscan-din.asm" }
+!if KEYSCAN=0 { !source "keyscan-g.asm" }
+!if KEYSCAN=1 { !source "keyscan-b.asm" }
+!if KEYSCAN=2 { !source "keyscan-din.asm" }
+!if KEYSCAN=3 { !source "keyscan-c64.asm" }
+!if KEYSCAN=4 { !source "keyscan-cbm2.asm" }
 
 
 ;###########################################################################################
@@ -1505,16 +1508,9 @@ ModifierKeys
 ;###################################################################################
 
 ;************** Keyboard Decoding Table
-!if EXTENDED=0 {
-		!if KEYBOARD= 0 { !source "kbd-n.asm" }
-		!if KEYBOARD= 1 { !source "kbd-b.asm" }	; QWERTY layout
-		!if KEYBOARD= 2 { !source "kbd-din1.asm" }
-		!if KEYBOARD= 3 { !source "kbd-c64.asm" }
-		!if KEYBOARD= 4 { !source "kbd-bsjg.asm" }	; Modified layout
-		!if KEYBOARD= 5 { !source "kbd-nsjg.asm" }	; @ replaced by ESC
-		!if KEYBOARD= 6 { !source "kbd-bz.asm" }	; QWERTZ layout
-		!if KEYBOARD= 7 { !source "kbd-cbm2.asm" }	; CBM-II layout (requires hardware mod)
-}
+
+!source "keyboard.asm"
+
 
 ;************** SHIFT RUN/STOP string
 
@@ -1524,27 +1520,7 @@ RUN_String
 
 ;************** CRTC Chip Register Setup Tables (2K ROMs)
 
-!if COLUMNS=80 {
-		!if REFRESH = 0 { !source "crtc-80-50hz.asm" }
-		!if REFRESH = 1 { !source "crtc-80-60hz.asm" }
-		!if REFRESH = 2 { !source "crtc-80-pal.asm" }
-		!if REFRESH = 3 { !source "crtc-80-ntsc.asm" }
-}
-
-!if COLUMNS=40 {
-	!if SOFT40=1 {
-		!if REFRESH = 0 { !source "crtc-soft40-50hz.asm" }
-		!if REFRESH = 1 { !source "crtc-soft40-60hz.asm" }
-		!if REFRESH = 2 { !source "crtc-soft40-pal.asm" }
-		!if REFRESH = 3 { !source "crtc-soft40-ntsc.asm" }
-
-	} ELSE {
-		!if REFRESH = 0 { !source "crtc-40-50hz.asm" }
-		!if REFRESH = 1 { !source "crtc-40-60hz.asm" }
-		!if REFRESH = 2 { !source "crtc-40-pal.asm" }
-		!if REFRESH = 3 { !source "crtc-40-ntsc.asm" }
-	}
-}
+!source "crtc.asm"
 
 ;************** BELL Sound Table
 
