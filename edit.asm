@@ -14,8 +14,10 @@
 ; DIRECTIVE	  FEATURE			VALID OPTIONS			NOTES / FUTURE OPTIONS
 ;----------	  -------			-------------			----------------------
 EXTENDED  = 0	; Extended Editor?		0=No, 1=Yes
+KEYSCAN   = 1   ; Keyboard Scanner		0=Graphic, 1=Business, 2=Extended, 3=C64
 KEYBOARD  = 5	; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG,6=BZ
 ;                                               7=CBM-II (requires hardware mod)
+
 COLUMNS   = 40	; Screen Width:			40 or 80
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes
 SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes

@@ -6,7 +6,6 @@
 
 ;--------------- Scan Keyboard (scnkey)
 ; NOTE: The keyboard ROW select is reset to zero in IRQ routine
-; PUZZLE: Where does it check that we hit the last row (10 for normal keyboards)?
 
 SCAN_KEYBOARD
 ;!if DEBUG = 1 { INC DBLINE+5 }		; DEBUG - 6th character on top line
