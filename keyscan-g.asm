@@ -133,32 +133,37 @@ SCAN_REC	STA KEYPRESSED		; Current Key Pressed: 255 = No Key
 		CMP #$FF		; No Key?
  		BEQ SCAN_OUT		; Yes, exit
 
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
+		!if CRUNCH=0 {
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+		}
     		LSR KEYFLAGS		;Flag: Print Shifted Chars.
     		BCC SCAN_NORM2		;l_e57a
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
-		NOP
+		!if CRUNCH=0 {
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+			NOP
+		}
+
 SCAN_SHIFT	ORA #$80		; Set upper bit for Graphics Symbol
 
 ;-------------- Put the KEY into the Buffer (Key in accumulator)

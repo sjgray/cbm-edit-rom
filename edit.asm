@@ -40,6 +40,8 @@ REPEATOPT = 1	; Key Repeat Option		0=No (Always ON), 1=Yes
 WEDGE     = 1	; DOS Wedge			0=No, 1=Yes
 WEDGEMSG  = 3	; Show wedge message?		0=No, 1=Yes,2=Custom		Only valid when WEDGE=1
 
+CRUNCH    = 0   ; Remove unneeded code (NOPS) when posible? 0=No, 1=Yes
+
 DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
 
 ; To generate Edit ROMs that are Byte-exact matches to actual Commodore ROMS set the
