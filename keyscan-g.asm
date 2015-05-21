@@ -52,7 +52,7 @@ SCAN_COL	LSR			; Shift the value right
 ;-------------- We have a key press. Look it up in the keyboard matrix
 
 		PHA			; Save for later
-		LDA KEYBOARD_NORMAL-1,X	; Read Keyboard Matrix (X is offset)
+		LDA KEYBOARD_NORMAL-1,X ; Read Keyboard Matrix (X is offset)
 		BNE SCAN_NOSH		; Is it SHIFT key? No, skip
 
 ;-------------- SHIFT key Detected

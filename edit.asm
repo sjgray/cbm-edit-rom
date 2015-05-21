@@ -14,7 +14,7 @@
 ; DIRECTIVE	  FEATURE			VALID OPTIONS			NOTES / FUTURE OPTIONS
 ;----------	  -------			-------------			----------------------
 EXTENDED  = 0	; Extended Editor?		0=No, 1=Yes
-KEYSCAN   = 1   ; Keyboard Scanner		0=Graphic, 1=Business, 2=Extended, 3=C64
+KEYSCAN   = 0   ; Keyboard Scanner		0=Graphic, 1=Business, 2=Extended, 3=C64
 KEYBOARD  = 5	; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG,6=BZ
 ;                                               7=CBM-II (requires hardware mod)
 
@@ -51,8 +51,8 @@ DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
 
 ;---------------------- Output filename
 
-;!TO "editrom.bin",plain			; Generic output file with no load address
-!TO "cpet-40-nsjg-ntsc.bin",plain		; ColourPET output file with no load address
+!TO "editrom.bin",plain			; Generic output file with no load address
+;!TO "cpet-40-nsjg-ntsc.bin",plain		; ColourPET output file with no load address
 
 ;---------------------- These are the symbol definitions for PET/CBM memory and IO chips
 
