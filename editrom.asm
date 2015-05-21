@@ -891,7 +891,7 @@ Be3e6		INX
 			JSR SS40_SyncPointers
 		}
 	} ELSE {
-		JSR ColourPET_SyncPointers		; Synchronize Pointers			@@@@@@@@@@@@@@@ COLOURPET
+		JSR ColourPET_SyncPointers		; Synchronize Pointers	@@@@@@@@@@@@@@@ COLOURPET
 	}
 
 }
@@ -919,33 +919,9 @@ Be3fe		JSR Erase_To_EOL			; Clear the bottom line
 !if EXTENDED=0 { !source "scrollpause-b.asm" }
 !if EXTENDED=1 { !source "scrollpause-din.asm" }
 
+;************* Jiffy Clock Timer Correction Patch
 
-;************** Correct Jiffy Clock Timer
-; Patch for 50 Hz
-; TODO: Analyze JIFFY CLOCK differences from older ROMs
-; TODO: make selectable
-
-!if EXTENDED=0 {
-ADVANCE_TIMER
-		JSR UDTIME			; $FFEA / jmp $f768	udtim	Update System Jiffy Clock
-		INC JIFFY6DIV5			; Counter to speed TI by 6/5
-		LDA JIFFY6DIV5			; Counter to speed TI by 6/5
-		CMP #$06			; every 6 IRQ's
-		BNE IRQ_NORMAL2			; no, jump back to IRQ routine
-		LDA #$00      			; yes, reset counter
-		STA JIFFY6DIV5			; Counter to speed TI by 6/5
-		BEQ ADVANCE_TIMER		; re-do jiffy clock update
-} ELSE {
-
-ADVANCE_TIMER_CORR
-		LDA #6
-		STA JIFFY6DIV5
-ADVANCE_TIMER
-		JSR ADVANCE_JIFFY_CLOCK		; In EDITROMEXT file
-		DEC JIFFY6DIV5
-		BEQ ADVANCE_TIMER_CORR
-		RTS
-}
+!source "jiffyfix.asm"
 
 ;####################################################################################################
 		!fill $e442-*,$aa	; 0 bytes ###################################################
