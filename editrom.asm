@@ -28,6 +28,9 @@
 ;    * Autoboot from default drive
 ;    * DOS Wedge
 ;
+; See EDIT.ASM for assemble OPTIONS!
+; Use MAKE.BAT to assemble a binary file with the current options.
+;
 ;-----------------------------------------------------------------------------------------------
 * = $e000	; Normal start address for EDIT ROM is $E000
 ;-----------------------------------------------------------------------------------------------
@@ -72,8 +75,10 @@ SET_REPEAT_MODE
 !if REPEATOPT = 1 {
 		STA RPTFLG				;$E4
 } else {
-		NOP
-		NOP
+		!if CRUNCH=0 {
+			NOP
+			NOP
+		}
 }
 		RTS
 
