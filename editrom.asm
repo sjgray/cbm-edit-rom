@@ -1337,8 +1337,11 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e
 		!byte $cd		; to match 901474-04 ##################
 		!fill $e800-*,$aa	; 78 bytes - Fill to end of 2K ########
 } ELSE {
-		!source "extextra.asm"	; Unused code        ##################
-		!byte $28		; to match 324243-04 ##################
+		!if CRUNCH=0 {
+			!source "extextra.asm"	; Unused code        ##########
+			!byte $28		; to match 324243-04 ##########
+		}
+
 		!fill $e7ff-*,$ff	; Fill to end of 2K  ##################
 		!byte $1a		; to match 324243-04 ##################
 }
