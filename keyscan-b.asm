@@ -77,7 +77,7 @@ SCAN_NEXT2	DEX			; Decrement keyboard table offset
 
 ;-------------- Completed all bits in ROW, Increment ROW
 
-		INC PIA1_Port_A		; Next Keyboard ROW (PUZZLE! Row counts up. How do we know we hit ROW 10?)
+		INC PIA1_Port_A		; Next Keyboard ROW
 		BNE SCAN_ROW		; More? Yes, loop back
 
 ;-------------- Process Key Image
