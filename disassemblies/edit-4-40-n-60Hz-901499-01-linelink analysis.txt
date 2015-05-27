@@ -3,6 +3,7 @@
 ;
 ; This disassembly is for understanding 40-column line linking in order to be integrated into main source
 ; Started May 27/2015 SJG
+; Marked with '@@@@@@@@@@' characters
 ;
 ;--------------- ZERO PAGE STORAGE
 
@@ -136,14 +137,14 @@ $E044: A9 C0     LDA #$C0	; $83C0 = Address of first character on last line of s
 $E046: A0 83     LDY #$83	;
 
 L_E048:
-$E048: 94 E0     STY LDTB1,X	; Screen Line Link Table
-$E04A: 38        SEC
-$E04B: E9 28     SBC #$28	; Subtract 40 characters (one physical line)
-$E04D: B0 01     BCS L_E050	; did we move past page? No, skip DEY
-$E04F: 88        DEY		; Yes,
+$E048: 94 E0     STY LDTB1,X	; Screen Line Link Table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E04A: 38        SEC		; @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E04B: E9 28     SBC #$28	; Subtract 40 characters (one physical line) @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E04D: B0 01     BCS L_E050	; did we move past page? No, skip DEY @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E04F: 88        DEY		; Yes, @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 L_E050:
-$E050: CA        DEX		; previous line
-$E051: 10 F5     BPL L_E048	; Loop up for more
+$E050: CA        DEX		; previous line @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E051: 10 F5     BPL L_E048	; Loop up for more @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 $E053: 84 C5     STY PNT+1	; Pointer: Current Screen Line Address HI
 $E055: E8        INX
@@ -168,20 +169,20 @@ $E06D: 84 C6     STY PNTR   	; Cursor Column on Current Line
 $E06F: 84 D8     STY TBLX   	; Current Cursor Physical Line Number
 
 L_E071:
-$E071: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
-$E073: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
-$E075: 09 80     ORA #$80
-$E077: 85 C5     STA PNT+1
+$E071: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E073: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@
+$E075: 09 80     ORA #$80	; @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E077: 85 C5     STA PNT+1	
 $E079: BD 98 E7  LDA $E798,X
 $E07C: 85 C4     STA PNT    	; Pointer: Current Screen Line Address LO
 $E07E: A9 27     LDA #$27
-$E080: 85 D5     STA LNMX   	; Physical Screen Line Length
+$E080: 85 D5     STA LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E082: E0 18     CPX #$18	; Line 24? (0-24)
 $E084: F0 08     BEQ L_E08E
-$E086: B5 E1     LDA LDTB1+1,X 	; Screen line link table
+$E086: B5 E1     LDA LDTB1+1,X 	; Screen line link table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E088: 30 04     BMI L_E08E
-$E08A: A9 4F     LDA #$4F
-$E08C: 85 D5     STA LNMX   	; Physical Screen Line Length
+$E08A: A9 4F     LDA #$4F	; @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E08C: 85 D5     STA LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 L_E08E:
 $E08E: A5 C6     LDA PNTR   	; Cursor Column on Current Line
 $E090: C9 28     CMP #$28
@@ -258,7 +259,7 @@ $E0EC: D0 CE     BNE L_E0BC	; No, Loop back up
 
 ;--------------- Do RETURN	[ Find last character on line ]
 
-$E0EE: A4 D5     LDY LNMX   	; Physical Screen Line Length
+$E0EE: A4 D5     LDY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E0F0: 84 AC     STY CRSW   	; Flag: INPUT or GET from Keyboard
 
 L_E0F2:				; LOOP[
@@ -371,7 +372,7 @@ $E180: C6 DC     DEC INSRT  	; Flag: Insert Mode
 L_E182:
 $E182: 20 06 E6  JSR L_E606
 $E185: E6 C6     INC PNTR   	; Cursor Column on Current Line
-$E187: A4 D5     LDY LNMX   	; Physical Screen Line Length
+$E187: A4 D5     LDY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E189: C4 C6     CPY PNTR   	; Cursor Column on Current Line
 $E18B: B0 19     BCS L_E1A6
 $E18D: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
@@ -408,9 +409,9 @@ $E1B2: 60        RTS
 L_E1B3:
 $E1B3: E0 17     CPX #$17	; Are we at end of the line - offset 39 ?
 $E1B5: B0 06     BCS L_E1BD	; No, skip out
-$E1B7: B5 E2     LDA LDTB1+2,X	; Yes, link the next line to this one
+$E1B7: B5 E2     LDA LDTB1+2,X	; Yes, link the next line to this one @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E1B9: 09 80     ORA #$80	; set the upper bit
-$E1BB: 95 E2     STA LDTB1+2,X	; set line link
+$E1BB: 95 E2     STA LDTB1+2,X	; set line link @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 L_E1BD:
 $E1BD: 60        RTS
 
@@ -429,8 +430,8 @@ $E1CB: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
 
 ;--------------- SUB
 L_E1CD:
-$E1CD: 16 E1     ASL LDTB1+1,X 	;
-$E1CF: 56 E1     LSR LDTB1+1,X 	;
+$E1CD: 16 E1     ASL LDTB1+1,X 	;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E1CF: 56 E1     LSR LDTB1+1,X 	;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E1D1: 20 B3 E1  JSR L_E1B3	; set line link
 $E1D4: A5 C6     LDA PNTR   	; Cursor Column on Current Line
 $E1D6: 48        PHA
@@ -462,7 +463,7 @@ $E1F6: 85 C5     STA PNT+1
 $E1F8: BD 98 E7  LDA $E798,X
 $E1FB: 85 C4     STA PNT    	; Pointer: Current Screen Line Address
 $E1FD: 84 C6     STY PNTR   	; Cursor Column on Current Line
-$E1FF: 84 D5     STY LNMX   	; Physical Screen Line Length
+$E1FF: 84 D5     STY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E201: 60        RTS
 
 ;--------------- Print PETSCII character to screen
@@ -521,7 +522,7 @@ $E24B: B1 C4     LDA (PNT),Y	; Pointer: Current Screen Line Address
 $E24D: 88        DEY
 $E24E: 91 C4     STA (PNT),Y	; Pointer: Current Screen Line Address
 $E250: C8        INY
-$E251: C4 D5     CPY LNMX   	; Physical Screen Line Length
+$E251: C4 D5     CPY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E253: D0 F5     BNE L_E24A
 L_E255:
 $E255: A9 20     LDA #$20	; SPACE>
@@ -546,7 +547,7 @@ $E273: D0 12     BNE L_E287
 $E275: C8        INY
 $E276: 84 C6     STY PNTR   	; Cursor Column on Current Line
 $E278: 88        DEY
-$E279: C4 D5     CPY LNMX   	; Physical Screen Line Length
+$E279: C4 D5     CPY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E27B: 90 07     BCC L_E284
 $E27D: 20 A9 E3  JSR L_E3A9
 $E280: A0 00     LDY #$00
@@ -561,7 +562,7 @@ $E28B: 18        CLC
 $E28C: 98        TYA
 $E28D: 69 28     ADC #$28
 $E28F: A8        TAY
-$E290: C5 D5     CMP LNMX   	; Physical Screen Line Length
+$E290: C5 D5     CMP LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E292: 90 EE     BCC L_E282
 $E294: F0 EC     BEQ L_E282
 $E296: 20 A9 E3  JSR L_E3A9
@@ -575,7 +576,7 @@ $E2A2: 88        DEY
 L_E2A3:
 $E2A3: C8        INY
 $E2A4: 91 C4     STA (PNT),Y	; Pointer: Current Screen Line Address
-$E2A6: C4 D5     CPY LNMX	; Physical Screen Line Length
+$E2A6: C4 D5     CPY LNMX	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E2A8: 90 F9     BCC L_E2A3
 $E2AA: B0 ED     BCS L_E299
 L_E2AC:
@@ -592,9 +593,9 @@ L_E2BE:
 $E2BE: C9 09     CMP #$09	; <TAB>?
 $E2C0: D0 D7     BNE L_E299
 L_E2C2:
-$E2C2: C4 D5     CPY LNMX   	; Physical Screen Line Length
+$E2C2: C4 D5     CPY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E2C4: 90 07     BCC L_E2CD
-$E2C6: A4 D5     LDY LNMX   	; Physical Screen Line Length
+$E2C6: A4 D5     LDY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 L_E2C8:
 $E2C8: 84 C6     STY PNTR   	; Cursor Column on Current Line
 $E2CA: 4C A6 E1  JMP L_E1A6
@@ -624,7 +625,7 @@ $E2EB: A6 CD     LDX QTSW   	; Flag: Editor in Quote Mode
 $E2ED: D0 30     BNE L_E31F
 $E2EF: C9 14     CMP #$14
 $E2F1: D0 28     BNE L_E31B
-$E2F3: A4 D5     LDY LNMX   	; Physical Screen Line Length
+$E2F3: A4 D5     LDY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E2F5: B1 C4     LDA (PNT),Y	; Pointer: Current Screen Line Address
 $E2F7: C9 20     CMP #$20
 $E2F9: D0 04     BNE L_E2FF
@@ -635,7 +636,7 @@ $E2FF: C0 4F     CPY #$4F
 $E301: F0 81     BEQ L_E284
 $E303: 20 EA E6  JSR L_E6EA
 L_E306:
-$E306: A4 D5     LDY LNMX   	; Physical Screen Line Length
+$E306: A4 D5     LDY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 L_E308:
 $E308: 88        DEY
 $E309: B1 C4     LDA (PNT),Y 	; Pointer: Current Screen Line Address
@@ -744,7 +745,7 @@ $E3AF: E0 19     CPX #$19	; Last line of screen?
 $E3B1: D0 03     BNE L_E3B6
 $E3B3: 20 D1 E3  JSR L_E3D1
 L_E3B6:
-$E3B6: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E3B6: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E3B8: 10 F4     BPL L_E3AE
 $E3BA: 86 D8     STX TBLX   	; Current Cursor Physical Line Number
 $E3BC: 4C 71 E0  JMP L_E071
@@ -773,16 +774,16 @@ L_E3D7:
 $E3D7: E8        INX		; Loop[
 $E3D8: BD 98 E7  LDA $E798,X	; Screen line address table
 $E3DB: 85 C4     STA PNT    	; Pointer: Current Screen Line Address LO
-$E3DD: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E3DD: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E3DF: 09 80     ORA #$80
 $E3E1: 85 C5     STA PNT+1	; Pointer: Current Screen Line Address HI
 $E3E3: E0 18     CPX #$18	; Last Line?
 $E3E5: B0 1D     BCS L_E404
-$E3E7: B4 E1     LDY LDTB1+1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E3E7: B4 E1     LDY LDTB1+1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E3E9: 30 02     BMI L_E3ED
 $E3EB: 29 7F     AND #$7F
 L_E3ED:
-$E3ED: 95 E0     STA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E3ED: 95 E0     STA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@
 $E3EF: 98        TYA
 $E3F0: 09 80     ORA #$80	; Set Hi bit
 $E3F2: 85 C8     STA SAL+1	;$C8
@@ -799,7 +800,7 @@ $E400: 10 F9     BPL L_E3FB	; ]] Loop back for more
 $E402: 30 D3     BMI L_E3D7	; ] Loop back for more
 
 L_E404:
-$E404: 95 E0     STA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E404: 95 E0     STA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 ;--------------- Clear the last screen line
 
@@ -813,7 +814,7 @@ $E40D: 10 FB     BPL L_E40A	; ] Loop back for more
 
 ;--------------- 
 $E40F: C6 D8     DEC TBLX   	; Current Cursor Physical Line Number
-$E411: A5 E0     LDA LDTB1	; Screen Line Link Table / Editor Temps (40 col)
+$E411: A5 E0     LDA LDTB1	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E413: 10 C0     BPL L_E3D5	; ] Loop back for more
 
 ;--------------- Check for Scroll Delay
@@ -1154,7 +1155,7 @@ $E63B: 60        RTS
 L_E63C:
 $E63C: 20 02 E2  JSR L_E202	; output to screen
 $E63F: AA        TAX
-$E640: A5 D5     LDA LNMX   	; Physical Screen Line Length
+$E640: A5 D5     LDA LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E642: 38        SEC
 $E643: E5 C6     SBC PNTR   	; Cursor Column on Current Line
 $E645: C9 05     CMP #$05	; Are we at the 5th last character on the line?
@@ -1268,14 +1269,14 @@ L_E6F6:
 $E6F6: A2 17     LDX #$17	; 24 screen lines
 
 L_E6F8:				; Loop[
-$E6F8: B5 E1     LDA LDTB1+1,X	; Line link table
+$E6F8: B5 E1     LDA LDTB1+1,X	; Line link table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E6FA: 09 80     ORA #$80
 $E6FC: 85 C8     STA SAL+1
-$E6FE: B4 E0     LDY LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E6FE: B4 E0     LDY LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E700: 30 02     BMI L_E704
 $E702: 29 7F     AND #$7F
 L_E704:
-$E704: 95 E1     STA LDTB1+1 ,X ; Line link table
+$E704: 95 E1     STA LDTB1+1 ,X ; Line link table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E706: 98        TYA
 $E707: 09 80     ORA #$80
 $E709: 85 C5     STA PNT+1
@@ -1295,11 +1296,11 @@ $E71F: E4 D8     CPX TBLX   	; Current Cursor Physical Line Number
 $E721: D0 D5     BNE L_E6F8	; ] Loop back for more
 $E723: E8        INX
 L_E724:
-$E724: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E724: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E726: 09 80     ORA #$80
 $E728: 85 C5     STA PNT+1
 $E72A: 29 7F     AND #$7F
-$E72C: 95 E0     STA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col)
+$E72C: 95 E0     STA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E72E: BD 98 E7  LDA $E798,X    ; Screen line address table 
 $E731: 85 C4     STA PNT    	; Pointer: Current Screen Line Address
 $E733: A0 27     LDY #$27
