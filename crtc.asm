@@ -28,12 +28,15 @@ CRT_SET_TEXT
 }
 
 !IF EXTENDED=1 {
-		JMP CRT_SET_TEXT_EXT			; Jump to EXTENDED version (upper rom)
+	JMP CRT_SET_TEXT_EXT			; Jump to EXTENDED version (upper rom)
+
+	!if CRUNCH=0 {	
 		NOP
 		NOP
 		NOP
 		NOP
 		NOP
+	}
 }
 
 ;-------------- Initialize CRTC to GRAPHICS Mode (Called from Jump Table)
@@ -50,10 +53,13 @@ CRT_SET_GRAPHICS
 	}
 }
 !IF EXTENDED=1 {
-		JMP CRT_SET_GRAPHICS_EXT		; Jump to EXTENDED version (upper rom)
+	JMP CRT_SET_GRAPHICS_EXT		; Jump to EXTENDED version (upper rom)
+
+	!if CRUNCH=0 {
 		NOP
 		NOP
 		NOP
+	}
 }
 
 ;************** Program CRTC chip for selected screen MODE (Called from Jump Table)
