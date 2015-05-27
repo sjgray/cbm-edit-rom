@@ -7,6 +7,8 @@
 ; Note: Not all keyboards are defined for all options! Please check source
 ;------------------------------------------------------------------------------
 
+;-------------- Graphic (Normal) Keyboard Scanner - Simple
+
 !if KEYSCAN=0 {
 		!if KEYBOARD= 0 { !source "kbd-n.asm" }
 		!if KEYBOARD= 1 { !source "kbd-b.asm" }		; QWERTY layout
@@ -18,6 +20,8 @@
 		!if KEYBOARD= 7 { !source "kbd-cbm2.asm" }	; CBM-II layout (requires hardware mod)
 }
 
+;--------------  Business Keyboard Scanner - Simple with code for specific shifted keys
+
 !if KEYSCAN=1 {
 		!if KEYBOARD= 0 { !source "kbd-n.asm" }
 		!if KEYBOARD= 1 { !source "kbd-b.asm" }		; QWERTY layout
@@ -28,6 +32,8 @@
 		!if KEYBOARD= 6 { !source "kbd-bz.asm" }	; QWERTZ layout
 		!if KEYBOARD= 7 { !source "kbd-cbm2.asm" }	; CBM-II layout (requires hardware mod)
 }
+
+;-------------- Extended Keyboard Scanner - Two Tables (Normal and Shifted)
 
 !if KEYSCAN=2 {
 		!if KEYBOARD= 0 { !source "kbdx-n.asm" }

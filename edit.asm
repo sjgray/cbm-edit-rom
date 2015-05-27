@@ -80,14 +80,19 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 !if EXTENDED  = 1 {
 	!source "editromext.asm" 
 } ELSE {		
-	!if COLOURPET + ESCCODES + WEDGE + EXECUDESK + SS40 + SOFT40 > 0 { !source "io.asm"}
+	!if COLOURPET + ESCCODES + WEDGE + EXECUDESK + SS40 + SOFT40 > 0 {
 
-	!if EXECUDESK = 1 { !source "execudesk.asm" }
-	!if WEDGE = 1	  { !source "editwedge.asm" }
-	!if COLOURPET = 1 { !source "colourpetsubs.asm" }
-	!if ESCCODES = 1  { !source "editescape.asm" }
-	!if REBOOT = 1    { !source "editreboot.asm" }
-	!if SS40 = 1      { !source "editsoft40.asm" }
+		!source "io.asm"
+
+		!if EXECUDESK = 1 { !source "execudesk.asm" }
+		!if WEDGE = 1	  { !source "editwedge.asm" }
+		!if COLOURPET = 1 { !source "colourpetsubs.asm" }
+		!if ESCCODES = 1  { !source "editescape.asm" }
+		!if REBOOT = 1    { !source "editreboot.asm" }
+		!if SS40 = 1      { !source "editsoft40.asm" }
+
+		!fill $F000-*,$FF } ; PAD to 4K ##########################
+	}
 }
 
-!if EXTENDED + EXECUDESK + COLOURPET + ESCCODES + WEDGE + SS40 > 0 { !fill $F000-*,$FF } ; PAD to 4K ##########################
+
