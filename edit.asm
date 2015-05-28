@@ -92,7 +92,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS	; Calculate bottom line of screen for debug
 		!if REBOOT = 1    { !source "editreboot.asm" }
 		!if SS40 = 1      { !source "editsoft40.asm" }
 
-		!fill $F000-*,$FF } ; PAD to 4K ##########################
+		!fill $F000-*,$FF	; PAD to 4K ##########################
 	}
 }
 
