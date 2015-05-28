@@ -1,12 +1,15 @@
 ; Commodore PET EDIT ROM for 80 column  - Updated comments by Steve Gray, Jan 2013
-; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  - Last update: Dec 15, 2013
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  - Last update: May 28, 2015
 ; Source ROM: ?????????
 ;
-; There are TWO fixed entry points in the EDIT ROM - $E202 and $E442. These entry points are called directly
-; from BASIC and KERNAL and DO NOT go through the JUMP TABLE!
+; Note: Not all KERNAL and BASIC calls go through this table.
+;       There are FIVE hard-coded entry points: $E0A7, $E116, $E202, $E442, $E600
 ;
+; $E0A7 Get Chr from keyboard buffer 
+; $E116 Input from screen/keyboard
 ; $E202 called from: DB82,DB8D,DB95,F18B,F26E,F86A (JSR)
 ; $E442 called from: FFFE (vector)
+; $E600 Return from interrupt
 ;
 ;============================== EDIT ROM JUMP TABLE
 
@@ -28,6 +31,12 @@
  E02D		JMP $E036	; Set REPEAT Flag
  E030		JMP $E1E1	; Set Window Top
  E033		JMP $E1DC	; Set Window Bottom
+
+; BUG!: the 80-column screen editor does not support line-linking. This means that you are
+;       limited to entering BASIC lines to the maximum width of one screen line.
+;       This ALSO applies when you have defined a window... you will be limited to the width
+;       of the window. Take caution when editing BASIC lines inside a window; any line that
+;       wraps around to the next line will be TRUNCATED if you edit it inside a window!!!!!
 
 ;============================== Set REPEAT Flag
 
@@ -111,7 +120,8 @@
  E0A6		RTS
 
 ;============================== Get Character From Keyboard Buffer
-
+; FIXED ENTRY POINT - Does not use jump table!
+;
  E0A7	iE0A7	LDY $026F
  E0AA		LDX #$00
  E0AC	iE0AC	LDA $0270,X	; Keyboard Buffer Queue (FIFO)
@@ -188,7 +198,8 @@
  E114		BCS $E144
 
 ;-------------- Input From Screen or Keyboard
-
+; FIXED ENTRY POINT - Does not use jump table!
+;
  E116	iE116	TYA
  E117		PHA
  E118		TXA
