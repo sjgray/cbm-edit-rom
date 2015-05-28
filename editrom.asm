@@ -57,12 +57,12 @@ EDITOR
 		JMP WINDOW_SCROLL_UP		; Scroll UP
 		JMP SCAN_KEYBOARD		; Scan Keyboard
 		JMP BEEP			; Ring BELL/CHIME
-
-!IF REPEATOPT = 1 {
+!if CODEBASE=0 {
+		JMP NOTSUPPORTED		; Set REPEAT mode
+		JMP NOTSUPPORTED		; Set Window Top
+		JMP NOTSUPPORTED		; Set Window Bottom
+} ELSE {		
 		JMP SET_REPEAT_MODE		; Set REPEAT MODE
-} else {
-		JMP BEEP			; Ring BELL/CHIME
-}
 		JMP WINDOW_SET_TOP		; Set Window Top
 		JMP WINDOW_SET_BOTTOM		; Set Window Bottom
 
@@ -72,15 +72,16 @@ EDITOR
 
 SET_REPEAT_MODE
 
-!if REPEATOPT = 1 {
-		STA RPTFLG				;$E4
-} else {
-		!if CRUNCH=0 {
-			NOP
-			NOP
+		!if REPEATOPT = 1 {
+			STA RPTFLG				;$E4
+		} else {
+			!if CRUNCH=0 {
+				NOP
+				NOP
+			}
 		}
-}
 		RTS
+}
 
 ;###################################################################################
            !fill $e04b-*,$aa	; 17 bytes #########################################
@@ -97,7 +98,7 @@ RESET_EDITOR
 }
 
 !IF BOOTCASE=0 { JSR CRT_SET_TEXT }			; Set Screen to TEXT mode
-!IF BOOTCASE=1 { JSR CRT_SET_GRAPHICS }		; Set Screen to GRAPHICS mode
+!IF BOOTCASE=1 { JSR CRT_SET_GRAPHICS }			; Set Screen to GRAPHICS mode
 
 ;************** Clear Window (Called from Jump Table)
 
@@ -958,30 +959,8 @@ Be3fe		JSR Erase_To_EOL			; Clear the bottom line
 
 
 ;************** Select Character Set
-!if EXTENDED=1 {
+!if EXTENDED=1 { !source "extcset.asm" }
 
-SELECT_CHAR_SET
-		CMP #1
-		BNE Be557
-Be552		JSR CRT_SET_TEXT_NEW
-		BMI Be5a7
-Be557		CMP #2
-		BEQ Be552
-		BNE Be59b
-
-;**************
-
-ProcControl_B
-		CMP #1
-		BNE Be567
-		JSR CLEAR_KEYFLAGS_210
-		JMP IRQ_EPILOG
-
-Be567		CMP #2 				; <$82> - Switch to old (PET) char set
-		BNE ProcControl_C
-		JSR CRT_SET_TEXT_OLD
-		BMI Be5a7
-}
 
 ;************** Do TAB
 

@@ -27,33 +27,47 @@ CRTCB    = $E881   ;CRTC Controller Data
 ;
 * = $E000
 ;
-;----- Code
+;************* Edit ROM Jump Table
 ;
-$E000: 4C 4B E0  JMP  L_E04B
-$E003: 4C A7 E0  JMP  L_E0A7
-$E006: 4C 16 E1  JMP  L_E116
-$E009: 4C 02 E2  JMP  L_E202
-$E00C: 4C 42 E4  JMP  L_E442
-$E00F: 4C 55 E4  JMP  L_E455
-$E012: 4C 00 E6  JMP  L_E600
-$E015: 4C 51 E0  JMP  L_E051
-$E018: 4C 7A E0  JMP  L_E07A
-$E01B: 4C 82 E0  JMP  L_E082
-$E01E: 4C 88 E0  JMP  L_E088
-$E021: 4C C8 E3  JMP  L_E3C8
-$E024: 4C E8 E3  JMP  L_E3E8
-$E027: 4C BE E4  JMP  L_E4BE
-$E02A: 4C A7 E6  JMP  L_E6A7
-$E02D: 4C 36 E0  JMP  L_E036
-$E030: 4C E1 E1  JMP  L_E1E1
-$E033: 4C DC E1  JMP  L_E1DC
+; Note: Not all KERNAL and BASIC calls go through this table.
+;       There are FIVE hard-coded entry points: $E0A7, $E116, $E202, $E442, $E600
+
+$E000: 4C 4B E0  JMP  L_E04B	; Main Initialization (called from Kernal power up reset) 
+$E003: 4C A7 E0  JMP  L_E0A7	; Get Character From Keyboard Buffer (FIXED ENTRY POINT. Must not move!)
+$E006: 4C 16 E1  JMP  L_E116	; Input From Screen or Keyboard	(FIXED ENTRY POINT. Must not move!)
+$E009: 4C 02 E2  JMP  L_E202	; Output to Screen		(FIXED ENTRY POINT. Must not move!)
+$E00C: 4C 42 E4  JMP  L_E442	; Main IRQ Handler		(FIXED ENTRY POINT. Must not move!)
+$E00F: 4C 55 E4  JMP  L_E455	; Actual IRQ (clock, keyboard scan)
+$E012: 4C 00 E6  JMP  L_E600	; Return From Interrupt		(FIXED ENTRY POINT. Must not move!)
+$E015: 4C 51 E0  JMP  L_E051	; Clear Window
+$E018: 4C 7A E0  JMP  L_E07A	; Set CRTC to TEXT mode
+$E01B: 4C 82 E0  JMP  L_E082	; Set CRTC to GRAPHICS mode
+$E01E: 4C 88 E0  JMP  L_E088	; Program CRTC (Table pointer in A/X, chr set in Y)
+$E021: 4C C8 E3  JMP  L_E3C8	; Scroll DOWN
+$E024: 4C E8 E3  JMP  L_E3E8	; Scroll UP
+$E027: 4C BE E4  JMP  L_E4BE	; Scan Keyboard
+$E02A: 4C A7 E6  JMP  L_E6A7	; Ring BELL/CHIME
+$E02D: 4C 36 E0  JMP  L_E036	; Set REPEAT MODE
+$E030: 4C E1 E1  JMP  L_E1E1	; Set Window Top
+$E033: 4C DC E1  JMP  L_E1DC	; Set Window Bottom
+
+
+;************* Set REPEAT MODE (Called from Jump Table)
+; Flag: $80 = Repeat, $40 = disable
+
 L_E036:
 $E036: 85 E4     STA $E4
 $E038: 60        RTS
+
+;-------------- Filler
 L_E040:
 $E039:           .BYT C1,D8,CF,D2,D0,30,32,08 ;text- axorp02
 $E041:           .BYT 29,7F,46,98,4C,48,E5,AA ;filler
 $E049:           .BYT AA,AA                   ;filler
+
+;************** Reset Editor (Called from Jump Table)
+
+RESET_EDITOR
 L_E04B:
 $E04B: 20 0F E6  JSR  L_E60F
 $E04E: 20 7A E0  JSR  L_E07A
@@ -84,15 +98,38 @@ $E072: 85 C4     STA $C4
 $E074: BD 6E E7  LDA $E76E,X
 $E077: 85 C5     STA $C5
 $E079: 60        RTS
+
+;************** Set Screen to TEXT or GRAPHICS MODE
+;
+; TEXT/GRAPHICS mode determines which font is displayed.
+; - GRAPHICS mode has uppercase and full graphics. Characters take 8 scanlines
+; - TEXT mode has lower case, upper case and limited graphics. Characters take 10 scanlines (normally)
+
+;-------------- Initialize CRTC to TEXT Mode (Called from Jump Table)
+
 L_E07A:
 $E07A: A9 2A     LDA #$2A
 $E07C: A2 E7     LDX #$E7
 $E07E: A0 0E     LDY #$0E
 $E080: D0 06     BNE L_E088
+
+;-------------- Initialize CRTC to GRAPHICS Mode (Called from Jump Table)
+
 L_E082:
 $E082: A9 3C     LDA #$3C
 $E084: A2 E7     LDX #$E7
 $E086: A0 0C     LDY #$0C
+
+;************** Program CRTC chip for selected screen MODE (Called from Jump Table)
+;
+; The CRTC controller controls the parameters for generating the display on the monitor. The CRTC chip has
+; several registers that must be set properly according to the type of connected display. These set characters on the line,
+; left and right margins, lines on the screen, height of each line and positioning of the top of the screen.
+; The parameters are read from a table and written to the CRTC controller chip. The VIA chip is used to select which of the
+; two fonts from the CHARACTER ROM is used.
+;
+; Parameters: Table pointer in A/X, CHRSET in Y
+
 L_E088:
 $E088: 85 C7     STA $C7
 $E08A: 86 C8     STX $C8
@@ -110,6 +147,14 @@ $E0A0: 8D 81 E8  STA CRTCB ;CRTC Controller Data
 $E0A3: 88        DEY
 $E0A4: 10 F5     BPL L_E09B
 $E0A6: 60        RTS
+
+
+;************** Get a KEY from keyboard buffer (Called from Jump Table)
+; $E0A7 - FIXED ENTRY POINT!!!!!
+;
+; Reads a character from 'KEYD' then shifts remaining buffer characters
+; If there is NO key it will return $FF.
+
 L_E0A7:
 $E0A7: AC 6F 02  LDY KEYBUF ;Keyboard Input Buffer
 $E0AA: A2 00     LDX #$00
@@ -123,6 +168,14 @@ $E0B7: C6 9E     DEC $9E
 $E0B9: 98        TYA
 $E0BA: 58        CLI
 $E0BB: 60        RTS
+
+;************** Get Line
+;
+; The PET is usually in this routine, waiting for keypresses and printing them or acting on them.
+; This routine continually loops until a <CR> is pressed. When <CR> is pressed then the line
+; where the cursor is, is processed. If the <RUN> key is pressed then the string is stuffed into
+; the keyboard buffer (overwriting whatever might be there)
+
 L_E0BC:
 $E0BC: 20 8C E6  JSR  L_E68C
 L_E0BF:
@@ -141,6 +194,9 @@ $E0D3: 4C 88 E7  JMP  L_E788	;patch was $E0A7-Get chr from keyboard buffer
 L_E0D6:
 $E0D6: C9 83     CMP #$83
 $E0D8: D0 10     BNE L_E0EA
+
+;		--------------------------------------- Stuff the <RUN> string to the keyboard buffer
+
 $E0DA: 78        SEI
 $E0DB: A2 09     LDX #$09
 $E0DD: 86 9E     STX $9E
@@ -150,9 +206,18 @@ $E0E2: 9D 6E 02  STA $026E,X
 $E0E5: CA        DEX
 $E0E6: D0 F7     BNE L_E0DF
 $E0E8: F0 D5     BEQ L_E0BF
+
+
+;		--------------------------------------- Check for RETURN key
+
 L_E0EA:
 $E0EA: C9 0D     CMP #$0D
 $E0EC: D0 CE     BNE L_E0BC
+
+;*******************************************************************************************
+; Parse the line. When the <CR> key is pressed the line where the cursor lives is executed
+;*******************************************************************************************
+
 $E0EE: A4 D5     LDY $D5
 $E0F0: 84 AC     STY $AC
 L_E0F2:
@@ -176,14 +241,26 @@ $E10E: 85 C6     STA $C6
 $E110: C5 A1     CMP $A1
 $E112: 90 0D     BCC L_E121
 $E114: B0 2E     BCS L_E144
+
+;************** Input a Character (Called from Jump Table)
+;
+; $E116 - FIXED ENTRY POINT!!!!!
+
 L_E116:
 $E116: 98        TYA
 $E117: 48        PHA
 $E118: 8A        TXA
 $E119: 48        PHA
 $E11A: 6C E9 00  JMP ( $00E9)
+
+;************** Default Screen Vector
+
 $E11D: A5 AC     LDA $AC
 $E11F: F0 9E     BEQ L_E0BF
+
+
+;************** Screen Input
+
 L_E121:
 $E121: A4 C6     LDY $C6
 $E123: B1 C4     LDA ($C4),Y
@@ -231,6 +308,9 @@ $E165: D0 02     BNE L_E169
 $E167: A9 FF     LDA #$FF
 L_E169:
 $E169: 60        RTS
+
+
+;************** Check Quote Mode
 L_E16A:
 $E16A: C9 22     CMP #$22
 $E16C: D0 08     BNE L_E176
@@ -240,6 +320,9 @@ $E172: 85 CD     STA $CD
 $E174: A9 22     LDA #$22
 L_E176:
 $E176: 60        RTS
+
+;************** Put Character to Screen
+
 L_E177:
 $E177: 09 40     ORA #$40
 L_E179:
@@ -262,6 +345,9 @@ L_E192:
 $E192: 20 A3 E3  JSR  L_E3A3
 $E195: A4 E2     LDY $E2
 $E197: 84 C6     STY $C6
+
+;************** IRQ Completion
+
 L_E199:
 $E199: A9 00     LDA #$00
 $E19B: 85 E8     STA $E8
@@ -277,6 +363,10 @@ $E1A6: AA        TAX
 $E1A7: 68        PLA
 $E1A8: 58        CLI
 $E1A9: 60        RTS
+
+
+;************** Move Cursor to End of Previous Line
+
 L_E1AA:
 $E1AA: A4 D5     LDY $D5
 $E1AC: A6 E0     LDX $E0
@@ -291,6 +381,11 @@ L_E1BA:
 $E1BA: C6 D8     DEC $D8
 $E1BC: 84 C6     STY $C6
 $E1BE: 4C 67 E0  JMP  L_E067
+
+;************** Erase To End of Line
+;
+; Called from WINDOW_CLEAR
+
 L_E1C1:
 $E1C1: A9 20     LDA #$20
 L_E1C3:
@@ -299,21 +394,35 @@ $E1C4: 91 C4     STA ($C4),Y
 $E1C6: C4 D5     CPY $D5
 $E1C8: 90 F9     BCC L_E1C3
 $E1CA: 60        RTS
+
+
+;************** Move Cursor to Left Margin
 L_E1CB:
 $E1CB: A4 E2     LDY $E2
 $E1CD: 84 C6     STY $C6
 $E1CF: A0 00     LDY #$00
 $E1D1: 60        RTS
+
+;************** Set Full Screen (Exit Window)
+;
+; This routine is used to set the screen size parameters for the printing routines
+
 L_E1D2:
 $E1D2: A9 00     LDA #$00
 $E1D4: AA        TAX
 $E1D5: 20 E1 E1  JSR  L_E1E1
 $E1D8: A9 18     LDA #$18
 $E1DA: A2 4F     LDX #$4F
+
+
+;************** Set Bottom Right Corner of Window
 L_E1DC:
 $E1DC: 85 E1     STA $E1
 $E1DE: 86 D5     STX $D5
 $E1E0: 60        RTS
+
+
+;************** Set Top Left Corner of Window
 L_E1E1:
 $E1E1: 85 E0     STA $E0
 $E1E3: 86 E2     STX $E2
@@ -340,7 +449,11 @@ $E1FF: 4C BF E7  JMP  L_E7BF	; jump to
 
 ;================ end of OLD FILLER AREA
 
-;---------------- output to screen
+; ************ Output Character to Screen Dispatch (Called from Jump Table)
+;
+; $E202 - FIXED ENTRY POINT!!!!!
+; Some BASIC and KERNAL calls jump directly here rather than going through the jump table.
+
 L_E202:
 $E202: 48        PHA
 $E203: 85 D9     STA $D9
@@ -349,6 +462,10 @@ $E206: 48        PHA
 $E207: 98        TYA
 $E208: 48        PHA
 $E209: 6C EB 00  JMP ( $00EB)
+
+;************** Output Character to Screen
+; SCROV vector normally points here
+
 $E20C: A9 00     LDA #$00
 $E20E: 85 AC     STA $AC
 $E210: A4 C6     LDY $C6
@@ -361,6 +478,9 @@ L_E21D:
 $E21D: A5 D9     LDA $D9
 $E21F: 10 03     BPL L_E224
 $E221: 4C F4 E2  JMP  L_E2F4
+
+;************** Handle unshifted characters
+
 L_E224:
 $E224: C9 0D     CMP #$0D
 $E226: D0 03     BNE L_E22B
@@ -394,6 +514,11 @@ $E255: 91 C4     STA ($C4),Y
 $E257: C8        INY
 $E258: C4 D5     CPY $D5
 $E25A: D0 F5     BNE L_E251
+
+;-------------------------------------
+; Note: "80240.PRG" jumps here ($E25C)
+;-------------------------------------
+
 L_E25C:
 $E25C: A9 20     LDA #$20
 $E25E: 91 C4     STA ($C4),Y
@@ -474,6 +599,9 @@ L_E2E0:
 $E2E0: C9 15     CMP #$15
 $E2E2: F0 03     BEQ L_E2E7
 $E2E4: 4C 91 E5  JMP  L_E591
+
+;************** Delete Line
+
 L_E2E7:
 $E2E7: A5 E0     LDA $E0
 $E2E9: 48        PHA
@@ -481,6 +609,9 @@ $E2EA: A5 D8     LDA $D8
 $E2EC: 85 E0     STA $E0
 $E2EE: 20 E8 E3  JSR  L_E3E8
 $E2F1: 4C CA E5  JMP  L_E5CA
+
+;************** Character Output with High Bit SET
+
 L_E2F4:
 $E2F4: 29 7F     AND #$7F
 $E2F6: C9 7F     CMP #$7F
@@ -573,6 +704,9 @@ L_E38F:
 $E38F: C9 16     CMP #$16
 $E391: F0 03     BEQ L_E396
 $E393: 4C BC E5  JMP  L_E5BC
+
+;************** Erase to Start of Line
+
 L_E396:
 $E396: A9 20     LDA #$20
 $E398: A4 E2     LDY $E2
@@ -582,6 +716,9 @@ $E39C: B0 EE     BCS L_E38C
 $E39E: 91 C4     STA ($C4),Y
 $E3A0: C8        INY
 $E3A1: D0 F7     BNE L_E39A
+
+;************** Do Cursor DOWN, Go to next line
+
 L_E3A3:
 $E3A3: 46 A3     LSR $A3
 $E3A5: A6 D8     LDX $D8
@@ -592,16 +729,26 @@ $E3AE: 4C 67 E0  JMP  L_E067
 L_E3B1:
 $E3B1: E6 D8     INC $D8
 $E3B3: 4C 67 E0  JMP  L_E067
+
+;************** Do CARRIAGE RETURN
+
 L_E3B6:
 $E3B6: A4 E2     LDY $E2
 $E3B8: 84 C6     STY $C6
 $E3BA: 20 A3 E3  JSR  L_E3A3
+
+;************** Do ESCAPE
+; Cancels Insert, Reverse and Quote modes
+
 L_E3BD:
 $E3BD: A9 00     LDA #$00
 $E3BF: 85 DC     STA $DC
 $E3C1: 85 9F     STA $9F
 $E3C3: 85 CD     STA $CD
 $E3C5: 4C 99 E1  JMP  L_E199
+
+;************** Scroll Window DOWN (Called from Jump Table)
+
 L_E3C8:
 $E3C8: A6 E1     LDX $E1
 $E3CA: E8        INX
@@ -621,6 +768,9 @@ $E3E0: 91 C4     STA ($C4),Y
 $E3E2: C4 D5     CPY $D5
 $E3E4: 90 F7     BCC L_E3DD
 $E3E6: B0 E3     BCS L_E3CB
+
+;************** Scroll Window UP (Called from Jump Table)
+
 L_E3E8:
 $E3E8: A6 E0     LDX $E0
 $E3EA: CA        DEX
@@ -642,6 +792,9 @@ $E404: 90 F7     BCC L_E3FD
 $E406: B0 E3     BCS L_E3EB
 L_E408:
 $E408: 20 C1 E1  JSR  L_E1C1
+
+;************** Check Keyboard Scroll Control
+
 $E40B: AD 12 E8  LDA PIA1COL ;PIA#1 Keyboard Columns Read
 $E40E: C9 FE     CMP #$FE
 $E410: D0 0E     BNE L_E420
@@ -676,6 +829,11 @@ $E43A: D0 1C     BNE L_E458
 $E43C: A9 00     LDA #$00
 $E43E: 85 F8     STA $F8
 $E440: F0 EF     BEQ L_E431
+
+;************** Main IRQ Dispatcher (Called from Jump Table)
+; $E442 - FIXED ENTRY POINT!!!!!!!!!!!!
+; This entry point must not move! It is called directly from KERNAL
+
 L_E442:
 $E442: 48        PHA
 $E443: 8A        TXA
@@ -691,6 +849,7 @@ L_E452:
 $E452: 6C 90 00  JMP ( $0090) ;hardware interrupt vector LO
 L_E455:
 $E455: 4C 31 E4  JMP  L_E431
+
 L_E458:
 $E458: A5 A7     LDA $A7
 $E45A: D0 1E     BNE L_E47A
@@ -858,6 +1017,9 @@ $E56C: E8        INX
 $E56D: 86 9E     STX $9E
 L_E56F:
 $E56F: 60        RTS
+
+;************** Do TAB
+
 L_E570:
 $E570: A5 C6     LDA $C6
 $E572: 29 F8     AND #$F8
@@ -877,6 +1039,9 @@ $E58A: EE 3A 03  INC $033A
 $E58D: 4C 82 E5  JMP  L_E582
 L_E590:
 $E590: 60        RTS
+
+;************** More character code checking
+
 L_E591:
 $E591: C9 19     CMP #$19
 $E593: D0 06     BNE L_E59B
@@ -901,6 +1066,9 @@ $E5B3: C9 07     CMP #$07
 $E5B5: D0 F0     BNE L_E5A7
 $E5B7: 20 A7 E6  JSR  L_E6A7
 $E5BA: F0 EB     BEQ L_E5A7
+
+;************** Continue checking codes... 
+
 L_E5BC:
 $E5BC: C9 15     CMP #$15
 $E5BE: D0 12     BNE L_E5D2
@@ -914,6 +1082,9 @@ $E5CA: 68        PLA
 $E5CB: 85 E0     STA $E0
 $E5CD: 20 63 E0  JSR  L_E063
 $E5D0: D0 18     BNE L_E5EA
+
+;************** Handle additional Codes > 127
+
 L_E5D2:
 $E5D2: C9 19     CMP #$19
 $E5D4: D0 08     BNE L_E5DE
@@ -935,8 +1106,17 @@ $E5ED: C9 0E     CMP #$0E
 $E5EF: D0 C2     BNE L_E5B3
 $E5F1: 20 82 E0  JSR  L_E082
 $E5F4: 30 F4     BMI L_E5EA
+
+;--------------- Filler
+
 $E5F6:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler
 $E5FE:           .BYT AA,AA ;filler
+
+;************** End of IRQ (Called from Jump Table)
+; $E600 - FIXED ENTRY POINT!!!!!!!
+; This entry point must not move! It is called directly from KERNAL
+; Do not modify this routine!
+
 L_E600:
 $E600: 68        PLA
 $E601: A8        TAY
@@ -944,12 +1124,21 @@ $E602: 68        PLA
 $E603: AA        TAX
 $E604: 68        PLA
 $E605: 40        RTI
+
+;************** Restore Character at Cursor
+; This routine is called to put the character back at the cursor position.
+; It is called to put the initial character on the screen and as part of the
+; cursor blinking routine.
+
 L_E606:
 $E606: A4 C6     LDY $C6
 $E608: 91 C4     STA ($C4),Y
 $E60A: A9 02     LDA #$02
 $E60C: 85 A8     STA $A8
 $E60E: 60        RTS
+
+;************** Editor Initialization
+
 L_E60F:
 $E60F: A9 7F     LDA #$7F
 $E611: 8D 4E E8  STA VIA0E ;VIA Register E
@@ -961,6 +1150,9 @@ L_E61C:
 $E61C: 95 8D     STA $8D,X
 $E61E: CA        DEX
 $E61F: 10 FB     BPL L_E61C
+
+;-------------- Set IRQ Vector - Normally $E455
+
 $E621: A9 55     LDA #$55
 $E623: 85 90     STA $<INTVEC ;hardware interrupt vector LO
 $E625: A9 E4     LDA #$E4
@@ -991,6 +1183,9 @@ $E65F: 85 E6     STA $E6
 $E661: 85 E5     STA $E5
 $E663: 8D 4E E8  STA VIA0E ;VIA Register E
 $E666: 20 D2 E1  JSR  L_E1D2
+
+;************** Clear Tab Stops (80 bits)
+
 $E669: A2 0C     LDX #$0C
 $E66B: A9 00     LDA #$00
 L_E66D:
@@ -1009,6 +1204,9 @@ $E683: A9 10     LDA #$10
 $E685: 85 E7     STA $E7
 $E687: 20 A4 E6  JSR  L_E6A4
 $E68A: F0 18     BEQ L_E6A4
+
+;************** Character Out Margin Beep
+
 L_E68C:
 $E68C: 20 02 E2  JSR  L_E202
 $E68F: AA        TAX
@@ -1023,6 +1221,9 @@ $E69C: F0 06     BEQ L_E6A4
 $E69E: 29 7F     AND #$7F
 $E6A0: C9 20     CMP #$20
 $E6A2: 90 2C     BCC L_E6D0
+
+;************** Do BELL
+
 L_E6A4:
 $E6A4: 20 A7 E6  JSR  L_E6A7
 L_E6A7:

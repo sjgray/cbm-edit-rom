@@ -102,8 +102,11 @@ CRTCDAT  = $E881   ;CRTC Data
 
 * = $E000
 
-;----- EDIT ROM JUMP TABLE
+;************* Edit ROM Jump Table
 ;
+; Note: Not all KERNAL and BASIC calls go through this table.
+;       There are FIVE hard-coded entry points: $E0A7, $E116, $E202, $E442, $E600
+
 $E000: 4C 36 E0  JMP  L_E036 	; Main Initialization (called from Kernal power up reset $FD16) 
 $E003: 4C A7 E0  JMP  L_E0A7 	; Get Character From Keyboard Buffer
 $E006: 4C 16 E1  JMP  L_E116 	; Input From Screen or Keyboard
@@ -123,7 +126,9 @@ $E02D: 4C 98 E0  JMP  L_E098 	; Set REPEAT Flag   (Function Not supported)
 $E030: 4C 98 E0  JMP  L_E098 	; Set Window Top    (Function Not supported)
 $E033: 4C 98 E0  JMP  L_E098 	; Set Window Bottom (Function Not supported)
 
-;---------------- Main Initialization
+;************** Reset Editor (Called from Jump Table)
+
+RESET_EDITOR
 L_E036:
 $E036: 20 83 E6  JSR L_E683	; Initialize EDITOR
 $E039: 20 17 E6  JSR L_E617 	; Initialize CRTC to GRAPHICS mode
@@ -194,7 +199,7 @@ $E096: 85 C6     STA PNTR   	; Cursor Column on Current Line
 L_E098:
 $E098: 60        RTS
 
-;---------------------------------------------------------------------
+;--------------- Filler
 
 $E099:           .BYT AA,AA,AA,AA,AA,AA,AA,AA	;filler
 $E0A1:           .BYT AA,AA,AA,AA,AA,AA 	;filler
