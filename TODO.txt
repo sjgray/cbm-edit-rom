@@ -41,3 +41,7 @@ PET/CBM EDIT ROM PROJECT - TODO List
 NOTE: If you are running ColourPET under VICE, please update to the latest experimental release!
       Colour RAM has been relocated to $8800 and hardware will be updated so that 40/80 columns
       can be supported with fixed colour ram locations
+
+Bugs:
+- STOP key doesn't work when listing or running programs using modified key layout.
+  Investigate: KERNAL_STOP at $F335 (seems to check for $EF as last keystroke)

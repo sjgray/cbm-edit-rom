@@ -106,7 +106,7 @@ Be4a7		STA VIA_Port_B
 
 Be4aa		JSR SCAN_KEYBOARD			; Scan the keyboard
 
-!if REBOOT=1 {  JSR CheckReboot }			; Check for soft reset
+!if REBOOT=1 {  JSR CheckReboot }			; Check for soft reset ******* should this go above Be474?????????????????
 
 		JMP IRQ_END				; Return from Interrupt
 
