@@ -20,8 +20,8 @@ OLD_SCAN_KEYBOARD
            BCS Be4dd
            STA KEYD,X
            INC ReverseFlag-1
-Be4dd      CMP #3 				; <STOP>
+Be4dd      CMP #3 				; <STOP> key from keyboard table
            BNE Be4e5
-           LDA #$ef
+           LDA #$ef				; STOP flag for BASIC/Kernal?
            STA STKEY
 Be4e5      RTS
