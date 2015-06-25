@@ -157,4 +157,11 @@ SCAN_NORM2	LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 		INX			; Increment character count
 		STX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 
+!if KEYBOARD != 1 {
+;		Compensate for STOP key not in standard position
+		CMP #3			; Is keycode "3" (STOP key)?
+		BNE SCAN_OUT
+		LDA #$EF		; fool kernal into thinking STOP is pressed
+		STA STKEY		; store it
+}
 SCAN_OUT	RTS
