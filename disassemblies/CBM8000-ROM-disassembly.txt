@@ -8499,11 +8499,15 @@
 
 
 ; -	-stop-
+; This routine checks $9B for a specific value ($EF) which indicates the STOP key is down. The problem
+; here is this is totally POSITION dependent, rather than the actual code assignment of the key!
+; This means we can't move the STOP key, or we have to fudge the scan (as is done for DIN layout where CLR/HOME is in
+; this position!
 
- F335	iF335	LDA $9B		; Flag: STOP key / RVS key
- F337		CMP #$EF
- F339		BNE $F342
- F33B		PHP
+ F335	iF335	LDA $9B		; Flag: STOP key / RVS key (raw bits from row scan at $F7A1)
+ F337		CMP #$EF	; this value indicates the STOP key is pressed
+ F339		BNE $F342	; no, skip
+ F33B		PHP		; yes...
  F33C		JSR $F2A6	; clrchn	Restore Default I/O
  F33F		STA $9E		; No. of Chars. in Keyboard Buffer (Queue)
  F341		PLP
@@ -9101,10 +9105,13 @@
  F79B	iF79B	LDA #$00
  F79D		STA $99		; Jiffy clock correction: 623rd 1/60 sec does not increment time
  F79F		STA $9A
- F7A1	iF7A1	LDA $E812
- F7A4		CMP $E812
- F7A7		BNE $F7A1
- F7A9		STA $9B		; Flag: STOP key / RVS key
+
+; scan the keyboard currently selected ROW. The CHECKSTOP routine at $F335 checks $9B for #$EF
+
+ F7A1	iF7A1	LDA $E812	; KEYBOARD ROW (does not set row here! must be in IRQ)
+ F7A4		CMP $E812	; Read ROW again (debounce)
+ F7A7		BNE $F7A1	; loop back if different
+ F7A9		STA $9B		; Flag: STOP key / RVS key - this is the raw bits returned from the ROW scan
  F7AB	iF7AB	RTS
 
 
