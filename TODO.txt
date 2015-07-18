@@ -45,3 +45,19 @@ NOTE: If you are running ColourPET under VICE, please update to the latest exper
 Bugs:
 - STOP key doesn't work when listing or running programs using modified key layout.
   Investigate: KERNAL_STOP at $F335 (seems to check for $EF as last keystroke)
+
+
+Future:
+- Ideas for ColourPET+G board
+	- Font support replaces the 4 background bits with 4 character set selection bits (16 posible sets)
+	- Support for bold, italic, underline, Double-high, double-wide, double-high+wide text using fonts
+	- Plan for 16 font sets:
+		- Normal (non-rotated), bold, italic, underline = 4 fonts
+		- Rotated = 3 (90/180/270 degrees)
+		- Double-high = 2 fonts
+		- Double-wide = 2 fonts
+		- Double-both = 4 fonts
+	- To print a "double" size font we print the same character side-by-side or one above the other
+	  but each character is a different font
+	- do we want to support this in the editor?????
+
