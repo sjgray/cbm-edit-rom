@@ -1019,8 +1019,12 @@ Be5b3		CMP #7 				; <CTRL> G = $07 = 07 = Ring Bell
 ;************** Continue checking codes... 
 
 ProcControl_A
-		CMP #$15 			; <CTRL> SHIFT-U = Insert Line						
+!IF COLOURPET=0 {
+		CMP #$15 			; <CTRL> SHIFT-U = Insert Line	- CONFLICT with colour code = DK YELLOW					
 		BNE ProcControl_C		; @@@@@@ Was: BNE ProcControl_B
+} ELSE {
+		JMP ProcControl_C
+}
 
 ESCAPE_I					; ESC-I = Insert Line
 		LDA TopMargin
