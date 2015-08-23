@@ -790,7 +790,7 @@ Be37c		CMP #9 					; <Shift TAB>
 Be38c		JMP IRQ_EPILOG
 
 Be38f		CMP #$16 				; <Shift Ctrl-V> Erase to beginning of line CONFLICTS with COLOURPET!
-!IF COLOURPET=1 {
+!IF COLOURPET=0 {
 		BEQ ERASE_TO_SOL			
 }
 		JMP ProcControl_A
