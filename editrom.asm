@@ -661,8 +661,12 @@ Be2c5		LDA TABS_SET,X				; Get TAB from table
 		JMP Me072
 }
 
+;************** Check for Erase to End of line
+
 Be2d0		CMP #$16 				; <Ctrl V> : Erase to EOL
 		BNE Be2e0
+
+;************** Erase to End of Line
 		LDA #$20				; <SPACE>
 		DEY
 
@@ -676,6 +680,9 @@ Be2d7		INY
 		BCC Be2d7
 
 		BCS Be299
+
+;************** Check for Delete Line
+
 Be2e0		CMP #$15				; <Ctrl U> - DELETE LINE
 		BEQ DELETE_LINE
 		JMP Scroll_Or_Select_Charset
@@ -1087,10 +1094,13 @@ IRQ_END		PLA
 ; This routine is called to put the character back at the cursor position.
 ; It is called to put the initial character on the screen and as part of the
 ; cursor blinking routine.
+;
+; TODO: Handle ColourPET! This routine causes existing text attribute to be changed to current
+; ----  colour. IE: moving cursor around the screen corrupts existing attribute
 
 Restore_Char_at_Cursor
 		LDY CursorCol			; Cursor Column on Current Line		
-		STA (ScrPtr),Y			; Pointer: Current Screen Line Address
+		STA (ScrPtr),Y			; Put the character on the screen!!!!!!!!!!!!!!!!!!!!! 
 !if COLOURPET=1 {
 ;		LDY CursorCol			; Cursor Column on Current Line
 		LDA COLOURV			; Get current Colour
