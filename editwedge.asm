@@ -54,11 +54,19 @@ install_wedge
 ;-------------- MESSAGE
 
 WEDGESTRING
+; Always start with erasing the SYS and READY message
+
+		!byte $91			; <UP>
+		!text "            "		; erase "SYS" message
+		!byte $0D			; <CR>
+		!text "            "		; erase "READY" message
+		!byte $0D			; <CR>
 
 ; Custom ColourPET message courtesy Christian Dirk - For GRAPHICS MODE startup screen
 !if WEDGEMSG=3 {				
          	!byte $13            		; <HOME> 
-         	!byte $1d,$1d,$1d,$1d
+         	!byte $99            		; <GRN>
+         	!pet "*** "
          	!byte $1c            		; <RED>
          	!pet "co"
          	!byte $99            		; <GRN>
@@ -68,11 +76,9 @@ WEDGESTRING
          	!byte $9e            		; <YEL>
          	!pet "pet"
          	!byte $99            		; <GRN>
-         	!byte $0D,$0D,$0D,$0D           ; <CR>
-         	!text "*** WEDGE ACTIVE ***"    ; message
-         	!byte $0D            		; <CR>
-         	!text "            "        	; erase "READY"
-         	!byte $0D            		; <CR>
+         	!pet " basic 4.0 + wedge ***"   ; message
+         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+
 }
 
 ; Custom ColourPET message for TEXT MODE startup screen
@@ -92,7 +98,7 @@ WEDGESTRING
 		!byte $5			; <WHT>
 		!pet " ***"
 		!byte 11,11
-		!byte $d,0			; <cr>
+		!byte $d			; <cr>
 }
 
 ; Wedge-only activation message		
@@ -106,15 +112,11 @@ WEDGESTRING
 
 ; No message. Erase the SYS and READY prompts.
 !if WEDGEMSG=0 {
-		!byte $91			; <UP>
-		!text "            "		; erase "SYS" message
-		!byte $0D			; <CR>
-		!text "            "		; erase "READY" message
-		!byte $0D			; <CR>
-		!byte $91,$91			; <UP><UP>
-		!byte $91,$91			; <UP><UP>
+		!byte $91,$91,$91,$91		; <UP><UP><UP><UP>
 }
-		!byte 0
+
+		!byte 0				; end of text marker
+		!byte 0				; extra 0 padding
 
 ;-------------- Keyboard Stuffer
 
