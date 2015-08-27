@@ -463,25 +463,21 @@ ESCAPE_X
 
 ESCAPE_N						; ESC-N = Screen Normal
 		JSR CRTPREP
-		LDA CRT_Status				; Read the Value
 		ORA #%00010000				; Set BIT 4
 		JMP CRTUPDATE
 
 ESCAPE_R						; ESC-R = Screen Reverse
 		JSR CRTPREP
-		LDA CRT_Status				; Read the Value
 		AND #%11101111				; Clear BIT 4
 		JMP CRTUPDATE
 
 ESCAPE_Y						; ESC-Y = Normal Chr Set    (B-series). Was: Set Default Tabs (C128)
 		JSR CRTPREP
-		LDA CRT_Status				; Read the Value
 		AND #%11011111				; Clear BIT 5
 		JMP CRTUPDATE
 				
 ESCAPE_Z						; ESC-Z = Alternate Chr Set (B-Series). Was: Clear All Tabs (C128)
 		JSR CRTPREP
-		LDA CRT_Status				; Read the Value
 		ORA #%00100000				; Set BIT 5
 CRTUPDATE
 		STA CRT_Status				; Write the Value to previously selected register
@@ -491,4 +487,5 @@ CRTUPDATE
 CRTPREP		SEI
 		LDA #12					; CRTC Register#12 - Display Address HI
 		STA CRT_Address				; Select the Register 
+		LDA CRT_Status				; Read the Value
 		RTS
