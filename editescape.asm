@@ -460,25 +460,45 @@ ESCAPE_X
 ; CRTC controller REGISTER 12 is used for Screen RAM Address HI
 ; BIT 4 controls the INVERT line     (normal=1,rvs=0)
 ; BIT 5 controls the CHR OPTION line (normal=0,alternate=1)
+;
+; NOTE: Only the MOTOROLA 6845 CRTC chip can READ register 12!
+; If MOT6845=0 then Register 12 is simply set (default for compatibility with most PET machines!)
+; If MOT6845=1 then Register 12 is read and then manipulated.
 
 ESCAPE_N						; ESC-N = Screen Normal
 		JSR CRTPREP
+	!if MOT6845=1 {
 		ORA #%00010000				; Set BIT 4
+	} else {
+		LDA #16					; Normal screen, Normal chr set
+	}
 		JMP CRTUPDATE
 
 ESCAPE_R						; ESC-R = Screen Reverse
 		JSR CRTPREP
+	!if MOT6845=1 {
 		AND #%11101111				; Clear BIT 4
+	} else {
+		LDA #0					; Reverse screen, Normal chr set
+	}
 		JMP CRTUPDATE
 
 ESCAPE_Y						; ESC-Y = Normal Chr Set    (B-series). Was: Set Default Tabs (C128)
 		JSR CRTPREP
+	!if MOT6845=1 {
 		AND #%11011111				; Clear BIT 5
+	} else {
+		LDA #16					; Normal screen, Normal chr set
+	}
 		JMP CRTUPDATE
 				
 ESCAPE_Z						; ESC-Z = Alternate Chr Set (B-Series). Was: Clear All Tabs (C128)
 		JSR CRTPREP
+	!if MOT6845=1 {
 		ORA #%00100000				; Set BIT 5
+	} else {
+		LDA #48					; Normal screen, Alternate chr set
+	}
 CRTUPDATE
 		STA CRT_Status				; Write the Value to previously selected register
 		CLI					; Enable Interrupts
@@ -487,5 +507,5 @@ CRTUPDATE
 CRTPREP		SEI
 		LDA #12					; CRTC Register#12 - Display Address HI
 		STA CRT_Address				; Select the Register 
-		LDA CRT_Status				; Read the Value
+		LDA CRT_Status				; Read the Value (if CRTC chip is NOT a Motorola6845 then this will not work)
 		RTS

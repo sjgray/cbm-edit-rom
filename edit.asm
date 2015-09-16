@@ -25,6 +25,7 @@ SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes
 BOOTCASE  = 1	; Initial Screen Mode		0=Text, 1=Graphics
 REFRESH   = 3	; Screen refresh:		0=Euro,1=NA,2=PAL,3=NTSC
 
+MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility
 HERTZ     = 50	; Line Frequency (Clock):	50=Euro.			50=Euro, 60=NorthAmerica
 
 COLOURPET = 1	; ColourPET additions?		0=No, 1=Yes
