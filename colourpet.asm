@@ -14,7 +14,10 @@
 ; ANALOG VERSION (future development):
 ; --------------
 ; Supports 256 colours
-; The 8 bits are arranged like: RRRGGGBB  (8 levels for RED, 8 for GREEN, and 4 for BLUE)
+; The 8 bits arrangment is to be determined:
+;	Option 1: RRRGGGBB  (8 levels for RED, 8 for GREEN, and 4 for BLUE. May result in unbalanced colours)
+;	Option 2: RRGGBBII  (4 levels for RED/GREEN/BLUE (64 colours), then 4 intensity levels for that colour)
+;
 ; The foreground colour is definable as above
 ; The background colour is selectable for the entire screen using a register (to be determined)
 ; The border colour is set via a register (to be determined)
