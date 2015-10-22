@@ -294,14 +294,14 @@ prepare_fn
 
 ;-------------- DIRECTORY
 
+		lda #0
+		sta STATUS
 		lda #$60			; DATA SA 0
 		sta SA
 		jsr OPENI			; open file
 		jsr TALK
 		lda SA
 		jsr SECND
-		lda #0
-		sta STATUS
 
 		ldy #3
 list_blocks
