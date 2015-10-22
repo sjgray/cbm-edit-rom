@@ -103,7 +103,7 @@ WEDGESTRING
 
 ; Wedge-only activation message		
 !if WEDGEMSG=1 {
-		!byte $91,$91			; <UP><UP>
+		!byte $91,$91,$91		; <UP><UP><UP>
 		!text "WEDGE ACTIVE"		; message
 		!byte $0D			; <CR>
 		!text "            "		; erase "READY"
