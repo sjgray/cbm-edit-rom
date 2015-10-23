@@ -103,7 +103,7 @@ WEDGESTRING
 
 ; Wedge-only activation message		
 !if WEDGEMSG=1 {
-		!byte $91,$91			; <UP><UP>
+		!byte $91,$91,$91		; <UP><UP><UP>
 		!text "WEDGE ACTIVE"		; message
 		!byte $0D			; <CR>
 		!text "            "		; erase "READY"
@@ -294,14 +294,14 @@ prepare_fn
 
 ;-------------- DIRECTORY
 
+		lda #0
+		sta STATUS
 		lda #$60			; DATA SA 0
 		sta SA
 		jsr OPENI			; open file
 		jsr TALK
 		lda SA
 		jsr SECND
-		lda #0
-		sta STATUS
 
 		ldy #3
 list_blocks
