@@ -13,7 +13,7 @@
 ; (1024 characters, with 1000 visible). So, the table initially contains $80 to $83. Note that the HIGH BIT
 ; of each entry is SET. This bit is the "line link flag" for the line.
 ; If SET the line is NOT linked, and if CLEARED the line IS linked.
-; When a character is printed to the 40th (last) character of the line, the line is linked (to the previous line).
+; When a character is printed to the 40th (last) character of the line, the line is linked (to the next line).
 ;
 ;--------------- ZERO PAGE STORAGE
 
