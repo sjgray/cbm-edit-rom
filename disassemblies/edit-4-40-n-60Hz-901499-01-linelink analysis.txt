@@ -65,7 +65,11 @@ DATAX  = $00D9   ;Current Character to Print
 FNADR  = $00DA   ;Pointer: Current File Name
 INSRT  = $00DC   ;Flag: Insert Mode
 MYCH   = $00DF   ;Serial Word Buffer
-LDTB1  = $00E0   ;Screen Line Link Table ($E0-$F8)
+LDTB1  = $00E0   ;Screen Line Link Table ($E0-$F8) @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		 ;This table is NOT used for 80 column machines since they do not support line    @@@@@@@
+		 ;linking. In fact, these locations are re-assigned for new 80-column features.   @@@@@@@
+		 ;So, if we want to add line linking to 80-col machines we need to use a new area @@@@@@@
+		 ;of memory @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 CAS1   = $00F9   ;Tape Motor Interlock #1
 CAS2   = $00FA   ;Tape Motor Interlock #2
@@ -142,7 +146,7 @@ $E044: A9 C0     LDA #$C0	; $83C0 = Address of first character on last line of s
 $E046: A0 83     LDY #$83	;
 
 L_E048:
-$E048: 94 E0     STY LDTB1,X	; Screen Line Link Table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E048: 94 E0     STY LDTB1,X	; Screen Line Link Table. Save HI byte of screen address to table@@@@@@@@@
 $E04A: 38        SEC		; @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E04B: E9 28     SBC #$28	; Subtract 40 characters (one physical line) @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E04D: B0 01     BCS L_E050	; did we move past page? No, skip DEY @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -176,18 +180,18 @@ $E06F: 84 D8     STY TBLX   	; Current Cursor Physical Line Number
 L_E071:
 $E071: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E073: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@
-$E075: 09 80     ORA #$80	; @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E077: 85 C5     STA PNT+1	
-$E079: BD 98 E7  LDA $E798,X
-$E07C: 85 C4     STA PNT    	; Pointer: Current Screen Line Address LO
-$E07E: A9 27     LDA #$27
-$E080: 85 D5     STA LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E082: E0 18     CPX #$18	; Line 24? (0-24)
+$E075: 09 80     ORA #$80	; Make sure HIGH bit is set @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E077: 85 C5     STA PNT+1	; Store in Current Screen Line Address HI @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E079: BD 98 E7  LDA $E798,X	; get the LO byte from table in ROM @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E07C: 85 C4     STA PNT    	; Pointer: Current Screen Line Address LO @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E07E: A9 27     LDA #$27       ; 40 characters/line minus 1 = 39 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E080: 85 D5     STA LNMX   	; Set Physical Screen Line Length =40 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E082: E0 18     CPX #$18	; Line 24? (0-24) last line cannot be linked @@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E084: F0 08     BEQ L_E08E
-$E086: B5 E1     LDA LDTB1+1,X 	; Screen line link table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E088: 30 04     BMI L_E08E
-$E08A: A9 4F     LDA #$4F	; @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E08C: 85 D5     STA LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E086: B5 E1     LDA LDTB1+1,X 	; check next line in screen line link table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E088: 30 04     BMI L_E08E     ; is HIGH bit set? (negative value) Yes, so NO linked line @@@@@@@@@@@@@@
+$E08A: A9 4F     LDA #$4F	; No, then line is linked. 79 = two screen lines @@@@@@@@@@@@@@@@@@@@@@@@
+$E08C: 85 D5     STA LNMX   	; Store in Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 L_E08E:
 $E08E: A5 C6     LDA PNTR   	; Cursor Column on Current Line
 $E090: C9 28     CMP #$28
@@ -530,7 +534,7 @@ $E250: C8        INY
 $E251: C4 D5     CPY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E253: D0 F5     BNE L_E24A
 L_E255:
-$E255: A9 20     LDA #$20	; SPACE>
+$E255: A9 20     LDA #$20	; <SPACE>
 $E257: 91 C4     STA (PNT),Y	; Pointer: Current Screen Line Address
 $E259: D0 29     BNE L_E284
 L_E25B:
