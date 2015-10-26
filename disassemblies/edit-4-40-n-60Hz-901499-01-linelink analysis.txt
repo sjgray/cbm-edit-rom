@@ -5,6 +5,16 @@
 ; Started May 27/2015 SJG
 ; Marked with '@@@@@@@@@@' characters
 ;
+; How Line Linking works:
+;
+; There is a TABLE in zero page at $00E0-00F8. One byte for each screen line (25 lines). When the screen is
+; cleared this table is initialized with the HI byte of each line on the screen's start address (first
+; character of the line). The LO byte of this address is stored in ROM at $E798. The screen is at $8000-83FF
+; (1024 characters, with 1000 visible). So, the table initially contains $80 to $83. Note that the HIGH BIT
+; of each entry is SET. This bit is the "line link flag" for the line.
+; If SET the line is NOT linked, and if CLEARED the line IS linked.
+; When a character is PRINTED to the 40th (last) character of the line, the Line Link byte
+;
 ;--------------- ZERO PAGE STORAGE
 
 USRADD = $0001   ;USR Address Low Byte / High Byte
@@ -123,7 +133,7 @@ $E018: 4C 0F E6  JMP  L_E60F 	; Initialize CRTC to TEXT mode
 $E01B: 4C 17 E6  JMP  L_E617 	; Initialize CRTC to GRAPHICS mode
 $E01E: 4C 1D E6  JMP  L_E61D 	; Initialize CRTC (table ptr in A/X, chr set in Y)
 $E021: 4C EA E6  JMP  L_E6EA 	; Scroll Down
-$E024: 4C D1 E3  JMP  L_E3D1 	; Scroll Screen
+$E024: 4C D1 E3  JMP  L_E3D1 	; Scroll Screen Up
 $E027: 4C BF E4  JMP  L_E4BF 	; Scan Keyboard
 $E02A: 4C 57 E6  JMP  L_E657 	; Ring BELL
 $E02D: 4C 98 E0  JMP  L_E098 	; Set REPEAT Flag   (Function Not supported)
@@ -161,6 +171,7 @@ $E056: 86 9F     STX RVS    	; Flag: Print Reverse Chars. -1=Yes
 $E058: 86 C4     STX PNT    	; Pointer: Current Screen Line Address LO
 
 ;--------------- Clear the screen (write all spaces)
+; Note: this clears ALL screen RAM, including the 24 non-visible locations at the end.
 
 $E05A: A9 20     LDA #$20	; <SPACE>
 L_E05C:
@@ -171,12 +182,13 @@ $E065: 9D 00 83  STA SCREEN4,X	; Screen RAM page 4
 $E068: E8        INX		; next character
 $E069: D0 F1     BNE L_E05C	; loop back for more
 
-;--------------- Cursor to start of line
+;--------------- Home the Cursor
 L_E06B:
-$E06B: A0 00     LDY #$00
+$E06B: A0 00     LDY #$00	; ROW=0, COL=0
 $E06D: 84 C6     STY PNTR   	; Cursor Column on Current Line
 $E06F: 84 D8     STY TBLX   	; Current Cursor Physical Line Number
 
+;---------------  Cursor to start of line
 L_E071:
 $E071: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E073: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@
@@ -194,9 +206,9 @@ $E08A: A9 4F     LDA #$4F	; No, then line is linked. 79 = two screen lines @@@@@
 $E08C: 85 D5     STA LNMX   	; Store in Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 L_E08E:
 $E08E: A5 C6     LDA PNTR   	; Cursor Column on Current Line
-$E090: C9 28     CMP #$28
-$E092: 90 04     BCC L_E098
-$E094: E9 28     SBC #$28
+$E090: C9 28     CMP #$28	; Is it greater than 40?
+$E092: 90 04     BCC L_E098	; No, skip
+$E094: E9 28     SBC #$28	; Yes, subtract 40
 $E096: 85 C6     STA PNTR   	; Cursor Column on Current Line
 
 ;--------------- Unsupported Functions Jump Here
@@ -282,7 +294,7 @@ $E0F9: D0 F7     BNE L_E0F2	; loop back for more
 L_E0FB:
 $E0FB: C8        INY		; last checked was not space so move one forward
 $E0FC: 84 A1     STY INDX	; Pointer: End of Logical Line for INPUT
-$E0FE: A0 00     LDY #$00
+$E0FE: A0 00     LDY #$00	; COL=0, QUOTEMODE=0
 $E100: 84 C6     STY PNTR   	; Cursor Column on Current Line
 $E102: 84 CD     STY QTSW   	; Flag: Editor in Quote Mode
 $E104: A5 A3     LDA LXSP   	; Cursor Y-X Pos. at Start of INPUT
@@ -301,20 +313,20 @@ $E116: 98        TYA
 $E117: 48        PHA
 $E118: 8A        TXA
 $E119: 48        PHA
-$E11A: A5 AC     LDA CRSW   	;Flag: INPUT or GET from Keyboard
+$E11A: A5 AC     LDA CRSW   	; Flag: INPUT or GET from Keyboard
 $E11C: F0 A1     BEQ L_E0BF
 L_E11E:
-$E11E: A4 C6     LDY PNTR	;Cursor Column on Current Line
-$E120: B1 C4     LDA (PNT),Y	;Pointer: Current Screen Line Address
-$E122: 85 D9     STA DATAX	;Current Character to Print
+$E11E: A4 C6     LDY PNTR	; Cursor Column on Current Line
+$E120: B1 C4     LDA (PNT),Y	; Pointer: Current Screen Line Address
+$E122: 85 D9     STA DATAX	; Current Character to Print
 $E124: 29 3F     AND #$3F
-$E126: 06 D9     ASL DATAX	;Current Character to Print
-$E128: 24 D9     BIT DATAX	;Current Character to Print
+$E126: 06 D9     ASL DATAX	; Current Character to Print
+$E128: 24 D9     BIT DATAX	; Current Character to Print
 $E12A: 10 02     BPL L_E12E
 $E12C: 09 80     ORA #$80
 L_E12E:
 $E12E: 90 04     BCC L_E134
-$E130: A6 CD     LDX QTSW	;Flag: Editor in Quote Mode
+$E130: A6 CD     LDX QTSW	; Flag: Editor in Quote Mode
 $E132: D0 04     BNE L_E138
 L_E134:
 $E134: 70 02     BVS L_E138
@@ -385,9 +397,9 @@ $E187: A4 D5     LDY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@
 $E189: C4 C6     CPY PNTR   	; Cursor Column on Current Line
 $E18B: B0 19     BCS L_E1A6
 $E18D: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
-$E18F: C0 4F     CPY #$4F
+$E18F: C0 4F     CPY #$4F	; 79=maximum line length (2 physical lines) minus 1
 $E191: D0 0C     BNE L_E19F
-$E193: 20 B3 E1  JSR L_E1B3
+$E193: 20 B3 E1  JSR L_E1B3	; Set 80-column line indicator
 $E196: 20 A9 E3  JSR L_E3A9
 $E199: A9 00     LDA #$00	; First character on line
 $E19B: 85 C6     STA PNTR   	; Cursor Column on Current Line
@@ -416,11 +428,11 @@ $E1B2: 60        RTS
 ; X hold physical line#
 
 L_E1B3:
-$E1B3: E0 17     CPX #$17	; Are we at end of the line - offset 39 ?
+$E1B3: E0 17     CPX #$17	; Are we at end of the line - offset 39 ? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E1B5: B0 06     BCS L_E1BD	; No, skip out
 $E1B7: B5 E2     LDA LDTB1+2,X	; Yes, link the next line to this one @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E1B9: 09 80     ORA #$80	; set the upper bit
-$E1BB: 95 E2     STA LDTB1+2,X	; set line link @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E1B9: 09 80     ORA #$80	; Link the line by SETTING the upper bit @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E1BB: 95 E2     STA LDTB1+2,X	; Store to line link table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 L_E1BD:
 $E1BD: 60        RTS
 
@@ -432,7 +444,7 @@ $E1C1: 4C A6 E1  JMP L_E1A6	; finish up?
 
 ;--------------- SUB
 L_E1C4:
-$E1C4: 20 D1 E3  JSR L_E3D1
+$E1C4: 20 D1 E3  JSR L_E3D1	; Scroll Screen Up
 $E1C7: C6 A3     DEC LXSP   	; Cursor Y-X Pos. at Start of INPUT
 $E1C9: C6 D8     DEC TBLX   	; Current Cursor Physical Line Number
 $E1CB: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
@@ -444,7 +456,7 @@ $E1CF: 56 E1     LSR LDTB1+1,X 	;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E1D1: 20 B3 E1  JSR L_E1B3	; set line link
 $E1D4: A5 C6     LDA PNTR   	; Cursor Column on Current Line
 $E1D6: 48        PHA
-$E1D7: 20 71 E0  JSR L_E071
+$E1D7: 20 71 E0  JSR L_E071	; Cursor to start of line
 $E1DA: 68        PLA
 $E1DB: 85 C6     STA PNTR   	; Cursor Column on Current Line
 $E1DD: 60        RTS
@@ -679,13 +691,13 @@ $E336: F0 3B     BEQ L_E373
 $E338: B5 DF     LDA MYCH,X	; Serial Word Buffer
 $E33A: 10 07     BPL L_E343
 $E33C: C6 D8     DEC TBLX   	; Current Cursor Physical Line Number
-$E33E: 20 71 E0  JSR L_E071
+$E33E: 20 71 E0  JSR L_E071	; Cursor to start of line
 $E341: 90 30     BCC L_E373
 L_E343:
 $E343: CA        DEX
 $E344: CA        DEX
 $E345: 86 D8     STX TBLX   	; Current Cursor Physical Line Number
-$E347: 20 71 E0  JSR L_E071
+$E347: 20 71 E0  JSR L_E071	; Cursor to start of line
 $E34A: A5 C6     LDA PNTR   	; Cursor Column on Current Line
 $E34C: 18        CLC
 $E34D: 69 28     ADC #$28
@@ -744,20 +756,22 @@ $E3A0: 4D EF 03  EOR TABS   	; Table of 80 bits to set TABs (80col)
 $E3A3: 9D F0 03  STA $03F0,X
 $E3A6: 4C A6 E1  JMP L_E1A6
 
+;--------------- Cursor DOWN?
 L_E3A9:
 $E3A9: 38        SEC
 $E3AA: 46 A3     LSR LXSP   	; Cursor Y-X Pos. at Start of INPUT
 $E3AC: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
 L_E3AE:
+				;[LOOP
 $E3AE: E8        INX
 $E3AF: E0 19     CPX #$19	; Last line of screen?
 $E3B1: D0 03     BNE L_E3B6
-$E3B3: 20 D1 E3  JSR L_E3D1
+$E3B3: 20 D1 E3  JSR L_E3D1	; Scroll Screen Up
 L_E3B6:
 $E3B6: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E3B8: 10 F4     BPL L_E3AE
+$E3B8: 10 F4     BPL L_E3AE	; is HI bit CLEAR? Yes then LOOP]
 $E3BA: 86 D8     STX TBLX   	; Current Cursor Physical Line Number
-$E3BC: 4C 71 E0  JMP L_E071
+$E3BC: 4C 71 E0  JMP L_E071	; Cursor to start of line
 
 L_E3BF:
 $E3BF: 20 A9 E3  JSR L_E3A9
@@ -780,7 +794,7 @@ $E3D3: 86 D8     STX TBLX   	; Current Cursor Physical Line Number
 L_E3D5:				; Loop[
 $E3D5: A2 FF     LDX #$FF
 L_E3D7:
-$E3D7: E8        INX		; Loop[
+$E3D7: E8        INX		; Loop[[
 $E3D8: BD 98 E7  LDA $E798,X	; Screen line address table
 $E3DB: 85 C4     STA PNT    	; Pointer: Current Screen Line Address LO
 $E3DD: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -1274,22 +1288,23 @@ $E6ED: E0 18     CPX #$18
 $E6EF: F0 33     BEQ L_E724
 $E6F1: 90 03     BCC L_E6F6
 $E6F3: 4C C4 E1  JMP L_E1C4
+
 L_E6F6:
 $E6F6: A2 17     LDX #$17	; 24 screen lines
 
 L_E6F8:				; Loop[
 $E6F8: B5 E1     LDA LDTB1+1,X	; Line link table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E6FA: 09 80     ORA #$80
+$E6FA: 09 80     ORA #$80	; SET HI bit = line not linked @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E6FC: 85 C8     STA SAL+1
 $E6FE: B4 E0     LDY LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E700: 30 02     BMI L_E704
-$E702: 29 7F     AND #$7F
+$E700: 30 02     BMI L_E704	; is HI bit SET? Yes, skip ahead
+$E702: 29 7F     AND #$7F	; No, CLEAR HI bit
 L_E704:
-$E704: 95 E1     STA LDTB1+1 ,X ; Line link table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E704: 95 E1     STA LDTB1+1 ,X ; Store it back to Line link table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E706: 98        TYA
-$E707: 09 80     ORA #$80
-$E709: 85 C5     STA PNT+1
-$E70B: A0 27     LDY #$27
+$E707: 09 80     ORA #$80	; SET HI bit
+$E709: 85 C5     STA PNT+1	; Store to screen line pointer
+$E70B: A0 27     LDY #$27	; 40 characters per line minus 1 (0-39)
 $E70D: BD 99 E7  LDA $E799,X	; Screen line address table
 $E710: 85 C7     STA SAL    	; Pointer: Tape Buffer/ Screen Scrolling
 $E712: BD 98 E7  LDA $E798,X	; Screen line address table
@@ -1320,7 +1335,7 @@ $E737: 91 C4     STA (PNT),Y	; Pointer: Current Screen Line Address
 $E739: 88        DEY
 $E73A: 10 FB     BPL L_E737	; Loop back for more.
 
-$E73C: 4C 71 E0  JMP L_E071
+$E73C: 4C 71 E0  JMP L_E071	; Cursor to start of line
 
 ;--------------- KEYBOARD DECODE TABLE
 ; Graphic "N" keyboard
