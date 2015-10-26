@@ -13,7 +13,7 @@
 ; (1024 characters, with 1000 visible). So, the table initially contains $80 to $83. Note that the HIGH BIT
 ; of each entry is SET. This bit is the "line link flag" for the line.
 ; If SET the line is NOT linked, and if CLEARED the line IS linked.
-; When a character is PRINTED to the 40th (last) character of the line, the Line Link byte
+; When a character is printed to the 40th (last) character of the line, the line is linked (to the previous line).
 ;
 ;--------------- ZERO PAGE STORAGE
 
@@ -400,7 +400,7 @@ $E18D: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
 $E18F: C0 4F     CPY #$4F	; 79=maximum line length (2 physical lines) minus 1
 $E191: D0 0C     BNE L_E19F
 $E193: 20 B3 E1  JSR L_E1B3	; Set 80-column line indicator
-$E196: 20 A9 E3  JSR L_E3A9
+$E196: 20 A9 E3  JSR L_E3A9	; Move Cursor to next line
 $E199: A9 00     LDA #$00	; First character on line
 $E19B: 85 C6     STA PNTR   	; Cursor Column on Current Line
 $E19D: F0 07     BEQ L_E1A6
@@ -570,7 +570,7 @@ $E276: 84 C6     STY PNTR   	; Cursor Column on Current Line
 $E278: 88        DEY
 $E279: C4 D5     CPY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E27B: 90 07     BCC L_E284
-$E27D: 20 A9 E3  JSR L_E3A9
+$E27D: 20 A9 E3  JSR L_E3A9	; Move Cursor to next line
 $E280: A0 00     LDY #$00
 L_E282:
 $E282: 84 C6     STY PNTR   	; Cursor Column on Current Line
@@ -586,7 +586,7 @@ $E28F: A8        TAY
 $E290: C5 D5     CMP LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E292: 90 EE     BCC L_E282
 $E294: F0 EC     BEQ L_E282
-$E296: 20 A9 E3  JSR L_E3A9
+$E296: 20 A9 E3  JSR L_E3A9	; Move Cursor to next line
 L_E299:
 $E299: 4C A6 E1  JMP L_E1A6
 L_E29C:
@@ -756,20 +756,20 @@ $E3A0: 4D EF 03  EOR TABS   	; Table of 80 bits to set TABs (80col)
 $E3A3: 9D F0 03  STA $03F0,X
 $E3A6: 4C A6 E1  JMP L_E1A6
 
-;--------------- Cursor DOWN?
+;--------------- Move Cursor to next line
 L_E3A9:
 $E3A9: 38        SEC
 $E3AA: 46 A3     LSR LXSP   	; Cursor Y-X Pos. at Start of INPUT
 $E3AC: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
 L_E3AE:
-				;[LOOP
+				; LOOP[
 $E3AE: E8        INX
-$E3AF: E0 19     CPX #$19	; Last line of screen?
+$E3AF: E0 19     CPX #$19	;   Last line of screen?
 $E3B1: D0 03     BNE L_E3B6
-$E3B3: 20 D1 E3  JSR L_E3D1	; Scroll Screen Up
+$E3B3: 20 D1 E3  JSR L_E3D1	;   Scroll Screen Up
 L_E3B6:
-$E3B6: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E3B8: 10 F4     BPL L_E3AE	; is HI bit CLEAR? Yes then LOOP]
+$E3B6: B5 E0     LDA LDTB1,X	;   Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E3B8: 10 F4     BPL L_E3AE	;   Is HI bit CLEAR? Yes then LOOP]
 $E3BA: 86 D8     STX TBLX   	; Current Cursor Physical Line Number
 $E3BC: 4C 71 E0  JMP L_E071	; Cursor to start of line
 
@@ -787,43 +787,48 @@ $E3CC: 85 CD     STA QTSW   	; Flag: Editor in Quote Mode
 $E3CE: 4C A6 E1  JMP L_E1A6
 
 ;--------------- Scroll Screen UP
+; Also scroll up line-link table
+
 L_E3D1:
 $E3D1: A2 19     LDX #$19	; 25 screen lines
 $E3D3: 86 D8     STX TBLX   	; Current Cursor Physical Line Number
 
-L_E3D5:				; Loop[
+L_E3D5:
 $E3D5: A2 FF     LDX #$FF
 L_E3D7:
-$E3D7: E8        INX		; Loop[[
-$E3D8: BD 98 E7  LDA $E798,X	; Screen line address table
-$E3DB: 85 C4     STA PNT    	; Pointer: Current Screen Line Address LO
-$E3DD: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E3DF: 09 80     ORA #$80
-$E3E1: 85 C5     STA PNT+1	; Pointer: Current Screen Line Address HI
-$E3E3: E0 18     CPX #$18	; Last Line?
-$E3E5: B0 1D     BCS L_E404
-$E3E7: B4 E1     LDY LDTB1+1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E3E9: 30 02     BMI L_E3ED
-$E3EB: 29 7F     AND #$7F
+				; -------- Set up screen pointers, scroll line link table entry for the current line
+$E3D7: E8        INX		; Loop[
+$E3D8: BD 98 E7  LDA $E798,X	;   Screen line address table LO @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E3DB: 85 C4     STA PNT    	;   Set up Pointer LO for screen scrolling
+$E3DD: B5 E0     LDA LDTB1,X	;   Screen Line Link Table (address table HI) @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E3DF: 09 80     ORA #$80	;   Make sure HI BIT is SET @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E3E1: 85 C5     STA PNT+1	;   Set up pointer HI for screen scrolling 
+$E3E3: E0 18     CPX #$18	;   Last Line?
+$E3E5: B0 1D     BCS L_E404	;   Yes, so skip ahead to exit loop
+$E3E7: B4 E1     LDY LDTB1+1,X	;   No, so get NEXT Line's Line Link entry @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E3E9: 30 02     BMI L_E3ED	;   is HI BIT SET? Yes, leave it as is and skip ahead
+$E3EB: 29 7F     AND #$7F	;   No, then CLEAR HI BIT
+
 L_E3ED:
-$E3ED: 95 E0     STA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@
+$E3ED: 95 E0     STA LDTB1,X	;   Store it in the CURRENT Line Link entry (IE scroll the high bits UP) @@@@
 $E3EF: 98        TYA
-$E3F0: 09 80     ORA #$80	; Set Hi bit
-$E3F2: 85 C8     STA SAL+1	;$C8
-$E3F4: BD 99 E7  LDA $E799,X	; Screen line address table
-$E3F7: 85 C7     STA SAL    	; Pointer: Tape Buffer/ Screen Scrolling
+$E3F0: 09 80     ORA #$80	;   Set Hi bit
+$E3F2: 85 C8     STA SAL+1	;   $C8
+$E3F4: BD 99 E7  LDA $E799,X	;   Screen line address table
+$E3F7: 85 C7     STA SAL    	;   Pointer: Tape Buffer/ Screen Scrolling
 
-$E3F9: A0 27     LDY #$27	; 40 characters per line
+;                               -------- Now we scroll the video screen lines
+$E3F9: A0 27     LDY #$27	;   40 characters per line
 
-L_E3FB:				; Loop[
-$E3FB: B1 C7     LDA (SAL),Y 	; Read character from screen
-$E3FD: 91 C4     STA (PNT),Y 	; Write it back
+L_E3FB:				;   Loop[[
+$E3FB: B1 C7     LDA (SAL),Y 	;     Read character from screen
+$E3FD: 91 C4     STA (PNT),Y 	;     Write it back
 $E3FF: 88        DEY
-$E400: 10 F9     BPL L_E3FB	; ]] Loop back for more
+$E400: 10 F9     BPL L_E3FB	;   ]] Loop back for more
 $E402: 30 D3     BMI L_E3D7	; ] Loop back for more
 
 L_E404:
-$E404: 95 E0     STA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E404: 95 E0     STA LDTB1,X	; Store to Screen Line Link Table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 ;--------------- Clear the last screen line
 
