@@ -149,59 +149,63 @@ $E039: 20 17 E6  JSR L_E617 	; Initialize CRTC to GRAPHICS mode
 $E03C: 20 54 E6  JSR L_E654 	; Ring BELL
 $E03F: 20 54 E6  JSR L_E654 	; Ring BELL
 
-;--------------- Clear Screen (reset line links)
+;--------------- Clear Screen
+; This routine clears the screen. Since there is no windowing it clears EVERY byte
+; in the screen memory, including non-visible bytes. It also calculates the HI byte
+; of the start of each screen line and stores it into the Screen Line Link table.
+; LO bytes are stored in ROM at $E798. These addresses are used for printing to the screen.
+; Entries with HI BIT CLEARED are linked to the line immediately above it.
 L_E042:
 $E042: A2 18     LDX #$18	; 24 lines
 $E044: A9 C0     LDA #$C0	; $83C0 = Address of first character on last line of screen?
 $E046: A0 83     LDY #$83	;
 
 L_E048:
-$E048: 94 E0     STY LDTB1,X	; Screen Line Link Table. Save HI byte of screen address to table@@@@@@@@@
-$E04A: 38        SEC		; @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E04B: E9 28     SBC #$28	; Subtract 40 characters (one physical line) @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E04D: B0 01     BCS L_E050	; did we move past page? No, skip DEY @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E04F: 88        DEY		; Yes, @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E048: 94 E0     STY LDTB1,X	; LOOP[      Save HI byte of screen address to table @@@@@@@@@@@@@@@@@@@@@
+$E04A: 38        SEC		;                                                    @@@@@@@@@@@@@@@@@@@@@
+$E04B: E9 28     SBC #$28	;   Subtract 40 characters (one physical line) @@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E04D: B0 01     BCS L_E050	;   did we move past page? No, skip ahead      @@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E04F: 88        DEY		;   Yes, next page   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 L_E050:
-$E050: CA        DEX		; previous line @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E051: 10 F5     BPL L_E048	; Loop up for more @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E050: CA        DEX		;   Previous line    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E051: 10 F5     BPL L_E048	; ] Loop up for more @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-$E053: 84 C5     STY PNT+1	; Pointer: Current Screen Line Address HI
-$E055: E8        INX
-$E056: 86 9F     STX RVS    	; Flag: Print Reverse Chars. -1=Yes
-$E058: 86 C4     STX PNT    	; Pointer: Current Screen Line Address LO
+$E053: 84 C5     STY PNT+1	; Store in screen pointer HI
+$E055: E8        INX		; X=0
+$E056: 86 9F     STX RVS    	; Clear RVS Flag
+$E058: 86 C4     STX PNT    	; Store 0 to screen Pointer LO (pointer should point to $8000 - HOME position)
 
-;--------------- Clear the screen (write all spaces)
-; Note: this clears ALL screen RAM, including the 24 non-visible locations at the end.
+;--------------- Write <SPACE> to all of screen memory
 
 $E05A: A9 20     LDA #$20	; <SPACE>
-L_E05C:
-$E05C: 9D 00 80  STA SCREEN1,X	; Screen RAM page 1
-$E05F: 9D 00 81  STA SCREEN2,X	; Screen RAM page 2
-$E062: 9D 00 82  STA SCREEN3,X	; Screen RAM page 3
-$E065: 9D 00 83  STA SCREEN4,X	; Screen RAM page 4
-$E068: E8        INX		; next character
-$E069: D0 F1     BNE L_E05C	; loop back for more
+L_E05C:				; LOOP[
+$E05C: 9D 00 80  STA SCREEN1,X	;   Screen RAM page 1
+$E05F: 9D 00 81  STA SCREEN2,X	;   Screen RAM page 2
+$E062: 9D 00 82  STA SCREEN3,X	;   Screen RAM page 3
+$E065: 9D 00 83  STA SCREEN4,X	;   Screen RAM page 4
+$E068: E8        INX		;   Next position
+$E069: D0 F1     BNE L_E05C	; ] Loop back for more
 
 ;--------------- Home the Cursor
 L_E06B:
 $E06B: A0 00     LDY #$00	; ROW=0, COL=0
-$E06D: 84 C6     STY PNTR   	; Cursor Column on Current Line
-$E06F: 84 D8     STY TBLX   	; Current Cursor Physical Line Number
+$E06D: 84 C6     STY PNTR   	; Store to Cursor Column on Current Line
+$E06F: 84 D8     STY TBLX   	; Store to Current Cursor Physical Line Number
 
 ;---------------  Cursor to start of line
 L_E071:
-$E071: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E073: B5 E0     LDA LDTB1,X	; Screen Line Link Table / Editor Temps (40 col) @@@@@@@@@@@@@@@@@@@@@@@@
+$E071: A6 D8     LDX TBLX   	; Get Current Cursor Physical Line Number @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E073: B5 E0     LDA LDTB1,X	; Get Current Line's Screen Line Link entry @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E075: 09 80     ORA #$80	; Make sure HIGH bit is set @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E077: 85 C5     STA PNT+1	; Store in Current Screen Line Address HI @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E079: BD 98 E7  LDA $E798,X	; get the LO byte from table in ROM @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E07C: 85 C4     STA PNT    	; Pointer: Current Screen Line Address LO @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E079: BD 98 E7  LDA $E798,X	; Get the LO byte from table in ROM @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E07C: 85 C4     STA PNT    	; Store to Current Screen Line Address LO @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E07E: A9 27     LDA #$27       ; 40 characters/line minus 1 = 39 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E080: 85 D5     STA LNMX   	; Set Physical Screen Line Length =40 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E082: E0 18     CPX #$18	; Line 24? (0-24) last line cannot be linked @@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E084: F0 08     BEQ L_E08E
-$E086: B5 E1     LDA LDTB1+1,X 	; check next line in screen line link table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E088: 30 04     BMI L_E08E     ; is HIGH bit set? (negative value) Yes, so NO linked line @@@@@@@@@@@@@@
+$E084: F0 08     BEQ L_E08E	; Yes, skip ahead @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E086: B5 E1     LDA LDTB1+1,X 	; Check next line in screen line link table @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E088: 30 04     BMI L_E08E     ; Is HIGH bit set? (negative value) Yes, so NO linked line @@@@@@@@@@@@@@
 $E08A: A9 4F     LDA #$4F	; No, then line is linked. 79 = two screen lines @@@@@@@@@@@@@@@@@@@@@@@@
 $E08C: 85 D5     STA LNMX   	; Store in Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 L_E08E:
@@ -242,19 +246,19 @@ $E0BB: 60        RTS
 ; Check for special keys like <RUN> or <CR> and loop back here for more.
 
 L_E0BC:
-$E0BC: 20 3C E6  JSR L_E63C
+$E0BC: 20 3C E6  JSR L_E63C	; Check for BELL at near-end of line
 
 L_E0BF:
 $E0BF: A5 9E     LDA NDX    	; No. of Chars. in Keyboard Buffer (Queue)
 $E0C1: 85 A7     STA BLNSW  	; Cursor Blink enable: 0 = Flash Cursor
-$E0C3: F0 FA     BEQ L_E0BF
+$E0C3: F0 FA     BEQ L_E0BF	; Loop back up for more
 $E0C5: 78        SEI
 $E0C6: A5 AA     LDA BLNON  	; Flag: Last Cursor Blink On/Off
-$E0C8: F0 09     BEQ L_E0D3
+$E0C8: F0 09     BEQ L_E0D3	
 $E0CA: A5 A9     LDA GDBLN  	; Character Under Cursor
 $E0CC: A0 00     LDY #$00
 $E0CE: 84 AA     STY BLNON  	; Flag: Last Cursor Blink On/Off
-$E0D0: 20 06 E6  JSR L_E606	; put character on screen
+$E0D0: 20 06 E6  JSR L_E606	; Put character on screen
 L_E0D3:
 $E0D3: 20 A7 E0  JSR L_E0A7	; Get character from keyboard buffer
 $E0D6: C9 83     CMP #$83	; <RUN>?
@@ -264,19 +268,19 @@ $E0D8: D0 10     BNE L_E0EA
 
 $E0DA: 78        SEI
 $E0DB: A2 09     LDX #$09	; 9 characters to copy
-$E0DD: 86 9E     STX NDX    	; No. of Chars. in Keyboard Buffer (Queue)
+$E0DD: 86 9E     STX NDX    	; Set keyboard buffer count
 
 L_E0DF:				; LOOP[
-$E0DF: BD 8E E7  LDA $E78E,X	; String: dL"*<CR>run<CR>
-$E0E2: 9D 6E 02  STA $026E,X	; Put in buffer
-$E0E5: CA        DEX		; next character
-$E0E6: D0 F7     BNE L_E0DF	; loop back for more
-$E0E8: F0 D5     BEQ L_E0BF
+$E0DF: BD 8E E7  LDA $E78E,X	;   String: dL"*<CR>run<CR>
+$E0E2: 9D 6E 02  STA $026E,X	;   Put in buffer
+$E0E5: CA        DEX		;   Next character
+$E0E6: D0 F7     BNE L_E0DF	; ] Loop back for more
+$E0E8: F0 D5     BEQ L_E0BF     ; If no characters remaining loop back again
 
 ;--------------- Check for RETURN
 L_E0EA:
-$E0EA: C9 0D     CMP #$0D	; <CR>?
-$E0EC: D0 CE     BNE L_E0BC	; No, Loop back up
+$E0EA: C9 0D     CMP #$0D	; Is it <CR>?
+$E0EC: D0 CE     BNE L_E0BC	; No, Loop back up to Input from Keyboard
 
 ;--------------- Do RETURN	[ Find last character on line ]
 
@@ -284,11 +288,11 @@ $E0EE: A4 D5     LDY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@
 $E0F0: 84 AC     STY CRSW   	; Flag: INPUT or GET from Keyboard
 
 L_E0F2:				; LOOP[
-$E0F2: B1 C4     LDA (PNT),Y	; Pointer: Current Screen Line Address
-$E0F4: C9 20     CMP #$20	; Is it <SPACE>?
-$E0F6: D0 03     BNE L_E0FB	; No, non-space is end of the line. Jump out.
-$E0F8: 88        DEY		; move to previous character
-$E0F9: D0 F7     BNE L_E0F2	; loop back for more
+$E0F2: B1 C4     LDA (PNT),Y	;   Pointer: Current Screen Line Address
+$E0F4: C9 20     CMP #$20	;   Is it <SPACE>?
+$E0F6: D0 03     BNE L_E0FB	;   No, found end of line, skip ahead
+$E0F8: 88        DEY		;   Move to previous character
+$E0F9: D0 F7     BNE L_E0F2	; ] Loop back for more
 
 ;--------------- Process line
 L_E0FB:
@@ -313,8 +317,10 @@ $E116: 98        TYA
 $E117: 48        PHA
 $E118: 8A        TXA
 $E119: 48        PHA
-$E11A: A5 AC     LDA CRSW   	; Flag: INPUT or GET from Keyboard
-$E11C: F0 A1     BEQ L_E0BF
+$E11A: A5 AC     LDA CRSW   	; Get Input Flag: INPUT or GET from Keyboard
+$E11C: F0 A1     BEQ L_E0BF	; Is it ZERO? Yes, Loop back up to Input from Keyboard
+
+;--------------- Continue to process the line
 L_E11E:
 $E11E: A4 C6     LDY PNTR	; Cursor Column on Current Line
 $E120: B1 C4     LDA (PNT),Y	; Pointer: Current Screen Line Address
@@ -333,13 +339,13 @@ $E134: 70 02     BVS L_E138
 $E136: 09 40     ORA #$40
 L_E138:
 $E138: E6 C6     INC PNTR	; Cursor Column on Current Line
-$E13A: 20 67 E1  JSR L_E167
+$E13A: 20 67 E1  JSR L_E167	; Switch Quote flag
 $E13D: C4 A1     CPY INDX	; Pointer: End of Logical Line for INPUT
 $E13F: D0 17     BNE L_E158
 L_E141:
 $E141: A9 00     LDA #$00
 $E143: 85 AC     STA CRSW	; Flag: INPUT or GET from Keyboard
-$E145: A9 0D     LDA #$0D
+$E145: A9 0D     LDA #$0D	; <CR>
 $E147: A6 AF     LDX DFLTN	; Default Input Device (0)
 $E149: E0 03     CPX #$03	; 3=SCREEN
 $E14B: F0 06     BEQ L_E153
@@ -357,9 +363,9 @@ $E15B: AA        TAX
 $E15C: 68        PLA
 $E15D: A8        TAY
 $E15E: A5 D9     LDA DATAX  	; Current Character to Print
-$E160: C9 DE     CMP #$DE	; <PI>?
-$E162: D0 02     BNE L_E166
-$E164: A9 FF     LDA #$FF	; Substitute screen code
+$E160: C9 DE     CMP #$DE	; Is it <PI>?
+$E162: D0 02     BNE L_E166	; No, skip ahead
+$E164: A9 FF     LDA #$FF	; Yes, substitute screen code
 L_E166:
 $E166: 60        RTS
 
@@ -1194,21 +1200,21 @@ $E638: 88        DEY
 $E639: 10 F5     BPL L_E630	; Loop back for more
 $E63B: 60        RTS
 
-;--------------- Check for BELL at and of line
+;--------------- Output character with check for BELL at and of line
 L_E63C:
-$E63C: 20 02 E2  JSR L_E202	; output to screen
-$E63F: AA        TAX
+$E63C: 20 02 E2  JSR L_E202	; Output character to screen (chr code in A)
+$E63F: AA        TAX		; Save the character to X
 $E640: A5 D5     LDA LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E642: 38        SEC
 $E643: E5 C6     SBC PNTR   	; Cursor Column on Current Line
 $E645: C9 05     CMP #$05	; Are we at the 5th last character on the line?
-$E647: D0 39     BNE L_E682	; No,exit out
+$E647: D0 39     BNE L_E682	; No, exit out
 $E649: 8A        TXA		; Yes, reload the character to print
 $E64A: C9 1D     CMP #$1D	; Is it <RIGHT>?
-$E64C: F0 06     BEQ L_E654	; Yes,
-$E64E: 29 7F     AND #$7F	; mask off hi bit
-$E650: C9 20     CMP #$20	; is it a control code?
-$E652: 90 2E     BCC L_E682	; yes, exit out
+$E64C: F0 06     BEQ L_E654	; Yes, do Double BELL
+$E64E: 29 7F     AND #$7F	; Mask off HI BIT
+$E650: C9 20     CMP #$20	; Is it a control code?
+$E652: 90 2E     BCC L_E682	; Yes, exit out
 
 ;--------------- Double Bell
 L_E654:
@@ -1226,22 +1232,22 @@ $E663: 8D 4A E8  STA $E84A	; VIA Register A - shift register
 
 $E666: A2 07     LDX #$07	; 7 bytes in BELL table
 
-L_E668:				; Loop [
-$E668: BD D4 E7  LDA $E7D4,X	; BELL table
+L_E668:				; LOOP[
+$E668: BD D4 E7  LDA $E7D4,X	;   BELL table
 $E66B: 8D 48 E8  STA $E848	
-$E66E: AD EC 03  LDA CHIME4 	; Chime Time 0=off (40col)
+$E66E: AD EC 03  LDA CHIME4 	;   Chime Time 0=off (40col)
 
-L_E671:				; Loop [[
-$E671: 88        DEY
-$E672: D0 FD     BNE L_E671	; ]] Loop back for more
+L_E671:				;   LOOPS[[
+$E671: 88        DEY		;
+$E672: D0 FD     BNE L_E671	;     ] Loop back for more
 $E674: 38        SEC
 $E675: E9 01     SBC #$01
-$E677: D0 F8     BNE L_E671	; ]] Loop back for more
-$E679: CA        DEX		; next byte in table
+$E677: D0 F8     BNE L_E671	;   ]] Loop back for more
+$E679: CA        DEX		;   Next byte in table
 $E67A: D0 EC     BNE L_E668	; ] Loop back for next BELL byte
 
-$E67C: 8E 4A E8  STX $E84A	; reset VIA register A
-$E67F: 8E 4B E8  STX $E84B	; reset VIA register B
+$E67C: 8E 4A E8  STX $E84A	; Reset VIA register A
+$E67F: 8E 4B E8  STX $E84B	; Reset VIA register B
 L_E682:
 $E682: 60        RTS
 
@@ -1258,7 +1264,7 @@ $E68E: CA        DEX
 $E68F: 10 FB     BPL L_E68C
 $E691: A2 0A     LDX #$0A	; 10 bytes to set
 L_E693:
-$E693: 9D F0 03  STA $03F0,X	; Loop [   TAB table???
+$E693: 9D F0 03  STA $03F0,X	; LOOP[   TAB table???
 $E696: CA        DEX
 $E697: 10 FA     BPL L_E693	; ] Loop back for more
 
@@ -1360,12 +1366,12 @@ $E735: A9 20     LDA #$20	; <SPACE>
 L_E737:
 $E737: 91 C4     STA (PNT),Y	; LOOP[    Write SPACE to screen
 $E739: 88        DEY		;   Y=Y-1
-$E73A: 10 FB     BPL L_E737	; ] Loop back for more.
+$E73A: 10 FB     BPL L_E737	; ] Loop back for more
 
 $E73C: 4C 71 E0  JMP L_E071	; Cursor to start of line
 
 ;--------------- KEYBOARD DECODE TABLE
-; Graphic "N" keyboard
+; Graphic "N" keyboard. 00=SHIFT, 03=RUN, FF=NO KEY
 
 $E73F:           .BYT 3D,2E,10,03,3C,20,5B,12	; keyboard decode table - graphic keyboard
 $E747:           .BYT 2D,30,00,3E,FF,5D,40,00	; keyboard decode table - graphic keyboard
@@ -1380,10 +1386,14 @@ $E787:           .BYT 1D,13,5F,28,26,25,23,21 	; keyboard decode table - graphic
 
 ;--------------- KEYSTROKE TABLE FOR <RUN> KEY
 
-$E78F:           .BYT 44,CC,22,2A,0D,52,55,4E	; SHIFT-RUN/STOP keystrokes for buffer
-$E797:           .BYT 0D 			; SHIFT-RUN/STOP keystrokes for buffer
+$E78F:           .BYT 44,CC,22,2A,0D,52,55,4E	; D <SHIFT>L " * <ENTER> R U N
+$E797:           .BYT 0D 			; <ENTER>
 
-;--------------- SCREEN ADDRESS TABLE
+;--------------- SCREEN ADDRESS TABLE (LO BYTES)
+; These are the LO bytes for the beginning of each screen line. These are use to set the
+; screen pointers when writing to the screen or scrolling, etc.
+; NOTE: HI bytes are calculated in the 'screen clear' routine and 
+;       stored in zero page at $00E0-00F8 (screen line link table)
 
 $E798:           .BYT 00,28,50,78,A0,C8,F0,18	; screen address - lo
 $E7A0:           .BYT 40,68,90,B8,E0,08,30,58	; screen address - lo
@@ -1391,6 +1401,8 @@ $E7A8:           .BYT 80,A8,D0,F8,20,48,70,98	; screen address - lo
 $E7B0:           .BYT C0 			; screen address - lo
 
 ;--------------- CRTC SETUP TABLES
+; This table is used to setup the CRTC chip screen parameters.
+; The values here configure the screen for 20kHz
 
 $E7B1:           .BYT 31,28,29,0F,20,03,19,1D	; CRTC register data -  40 COL TEXT mode
 $E7B9:           .BYT 00,09,00,00,10,00,00,00	; CRTC register data -  40 COL TEXT mode
@@ -1402,7 +1414,8 @@ $E7D3:           .BYT 00,00 			; CRTC register data -  40 COL GRAPHICS mode
 
 $E7D5:           .BYT 0E,1E,3E,7E,3E,1E,0E	; BELL chime values
 
-;--------------- POWERS OF 2 TABLE (doesn't seem to be referenced anywhere)
+;--------------- POWERS OF 2 TABLE 
+; This table is used by the TAB routine
 
 $E7DC:           .BYT 80,40,20,10,08,04,02,01	; BIT table
 
