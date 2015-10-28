@@ -381,6 +381,8 @@ $E173: 60        RTS
 
 L_E174:
 $E174: 09 40     ORA #$40
+
+;--------------- 
 L_E176:
 $E176: A6 9F     LDX RVS    	; Flag: Print Reverse Chars. -1=Yes
 $E178: F0 02     BEQ L_E17C
@@ -453,21 +455,21 @@ $E1CB: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
 
 ;--------------- Adjust Line Link and Move to start of line
 L_E1CD:
-$E1CD: 16 E1     ASL LDTB1+1,X 	;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E1CF: 56 E1     LSR LDTB1+1,X 	;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E1CD: 16 E1     ASL LDTB1+1,X 	; Shift to lose HI BIT @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E1CF: 56 E1     LSR LDTB1+1,X 	; HI BIT is now CLEARED @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E1D1: 20 B3 E1  JSR L_E1B3	; set line link
-$E1D4: A5 C6     LDA PNTR   	; Cursor Column on Current Line
-$E1D6: 48        PHA
+$E1D4: A5 C6     LDA PNTR   	; Get Cursor Column on Current Line
+$E1D6: 48        PHA		; Remember column
 $E1D7: 20 71 E0  JSR L_E071	; Cursor to start of line
-$E1DA: 68        PLA
-$E1DB: 85 C6     STA PNTR   	; Cursor Column on Current Line
+$E1DA: 68        PLA		; Restore column
+$E1DB: 85 C6     STA PNTR   	; Store Cursor Column on Current Line
 $E1DD: 60        RTS
 
 ;--------------- Back to previous line when actioning DEL or LEFT
 
 L_E1DE:
-$E1DE: A0 27     LDY #$27
-$E1E0: A6 D8     LDX TBLX   	; Current Cursor Physical Line Number
+$E1DE: A0 27     LDY #$27	; Column 39
+$E1E0: A6 D8     LDX TBLX   	; Get Current Cursor Physical Line Number
 $E1E2: D0 06     BNE L_E1EA	; Is it Zero? No, ok to proceed, so skip ahead
 $E1E4: 86 C6     STX PNTR   	; Yes, movement is invalid. Cursor Column on Current Line
 $E1E6: 68        PLA		; pull the character from the stack
@@ -475,19 +477,19 @@ $E1E7: 68        PLA		; pull the character from the stack
 $E1E8: D0 BC     BNE L_E1A6	; jump back up to finish up
 
 L_E1EA:
-$E1EA: B5 DF     LDA MYCH,X	; Serial Word Buffer
-$E1EC: 30 05     BMI L_E1F3
-$E1EE: CA        DEX
-$E1EF: B5 DF     LDA MYCH,X	; Serial Word Buffer
-$E1F1: A0 4F     LDY #$4F
+$E1EA: B5 DF     LDA LDTB1-1,X	; Get PREVIOUS line's Line Link value
+$E1EC: 30 05     BMI L_E1F3	; Is HI BIT SET? Yes, skip ahead
+$E1EE: CA        DEX		; No, it's ok to go back to previous line
+$E1EF: B5 DF     LDA LDTB1-1,X	; Get PREVIOUS line's Line Link value
+$E1F1: A0 4F     LDY #$4F	; Column 79
 L_E1F3:
 $E1F3: CA        DEX
 $E1F4: 86 D8     STX TBLX   	; Current Cursor Physical Line Number
-$E1F6: 85 C5     STA PNT+1
-$E1F8: BD 98 E7  LDA $E798,X	; get LO byte from ROM table
-$E1FB: 85 C4     STA PNT    	; Pointer: Current Screen Line Address
-$E1FD: 84 C6     STY PNTR   	; Cursor Column on Current Line
-$E1FF: 84 D5     STY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E1F6: 85 C5     STA PNT+1	; Store to Current Screen Line Address pointer
+$E1F8: BD 98 E7  LDA $E798,X	; Get LO byte from ROM table
+$E1FB: 85 C4     STA PNT    	; Store to Current Screen Line Address pointer
+$E1FD: 84 C6     STY PNTR   	; Store to Cursor Column on Current Line
+$E1FF: 84 D5     STY LNMX   	; Store to Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E201: 60        RTS
 
 ;--------------- Print PETSCII character to screen
@@ -504,41 +506,41 @@ $E20B: 85 AC     STA CRSW   	; Flag: INPUT or GET from Keyboard
 $E20D: A4 C6     LDY PNTR   	; Cursor Column on Current Line
 $E20F: A5 D9     LDA DATAX  	; Current Character to Print
 $E211: 29 7F     AND #$7F	; Mask off top bit (graphics characters)
-$E213: C9 1B     CMP #$1B	; <ESC>?
-$E215: D0 03     BNE L_E21A
-$E217: 4C C6 E3  JMP L_E3C6	; Cansel INS/RVS/Quote
+$E213: C9 1B     CMP #$1B	; Is it <ESC>?
+$E215: D0 03     BNE L_E21A	; No, so skip ahead
+$E217: 4C C6 E3  JMP L_E3C6	; Yes, Cancel INS/RVS/Quote
 L_E21A:
 $E21A: A5 D9     LDA DATAX  	; Current Character to Print
-$E21C: 10 03     BPL L_E221	; Is top bit set?
-$E21E: 4C D5 E2  JMP L_E2D5	; Yes
+$E21C: 10 03     BPL L_E221	; Is top bit CLEAR? Yes, handle UNSHIFTED Character
+$E21E: 4C D5 E2  JMP L_E2D5	; No, Handle SHIFTED Character
 
 ;--------------- Handle UNSHIFTED Characters
 
 L_E221:
-$E221: C9 0D     CMP #$0D	; <CR>?
-$E223: D0 03     BNE L_E228
-$E225: 4C BF E3  JMP L_E3BF
+$E221: C9 0D     CMP #$0D	; Is it <CR>?
+$E223: D0 03     BNE L_E228	; No, skip ahead
+$E225: 4C BF E3  JMP L_E3BF	; Yes, Handle <CR>
 
 L_E228:
-$E228: C9 20     CMP #$20	; <SPACE>?
-$E22A: 90 08     BCC L_E234
-$E22C: 29 3F     AND #$3F
-$E22E: 20 67 E1  JSR L_E167
-$E231: 4C 76 E1  JMP L_E176
+$E228: C9 20     CMP #$20	; Is it <SPACE>?
+$E22A: 90 08     BCC L_E234	; No, it's 0-31
+$E22C: 29 3F     AND #$3F	; Yes, Mask off HI BIT
+$E22E: 20 67 E1  JSR L_E167	; Switch Quote flag if found
+$E231: 4C 76 E1  JMP L_E176	;
 
 L_E234:
 $E234: A6 DC     LDX INSRT  	; Flag: Insert Mode
-$E236: F0 03     BEQ L_E23B
+$E236: F0 03     BEQ L_E23B	; Is FLAG=0? Yes, skip ahead
 $E238: 4C 7A E1  JMP L_E17A
 
 L_E23B:
-$E23B: C9 14     CMP #$14	; <DEL>?
-$E23D: D0 1C     BNE L_E25B
-$E23F: 88        DEY
+$E23B: C9 14     CMP #$14	; Is it <DEL>?
+$E23D: D0 1C     BNE L_E25B	; No, skip ahead
+$E23F: 88        DEY		; Yes, move to the left
 $E240: 84 C6     STY PNTR   	; Cursor Column on Current Line
-$E242: 10 06     BPL L_E24A
+$E242: 10 06     BPL L_E24A	; I
 $E244: 20 DE E1  JSR L_E1DE	; Back to previous line
-$E247: 4C 55 E2  JMP  L_E255
+$E247: 4C 55 E2  JMP L_E255
 
 L_E24A:
 $E24A: C8        INY
@@ -580,56 +582,63 @@ $E282: 84 C6     STY PNTR   	; Cursor Column on Current Line
 L_E284:
 $E284: 4C A6 E1  JMP L_E1A6	; Finish Up
 L_E287:
-$E287: C9 11     CMP #$11	; <DOWN>?
-$E289: D0 11     BNE L_E29C
+$E287: C9 11     CMP #$11	; Is it <DOWN>?
+$E289: D0 11     BNE L_E29C	; No, skip ahead
 $E28B: 18        CLC
 $E28C: 98        TYA
-$E28D: 69 28     ADC #$28
+$E28D: 69 28     ADC #$28	; Add 40 for next line
 $E28F: A8        TAY
-$E290: C5 D5     CMP LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E292: 90 EE     BCC L_E282
-$E294: F0 EC     BEQ L_E282
-$E296: 20 A9 E3  JSR L_E3A9	; Move Cursor to next line
+$E290: C5 D5     CMP LNMX   	; Compare it to Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E292: 90 EE     BCC L_E282	; Less, so it's ok
+$E294: F0 EC     BEQ L_E282	; Equal, also ok
+$E296: 20 A9 E3  JSR L_E3A9	; More, so Move Cursor to next line
+
 L_E299:
 $E299: 4C A6 E1  JMP L_E1A6	; Finish Up
+
 L_E29C:
-$E29C: C9 10     CMP #$10	;
-$E29E: D0 0C     BNE L_E2AC
-$E2A0: A9 20     LDA #$20	; <SPACE>
+$E29C: C9 10     CMP #$10	; Is it <$10>? (BUG!: This should be #10 or #$16 - Erase to EOL)
+$E29E: D0 0C     BNE L_E2AC	; No, skip ahead
+
+;--------------- Clear to End of Line
+$E2A0: A9 20     LDA #$20	; Yes, set character to <SPACE>
 $E2A2: 88        DEY
 L_E2A3:
-$E2A3: C8        INY
-$E2A4: 91 C4     STA (PNT),Y	; Pointer: Current Screen Line Address
-$E2A6: C4 D5     CPY LNMX	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-$E2A8: 90 F9     BCC L_E2A3
-$E2AA: B0 ED     BCS L_E299
+$E2A3: C8        INY		; LOOP[
+$E2A4: 91 C4     STA (PNT),Y	; 	Store <SPACE> to screen
+$E2A6: C4 D5     CPY LNMX	; 	Is it end of line? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+$E2A8: 90 F9     BCC L_E2A3	; ] No, loop back for more
+$E2AA: B0 ED     BCS L_E299	; Yes, Finish up
+
+;--------------- Continue checking character to print
 L_E2AC:
-$E2AC: C9 0E     CMP #$0E	;
-$E2AE: D0 05     BNE L_E2B5
-$E2B0: 20 0F E6  JSR L_E60F	; Set screen to TEXT mode
-$E2B3: 30 E4     BMI L_E299
+$E2AC: C9 0E     CMP #$0E	; Is it <TEXT>?
+$E2AE: D0 05     BNE L_E2B5	; No, skip ahead
+$E2B0: 20 0F E6  JSR L_E60F	; Yes, Set screen to TEXT mode
+$E2B3: 30 E4     BMI L_E299	; Finish up
 L_E2B5:
-$E2B5: C9 07     CMP #$07	; <BELL>?
-$E2B7: D0 05     BNE L_E2BE
+$E2B5: C9 07     CMP #$07	; Is it <BELL>?
+$E2B7: D0 05     BNE L_E2BE	; No, skip ahead
 $E2B9: 20 57 E6  JSR L_E657	; Ring BELL
-$E2BC: F0 DB     BEQ L_E299
+$E2BC: F0 DB     BEQ L_E299	; Finish up
 L_E2BE:
-$E2BE: C9 09     CMP #$09	; <TAB>?
-$E2C0: D0 D7     BNE L_E299
+$E2BE: C9 09     CMP #$09	; Is it <TAB>?
+$E2C0: D0 D7     BNE L_E299	; Finish up
 L_E2C2:
 $E2C2: C4 D5     CPY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 $E2C4: 90 07     BCC L_E2CD
 $E2C6: A4 D5     LDY LNMX   	; Physical Screen Line Length @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 L_E2C8:
 $E2C8: 84 C6     STY PNTR   	; Cursor Column on Current Line
 $E2CA: 4C A6 E1  JMP L_E1A6	; Finish Up
 L_E2CD:
 $E2CD: C8        INY
-$E2CE: 20 88 E5  JSR L_E588
-$E2D1: F0 EF     BEQ L_E2C2
-$E2D3: D0 F3     BNE L_E2C8
+$E2CE: 20 88 E5  JSR L_E588	; Check TAB
+$E2D1: F0 EF     BEQ L_E2C2	; Is this a TAB position?
+$E2D3: D0 F3     BNE L_E2C8	; No, Loop back
 
-;--------------- Handle HI-BIT (SHIFTED) Characters
+;--------------- Handle SHIFTED Characters
 
 L_E2D5:
 $E2D5: 29 7F     AND #$7F	; strip off top bit
@@ -656,7 +665,7 @@ $E2F9: D0 04     BNE L_E2FF	; No, skip ahead
 $E2FB: C4 C6     CPY PNTR	; Cursor Column on Current Line
 $E2FD: D0 07     BNE L_E306
 L_E2FF:
-$E2FF: C0 4F     CPY #$4F	; Column 80?
+$E2FF: C0 4F     CPY #$4F	; Column 79?
 $E301: F0 81     BEQ L_E284	; Yes, go back up for more
 $E303: 20 EA E6  JSR L_E6EA	; Check for and perform scrolling UP
 L_E306:
@@ -737,24 +746,24 @@ $E37C: A0 00     LDY #$00
 
 L_E37E:				; LOOP[
 $E37E: C4 C6     CPY PNTR   	;   Cursor Column on Current Line
-$E380: B0 F1     BCS L_E373
+$E380: B0 F1     BCS L_E373	;   Finish up
 $E382: 91 C4     STA (PNT),Y	;   Pointer: Current Screen Line Address
 $E384: C8        INY
 $E385: D0 F7     BNE L_E37E	; ] loop back for more
 L_E387:
 $E387: C9 0E     CMP #$0E	; Is it SHIFT<TEXT> = <GRAPHICS>?
-$E389: D0 05     BNE L_E390
-$E38B: 20 17 E6  JSR L_E617
-$E38E: 30 E3     BMI L_E373
+$E389: D0 05     BNE L_E390	; No, skip ahead
+$E38B: 20 17 E6  JSR L_E617	; Yes, Set screen to graphics mode
+$E38E: 30 E3     BMI L_E373	; Finish up
 L_E390:
 $E390: C9 07     CMP #$07	; Is it SHIFT<BELL>?
 $E392: D0 05     BNE L_E399	; No, skip ahead
 $E394: 20 54 E6  JSR L_E654	; Ring the Bell
-$E397: F0 DA     BEQ L_E373
+$E397: F0 DA     BEQ L_E373	; Finish up
 L_E399:
 $E399: C9 09     CMP #$09	; Is it SHIFT<TAB>?
-$E39B: D0 D6     BNE L_E373
-$E39D: 20 88 E5  JSR L_E588	;
+$E39B: D0 D6     BNE L_E373	; Finish up
+$E39D: 20 88 E5  JSR L_E588	; Set TAB
 $E3A0: 4D EF 03  EOR TABS   	; Table of 80 bits to set TABs (80col)
 $E3A3: 9D F0 03  STA $03F0,X
 $E3A6: 4C A6 E1  JMP L_E1A6	; Finish Up
@@ -776,6 +785,7 @@ $E3B8: 10 F4     BPL L_E3AE	;   Is HI bit CLEAR? Yes then LOOP]
 $E3BA: 86 D8     STX TBLX   	; Current Cursor Physical Line Number
 $E3BC: 4C 71 E0  JMP L_E071	; Cursor to start of line
 
+;--------------- Handle <CR>
 L_E3BF:
 $E3BF: 20 A9 E3  JSR L_E3A9
 $E3C2: A9 00     LDA #$00
@@ -1099,19 +1109,21 @@ $E584: E8        INX
 $E585: 86 9E     STX NDX    	; No. of Chars. in Keyboard Buffer (Queue)
 L_E587:
 $E587: 60        RTS
+
+;--------------- Check TAB
 L_E588:
 $E588: 98        TYA
-$E589: 29 07     AND #$07
+$E589: 29 07     AND #$07	; Only look at lower 3 bits (values 0 to 7)
 $E58B: AA        TAX
-$E58C: BD DC E7  LDA $E7DC,X
-$E58F: 8D EF 03  STA TABS   	; Table of 80 bits to set TABs (80col)
+$E58C: BD DC E7  LDA $E7DC,X	; GetTable of BIT position values
+$E58F: 8D EF 03  STA TABS   	; Table of 80 bits to set TABs
 $E592: 98        TYA
 $E593: 4A        LSR
 $E594: 4A        LSR
 $E595: 4A        LSR
 $E596: AA        TAX
-$E597: BD F0 03  LDA $03F0,X
-$E59A: 2C EF 03  BIT TABS   	; Table of 80 bits to set TABs (80col)
+$E597: BD F0 03  LDA TABS+1,X	; Get the BITS for that group of tabs (Table of 80 bits to set TABs)
+$E59A: 2C EF 03  BIT TABS   	; Set FLAG for testing???? (Table of 80 bits to set TABs)
 $E59D: 60        RTS
 
 ;--------------- Filler
