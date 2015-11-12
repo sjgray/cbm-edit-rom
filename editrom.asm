@@ -32,6 +32,13 @@
 ; Use MAKE.BAT to assemble a binary file with the current options.
 ;
 ;-----------------------------------------------------------------------------------------------
+; BUG!: the 80-column screen editor does not support line-linking. This means that you are
+;       limited to entering BASIC lines to the maximum width of one screen line.
+;       This ALSO applies when you have defined a window... you will be limited to the width
+;       of the window. Take caution when editing BASIC lines inside a window; any line that
+;       wraps around to the next line will be TRUNCATED if you edit it inside a window!!!!!
+
+;-----------------------------------------------------------------------------------------------
 * = $e000	; Normal start address for EDIT ROM is $E000
 ;-----------------------------------------------------------------------------------------------
 
@@ -1143,7 +1150,13 @@ Be61a		STA JIFFY_CLOCK,X		; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
 
 ;-------------- Init SS40
 
-!if SS40=1 {	JSR SS40_INIT80 }		; Initialize Switchable Soft-40
+!if SS40=1 {
+	!IF SS40MODE=80 {
+		JSR SS40_INIT80			; Initialize Switchable Soft-40 to 80 columns
+	} ELSE {
+		JSR SS40_INIT40			; Initialize Switchable Soft-40 to 40 columns
+	}
+}
 
 ;-------------- 
 
