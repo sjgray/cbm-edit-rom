@@ -1,10 +1,14 @@
 ; IO - This part of the ROM is not visible since IO is mapped here, so we will fill it
 ; ==   with a decription of the editrom features and options.
 
-	!text "** CBM EDIT ROM PROJECT ** "
+!text "** CBM EDIT ROM PROJECT ** Codebase="
+
+!IF CODEBASE=0 { !text "0" }
+!IF CODEBASE=1 { !text "1" }
+!IF CODEBASE=2 { !text "2" }
 
 !IF COLOURPET = 1 {
-	!text "COLOURPET ROM 2014-06-14 "
+	!text ",COLOURPET 2015-11-17 "
 	!text ", Hardware="
 		!if COLOURVER=0 { !text "BETA" }
 		!if COLOURVER=1 { !text "RELEASE" }

@@ -20,7 +20,11 @@ Be452		JMP (CINV)	; Vector: Hardware Interrupt   [E455] Points to 'IRQ_NORMAL'
 ; Normally: $E455
 
 IRQ_NORMAL
-		JMP ADVANCE_TIMER 			;@@@@@@@@@@@@@@@ was: JSR ADVANCE_TIMER  ***** FIX? ******
+		!IF IRQFIX=1 {
+			JMP ADVANCE_TIMER		; was JSR ADVANCE_TIMER
+		} ELSE {
+			JSR UDTIME			; Update System Jiffy Clock. KERNAL routine $FFEA 			
+		}
 
 IRQ_NORMAL2						; ie458
 		LDA Blink				; Cursor Blink enable: 0 = Flash Cursor

@@ -515,6 +515,8 @@ $E211: 29 7F     AND #$7F	; Mask off top bit (graphics characters)
 $E213: C9 1B     CMP #$1B	; Is it <ESC>?
 $E215: D0 03     BNE L_E21A	; No, so skip ahead
 $E217: 4C C6 E3  JMP L_E3C6	; Yes, Cancel INS/RVS/Quote
+
+;--------------- Reload character and check HI BIT
 L_E21A:
 $E21A: A5 D9     LDA DATAX  	; Current Character to Print
 $E21C: 10 03     BPL L_E221	; Is top bit CLEAR? Yes, handle UNSHIFTED Character
@@ -1411,6 +1413,8 @@ $E7C1:           .BYT 00,00			; CRTC register data -  40 COL TEXT mode
 $E7C3:           .BYT 31,28,29,0F,28,05,19,21	; CRTC register data -  40 COL GRAPHICS mode
 $E7CB:           .BYT 00,07,00,00,10,00,00,00	; CRTC register data -  40 COL GRAPHICS mode
 $E7D3:           .BYT 00,00 			; CRTC register data -  40 COL GRAPHICS mode
+
+;--------------- BELL Frequency Table
 
 $E7D5:           .BYT 0E,1E,3E,7E,3E,1E,0E	; BELL chime values
 

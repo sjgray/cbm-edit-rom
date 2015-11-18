@@ -8,7 +8,7 @@
 
 !if EXTENDED=0 {
 ADVANCE_TIMER
-		JSR UDTIME			; $FFEA / jmp $f768	udtim	Update System Jiffy Clock
+		JSR UDTIME			; Update System Jiffy Clock. KERNAL routine $FFEA
 		INC JIFFY6DIV5			; Counter to speed TI by 6/5
 		LDA JIFFY6DIV5			; Counter to speed TI by 6/5
 		CMP #$06			; every 6 IRQ's

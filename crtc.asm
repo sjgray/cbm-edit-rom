@@ -91,11 +91,11 @@ CRT_PROGRAM
 
 		LDY #$11				; Number of bytes to copy = 17
 
-Be09b		LDA (SAL),Y				; Pointer: Tape Buffer/ Screen Scrolling
+CRT_LOOP	LDA (SAL),Y				; Pointer: Tape Buffer/ Screen Scrolling
 		STY CRT_Address				; Select the register to update 6545/6845 CRT		CHIP
 		STA CRT_Status				; Write to the register
 		DEY
-		BPL Be09b				; loop for more
+		BPL CRT_LOOP				; loop for more
 		RTS
 } ELSE {
 		JMP CRT_PROGRAM_SS40			; Jump to Switchable Soft-40 version (upper rom)
