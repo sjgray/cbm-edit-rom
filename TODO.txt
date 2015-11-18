@@ -16,10 +16,6 @@ PET/CBM EDIT ROM PROJECT - TODO List
 - Comment Autoboot code, and convert to proper syntax
 	- Do we want to include the "OLD" routine? (we already have the "OLD" matrix files)
 
-- Add code from 40 column edit roms. Currently if you set COLUMNS=40 it uses the 80 column rom code.
-	- 80 Column rom has no code for screen line linking. This restricts basic lines to one screen line.
-	- Caution - screen line linking memory locations might be in use.
-
 - ColourPET features:
 	- Fix cursor changing colour of existing text when cursoring around
 	- Some ESC codes not working.
