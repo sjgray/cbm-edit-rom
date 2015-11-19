@@ -128,13 +128,13 @@ CURSOR_LEFT_MARGIN
 		LDA Line_Addr_Lo-1,X	; Get the LO byte from table in ROM
 		STA ScrPtr    		; Store to Current Screen Line Address LO
 		LDA #$27       		; 40 characters/line minus 1 = 39
-		STA LNMX   		; Set Physical Screen Line Length = 40
+		STA RigMargin   		; Set Physical Screen Line Length = 40
 		CPX #$18		; Line 24? (0-24) last line cannot be linked
 		BEQ CLM_SKIP1		; Yes, skip ahead
 		LDA LineLinkTable+1,X 	; Check next line in screen line link table
 		BMI CLM_SKIP1  		; Is HIGH bit set? (negative value) Yes, so NO linked line
 		LDA #$4F		; No, then line is linked. 79 = two screen lines
-		STA LNMX   		; Store in Physical Screen Line Length
+		STA RigMargin   		; Store in Physical Screen Line Length
 CLM_SKIP1 	
 		LDA CursorCol   	; Cursor Column on Current Line
 		CMP #$28		; Is it greater than 40?
@@ -441,7 +441,7 @@ PL_SKIP2	DEX
 		RTS
 
 ;################################################################################################
-		!fill $e202-*,$aa	; 0 bytes ##############################################
+;		!fill $e202-*,$aa	; 0 bytes ##############################################
 ;################################################################################################
 
 ; ************ Output Character to Screen Dispatch (Called from Jump Table) [$E202]
@@ -887,7 +887,7 @@ ADVANCE_TIMER
 		BEQ IRQ_MAIN		; Do normal IRQ
 
 ;####################################################################################################
-		!fill $e442-*,$aa	; 0 bytes ###################################################
+;		!fill $e442-*,$aa	; 0 bytes ###################################################
 ;####################################################################################################
 
 ;************** Main IRQ Dispatcher (Called from Jump Table) [$E442]
@@ -918,7 +918,7 @@ IRQ_NORMAL2
 		BNE PREP_KEYSCAN		; Is >0? Yes, skip
 
 		LDA #$14		; Normal blink rate
-		BIT RPTFLG4 		; Repeat Flag (40 col)
+		BIT RPTFLG 		; Repeat Flag (40 col)
 		BPL IRQ_SKIP1
 		LDA #$02		; Fast blink rate
 IRQ_SKIP1
@@ -1161,7 +1161,7 @@ INITED2
 		DEX
 		BPL INITED2			; ] Loop back for more
 
-		STA RPTFLG4			; Repeat Flag
+		STA RPTFLG			; Repeat Flag
 
 ;		-------------- Set IRQ Vector - Normally $E455 or $E900 for Execudesk
 
@@ -1181,16 +1181,16 @@ INITED2
 		LDA #$03			; 3=Screen
 		STA DFLTO  			; Set Default Output (CMD) to Screen
 		LDA #$0F
-		STA PIA1_ROW 			; Keyboard ROW select
+		STA PIA1_Port_A 		; Keyboard ROW select [$E810]
 		ASL
-		STA VIA_0			; VIA Register 0 (flags)
+		STA VIA_Port_B			; VIA Register 0 (flags) [$E840]
 		STA VIA_DDR_B			;
 		STX PIA2_Port_B			;
 		STX VIA_Timer_1_Hi		;
 
 		LDA #$3D
-		STA PIA1_13 			; PIA#1 Register 13 (Retrace flag and interrupt)
-		BIT PIA1_COL 			; Keyboard COL read
+		STA PIA1_Cont_B			; PIA#1 Register 13 (Retrace flag and interrupt) [$E813]
+		BIT PIA1_Port_B 		; Keyboard COL read
 
 		LDA #$3C
 		STA PIA2_Cont_A
@@ -1199,17 +1199,17 @@ INITED2
 		STX PIA2_Port_B
 
 		LDA #$0C
-		STA VIA_PCR 			; VIA Register C (cb2)
+		STA VIA_PCR 			; VIA Register C (cb2) [$E84C]
 		STA BLNCT  			; Timer: Countdown to Toggle Cursor
 		STA Blink  			; Cursor Blink enable: 0 = Flash Cursor
 
 		LDA #$09
-		STA XMAX4  			; Max keyboard buffer size (40 col)
+		STA XMAX  			; Max keyboard buffer size (40 col)
 
 		LDA #$10
-		STA CHIME4 			; Chime Time 0=off (40col)
-		STA DELAY4			; Repeat key countdown (40col)
-		STA KOUNT4 			; Delay between repeats (40col)
+		STA CHIME 			; Chime Time 0=off (40col)
+		STA DELAY			; Repeat key countdown (40col)
+		STA KOUNT 			; Delay between repeats (40col)
 		RTS
 
 ;************** Check for screen scrolling [$E6EA]

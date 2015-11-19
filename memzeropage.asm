@@ -2,6 +2,7 @@
 ; ================
 ; Descriptions are from Butterfield's memory maps from Transactor
 
+;		--------------- Common Usage (All Codebases)
 Basic_USR 	= $00		; USR Jump
 USRADD 		= $01		; USR Jump
 CHARAC 		= $03		; Search Character
@@ -149,6 +150,13 @@ INSRT		= $dc		; Number of inserts outstanding
 ROPRTY		= $dd		; Write shift word / read character in
 FSBLK		= $de		; Tape blocks remaining to write
 MYCH		= $df		; Serial word buffer
+
+!IF CODEBASE=0 {
+;		---------------- 40-Column Only Usage (Codebase 0)
+LineLinkTable   = $e0		; 40-Col Line Link Table (to $F8)
+
+} ELSE {
+;		---------------- 80-Column Only Usage (Codebase 1 or 2)
 TopMargin	= $e0		; Window TOP line
 BotMargin	= $e1		; Window BOTTOM line
 LefMargin	= $e2		; Womdpw LEFT margin
@@ -158,22 +166,20 @@ KOUNT		= $e5		; Repeat countdown
 DELAY		= $e6		; New key marker
 CHIME		= $e7		; Chime Time
 HOMECT		= $e8		; Home count
-SCRIV		= $e9		; Screen Input Vector
+SCRIV		= $e9		; Screen Input Vector  (E9/EA)
 SCROV		= $eb		; Screen Output Vector (EB/EC)
-
-; $ED-F7 			; Part of 40 column wrap table - UNUSED on 80 col!
-
-!IF SS40=1 {
-SCNWIDTH	= $f0
+; $ED-F7 			; UNUSED
 }
 
 !IF ESCCODES = 1 {
+;		---------------- These are Customized Locations
+SCNWIDTH	= $f0		; Screen Mode (40 or 80)
 LASTCHAR	= $f1		; Last Key Pressed
 BELLMODE	= $f2		; 0=Disable, 1=Enable BELL/CHIME
-EUROFLAG        = $f3		; 0=ASCI, 1=DIN
+EUROFLAG        = $f3		; 0=ASCII, 1=DIN
 }
 
-
+;		---------------- Common Usage
 JIFFY6DIV5	= $f8
 CAS1		= $f9		; Cassette #1 status
 CAS2		= $fa		; Cassette #2 status

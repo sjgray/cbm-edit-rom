@@ -35,21 +35,21 @@ HERTZ     = 50	; Line Frequency (Clock):	50=Euro.			50=Euro, 60=NorthAmerica
 IRQFIX    = 1   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating
 BOOTCASE  = 1	; Initial Screen Mode		0=Text, 1=Graphics
 
-ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes
-WEDGE     = 1	; DOS Wedge			0=No, 1=Yes
+ESCCODES  = 0	; Add ESC codes? 		0=No, 1=Yes
+WEDGE     = 0	; DOS Wedge			0=No, 1=Yes
 WEDGEMSG  = 3	; Show wedge message?		0=No, 1=Yes,2=Custom, 3=ColourPET	Only valid when WEDGE=1
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes
 SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns
 
-COLOURPET = 1	; ColourPET additions?		0=No, 1=Yes
+COLOURPET = 0	; ColourPET additions?		0=No, 1=Yes
 COLOURVER = 0	; ColourPET Hardware Version	0=Beta,1=Release		0=ColourRAM at $8400, 1=$8800 (use for VICE)
 COLOURMODE= 0	; ColourPET Hardware Type	0=Digital, 1=Analog
 DEFAULTFG = 5	; ColourPET Foreground colour   0 to 15 RGBI
 DEFAULTBG = 0	; ColourPET Background colour   0 to 15 RGBI
 
 MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility
-REBOOT    = 1	; Add keyboard reboot? 		0=No, 1=Yes
+REBOOT    = 0	; Add keyboard reboot? 		0=No, 1=Yes
 EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
 CRUNCH    = 0   ; Remove unneeded code (NOPS) when posible? 0=No, 1=Yes
