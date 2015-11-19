@@ -150,6 +150,10 @@ INSRT		= $dc		; Number of inserts outstanding
 ROPRTY		= $dd		; Write shift word / read character in
 FSBLK		= $de		; Tape blocks remaining to write
 MYCH		= $df		; Serial word buffer
+CAS1		= $f9		; Cassette #1 status
+CAS2		= $fa		; Cassette #2 status
+STAL		= $fb		; Tape start address/ MLM
+MEMUSS		= $fd		; MLM / DOS pointer / Misc
 
 !IF CODEBASE=0 {
 ;		---------------- 40-Column Only Usage (Codebase 0)
@@ -169,6 +173,7 @@ HOMECT		= $e8		; Home count
 SCRIV		= $e9		; Screen Input Vector  (E9/EA)
 SCROV		= $eb		; Screen Output Vector (EB/EC)
 ; $ED-F7 			; UNUSED
+JIFFY6DIV5	= $f8		; TI clock adjust (speed by 6/5)
 }
 
 !IF ESCCODES = 1 {
@@ -179,9 +184,3 @@ BELLMODE	= $f2		; 0=Disable, 1=Enable BELL/CHIME
 EUROFLAG        = $f3		; 0=ASCII, 1=DIN
 }
 
-;		---------------- Common Usage
-JIFFY6DIV5	= $f8
-CAS1		= $f9		; Cassette #1 status
-CAS2		= $fa		; Cassette #2 status
-STAL		= $fb		; Tape start address/ MLM
-MEMUSS		= $fd		; MLM / DOS pointer / Misc

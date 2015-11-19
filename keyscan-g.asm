@@ -8,7 +8,7 @@
 ;--------------- Scan Keyboard (scnkey)
 ; NOTE: The keyboard ROW select is reset to zero in IRQ routine
 
-SCAN_KEYBOARD
+SCAN_KEYBOARD				; [$E4BF]
 
 ;!if DEBUG = 1 { INC DBLINE+5 }		; DEBUG - 6th character on top line
 
@@ -36,37 +36,38 @@ SCAN_ROW
 		CMP PIA1_Port_B 	; Keyboard COL result
 		BNE SCAN_ROW		; Debounce
 
-;---------------
-    		CMP #$FF
-    		BNE SCAN_COL
-    		TXA
+;		----------------------- Check Result [$E4DF]
+    		CMP #$FF		; Are any keys pressed?  ($FF = No keys are down)
+    		BNE SCAN_COL		; Yes, go check the bits
+    		TXA			; No,
     		SEC
     		SBC #$08
     		TAX
     		BNE SCAN_NEXT3
     		BEQ SCAN_GOT
+;		----------------------- Some keys are down
 
 SCAN_COL	LSR			; Shift the value right
 		BCS SCAN_NEXT2		; If the bit was "1" then key is NOT down. Skip
 
-;-------------- We have a key press. Look it up in the keyboard matrix
+;		----------------------- We have a key press. Look it up in the keyboard matrix
 
 		PHA			; Save for later
 		LDA KEYBOARD_NORMAL-1,X ; Read Keyboard Matrix (X is offset)
 		BNE SCAN_NOSH		; Is it SHIFT key? No, skip
 
-;-------------- SHIFT key Detected
+;		----------------------- SHIFT key Detected
 
 		LDA #$01		; Set the SHIFT flag
 		STA KEYFLAGS		; Flag: Print Shifted Chars.
 		BNE SCAN_NEXT		; No, skip
 
-;-------------- Non-SHIFT key
+;		----------------------- Non-SHIFT key
 
 SCAN_NOSH	CMP #$10		; Is it REPEAT?
 		BNE SCAN_NORPT		; No, skip
 
-;-------------- REPEAT key
+;		----------------------- REPEAT key
 
 		LDA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
 		ORA #$80
@@ -76,7 +77,7 @@ SCAN_NOSH	CMP #$10		; Is it REPEAT?
 SCAN_NORPT	CMP #$FF		; Is it "no key"?
 		BEQ SCAN_NEXT		; Yes, skip
 
-;-------------- Normal key
+;		----------------------- Normal key
 
 		STA Key_Image		; Store the key
 
@@ -87,11 +88,12 @@ SCAN_NEXT2	DEX			; Decrement keyboard table offset
 		DEY			; Next COLUMN
 		BNE SCAN_COL		; Go back up for next column bit
 
-;-------------- Completed all bits in ROW, Increment ROW
-SCAN_NEXT3
-		INC PIA1_Port_A		; Next Keyboard ROW
+;		------------------------ Completed all bits in ROW, Increment ROW
+
+SCAN_NEXT3	INC PIA1_Port_A		; Next Keyboard ROW
 		BNE SCAN_ROW		; More? Yes, loop back
-;-------------- Process Key Image
+
+;		------------------------ Process Key Image
 
 SCAN_GOT	LDA Key_Image		; Key Image
 		CMP KEYPRESSED		; Current Key Pressed: 255 = No Key
@@ -126,26 +128,25 @@ SCAN_DELAY2	DEC KOUNT		; Repeat Speed Counter
 		LDX #$04
 		STX KOUNT		; Repeat Speed Counter
 		LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
-		DEX			; One less
-		BPL SCAN_OUT		; Exit
+		BNE SCAN_OUT		; Exit
 
 SCAN_REC	STA KEYPRESSED		; Current Key Pressed: 255 = No Key
 		CMP #$FF		; No Key?
  		BEQ SCAN_OUT		; Yes, exit
 
 		!if CRUNCH=0 {
-			NOP
-			NOP
-			NOP
-			NOP
+			NOP		; These NOPs are here to remove the code
+			NOP		; used to handle SHIFTED number keys.
+			NOP		; It appears the Business Keyboard scanner (80-column machines)
+			NOP		; was modified for Graphic Keyboard (40-column machines).
 			NOP
 			NOP
 			NOP
 		}
     		LSR KEYFLAGS		;Flag: Print Shifted Chars.
-    		BCC SCAN_NORM2		;l_e57a
+    		BCC SCAN_NORM		;l_e57a
 		!if CRUNCH=0 {
-			NOP
+			NOP		; See above.
 			NOP
 			NOP
 			NOP
@@ -166,7 +167,7 @@ SCAN_REC	STA KEYPRESSED		; Current Key Pressed: 255 = No Key
 
 SCAN_SHIFT	ORA #$80		; Set upper bit for Graphics Symbol
 
-;-------------- Put the KEY into the Buffer (Key in accumulator)
+;		----------------------- Put the KEY into the Buffer (Key in accumulator) [$E57A]
 
 SCAN_NORM
 

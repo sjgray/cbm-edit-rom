@@ -125,7 +125,7 @@ CURSOR_LEFT_MARGIN
 		LDA LineLinkTable,X	; Get Current Line's Screen Line Link entry
 		ORA #$80		; Make sure HIGH bit is set
 		STA ScrPtr+1		; Store in Current Screen Line Address HI
-		LDA Line_Addr_Lo-1,X	; Get the LO byte from table in ROM
+		LDA Line_Addr_Lo,X	; Get the LO byte from table in ROM
 		STA ScrPtr    		; Store to Current Screen Line Address LO
 		LDA #$27       		; 40 characters/line minus 1 = 39
 		STA RigMargin   		; Set Physical Screen Line Length = 40
@@ -802,7 +802,7 @@ WSU_LOOP1
 ;		----------------------- Set up screen pointers, scroll line link table entry for the current line
 WSU_LOOP2
 		INX			; LOOP[
-		LDA Line_Addr_Lo-1,X	;   Screen line address table LO
+		LDA Line_Addr_Lo,X	;   Screen line address table LO
 		STA ScrPtr    		;   Set up Pointer LO for screen scrolling
 		LDA LineLinkTable,X	;   Screen Line Link Table (address table HI)
 		ORA #$80		;   Make sure HI BIT is set
@@ -817,7 +817,7 @@ WSU_SKIP1
 		TYA
 		ORA #$80		;   Set HI BIT
 		STA SAL+1		;   $C8
-		LDA Line_Addr_Lo,X	;   Screen line address table
+		LDA Line_Addr_Lo+1,X	;   Screen line address table
 		STA SAL    		;   Pointer: Tape Buffer/ Screen Scrolling
 
 ;               ----------------------- Now we scroll the video screen lines
@@ -884,7 +884,7 @@ ADVANCE_TIMER
 		BNE IRQ_NORMAL2		; No, do normal IRQ
 		LDA #$00		; Reset IRQ adjustment counter
 		STA JIFFY6DIV5 		; Counter to speed TI by 6/5 (40col)
-		BEQ IRQ_MAIN		; Do normal IRQ
+		BEQ ADVANCE_TIMER	; was IRQ_MAIN		; Do normal IRQ
 
 ;####################################################################################################
 ;		!fill $e442-*,$aa	; 0 bytes ###################################################
@@ -934,7 +934,7 @@ IRQ_SKIP2
 		EOR #$80		; Flip the top bit (reverse character bit)
 		STA (ScrPtr),Y		; Pointer: Current Screen Line Address
 
-;		--------------- Prep for keyboard scanning
+;		--------------- Prep for keyboard scanning [$E47B]
 PREP_KEYSCAN
 		LDY #$00
 		LDA PIA1_Port_A		; Keyboard ROW select
@@ -942,7 +942,7 @@ PREP_KEYSCAN
 		STA PIA1_Port_A 	; Keyboard ROW select
 		LDA PIA1_Port_A 	; Keyboard ROW select
 
-;		--------------- Check tape and IEEE
+;		--------------- Check tape and IEEE [$E488]
 CHECK_TAPE_IEEE
 		ASL
 		ASL
@@ -1061,7 +1061,7 @@ CRT_SET_GRAPHICS
 ; OPTIONS: 'SS40' uses new routine in upper rom
 
 CRT_PROGRAM
-;		--------------------- Set 'Character Set'
+;		--------------------- Set 'Character Set' [$E61D]
 
 		STA SAL				; Pointer LO: Tape Buffer/ Screen Scrolling
 		STX SAL+1			; Pointer HI
@@ -1072,7 +1072,7 @@ CRT_PROGRAM
 		ORA FNLEN			; update lower nibble in Temp Variable
 		STA VIA_PCR			; write it back to VIA Register C - CA2			CHIP
 
-;		--------------------- Write to the CRTC controller
+;		--------------------- Write to the CRTC controller [$E62E]
 
 		LDY #$11			; Number of bytes to copy = 17
 
@@ -1242,9 +1242,9 @@ SD_SKIP
 		ORA #$80			;   SET HI bit
 		STA ScrPtr+1			;   Store to screen line SOURCE pointer
 		LDY #$27			;   40 characters per line minus 1 (0-39)
-		LDA Line_Addr_Lo,X		;   Get screen's LO byte from Screen line address table
+		LDA Line_Addr_Lo+1,X		;   Get screen's LO byte from Screen line address table
 		STA SAL    			;   Store it to DESTINATION screen pointer
-		LDA Line_Addr_Lo-1,X		;   Get Previous lines LO byte from Screen line address table
+		LDA Line_Addr_Lo,X		;   Get Previous lines LO byte from Screen line address table
 		STA ScrPtr    			;   Store it to the SOURCE pointer
 
 ;		------------------------------- Copy the line
@@ -1307,7 +1307,11 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e	; BELL chime values
 ;************** POWERS OF 2 TABLE [$E7DC]
 ; This table is used by the TAB routine
 
-POWERSOF2       !byte 80,40,20,10,08,04,02,01	; BIT table
+POWERSOF2       !byte $80,$40,$20,$10,$08,$04,$02,$01	; BIT table
+
+;************** VERSION BYTE?
+
+		!byte $BB				; Unkown. Could be VERSION?
 
 ;************** FILLER
 

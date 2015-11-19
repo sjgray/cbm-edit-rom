@@ -27,7 +27,7 @@ DELAY			= $03e9 ;Repeat Key countdown delay 	(40 col)
 KOUNT			= $03ea ;Delay between repeats 		(40 col)
 XMAX			= $03eb ;Max keyboard buffer size 	(40 col)
 CHIME			= $03ec ;Chime Time 0=off 		(40 col)
-TIADJ			= $03ed ;TI clock adjust (speed by 6/5) (40 col)
+JIFFY6DIV5		= $03ed ;TI clock adjust (speed by 6/5) (40 col) Was: TIADJ
 RPTFLG			= $03ee ;Repeat Flag                    (40 col)
 TABS			= $03ef ;TAB-STOP table			(40 col)
 }

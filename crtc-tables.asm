@@ -12,7 +12,7 @@
 }
 
 !if COLUMNS=40 {
-	!if SOFT40=1 {
+	!IF SOFT40=1 {
 		!if REFRESH = 0 { !source "crtc-soft40-50hz.asm" }
 		!if REFRESH = 1 { !source "crtc-soft40-60hz.asm" }
 		!if REFRESH = 2 { !source "crtc-soft40-pal.asm" }
