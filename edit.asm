@@ -96,7 +96,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS		; Calculate bottom line of screen for debug
 ; $E800-E8FF is not visible as I/O is in this space (the IO.ASM file can be used to place comments here)
 ; $E900-EFFF for Extended ROM start address
 
-!IF CORE = 2 {
+!IF CODEBASE = 2 {
 	!SOURCE "editromext.asm" 
 } ELSE {		
 	!IF COLOURPET + ESCCODES + WEDGE + EXECUDESK + SS40 + SOFT40 > 0 {

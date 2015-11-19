@@ -6,7 +6,7 @@
 ; TODO: Analyze JIFFY CLOCK differences from older ROMs
 ; TODO: make selectable
 
-!if EXTENDED=0 {
+!if CODEBASE<2 {
 ADVANCE_TIMER
 		JSR UDTIME			; Update System Jiffy Clock. KERNAL routine $FFEA
 		INC JIFFY6DIV5			; Counter to speed TI by 6/5

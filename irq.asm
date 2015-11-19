@@ -73,7 +73,7 @@ Be474		LDY #0
 							; Upper bits: IEEE and Cassette
 							; Lower bits: Keyboard ROW select
 
-!if EXTENDED=0 {
+!if CODEBASE<2 {
 		AND #$F0				; Mask off lower 4 bits (reset keyboard scan row)
 		STA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
 		LDA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP

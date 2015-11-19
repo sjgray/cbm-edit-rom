@@ -16,7 +16,7 @@
 
 CRT_SET_TEXT
 
-!if EXTENDED=0 {
+!if CODEBASE<2 {
 	!IF SS40=0 {
 		LDA #<CRT_CONFIG_TEXT			; Point to CRTC Table
 		LDX #>CRT_CONFIG_TEXT			; Point to CRTC Table
@@ -27,7 +27,7 @@ CRT_SET_TEXT
 	}
 }
 
-!IF EXTENDED=1 {
+!IF CODEBASE=2 {
 	JMP CRT_SET_TEXT_EXT			; Jump to EXTENDED version (upper rom)
 
 	!if CRUNCH=0 {	
@@ -43,7 +43,7 @@ CRT_SET_TEXT
 
 CRT_SET_GRAPHICS
 
-!if EXTENDED=0 {
+!if CODEBASE<2 {
 	!IF SS40=0 {
 		LDA #<CRT_CONFIG_GRAPHICS       	; Point to CRTC Table
 		LDX #>CRT_CONFIG_GRAPHICS       	; Point to CRTC Table
@@ -52,7 +52,7 @@ CRT_SET_GRAPHICS
 		JMP CRT_SET_GRAPHICS_SS40		; Jump to SS40 version (upper rom)
 	}
 }
-!IF EXTENDED=1 {
+!IF CODEBASE=2 {
 	JMP CRT_SET_GRAPHICS_EXT		; Jump to EXTENDED version (upper rom)
 
 	!if CRUNCH=0 {

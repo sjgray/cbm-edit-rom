@@ -389,10 +389,10 @@ CHAR_TO_SCREEN
 		ORA #$40 				; '@'
 CHAR_TO_SCREEN2
 		LDX ReverseFlag
-		BEQ CTS_SKIP1 Be17f
+		BEQ CTS_SKIP1
 CHAR_TO_SCREEN3
 		ORA #$80
-CTS_SKIP1 Be17f
+CTS_SKIP1
 
 !IF CODEBASE=1 {
 		LDX INSRT				; Flag: Insert Mode, >0 = # INSTs
@@ -1245,13 +1245,13 @@ ChrOutMarginBeep
 		SEC
 		SBC CursorCol			; Cursor Column on Current Line
 		CMP #5				; 5 characters from end of line
-		BNE Be6d0
+		BNE BELLDONE
 		TXA
 		CMP #$1d 			; <Cursor Right> ?
 		BEQ Double_BEEP			; Ring BELL
 		AND #$7f
 		CMP #$20 			; <SPACE>
-		BCC Be6d0
+		BCC BELLDONE
 
 ;************** Do BELL
 
