@@ -1210,6 +1210,7 @@ INITED2
 		STA CHIME 			; Chime Time 0=off (40col)
 		STA DELAY			; Repeat key countdown (40col)
 		STA KOUNT 			; Delay between repeats (40col)
+!IF WEDGE=1 {	JSR WEDGE_PREP }		; Activate WEDGE
 		RTS
 
 ;************** Check for screen scrolling [$E6EA]
