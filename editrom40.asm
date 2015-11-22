@@ -908,7 +908,11 @@ IRQM_SKIP	JMP ($0090) 		; Vector: Hardware Interrupt		(points to $E455)
 
 ;=============== IRQ Handler [$E455]
 IRQ_NORMAL
-		JSR UDTIME		; $FFEA / jmp $f768	udtim	Update System Jiffy Clock
+!IF HERTZ=50 {
+		JMP ADVANCE_TIMER	; 50Hz correction routine
+} ELSE {
+		JSR UDTIME		; 60Hz no correction needed. Update System Jiffy Clock = Kernal UDTIME=$FFEA 
+}
 
 ;		--------------- Blink the cursor
 IRQ_NORMAL2
@@ -1312,7 +1316,8 @@ POWERSOF2       !byte $80,$40,$20,$10,$08,$04,$02,$01	; BIT table
 
 ;************** VERSION BYTE?
 
-		!byte $BB				; Unkown. Could be VERSION?
+!IF HERTZ=50 {	!byte $29 }			; 901498-01 [edit-4-40-n-50]
+!IF HERTZ=60 {	!byte $BB }			; 901499-01 [edit-4-40-n-60]
 
 ;************** FILLER
 
