@@ -13,7 +13,7 @@
 ;   CODEBASE=2 for 80-column (8296/8296D) machines (mostly DIN keyboard versions)
 ;
 ; Both CODEBASE=0 and CODEBASE=2 have limited customizability. You may change screen/keyboard and
-; a few other options. CODEBASE=1 is designed for maximum custimizability (for example COLOURPET,
+; a few other options. CODEBASE=1 is designed for maximum customizability (for example COLOURPET,
 ; ESC codes, Soft40, SS40, Wedge etc).
 ;
 ; If there are no options listed it means that support has not been added yet!
@@ -61,6 +61,7 @@ DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
 ; To generate Edit ROMs that are Byte-exact matches to actual Commodore ROMS set the
 ; following options (If an option is not listed assume "0"):
 ;
+; 901498-01 -> CODEBASE=0,KEYSCAN=0,KEYBOARD=0,COLUMNS=40,REFRESH=1,BOOTCASE=1,HERTZ=50,REPEATOPT=0   [edit-4-40-n-50Hz]
 ; 901499-01 -> CODEBASE=0,KEYSCAN=0,KEYBOARD=0,COLUMNS=40,REFRESH=1,BOOTCASE=1,HERTZ=60,REPEATOPT=0   [edit-4-40-n-60Hz]
 ; 901474-04 -> CODEBASE=1,KEYSCAN=1,KEYBOARD=1,COLUMNS=80,REFRESH=0,BOOTCASE=0,HERTZ=50,REPEATOPT=1   [edit-4-80-b-50Hz]
 ; 324243-04 -> CODEBASE=2,KEYSCAN=2,KEYBOARD=2,COLUMNS=80,REFRESH=0,BOOTCASE=0,HERTZ=50,REPEATOPT=0   [edit-4-80-din-50Hz] (8296D)
