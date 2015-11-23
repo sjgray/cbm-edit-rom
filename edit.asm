@@ -33,7 +33,7 @@ REPEATOPT = 1	; Key Repeat Option		0=No (Always ON), 1=Yes
 COLUMNS   = 40	; Screen Width:			40 or 80 columns
 HERTZ     = 50	; Line Frequency (Clock):	50=Euro,60=N.America
 IRQFIX    = 1   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating
-BOOTCASE  = 1	; Initial Screen Mode		0=Text, 1=Graphics
+BOOTCASE  = 0	; Initial Screen Mode		0=Text, 1=Graphics
 
 ESCCODES  = 0	; Add ESC codes? 		0=No, 1=Yes
 WEDGE     = 0	; DOS Wedge			0=No, 1=Yes
@@ -50,7 +50,7 @@ DEFAULTBG = 0	; ColourPET Background colour   0 to 15 RGBI
 
 MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility
 REBOOT    = 0	; Add keyboard reboot? 		0=No, 1=Yes
-EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes
+EXECUDESK = 1	; Add Execudesk Menu?		0=No, 1=Yes			Note: Requires BOOT to TEXT mode!
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
 CRUNCH    = 0   ; Remove unneeded code (NOPS) when posible? 0=No, 1=Yes
 ;

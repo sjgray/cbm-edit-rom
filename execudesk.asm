@@ -1,6 +1,7 @@
 ; PET/CBM EDIT ROM - EXECUDESK 
 ; ================
 ; Execudesk is a power-on menu system for 8296 machines
+; NOTE: The Execudesk menu requires that the machine boot to TEXT mode!
 ;
 ;---- patch - set IRQ vector to EXECUDESK IRQ HANDLER at $E900
 ;
