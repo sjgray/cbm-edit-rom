@@ -120,7 +120,18 @@ WEDGESTRING
 
 ;-------------- Keyboard Stuffer
 
-WEDGE_PREP	LDX #9				; Length of string
+WEDGE_PREP
+!IF WEDGEBYPASS=1 {
+		LDA PIA1_Port_A 		; Keyboard ROW select - PIA#1, Register 0
+						; Upper bits: IEEE and Cassette
+						; Lower bits: Keyboard ROW select
+		AND #$F0			; Mask off lower 4 bits (reset keyboard scan row)
+		STA PIA1_Port_A			; Keyboard ROW select - PIA#1, Register 0				CHIP
+		LDA PIA1_Port_B			; Keyboard COL result							CHIP
+		CMP #$FF			; Are any keys pressed?  (FF=No keys down)
+		BNE WP_DONE			; Yes, so bypass wedge preps
+}
+		LDX #9				; Length of string
 
 WP_LOOP		LDA WEDGE_SYS,X			; Get a key from table
 		STA KEYD,X 			; put it in the Keyboard Buffer
@@ -129,7 +140,7 @@ WP_LOOP		LDA WEDGE_SYS,X			; Get a key from table
 
 		LDA #9				; Length of string
 		STA CharsInBuffer		; Set characters in keyboard buffer 
-		RTS
+WP_DONE		RTS
 
 ;-------------- TEXT to stuff into keyboard buffer
 

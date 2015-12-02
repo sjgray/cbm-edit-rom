@@ -38,6 +38,7 @@ BOOTCASE  = 0	; Initial Screen Mode		0=Text, 1=Graphics
 ESCCODES  = 0	; Add ESC codes? 		0=No, 1=Yes
 WEDGE     = 0	; DOS Wedge			0=No, 1=Yes
 WEDGEMSG  = 1	; Show wedge message?		0=No, 1=Yes,2=Custom, 3=ColourPET	Only valid when WEDGE=1
+WEDGEBYPASS=1	; Enable Wedge Bypass?		0=No, 1=Yes			Hold Any key on ROW0 on bootup to bypass wedge
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes
 SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns
