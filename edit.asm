@@ -8,8 +8,8 @@
 ; The most important is the CODEBASE variable. It determines which main code to use, which will determine
 ; how many features are available:
 ;
-;   CODEBASE=0 for 40-column (2001/30xx/40xx) machines
-;   CODEBASE=1 for 80-column (80xx/82xx/9000) machines
+;   CODEBASE=0 for 40-column (30xx/40xx) machines with Universal Dynamic Motherboard
+;   CODEBASE=1 for 80-column (80xx/82xx/9000) machines with Universal Dynamic Motherboard
 ;   CODEBASE=2 for 80-column (8296/8296D) machines (mostly DIN keyboard versions)
 ;
 ; Both CODEBASE=0 and CODEBASE=2 have limited customizability. You may change screen/keyboard and
@@ -25,33 +25,33 @@
 ; DIRECTIVE	  FEATURE			VALID OPTIONS			NOTES / FUTURE OPTIONS
 ;----------	  -------			-------------			----------------------
 
-CODEBASE  = 0   ; Code Base			0=4000, 1=8000, 2=8296		
-KEYSCAN   = 0   ; Keyboard Scanner		0=Graphic, 1=Business, 2=Extended, 3=C64
-KEYBOARD  = 0	; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG,6=BZ,7=CBM-II (requires hardware mod)
-REFRESH   = 0	; Screen refresh:		0=Internal-Euro,1=Internal-NA,2=External-PAL,3=External-NTSC
-REPEATOPT = 1	; Key Repeat Option		0=No (Always ON), 1=Yes
-COLUMNS   = 40	; Screen Width:			40 or 80 columns
-HERTZ     = 50	; Line Frequency (Clock):	50=Euro,60=N.America
+CODEBASE  = 1   ; Code Base			0=4000, 1=8000, 2=8296		
+KEYSCAN   = 1   ; Keyboard Scanner		0=Graphic, 1=Business, 2=Extended, 3=C64
+KEYBOARD  = 1	; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG,6=BZ,7=CBM-II (requires hardware mod)
+REFRESH   = 1	; Screen refresh:		0=Internal-Euro,1=Internal-NA,2=External-PAL,3=External-NTSC
+REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
+COLUMNS   = 80	; Screen Width:			40 or 80 columns
+HERTZ     = 60	; Line Frequency (Clock):	50=Euro,60=N.America
 IRQFIX    = 1   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating
 BOOTCASE  = 0	; Initial Screen Mode		0=Text, 1=Graphics
 
-ESCCODES  = 0	; Add ESC codes? 		0=No, 1=Yes
-WEDGE     = 0	; DOS Wedge			0=No, 1=Yes
-WEDGEMSG  = 1	; Show wedge message?		0=No, 1=Yes,2=Custom, 3=ColourPET	Only valid when WEDGE=1
-WEDGEBYPASS=1	; Enable Wedge Bypass?		0=No, 1=Yes			Hold Any key on ROW0 on bootup to bypass wedge
+ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes
+WEDGE     = 1	; DOS Wedge			0=No, 1=Yes
+WEDGEMSG  = 4	; Show wedge message?		0=No, 1=Yes,2=Custom, 3=ColourPET,4=Project	Only valid when WEDGE=1
+WEDGEBYPASS=1	; Enable Wedge Bypass check?	0=No, 1=Yes			Hold Any key on ROW0 on bootup to bypass wedge
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes
-SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes
+SS40      = 1	; Software Switchable Soft-40	0=No, 1=Yes
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns
 
 COLOURPET = 0	; ColourPET additions?		0=No, 1=Yes
-COLOURVER = 0	; ColourPET Hardware Version	0=Beta,1=Release		0=ColourRAM at $8400, 1=$8800 (use for VICE)
+COLOURVER = 1	; ColourPET Hardware Version	0=Beta,1=Release		0=ColourRAM at $8400, 1=$8800 (use for VICE)
 COLOURMODE= 0	; ColourPET Hardware Type	0=Digital, 1=Analog
 DEFAULTFG = 5	; ColourPET Foreground colour   0 to 15 RGBI
 DEFAULTBG = 0	; ColourPET Background colour   0 to 15 RGBI
 
 MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility
-REBOOT    = 0	; Add keyboard reboot? 		0=No, 1=Yes
-EXECUDESK = 1	; Add Execudesk Menu?		0=No, 1=Yes			Note: Requires BOOT to TEXT mode!
+REBOOT    = 1	; Add keyboard reboot? 		0=No, 1=Yes
+EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes			Note: Requires BOOT to TEXT mode!
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
 CRUNCH    = 0   ; Remove unneeded code (NOPS) when posible? 0=No, 1=Yes
 ;

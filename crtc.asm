@@ -23,12 +23,12 @@ CRT_SET_TEXT
 		LDY #$0E				; Character Set = TEXT
 		BNE CRT_PROGRAM
 	} ELSE {
-		JMP CRT_SET_GRAPHICS_SS40		; Jump to SS40 version (upper rom)
+		JMP CRT_SET_TEXT_SS40			; Jump to SS40 version (upper rom)
 	}
 }
 
 !IF CODEBASE=2 {
-	JMP CRT_SET_TEXT_EXT			; Jump to EXTENDED version (upper rom)
+	JMP CRT_SET_TEXT_EXT				; Jump to EXTENDED version (upper rom)
 
 	!if CRUNCH=0 {	
 		NOP

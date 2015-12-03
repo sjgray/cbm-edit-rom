@@ -62,6 +62,13 @@ WEDGESTRING
 		!text "            "		; erase "READY" message
 		!byte $0D			; <CR>
 
+; Custom 8032 - For TEXT MODE startup screen
+!if WEDGEMSG=4 {				
+         	!byte $13            		; <HOME> 
+         	!pet "*** Commodore EDITROM Project - Wedge/ESC/SS40 ***"
+         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+}
+
 ; Custom ColourPET message courtesy Christian Dirk - For GRAPHICS MODE startup screen
 !if WEDGEMSG=3 {				
          	!byte $13            		; <HOME> 
