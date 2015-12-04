@@ -31,19 +31,27 @@ PET/CBM EDIT ROM PROJECT - TODO List
 - Investigate CRTC parameters for use with RGB/CGA to VGA adapters. Hervé connected his PET to a
   GB8220 board and says the sync width needs adjusting to get a stable picture. His 8032 CRTC
   is initialized with the following registers: 63,40,53,33,33,7,25,32,0,8
-
-- Request: Toggle internal/external monitor settings. Hardware control for internal monitor shutoff
 	
 NOTE: If you are running ColourPET under VICE, please update to the latest experimental release!
       Colour RAM has been relocated to $8800 and hardware will be updated so that 40/80 columns
       can be supported with fixed colour ram locations
 
+Requests:
+---------
+
+- Toggle internal/external monitor settings. Hardware control for internal monitor shutoff
+
+
 Bugs:
+-----
 - STOP key doesn't work when listing or running programs using modified key layout.
   Investigate: KERNAL_STOP at $F335 (seems to check for $EF as last keystroke)
+- When scrolling a window (using ESC-T for Top) it also scrolls the first character on the line (outside the window)
 
 
-Future:
+Future Ideas:
+-------------
+
 - Ideas for ColourPET+G board
 	- Font support replaces the 4 background bits with 4 character set selection bits (16 posible sets)
 	- Support for bold, italic, underline, Double-high, double-wide, double-high+wide text using fonts
