@@ -54,73 +54,7 @@ install_wedge
 ;-------------- MESSAGE
 
 WEDGESTRING
-; Always start with erasing the SYS and READY message
-
-		!byte $91			; <UP>
-		!text "            "		; erase "SYS" message
-		!byte $0D			; <CR>
-		!text "            "		; erase "READY" message
-		!byte $0D			; <CR>
-
-; Custom 8032 - For TEXT MODE startup screen
-!if WEDGEMSG=4 {				
-         	!byte $13            		; <HOME> 
-         	!pet "*** Commodore EDITROM Project - Wedge/ESC/SS40 ***"
-         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
-}
-
-; Custom ColourPET message courtesy Christian Dirk - For GRAPHICS MODE startup screen
-!if WEDGEMSG=3 {				
-         	!byte $13            		; <HOME> 
-         	!byte $99            		; <GRN>
-         	!pet "*** "
-         	!byte $1c            		; <RED>
-         	!pet "co"
-         	!byte $99            		; <GRN>
-         	!pet "lo"
-         	!byte $9a            		; <BLU>
-         	!pet "ur"
-         	!byte $9e            		; <YEL>
-         	!pet "pet"
-         	!byte $99            		; <GRN>
-         	!pet " basic 4.0 + wedge ***"   ; message
-         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
-
-}
-
-; Custom ColourPET message for TEXT MODE startup screen
-!if WEDGEMSG=2 {
-		!byte $93,$5			; <CLS><WHT>
-		!pet "*** "
-		!byte $9f			; <LTCYN>
-		!pet "Commodore "
-		!byte $1c			; <RED>
-		!pet "Co"
-		!byte $99			; <GRN>
-		!pet "lo"
-		!byte $9a			; <BLU>
-		!pet "ur"
-		!byte $9e			; <YEL>
-		!pet "PET"
-		!byte $5			; <WHT>
-		!pet " ***"
-		!byte 11,11
-		!byte $d			; <cr>
-}
-
-; Wedge-only activation message		
-!if WEDGEMSG=1 {
-		!byte $91,$91,$91		; <UP><UP><UP>
-		!text "WEDGE ACTIVE"		; message
-		!byte $0D			; <CR>
-		!text "            "		; erase "READY"
-		!byte $91			; <UP>
-}
-
-; No message. Erase the SYS and READY prompts.
-!if WEDGEMSG=0 {
-		!byte $91,$91,$91,$91		; <UP><UP><UP><UP>
-}
+		!SOURCE "WEDGEMSG.ASM"
 
 		!byte 0				; end of text marker
 		!byte 0				; extra 0 padding
