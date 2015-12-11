@@ -7,7 +7,7 @@ TABSTOPS
            !byte $50,$48,$40,$38,$30,$28,$20,$18
            !byte $10,$08
 
-           !fill $ee85-*,$ff			; 560 bytes!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!IF CRUNCH=0 {	!fill $ee85-*,$ff }			; 560 bytes!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ;--------- VOCALS Table
 
@@ -55,7 +55,7 @@ DIACRITIC_CODES
            !byte $6f ; acute
            !byte $7f ; circumflex
 
-           !fill $eedf-*,$aa			; 11 bytes
+!IF CRUNCH=0 {	!fill $eedf-*,$aa }			; 11 bytes
 
 ;--------- Diacritic Index Table
 
@@ -74,7 +74,7 @@ DIACRITIC_INDEX
            !byte $1b ; acute
            !byte $1e ; circumflex
 
-           !fill $eef6-*,$aa			; 10 bytes
+!IF CRUNCH=0 {	!fill $eef6-*,$aa }			; 10 bytes
 
 ;--------- Diacritic Action Table
 
