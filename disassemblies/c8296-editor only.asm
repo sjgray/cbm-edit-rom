@@ -1375,13 +1375,32 @@ CRT_Status = $e881
            .FILL $e7ff-* ($ff) ;   83 bytes
            .BYTE $1a
 
+; ****************************************
+  THIS IS THE END OF THE "2K EDIT ROM AREA
+; ****************************************
+
+; ****************************************************
+; $E800-$E8FF 
+; This area of the ROM is not visible to the computer.
+; It is part of the IO address space.
+; Commodore used this area to add a comment to the ROM
+; ****************************************************
+
            .BYTE "CBM 8296D EUROSCREEN EDITOR 4V4E "
            .BYTE "(E-324243-04) (C) 1982 COMMODORE "
            .BYTE "ELECTRONICS LTD D  "
            .BYTE $07,$01
            .FILL $e900-* ($ff) ;  169 bytes
 
+; ********************************************************
+  THIS IS THE START OF THE EXTENDED "4K" ROM AREA AT $E900
+; ********************************************************
+
            .BYTE $16,$44,$20,$20,$07,$01
+
+; *************************************
+; Mini jump table for extended features
+; *************************************
 
            JMP CHROUT_WITH_DIACRITICS
            JMP IS_DIACRITIC_CHAR
@@ -1391,6 +1410,7 @@ CRT_Status = $e881
            JMP IS_VOCAL
            JMP PET_TO_ASCII
            JMP SCAN_KEYBOARD
+
            .FILL $e924-* ($aa) ;    6 bytes
 
 ; *************

@@ -38,7 +38,7 @@
 !if KEYSCAN=2 {
 		!if KEYBOARD= 0 { !source "kbdx-n.asm" }
 		!if KEYBOARD= 1 { !source "kbdx-b.asm" }	; QWERTY layout
-		!if KEYBOARD= 2 { !source "kbdx-din1.asm" }
+		!if KEYBOARD= 2 { !source "kbdx-din.asm" }
 		!if KEYBOARD= 3 { !source "kbdx-c64.asm" }
 		!if KEYBOARD= 4 { !source "kbdx-bsjg.asm" }	; Modified layout
 		!if KEYBOARD= 5 { !source "kbdx-nsjg.asm" }	; @ replaced by ESC

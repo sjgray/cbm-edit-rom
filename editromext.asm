@@ -6,8 +6,8 @@
 ;*=e800
 ;---------- Copyright Notice or Comments
 
-	!source "copyright-4v4e.asm"
-	!fill $e900-*,$ff  
+!source "copyright-4v4e.asm"
+!fill $e900-*,$ff  
 
 ;*=e900
 ;--------- Start of Visible Code
@@ -30,8 +30,8 @@
 
 ;--------- Extended Keyboard Scanner and printing routines
 
-		!source "extkeyscan.asm"
-		!source "extprinting.asm"
+!source "extkeyscan.asm"
+!source "extprinting.asm"
 
 ;--------- Program CRTC				(called from EDITROM.ASM)
 
@@ -96,7 +96,7 @@ CRT_SET_TEXT_OLD_1
            LDA #<CRT_CONFIG_TEXT_OLD
            LDX #>CRT_CONFIG_TEXT_OLD
            LDY #14
-           JMP CRT_PROGRAM_OLD
+           JMP CRT_PROGRAM
 
 ;--------- Advance JIFFY Clock
 ; This routine was relocated to EXTROM
@@ -140,7 +140,7 @@ JIFFY_MAX
 
 ;--------- Extended Keyboard scanning tables
 
-		!source "extkeytables.asm"
+!source "extkeytables.asm"
 
 ;--------- Keyboard Tables
 

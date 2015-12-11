@@ -55,7 +55,7 @@ Bea6d      CPX #$1d
            INC CursorCol
            CPY RigMargin
            BCC Mea80
-           JSR Cursor_Down
+           JSR CURSOR_DOWN
            LDY LefMargin
            STY CursorCol
 Mea80      BIT SET_V_FLAG 				; SOV Set overflow flag
@@ -182,7 +182,7 @@ INCREASE_COL
 
 ;--------- ?
 
-Jeb3a
+Screen_Input_Ext
            LDY CursorCol
            LDA (ScrPtr),Y				;----------------(!!!!!!!!!!!!!!!! fix for colour)?
            JSR Check_Diacritic
