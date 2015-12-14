@@ -5,10 +5,13 @@ This project will allow you to build various EDIT ROMS for the Commodore PET/CBM
 
 FILES:
 
-make.bat	- type "make" to assemble.
+make.bat	- type "make" to assemble with options set in "edit.asm" file
+
 edit.asm	- The "main" source file. Contains directives to choose which options to include/use.
-editrom.asm	- Code for 2K ROM
-editromext.asm	- Code for upper 2K of 4K ROM
+editrom40.asm	- Code for CODEBASE 0 - 40 column, 2K ROM
+editrom80.asm   - Code for CODEBASE 1 - 80 column, 2K ROM
+editrom82.asm   - Code for CODEBASE 2 - 80 column, 4K ROM, DIN editor features
+editromext.asm	- Code for CODEBASE 2's upper 2K of 4K ROM
 
 crt-*    - Files to define screen settings. Written to CRTC controller chip.
 kbd-*    - Files to define keyboard matrix for simple keyboard scanning routine.
