@@ -107,7 +107,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS		; Calculate bottom line of screen for debug
 	!IF COLOURPET + ESCCODES + WEDGE + EXECUDESK + SS40 + SOFT40 > 0 {
 		!IF OPTROM=0 {!SOURCE "io.asm"}	; Filler not visible due to I/O space!
 		!IF OPTROM=1 { *=$9000 }  	; Assemble to option ROM at $9000
-		!IF OPTROM=2 { *=$A000 }  	; Assemble to option ROM at $9000
+		!IF OPTROM=2 { *=$A000 }  	; Assemble to option ROM at $A000
 		
 		!IF EXECUDESK = 1 { !SOURCE "execudesk.asm" }
 		!IF WEDGE = 1	  { !SOURCE "editwedge.asm" }
