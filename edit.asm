@@ -26,6 +26,8 @@
 ;----------	  -------			-------------			----------------------
 
 CODEBASE  = 1   ; Code Base			0=4000, 1=8000, 2=8296		
+OPTROM    = 1   ; Location of EXT code		0=Extended Edit ROM area ($E800-EFFF), 1=$9000, 2=$A000
+
 KEYSCAN   = 1   ; Keyboard Scanner		0=Graphic, 1=Business, 2=DIN
 KEYBOARD  = 1	; Keyboard type:		0=N,1=B,2=DIN,3=C64,4=BSJG,5=NSJG,6=BZ,7=CBM-II (requires hardware mod)
 REFRESH   = 0	; Screen refresh:		0=Internal-Euro,1=Internal-NA,2=External-PAL,3=External-NTSC
@@ -35,8 +37,8 @@ HERTZ     = 50	; Line Frequency (Clock):	50=Euro,60=N.America
 IRQFIX    = 0   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating
 BOOTCASE  = 0	; Initial Screen Mode		0=Text, 1=Graphics
 
-ESCCODES  = 0	; Add ESC codes? 		0=No, 1=Yes
-WEDGE     = 0	; DOS Wedge			0=No, 1=Yes
+ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes
+WEDGE     = 1	; DOS Wedge			0=No, 1=Yes
 WEDGEMSG  = 4	; Show wedge message?		0=No, 1=Yes,2=Custom, 3=ColourPET,4=Project	Only valid when WEDGE=1
 WEDGEBYPASS=1	; Enable Wedge Bypass check?	0=No, 1=Yes			Hold Any key on ROW9 (bottom line in matrix) on bootup to bypass wedge
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes
@@ -103,9 +105,10 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS		; Calculate bottom line of screen for debug
 	!SOURCE "editromext.asm" 
 } ELSE {		
 	!IF COLOURPET + ESCCODES + WEDGE + EXECUDESK + SS40 + SOFT40 > 0 {
-
-		!SOURCE "io.asm"	; filler not visible due to I/O space!
-
+		!IF OPTROM=0 {!SOURCE "io.asm"}	; Filler not visible due to I/O space!
+		!IF OPTROM=1 { *=$9000 }  	; Assemble to option ROM at $9000
+		!IF OPTROM=2 { *=$A000 }  	; Assemble to option ROM at $9000
+		
 		!IF EXECUDESK = 1 { !SOURCE "execudesk.asm" }
 		!IF WEDGE = 1	  { !SOURCE "editwedge.asm" }
 		!IF COLOURPET = 1 { !SOURCE "colourpetsubs.asm" }
@@ -113,6 +116,6 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS		; Calculate bottom line of screen for debug
 		!IF REBOOT = 1    { !SOURCE "editreboot.asm" }
 		!IF SS40 = 1      { !SOURCE "editsoft40.asm" }
 
-		!FILL $F000-*,$FF	; PAD to 4K ##########################
+		!IF OPTROM=0 { !FILL $F000-*,$FF }	; PAD to 4K ##########################
 	}
 }

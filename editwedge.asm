@@ -85,7 +85,10 @@ WP_DONE		RTS
 
 ;-------------- TEXT to stuff into keyboard buffer
 
-WEDGE_SYS	!text "SYS59648"		; Make sure WEDGE is loaded at $E900!
+WEDGE_SYS
+		!IF OPTROM=0 {!text "SYS59648"}		; WEDGE is located at $E900!
+		!IF OPTROM=1 {!text "SYS36864"}		; WEDGE is located at $9000!
+		!IF OPTROM=2 {!text "SYS40960"}		; WEDGE is located at $9000!
 		!byte $0D
 
 
