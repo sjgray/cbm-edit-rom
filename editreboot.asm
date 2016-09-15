@@ -10,7 +10,7 @@
 ; OPTIONS: KEYBOARD selects reboot matrix
 
 CheckReboot
-		!IF KEYBOARD=7 {
+		!IF KEYBOARD=8 {
 			LDY #15				; ROW=15
 		} ELSE {
 			LDY #9				; ROW=9
@@ -49,7 +49,7 @@ RebootCodes
 }
 
 ;		----------------- Business Keyboard: ESC-SHIFT-SHIFT-DEL
-!if (KEYBOARD=1) OR (KEYBOARD=4) OR (KEYBOARD=6) {
+!if (KEYBOARD=1) OR (KEYBOARD=4) OR (KEYBOARD=6) OR (KEYBOARD=7) {
 		!byte %11111111	; ROW 9
 		!byte %11111111	; ROW 8
 		!byte %10111110	; ROW 7 - (ghost), ESC
@@ -107,7 +107,7 @@ RebootCodes
 ;		--------------- CBM-II Keyboard (16 ROWS): ?
 ;		Note: The CBM-II keyboard is 16x6. Two columns are not connected
 ;		TODO: Development is in progress; wiring is TBD
-!if KEYBOARD=7 { 
+!if KEYBOARD=8 { 
 		!byte %11111111	; ROW 15
 		!byte %11111111	; ROW 14
 		!byte %11111111	; ROW 13
@@ -120,7 +120,7 @@ RebootCodes
 		!byte %11111111	; ROW 6
 		!byte %11111111	; ROW 5
 		!byte %11111111	; ROW 4
-		!byte %11111110	; ROW 3
+		!byte %11111111	; ROW 3
 		!byte %11111111	; ROW 2
 		!byte %11111111	; ROW 1
 		!byte %11111111	; ROW 0
