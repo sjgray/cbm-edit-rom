@@ -1,0 +1,120 @@
+Analysis of: edit-8096-french hack
+Compared to: 901474-03 (edit-4-80-B-60)
+Analysed by Steve Gray
+
+Decription:
+
+This was found in an 8096 PET with TAN keyboard and label at World of Commodore 2015.
+This Edit ROM appears to be normal except that the SHIFTed "backarrow" key toggles
+the screen between TEXT and GRAPHICS modes when pressed. Also there seems to be some key
+substitution going on... perhaps french accent characters. The machine has a 2K EPROM in
+the character ROM socket, so it probably has a modified character set.
+
+This rom seems to be a hack of 901474-03. The majority of the code is identical except
+for one patch in the main code and a block of new code at the very end (normally unused).
+
+Analysis:
+
+OLD:
+  $E56C: E8        INX          ; move to next buffer position
+  $E56D: 86 9E     STX $9E      ; store the key
+  $E56F: 60        RTS
+
+NEW:
+  $E56C: 4C 8B E7  JSR $E78B	; jump to patch
+  $E56F: 60        RTS
+
+NEW:
+  $E78B...$E7FF    Entirely new code in patch area
+
+Rough disassembly:
+
+L_E78B:
+$E78B: A4 98     LDY SFDX	;Flag: Print Shifted Chars.
+$E78D: F0 2C     BEQ L_E7BB
+$E78F: C9 5F     CMP #$5F	; Is it BackArrow key?
+$E791: F0 4C     BEQ L_E7DF	; Yes, toggle the screen mode then RETURN (do not store key!)
+$E793: C8        INY
+$E794: C8        INY
+$E795: C9 5C     CMP #$5C	; Is it pound sign?
+$E797: F0 14     BEQ L_E7AD	; yes, do substitution ($B4)
+$E799: C9 5D     CMP #$5D	; Is it "]"
+$E79B: F0 13     BEQ L_E7B0	; yes, do substitution ($AF)
+$E79D: 88        DEY
+$E79E: C9 5E     CMP #$5E	; Is it "up arrow"?
+$E7A0: F0 15     BEQ L_E7B7
+$E7A2: 88        DEY
+$E7A3: C9 5B     CMP #$5B	; Is it "["?
+$E7A5: F0 10     BEQ L_E7B7	; yes, do substitution
+$E7A7: 88        DEY
+$E7A8: C9 40     CMP #$40	; Is it "@"
+
+L_E7AA:
+$E7AA: F0 0B     BEQ L_E7B7	; yes, just store it
+
+$E7AC: 2C        .BYTE $2C	;bit command
+$E7AD: A9 B4     LDA #$B4
+$E7AF: 2C        .BYTE $2C	;bit command
+$E7B0: A9 AF     LDA #$AF	;
+
+;------------------------------- Exit and store KEY in buffer)
+L_E7B2:
+$E7B2: 9D 6F 02  STA $026F,X	;keyboard input buffer
+
+;------------------------------- Exit without storing KEY
+L_E7B5:
+$E7B5: E6 9E     INC NDX    	;No. of Chars. in Keyboard Buffer (Queue)
+
+L_E7B7:
+$E7B7: 8C E8 03  STY $03E8	;in command buffer string area
+$E7BA: 60        RTS		;return to original keyboard buffer routine
+
+;--------------------------------
+
+L_E7BB:
+$E7BB: AC E8 03  LDY $03E8	; in command buffer string area
+$E7BE: C0 03     CPY #$03	; is it greater than 3?
+$E7C0: B0 F3     BCS L_E7B5	; yes, jump back to exit (but do not store key)
+
+;-------------------------------
+
+$E7C2: A0 00     LDY #$00	; start at first position of table
+L_E7C4:
+$E7C4: D9 E8 E7  CMP $E7E8,Y	; [LOOP compare to table entry
+$E7C7: F0 0A     BEQ L_E7D3	;   Yes, jump ahead
+$E7C9: C8        INY		;   No, skip 4 bytes in table
+$E7CA: C8        INY
+$E7CB: C8        INY
+$E7CC: C8        INY
+$E7CD: C0 14     CPY #$14	;   have we compared 20 bytes?
+$E7CF: D0 F3     BNE L_E7C4	; ]LOOP no, loop back
+$E7D1: F0 DF     BEQ L_E7B2	; yes, jump back to exit (store key)
+
+;------------------------------- Match with table
+
+L_E7D3:
+$E7D3: 38        SEC
+$E7D4: 98        TYA
+$E7D5: 6D E8 03  ADC $03E8	; in command buffer string area
+$E7D8: A8        TAY		; Save A in Y
+$E7D9: B9 E8 E7  LDA $E7E8,Y	; compare to table entry
+$E7DC: A8        TAY		; compare 
+$E7DD: D0 D3     BNE L_E7B2	; yes, jump back to exit (store key)
+
+;------------------------------- Toggle the Screen Mode
+
+L_E7DF:
+$E7DF: AD 4C E8  LDA VIA_PCR 	; VIA PCR - Reg#C (cb2
+$E7E2: 49 02     EOR #$02	; toggle bit 1 (graphic/text mode bit)
+$E7E4: 8D 4C E8  STA VIA_PCR 	; VIA PCR - Reg#C (cb2
+$E7E7: 60        RTS
+
+;--------------- Table
+; Seems to be for key substitution
+
+$E7E8:           .BYT 41,A8,AA,41 ;"A"
+                 .BYT 45,B5,B6,FF ;"E"
+$E7F0:           .BYT 49,49,B7,DF ;"I"
+		 .BYT 4F,4F,B8,4F ;"O"
+$E7F8:           .BYT 55,B9,DC,A9 ;"U"
+                 .BYT AA,AA,4A,4C ;graphic symbol - could it be reasigned to something in chr set?
