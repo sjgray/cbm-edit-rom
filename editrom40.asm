@@ -1322,6 +1322,10 @@ POWERSOF2       !byte $80,$40,$20,$10,$08,$04,$02,$01	; BIT table
 !IF HERTZ=50 {	!byte $29 }			; 901498-01 [edit-4-40-n-50]
 !IF HERTZ=60 {	!byte $BB }			; 901499-01 [edit-4-40-n-60]
 
+;************** SMALL PATCHES HERE
+
+!IF BACKARROW = 1 { !SOURCE "editbarrow.asm" }	; Patch for Back Arrow toggling of screen mode
+
 ;************** FILLER
 
 !fill $e800-*,$aa	; Fill to end of 2K

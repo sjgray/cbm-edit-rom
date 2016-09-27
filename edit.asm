@@ -56,6 +56,7 @@ REBOOT    = 0	; Add keyboard reboot? 		0=No, 1=Yes
 EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes			Note: Requires BOOT to TEXT mode!
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
 CRUNCH    = 0   ; Remove unneeded code (NOPS) when posible? 0=No, 1=Yes
+BACKARROW = 0   ; Patch for screen mode toggle  0=NO, 1=Yes 2K, 2=Yes EXT	Note: B keyboard scanner only
 ;
 DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
 
@@ -104,7 +105,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS		; Calculate bottom line of screen for debug
 !IF CODEBASE = 2 {
 	!SOURCE "editromext.asm" 
 } ELSE {		
-	!IF COLOURPET + ESCCODES + WEDGE + EXECUDESK + SS40 + SOFT40 > 0 {
+	!IF COLOURPET + ESCCODES + WEDGE + EXECUDESK + SS40 + SOFT40 + BACKARROW > 0 {
 		!IF OPTROM=0 {!SOURCE "io.asm"}	; Filler not visible due to I/O space!
 		!IF OPTROM=1 { *=$9000 }  	; Assemble to option ROM at $9000
 		!IF OPTROM=2 { *=$A000 }  	; Assemble to option ROM at $A000
@@ -115,6 +116,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS		; Calculate bottom line of screen for debug
 		!IF ESCCODES = 1  { !SOURCE "editescape.asm" }
 		!IF REBOOT = 1    { !SOURCE "editreboot.asm" }
 		!IF SS40 = 1      { !SOURCE "editsoft40.asm" }
+		!IF BACKARROW = 2 { !SOURCE "editbarrow.asm" }
 
 		!IF OPTROM=0 { !FILL $F000-*,$FF }	; PAD to 4K ##########################
 	}
