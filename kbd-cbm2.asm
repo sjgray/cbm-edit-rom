@@ -32,3 +32,6 @@ KEYBOARD_NORMAL
 !BYTE $8E,$2A,$39,$36,$33,$30 ; GRAPH  *      9      6      3      00     ROW14/O
 !BYTE $03,$2F,$2D,$2B,$0D,$FF ; STOP   /      -      +      ENTER  NONE   ROW15/P
 
+; NOTE: These bytes are directly from the CBM-II kernal:
+; $EA29 - Normal Table
+; $EA89 - Shifted Table
