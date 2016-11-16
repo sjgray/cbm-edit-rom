@@ -25,5 +25,6 @@
 		!if REFRESH = 1 { !source "crtc-40-60hz.asm" }
 		!if REFRESH = 2 { !source "crtc-40-pal.asm" }
 		!if REFRESH = 3 { !source "crtc-40-ntsc.asm" }
+		!if REFRESH = 9 { !source "crtc-40-custom.asm" }
 	}
 }
