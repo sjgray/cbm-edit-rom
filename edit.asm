@@ -30,7 +30,7 @@ OPTROM    = 1   ; Location of EXT code		0=Extended Edit ROM area ($E800-EFFF), 1
 
 KEYSCAN   = 1   ; Keyboard Scanner		0=Graphic, 1=Business, 2=DIN
 KEYBOARD  = 1	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=BSJG,5=NSJG,6=B-QWERTZ,7=B AZERTY,8=CBM-II (requires hardware mod)
-REFRESH   = 0	; Screen refresh:		0=Internal-Euro,1=Internal-NA,2=External-PAL,3=External-NTSC
+REFRESH   = 9	; Screen refresh:		0=Internal-Euro,1=Internal-NA,2=External-PAL,3=External-NTSC,9=Custom
 REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
 COLUMNS   = 80	; Screen Width:			40 or 80 columns
 HERTZ     = 50	; Line Frequency (Clock):	50=Euro,60=N.America

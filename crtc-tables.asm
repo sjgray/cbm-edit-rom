@@ -9,6 +9,7 @@
 		!if REFRESH = 1 { !source "crtc-80-60hz.asm" }
 		!if REFRESH = 2 { !source "crtc-80-pal.asm" }
 		!if REFRESH = 3 { !source "crtc-80-ntsc.asm" }
+		!if REFRESH = 9 { !source "crtc-80-custom.asm" }
 }
 
 !if COLUMNS=40 {
@@ -17,6 +18,7 @@
 		!if REFRESH = 1 { !source "crtc-soft40-60hz.asm" }
 		!if REFRESH = 2 { !source "crtc-soft40-pal.asm" }
 		!if REFRESH = 3 { !source "crtc-soft40-ntsc.asm" }
+		!if REFRESH = 9 { !source "crtc-soft40-custom.asm" }
 
 	} ELSE {
 		!if REFRESH = 0 { !source "crtc-40-50hz.asm" }
