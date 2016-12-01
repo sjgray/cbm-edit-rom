@@ -38,7 +38,7 @@ CursorColour    = $ED		; Storage for Colour at Cursor position
 
 ;---------------- Storage (Currently in Screen RAM - To be moved?)
 
-COLOURSTOR = COLOUR_RAM + 25 * COLUMNS	; Calculate Last visible colour mem
+COLOURSTOR = COLOUR_RAM + 25 * COLUMNS + 9	; Calculate Last visible colour mem then add offset for safety
 
 COLOURV 	= COLOURSTOR+1	; Combined FG and BG value
 COLOURFG	= COLOURSTOR+2	; Foreground Colour

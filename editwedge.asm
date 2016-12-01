@@ -5,6 +5,10 @@
 ; but rewritten and enhanced by Nils Eilers
 ;
 ; Adapted for EDIT-ROM and ACME assembler by Steve Gray.
+;
+; NOTE: The reason we have to stuff the keyboard buffer to activate the wedge is because
+;       the editrom code runs before basic and zero-page are initialized.
+;
 ;----------------------------------------------------------------------------------------
 ; Wedge commands are only available in direct mode. 
 ;
@@ -28,13 +32,11 @@
 ;				@D1=0			- Duplicate disk (dual drive units only). Target drive first, then source.
 ;------------------------------------------------------------------------------------------------------------------------------------------
 
-!source "membasic4.asm"
-
 
 ;-------------- INSTALL WEDGE
-; Make sure 'install_wedge' is assembled to $E900 so SYS can start it properly!
+; This patches the CHRGET routine in Zero Page to point to the WEDGE interpreter
 
-install_wedge
+INSTALL_WEDGE
 		lda #<resident_wedge		; patch CHRGET JMP address
 		sta CHRGET+1 			; to jump into wedge
 		lda #>resident_wedge
@@ -45,54 +47,21 @@ install_wedge
 		lda #8				; init default device
 		sta CHRGETX			; $73=unused byte in CHRGET
 
+!if WEDGEMSG=1 {
 		lda #<WEDGESTRING		; write "wedge active"
 		ldy #>WEDGESTRING
 		jsr STROUTZ
-	
+}	
 		rts				; exit to BASIC
 
 ;-------------- MESSAGE
-
 WEDGESTRING
-		!SOURCE "WEDGEMSG.ASM"
-
-		!byte 0				; end of text marker
+		!text "WEDGE INSTALLED"		; message
+		!byte $0D			; <CR>
 		!byte 0				; extra 0 padding
 
-;-------------- Keyboard Stuffer
-
-WEDGE_PREP
-!IF WEDGEBYPASS=1 {
-		LDA PIA1_Port_A 		; Keyboard ROW select - PIA#1, Register 0
-						; Upper bits: IEEE and Cassette
-						; Lower bits: Keyboard ROW select
-		AND #$F0			; Mask off lower 4 bits (reset keyboard scan row)
-		STA PIA1_Port_A			; Keyboard ROW select - PIA#1, Register 0				CHIP
-		LDA PIA1_Port_B			; Keyboard COL result							CHIP
-		CMP #$FF			; Are any keys pressed?  (FF=No keys down)
-		BNE WP_DONE			; Yes, so bypass wedge preps
-}
-		LDX #9				; Length of string
-
-WP_LOOP		LDA WEDGE_SYS,X			; Get a key from table
-		STA KEYD,X 			; put it in the Keyboard Buffer
-		DEX
-		BPL WP_LOOP			; loop until done
-
-		LDA #9				; Length of string
-		STA CharsInBuffer		; Set characters in keyboard buffer 
-WP_DONE		RTS
-
-;-------------- TEXT to stuff into keyboard buffer
-
-WEDGE_SYS
-		!IF OPTROM=0 {!text "SYS59648"}		; WEDGE is located at $E900!
-		!IF OPTROM=1 {!text "SYS36864"}		; WEDGE is located at $9000!
-		!IF OPTROM=2 {!text "SYS40960"}		; WEDGE is located at $9000!
-		!byte $0D
-
-
 ;-------------- Resident part of the universal DOS wedge
+; When installed, the CHRGET routine points here.
 
 resident_wedge
 		wedge_unit = CHRGETX		; default device, unused byte in CHRGET
@@ -228,9 +197,9 @@ GS_DONE		jsr SCROUT			; write char to screen
 		jsr UNTLK			; UNTALK
 		jmp READY
 
-;----------------------------------------------------------------------------
-;###### TODO: if we have quotes in our string, then they should handled here
-;----------------------------------------------------------------------------
+;------------------------------------------------------------------------------
+;###### TODO: if we have quotes in our string, then they should be handled here
+;------------------------------------------------------------------------------
 prepare_fn
 		iny				; count filename length
 		lda (TXTPTR),y

@@ -65,14 +65,15 @@ ColourPET_Init
 
 		JSR INIT_EDITOR			; Do Normal Initialization
 
-		LDA #DEFAULTFG			; Green
-		STA COLOURFG
-		LDA #DEFAULTBG			; Black
-		STA COLOURBG			; Background=Black
+		LDA #0
 		STA COLOURCOUNT			; Reset Colour Count
-		
-		LDA #0				; Black
 
+		LDA #DEFAULTFG			; Default Foreground Colour
+		STA COLOURFG
+		LDA #DEFAULTBG			; Default Background Colour
+		STA COLOURBG
+		LDA #DEFAULTBO			; Default Border Colour
+		
 ;-------------- Set Border Colour and update Register
 
 SetColourAndBorder
