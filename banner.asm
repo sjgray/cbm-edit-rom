@@ -131,4 +131,4 @@
 ; Unspecified values
 ;-----------------------------------------------
 
-		!byte 13,0			; <CR> and Zero pad incase banner out of range
+		!byte 0,0			; Zeros must end string.
