@@ -223,7 +223,13 @@ GetLin10
 		LDA CursorChar				; Character Under Cursor
 		LDY #0
 		STY BlinkPhase				; Flag: Last Cursor Blink On/Off
+
+!IF COLOURPET=0 {
 		JSR Restore_Char_at_Cursor		; Put character on screen
+} ELSE {
+		JSR Put_ColourChar_at_Cursor		; Put character AND Colour on screen
+}
+
 GL_1		JSR GETKEY				; Get Character From Keyboard Buffer
 		CMP #$83				; Is it the <RUN> key?
 		BNE GL_3				; No, skip ahead
@@ -365,7 +371,13 @@ CHAR_TO_SCREEN3
 CTS_SKIP1	LDX INSRT				; Flag: Insert Mode, >0 = # INSTs
 		BEQ CTS_SKIP2
 		DEC INSRT				; Flag: Insert Mode, >0 = # INSTs
-CTS_SKIP2	JSR Restore_Char_at_Cursor		; Put character on screen
+CTS_SKIP2
+
+!IF COLOURPET=0 {
+		JSR Restore_Char_at_Cursor		; Put character on screen
+} ELSE {
+		JSR Put_ColourChar_at_Cursor		; Put character AND Colour on screen
+}
 		INC CursorCol				; Cursor Column on Current Line
 		LDY RigMargin				; Physical Screen Line Length
 		CPY CursorCol				; Cursor Column on Current Line
@@ -1040,14 +1052,29 @@ IRQ_END		PLA
 ; ----  colour. IE: moving cursor around the screen corrupts existing attribute
 ; $E606
 
+!IF COLOURPET=1 {
+
+;************** Writes the NEW Character and Colour to the Screen
+PutColourChar_at_Cursor
+		PHA				; Save the character
+		LDY CursorCol			; Cursor Column on Current Line
+		LDA ColourV			; Current Colour Attribute
+		STA (COLOURPRT),Y		; Put the Colour to ColourRAM
+		PLA				; Restore the character
+		JMP Restore_Char_at_Cursor	; Restore character
+
+;************** Writes the OLD Colour at Cursor Position to the screen
+Restore_Colour_at_Cursor
+		PHA				; Push Character
+		LDY CursorCol			; Cursor Column on Current Line
+		LDA CURSORCOLOUR		; Get current Colour
+		STA (COLOURPTR),Y		; Set the Colour
+		PLA				; Pull Character
+}
+;************** Writes the OLD Character at Cursor Position to the screen
 Restore_Char_at_Cursor
 		LDY CursorCol			; Cursor Column on Current Line		
 		STA (ScrPtr),Y			; Put the character on the screen!!!!!!!!!!!!!!!!!!!!! 
-!IF COLOURPET=1 {
-;		LDY CursorCol			; Cursor Column on Current Line
-		LDA COLOURV			; Get current Colour
-		STA (COLOURPTR),Y		; Set the Colour
-}
 		LDA #2				; Set blink count so cursor appears immediately
 		STA BLNCT			; Timer: Countdown to Toggle Cursor
 		RTS

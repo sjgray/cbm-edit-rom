@@ -28,7 +28,7 @@
 
 COLOURPTR	= $C0		; Pointer for screen writes (WAS: Tape Pointer)
 COLOURPTR2	= $C2		; Pointer for scrolling etc (WAS: Tape Pointer)
-CursorColour    = $ED		; Storage for Colour at Cursor position
+CURSORCOLOUR    = $ED		; Storage for Colour at Cursor position
 
 ;---------------- Colour Screen RAM
 
