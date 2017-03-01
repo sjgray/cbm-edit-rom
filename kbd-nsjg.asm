@@ -6,8 +6,8 @@
 ;        CTRL- = CTRL+key , SHC- = Shift-CTRL+key, A- = Accent
 ;
 ; In order to use ESC codes, the keyboard must have an ESC key. The standard Graphic keyboard has none,
-; so the "@" key is used instead as it occupies the position an ESC key would normally be, and the "@"
-; symbol is rarely used.
+; so the "@" key is used instead as it occupies the position an ESC key would normally be. The BACKARROW
+; key will become the "@" symbol so that the DOS wedge is usable (BACKARROW is rarely used).
 
 ;---------- Normal (no modifiers) Table
 
@@ -24,4 +24,4 @@ KEYBOARD_NORMAL
 !byte $2f,$38,$ff,$50,$49,$59,$52,$57 ; KP /   KP 8   NONE   p      i      y      r      w
 !byte $39,$37,$5e,$4f,$55,$54,$45,$51 ; KP 9   KP 7   UP-ARR o      u      t      e      q
 !byte $14,$11,$09,$29,$5c,$27,$24,$22 ; DEL    DOWN   TAB??? )      \      '      $      "
-!byte $1d,$13,$5f,$28,$26,$25,$23,$21 ; RIGHT  HOME   BK-ARR (      &      %      #      !
+!byte $1d,$13,$40,$28,$26,$25,$23,$21 ; RIGHT  HOME   @      (      &      %      #      !      BACKARROW replaced by @
