@@ -1055,11 +1055,11 @@ IRQ_END		PLA
 !IF COLOURPET=1 {
 
 ;************** Writes the NEW Character and Colour to the Screen
-PutColourChar_at_Cursor
+Put_ColourChar_at_Cursor
 		PHA				; Save the character
 		LDY CursorCol			; Cursor Column on Current Line
-		LDA ColourV			; Current Colour Attribute
-		STA (COLOURPRT),Y		; Put the Colour to ColourRAM
+		LDA COLOURV			; Current Colour Attribute
+		STA (COLOURPTR),Y		; Put the Colour to ColourRAM
 		PLA				; Restore the character
 		JMP Restore_Char_at_Cursor	; Restore character
 

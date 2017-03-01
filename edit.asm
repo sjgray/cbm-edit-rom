@@ -25,7 +25,7 @@
 ; The following DATE and COMMENT strings will be placed in the IO area (if used).
 ; Take care that comments do not overflow into code space!
 
-!macro DATE    { !text "2016-12-01" }
+!macro DATE    { !text "2017-02-28" }
 !macro COMMENT { !text "sjg" }
 
 ;================================================================================
@@ -35,26 +35,26 @@
 CODEBASE  = 1   ; Code Base			0=4000, 1=8000, 2=8296		
 OPTROM    = 0   ; Location of EXT code		0=Extended Edit ROM area ($E800-EFFF), 1=$9000, 2=$A000
 
-KEYSCAN   = 0   ; Keyboard Scanner		0=Graphic, 1=Business, 2=DIN
-KEYBOARD  = 5	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (requires hardware mod)
-REFRESH   = 0	; Screen refresh:		0=Internal-Euro,1=Internal-NA,2=External-PAL,3=External-NTSC,9=Custom
+KEYSCAN   = 1   ; Keyboard Scanner		0=Graphic, 1=Business, 2=DIN
+KEYBOARD  = 1	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (requires hardware mod)
+REFRESH   = 1	; Screen refresh:		0=Internal-Euro,1=Internal-NA,2=External-PAL,3=External-NTSC,9=Custom
 REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
-COLUMNS   = 80	; Screen Width:			40 or 80 columns
+COLUMNS   = 40	; Screen Width:			40 or 80 columns
 HERTZ     = 50	; Line Frequency (Clock):	50=Euro,60=N.America
 IRQFIX    = 1   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating
-BOOTCASE  = 0	; Initial Screen Mode		0=Text/Lower, 1=Upper/Graphics
+BOOTCASE  = 1	; Initial Screen Mode		0=Text/Lower, 1=Upper/Graphics
 
-ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes
-AUTORUN   = 0   ; Set for BANNER and/or WEDGE	0=No, 1=Yes
+ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
+AUTORUN   = 1   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner and/or wedge.
 BYPASS    = 0   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to bypass custom banner, wedge or other autostart option
-BANNER    = 0   ; Custom Banner (power on msg)  0=No, N=Banner# (1-5)		Refer to docs or source
+BANNER    = 3   ; Custom Banner (power on msg)  0=No, N=Banner# (1-5)		Refer to docs or source
 WEDGE     = 1	; DOS Wedge			0=No, 1=Yes
-WEDGEMSG  = 1	; Show wedge message?		0=No, 1=Yes
-SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes
-SS40      = 1	; Software Switchable Soft-40	0=No, 1=Yes
+WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes
+SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
+SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns		Valid when SS40=1
 
-COLOURPET = 0	; ColourPET additions?		0=No, 1=Yes
+COLOURPET = 1	; ColourPET additions?		0=No, 1=Yes			Also set ESCCODES=1
 COLOURVER = 0	; ColourPET Hardware Version	0=Beta,1=Release		0=ColourRAM at $8400, 1=$8800 (use for VICE)
 COLOURMODE= 0	; ColourPET Hardware Type	0=Digital, 1=Analog
 DEFAULTFG = 5	; ColourPET Foreground colour   0 to 15 RGBI 			0=black 1=dkgrey 2=dkblue 3=ltblue 4=dkgreen 5=ltgreen 6=dkcyan 7=ltcyan

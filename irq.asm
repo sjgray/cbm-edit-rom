@@ -44,7 +44,7 @@ ie468		STA BLNCT
 		LDY CursorCol				; Column where cursor lives
 		LSR BlinkPhase				; Is it blinking?
 !IF COLOURPET=1 {
-		LDX CursorColour			; Get colour
+		LDX CURSORCOLOUR			; Get colour
 }
 		LDA (ScrPtr),Y				; Get character from the screen
 		BCS Be470				; Yes, skip
@@ -52,7 +52,7 @@ ie468		STA BLNCT
 !IF COLOURPET=1 {
 		TAX
 		LDA (COLOURPTR),Y			; Get Colour at cursor
-		STA CursorColour			; Save it
+		STA CURSORCOLOUR			; Save it
 		TXA
 }
 		INC BlinkPhase				; count
