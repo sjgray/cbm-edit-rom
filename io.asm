@@ -21,10 +21,11 @@
 	!if KEYBOARD=2 { !text "din" }
 	!if KEYBOARD=3 { !text "c64/vic" }
 	!if KEYBOARD=4 { !text "b-sjg" }	; Modified layout - cursor keys, esc etc
-	!if KEYBOARD=5 { !text "n-sjg" }	; Modified layout - @ replaced with ESC
+	!if KEYBOARD=5 { !text "n-sjg" }	; Modified layout - @ replaced with ESC, backarrow becomes @
 	!if KEYBOARD=6 { !text "b-qwertz" }	; QWERTZ layout
 	!if KEYBOARD=7 { !text "b-azerty" }	; AZERTY layout
 	!if KEYBOARD=8 { !text "cbm-ii" }	; CBM-II keyboard (requires hardware mod)
+	!if KEYBOARD=9 { !text "n-sjg2" }	; Modified layout - backarrow replaced with ESC
 
 !text " SCREEN="
 	!if COLUMNS=40  { !text "40" }

@@ -15,10 +15,11 @@
 		!if KEYBOARD= 2 { !source "kbd-din1.asm" }
 		!if KEYBOARD= 3 { !source "kbd-c64.asm" }
 		!if KEYBOARD= 4 { !source "kbd-bsjg.asm" }	; Modified layout
-		!if KEYBOARD= 5 { !source "kbd-nsjg.asm" }	; @ replaced by ESC
+		!if KEYBOARD= 5 { !source "kbd-nsjg.asm" }	; @ replaced by ESC, backarrow becomes @
 		!if KEYBOARD= 6 { !source "kbd-bz.asm" }	; QWERTZ layout
 		!if KEYBOARD= 7 { !source "kbd-ba.asm" }	; AZERTY layout (french)
 		!if KEYBOARD= 8 { !source "kbd-cbm2.asm" }	; CBM-II layout (requires hardware mod)
+		!if KEYBOARD= 9 { !source "kbd-nsjg2.asm" }	; backarrow replaced by ESC
 }
 
 ;--------------  Business Keyboard Scanner - Simple with code for specific shifted keys
@@ -29,10 +30,11 @@
 		!if KEYBOARD= 2 { !source "kbd-din1.asm" }
 		!if KEYBOARD= 3 { !source "kbd-c64.asm" }
 		!if KEYBOARD= 4 { !source "kbd-bsjg.asm" }	; Modified layout
-		!if KEYBOARD= 5 { !source "kbd-nsjg.asm" }	; @ replaced by ESC
+		!if KEYBOARD= 5 { !source "kbd-nsjg.asm" }	; @ replaced by ESC, backarrow becomes @
 		!if KEYBOARD= 6 { !source "kbd-bz.asm" }	; QWERTZ layout
 		!if KEYBOARD= 7 { !source "kbd-ba.asm" }	; AZERTY layout (french)
 		!if KEYBOARD= 8 { !source "kbd-cbm2.asm" }	; CBM-II layout (requires hardware mod)
+		!if KEYBOARD= 9 { !source "kbd-nsjg2.asm" }	; backarrow replaced by ESC
 }
 
 ;-------------- Extended Keyboard Scanner - Two Tables (Normal and Shifted)
@@ -43,8 +45,9 @@
 		!if KEYBOARD= 2 { !source "kbdx-din.asm" }
 		!if KEYBOARD= 3 { !source "kbdx-c64.asm" }
 		!if KEYBOARD= 4 { !source "kbdx-bsjg.asm" }	; Modified layout
-		!if KEYBOARD= 5 { !source "kbdx-nsjg.asm" }	; @ replaced by ESC
+		!if KEYBOARD= 5 { !source "kbdx-nsjg.asm" }	; @ replaced by ESC, backarrow becomes @
 		!if KEYBOARD= 6 { !source "kbdx-bz.asm" }	; QWERTZ layout
 		!if KEYBOARD= 7 { !source "kbdx-ba.asm" }	; AZERTY layout (french)
 		!if KEYBOARD= 8 { !source "kbdx-cbm2.asm" }	; CBM-II layout (requires hardware mod)
+		!if KEYBOARD= 9 { !source "kbdx-nsjg2.asm" }	; backarrow replaced by ESC
 }

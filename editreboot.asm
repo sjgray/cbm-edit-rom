@@ -35,7 +35,7 @@ CheckOut	RTS
 
 RebootCodes
 ;		----------------- Normal/Graphic Keyboard: @-SHIFT-SHIFT-DEL
-!if (KEYBOARD=0) OR (KEYBOARD=5) {
+!if (KEYBOARD=0) OR (KEYBOARD=5) OR (KEYBOARD=9) {
 		!byte %11111111	; ROW 9 - No keys
 		!byte %01111111	; ROW 8 - <DEL>
 		!byte %11111111	; ROW 7 - No keys
