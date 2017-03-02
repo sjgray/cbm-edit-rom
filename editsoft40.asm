@@ -11,18 +11,14 @@
 ; * UPDATE_CURSOR_ROW   - Sets screen pointers
 ;
 ; To switch between 40/80 column we also need to include ESC codes (ESC-X to switch)
-;
-; ZP Usage:
-; * SCNWIDTH = $f2					; 40 or 80
 
 ;************** Init Switchable Soft-40
 
-SS40_INIT80
-		LDA #80					; Set 80 column mode
+SS40_INIT80	LDA #80					; Set 80 column mode
 		STA SCNWIDTH				; Store it
 		RTS
-SS40_INIT40
-		LDA #40					; Set 40 column mode
+
+SS40_INIT40	LDA #40					; Set 40 column mode
 		STA SCNWIDTH				; Store it
 		RTS
 
@@ -33,12 +29,10 @@ SS40_SwapModes
 		CMP #40					; Is it 40?
 		BEQ SS40_SET80				; Yes, switch it to 80
 
-SS40_SET40
-		JSR SS40_INIT40				; No, switch it to 40
+SS40_SET40	JSR SS40_INIT40				; No, switch it to 40
 		JMP SS40_DOIT
 
-SS40_SET80
-		JSR SS40_INIT80				; Set to 80
+SS40_SET80	JSR SS40_INIT80				; Set to 80
 
 SS40_DOIT	JSR CRT_SET_TEXT_SS40			; Program CRTC for Text mode
 		JSR FULL_SCREEN_WINDOW			; Clear windows

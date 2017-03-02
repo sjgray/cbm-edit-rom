@@ -178,7 +178,10 @@ JIFFY6DIV5	= $f8		; TI clock adjust (speed by 6/5)
 
 !IF ESCCODES = 1 {
 ;		---------------- These are Customized Locations
-SCNWIDTH	= $f0		; Screen Mode (40 or 80)
+;               NOTE!: With Codebase 1 the area from $ED-$F7 are unused
+;                      With Codebase 0 the area is part of the LineWrap Table
+;
+SCNWIDTH	= $f0		; Screen Mode (40 or 80) for SS40
 LASTCHAR	= $f1		; Last Key Pressed
 BELLMODE	= $f2		; 0=Disable, 1=Enable BELL/CHIME
 EUROFLAG        = $f3		; 0=ASCII, 1=DIN

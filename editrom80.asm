@@ -218,17 +218,12 @@ GetLin10
 ;************** Got a character, so process it
 
 		SEI
-		LDA BlinkPhase				; Flag: Last Cursor Blink On/Off
-		BEQ GL_1
-		LDA CursorChar				; Character Under Cursor
-		LDY #0
-		STY BlinkPhase				; Flag: Last Cursor Blink On/Off
-
-!IF COLOURPET=0 {
-		JSR Restore_Char_at_Cursor		; Put character on screen
-} ELSE {
-		JSR Put_ColourChar_at_Cursor		; Put character AND Colour on screen
-}
+		LDA BlinkPhase				; Check if cursor in blink phase
+		BEQ GL_1				; no, so no need to restore original character
+		LDA CursorChar				; yes, get character under Cursor
+		LDY #0					; 
+		STY BlinkPhase				; reset blinkphase
+		JSR Restore_Char_at_Cursor		; Restore character under cursor before processing new key
 
 GL_1		JSR GETKEY				; Get Character From Keyboard Buffer
 		CMP #$83				; Is it the <RUN> key?

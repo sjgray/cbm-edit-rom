@@ -17,6 +17,8 @@ IRQ_MAIN
 Be452		JMP (CINV)	; Vector: Hardware Interrupt   [E455] Points to 'IRQ_NORMAL'
 
 ;************** IRQ (Called from Jump Table)
+; The IRQ is fired when the CRTC chip does a VSYNC, so the timing is
+; dependent on the CRTC configuration.
 ; Normally: $E455
 
 IRQ_NORMAL
@@ -43,29 +45,12 @@ IRQ_NORMAL2						; ie458
 ie468		STA BLNCT				; store to blink countdown counter
 		LDY CursorCol				; Column where cursor lives
 		LSR BlinkPhase				; Is it blinking?
-
-;!IF COLOURPET=0 {
 		LDA (ScrPtr),Y				; Get character from the screen
 		BCS Be470				; Yes, skip
 		INC BlinkPhase				; count
 		STA CursorChar				; Remember the character at cursor (to be restored when cursor moves)
 Be470		EOR #$80				; Flip the reverse bit
 		STA (ScrPtr),Y				; Put it back on the screen
-;} ELSE {
-;		LDX CURSORCOLOUR			; Get colour
-;		LDA (ScrPtr),Y				; Get character from the screen
-;		BCS Be470				; Yes, skip
-;		TAX
-;		LDA (COLOURPTR),Y			; Get Colour at cursor
-;		STA CURSORCOLOUR			; Save it
-;		TXA
-;		INC BlinkPhase				; count
-;		STA CursorChar				; Remember the character at cursor (to be restored when cursor moves)
-;Be470		EOR #$80				; Flip the reverse bit
-;		STA (ScrPtr),Y				; Put it back on the screen
-;		LDA COLOURV				; Get current colour
-;		STA (COLOURPTR),Y			; Write it
-;}
 
 ;		----------------------------------------- Check IEEE and Cassette status
 
@@ -79,7 +64,6 @@ Be474		LDY #0
 		STA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
 		LDA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
 } 
-!IF COLOURPET=0 {
 		ASL					; Shift upper bits to lower 
 		ASL 
 		ASL 
@@ -107,11 +91,9 @@ Be49e		LDA CAS2				; Tape Motor Interlock #2
 		LDA VIA_Port_B
 		AND #$ef
 Be4a7		STA VIA_Port_B
-}
-
 Be4aa		JSR SCAN_KEYBOARD			; Scan the keyboard
 
-!if REBOOT=1 {  JSR CheckReboot }			; Check for soft reset ******* should this go above Be474?????????????????
+!IF REBOOT=1 {  JSR CheckReboot }			; Check for soft reset ******* should this go above Be474 ?????????????????
 
 		JMP IRQ_END				; Return from Interrupt
 
