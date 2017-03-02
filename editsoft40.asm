@@ -66,8 +66,8 @@ CRT_SET_80
 CRT_PROGRAM_SS40
 ;		--------------------- Set 'Character Set'
 
-		STA SAL					; Pointer LO: Tape Buffer/ Screen Scrolling
-		STX SAL+1				; Pointer HI
+		STA MYZP				; Pointer LO
+		STX MYZP+1				; Pointer HI
 		LDA VIA_PCR				; Get current register byte VIA Register C - CA2	CHIP 
 		AND #$f0				; mask out lower nibble
 		STA FNLEN				; save it to Temp Variable
@@ -79,7 +79,7 @@ CRT_PROGRAM_SS40
 
 		LDY #$11				; Number of bytes to copy = 17
 
-SS40Loop	LDA (SAL),Y				; Pointer: Tape Buffer/ Screen Scrolling
+SS40Loop	LDA (MYZP),Y				; Pointer
 		STY CRT_Address				; Select the register to update 6545/6845 CRT		CHIP
 		STA CRT_Status				; Write to the register
 		DEY
@@ -160,7 +160,7 @@ SS40_SP40
 		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
 		RTS
 
-;-------------- 
+;-------------- Sync Pointers2 - Previous Line
 
 SS40_SyncPointers2
 		LDA SCNWIDTH				; What is current screen width?

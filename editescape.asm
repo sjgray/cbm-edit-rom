@@ -45,7 +45,7 @@ DoEscapeCode	AND #$7F		; Strip top bit
 		CMP #$2F		; Greater than "uparrow"?
 } ELSE {
 		SBC #$40		; Subtract 40 (Start at "@")
-		CMP #$1F		; Greater than "uparrow"?
+		CMP #$20		; Greater than "uparrow"?
 }
 		BCS DoESCDONE		; Yes, skip
 
@@ -115,8 +115,7 @@ ESCVECTORS
 		!WORD ESCAPE_BS-1	; Esc-\ Toggle ASCII / DIN
 		!WORD ESCAPE_RB-1	; Esc-] Mark End (Copy)
 		!WORD ESCAPE_UA-1	; Esc-UPARROW Paste
-
-;		!WORD ESCAPE_BA-1	; Esc-BACKARROW
+		!WORD ESCAPE_BA-1	; Esc-BACKARROW Display Project Info
 
 ;=============== ESCAPE CODES not in normal PET code
 ;
@@ -132,7 +131,10 @@ ESCAPE_M	; Esc-m Scroll Off
 
 !IF SS40=0 {
 ESCAPE_X	; Esc-x Switch 40/80 Col
-}
+}		
+!IF INFO=0 {
+ESCAPE_BA	; Esc-Backarrow Display Project info
+}		
 
 		JMP IRQ_EPILOG				; Ignore sequence for now
 
@@ -152,7 +154,17 @@ ESC_NUM2
 		JMP ESC_DONE2				; return and process
 
 }
+;------------------------------------------------------------------------------------------------
+; ESC-BACKARROW Display Project Info
+!IF INFO=1 {
+ESCAPE_BA
+		lda #<INFOSTRING		; write "wedge active"
+		ldy #>INFOSTRING
+		jsr STROUTZ
+		jmp IRQ_EPILOG
+}
 
+;------------------------------------------------------------------------------------------------
 ; ESC-E = Fill BG Colour
 ; For NormalPET ?
 ; For ColourPET will fill the screen with the current BG colour (ignores window)
@@ -216,7 +228,7 @@ ESCELoop
 		JMP IRQ_EPILOG
 
 
-
+;------------------------------------------------------------------------------------------------
 ; ESC-F = Flash Screen / Fill FG+BG Colour (was: Cursor Flash)
 ; For NormalPET this will toggle the REVERSE bit (bit 7) of each character on the screen (ignores window)
 ; For ColourPET this will fill the screen with the current colour FG+BG (ignores window)
@@ -285,23 +297,27 @@ ESCFLoop2
 }
 		JMP IRQ_EPILOG
 
+;------------------------------------------------------------------------------------------------
 ESCAPE_G						; Esc-g Bell Enable
 		LDA #1
 		STA BELLMODE
 		JMP IRQ_EPILOG
 
+;------------------------------------------------------------------------------------------------
 ESCAPE_H						; Esc-h Bell Disable
 		LDA #0
 		STA BELLMODE
 		JMP IRQ_EPILOG
 
-
+;------------------------------------------------------------------------------------------------
 ESCAPE_Q						; Esc-q Erase End
 		JSR Erase_To_EOL
 		JMP IRQ_EPILOG
+;------------------------------------------------------------------------------------------------
 ESCAPE_S						; Esc-s Standard Lowercase (was: Block Cursor)
 		JSR CRT_SET_TEXT			; Set Lowercase/Text Mode
 		JMP IRQ_EPILOG
+;------------------------------------------------------------------------------------------------
 ESCAPE_U						; Esc-u Uppercase (was: Underline Cursor - not supported on PET)
 		JSR CRT_SET_GRAPHICS			; Set Uppercase/Graphics Mode
 		JMP IRQ_EPILOG

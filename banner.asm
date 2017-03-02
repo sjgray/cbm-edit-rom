@@ -22,6 +22,7 @@
 ; 3  80COL  TEXT   Displays "Commodore EDITROM Project - Wedge/ESC/SS40" replacing banner
 ; 4  ANY    GRAPH  Displays "CBM BASIC 4 WITH WEDGE" replacing banner
 ; 5  CPET   GRAPH  Displays C65-like screen with colour bars
+; 6  80COL  ANY    Displays "commodore basic 4.0 with wedge/esc/ss40" replacing banner
 ; 99 ANY    ANY    Displays DATE and COMMENT for debug purposes
 
 ;-----------------------------------------------

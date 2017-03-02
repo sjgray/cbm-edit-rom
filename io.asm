@@ -1,7 +1,8 @@
 ; IO - This part of the ROM is not visible since IO is mapped here, so we will fill it
 ; ==   with a decription of the editrom features and options.
 
-!text "**CBM EDIT ROM**["
+!text "**CBM EDIT ROM**"
+!text "["
 +DATE
 
 !text "] CODEBASE="
@@ -58,5 +59,4 @@
 !if DEBUG=1     { !text ",debug" }
 !text ". COMMENT="
 +COMMENT
-
 !fill $E900-*,$20 
