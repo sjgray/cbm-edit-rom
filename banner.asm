@@ -37,6 +37,16 @@
 }
 
 ;-----------------------------------------------
+; Custom 8032 - For TEXT MODE startup screen
+;-----------------------------------------------
+
+!if BANNER=6 {				
+         	!byte $13            		; <HOME> 
+         	!pet "*** commodore basic 4.0 with wedge/esc/ss40 ***"
+         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+}
+
+;-----------------------------------------------
 ; Custom ColourPET-40 C65-like startup screen with colour bars
 ; TIP: Set foreground and background colour to <BLUE> to hide initial banner message
 ;-----------------------------------------------
