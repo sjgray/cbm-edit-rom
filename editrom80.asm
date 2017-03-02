@@ -356,13 +356,10 @@ CQ_DONE		RTS
 ;************** Put Character to Screen
 ; After characters have been processed, come here to print them
 
-CHAR_TO_SCREEN
-		ORA #$40 				; '@'
-CHAR_TO_SCREEN2
-		LDX ReverseFlag
+CHAR_TO_SCREEN	ORA #$40 				; '@'
+CHAR_TO_SCREEN2 LDX ReverseFlag
 		BEQ CTS_SKIP1
-CHAR_TO_SCREEN3
-		ORA #$80
+CHAR_TO_SCREEN3	ORA #$80
 CTS_SKIP1	LDX INSRT				; Flag: Insert Mode, >0 = # INSTs
 		BEQ CTS_SKIP2
 		DEC INSRT				; Flag: Insert Mode, >0 = # INSTs
@@ -1042,31 +1039,9 @@ IRQ_END		PLA
 ; This routine is called to put the character back at the cursor position.
 ; It is called to put the initial character on the screen and as part of the
 ; cursor blinking routine.
-;
-; TODO: Handle ColourPET! This routine causes existing text attribute to be changed to current
-; ----  colour. IE: moving cursor around the screen corrupts existing attribute
+; ColourPET: DOES NOT set/change COLOUR ATTRIBUTE!
 ; $E606
 
-!IF COLOURPET=1 {
-
-;************** Writes the NEW Character and Colour to the Screen
-Put_ColourChar_at_Cursor
-		PHA				; Save the character
-		LDY CursorCol			; Cursor Column on Current Line
-		LDA COLOURV			; Current Colour Attribute
-		STA (COLOURPTR),Y		; Put the Colour to ColourRAM
-		PLA				; Restore the character
-		JMP Restore_Char_at_Cursor	; Restore character
-
-;************** Writes the OLD Colour at Cursor Position to the screen
-Restore_Colour_at_Cursor
-		PHA				; Push Character
-		LDY CursorCol			; Cursor Column on Current Line
-		LDA CURSORCOLOUR		; Get current Colour
-		STA (COLOURPTR),Y		; Set the Colour
-		PLA				; Pull Character
-}
-;************** Writes the OLD Character at Cursor Position to the screen
 Restore_Char_at_Cursor
 		LDY CursorCol			; Cursor Column on Current Line		
 		STA (ScrPtr),Y			; Put the character on the screen!!!!!!!!!!!!!!!!!!!!! 
