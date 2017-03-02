@@ -1,4 +1,6 @@
 ; INFO - This generates a text string containing info about the project properties
+;        and variable settings. This can be included in the code area and if ESCCODES=1
+         can be printed using ESC-BACKARROW.
 
 !pet "["
 +DATE
