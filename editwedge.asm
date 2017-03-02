@@ -279,7 +279,7 @@ newline		lda #$0D			; <CR>
 		bne to_list_blocks
 
 stoplisting	jsr CLSEI			; close file with $E0, unlisten
-		jsr CRLF
+;		jsr CRLF
 		pla 
 		pla 
 		jmp READY			; BASIC warm start

@@ -19,10 +19,10 @@ AUTODISPATCH
 		RTS
 
 ERASE_SYS
-		lda #<ERASE_TXT			; pointer to erase text string
-		ldy #>ERASE_TXT
-		jsr STROUTZ			; print it
-		rts
+		LDA #<ERASE_TXT			; pointer to erase text string
+		LDY #>ERASE_TXT
+		JSR STROUTZ			; print it
+		RTS
 
 ;-------------- Wedge Prep (1st Step)
 ; We jump to here in the Editor ROM Init code, near the end.

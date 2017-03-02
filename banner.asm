@@ -22,13 +22,25 @@
 ; 3  80COL  TEXT   Displays "Commodore EDITROM Project - Wedge/ESC/SS40" replacing banner
 ; 4  ANY    GRAPH  Displays "CBM BASIC 4 WITH WEDGE" replacing banner
 ; 5  CPET   GRAPH  Displays C65-like screen with colour bars
+; 99 ANY    ANY    Displays DATE and COMMENT for debug purposes
+
+;-----------------------------------------------
+; DEBUG BANNER
+;-----------------------------------------------
+!IF BANNER=99 {
+		!pet "date: "
+		+DATE
+		!byte $0D
+		!pet "comment: "
+		+COMMENT
+		!byte $0D				
+}
 
 ;-----------------------------------------------
 ; Custom ColourPET-40 C65-like startup screen with colour bars
 ; TIP: Set foreground and background colour to <BLUE> to hide initial banner message
 ;-----------------------------------------------
-
-!if BANNER=5 {
+!IF BANNER=5 {
 		!byte $5,$1F,$93		; <WHT><BLUE><CLS>
 		
 		;-- line 1		
@@ -121,10 +133,10 @@
 		!pet "ur"
 		!byte $9e			; <YEL>
 		!pet "PET"
-		!byte $5			; <WHT>
+		!byte $05			; <WHT>
 		!pet " ***"
 		!byte 11,11
-		!byte $d			; <cr>
+		!byte $0D			; <cr>
 }
 
 ;-----------------------------------------------

@@ -34,37 +34,38 @@ IRQ_NORMAL2						; ie458
 
 ;		----------------------------------------- BLINK THE CURSOR
 
-		LDA #$14
+		LDA #$14				; default cursor blink rate (20)
 !if REPEATOPT = 1 {
-		BIT RPTFLG
-		BPL ie468
+		BIT RPTFLG				; check repeat flag
+		BPL ie468				; skip if not enabled
 		LDA #2					; make cursor blink immediately
 }
-ie468		STA BLNCT
+ie468		STA BLNCT				; store to blink countdown counter
 		LDY CursorCol				; Column where cursor lives
 		LSR BlinkPhase				; Is it blinking?
-!IF COLOURPET=1 {
-		LDX CURSORCOLOUR			; Get colour
-}
+
+;!IF COLOURPET=0 {
 		LDA (ScrPtr),Y				; Get character from the screen
 		BCS Be470				; Yes, skip
-
-!IF COLOURPET=1 {
-		TAX
-		LDA (COLOURPTR),Y			; Get Colour at cursor
-		STA CURSORCOLOUR			; Save it
-		TXA
-}
 		INC BlinkPhase				; count
 		STA CursorChar				; Remember the character at cursor (to be restored when cursor moves)
-
 Be470		EOR #$80				; Flip the reverse bit
 		STA (ScrPtr),Y				; Put it back on the screen
-
-!IF COLOURPET=1 {
-		LDA COLOURV				; Get current colour
-		STA (COLOURPTR),Y			; Write it
-}
+;} ELSE {
+;		LDX CURSORCOLOUR			; Get colour
+;		LDA (ScrPtr),Y				; Get character from the screen
+;		BCS Be470				; Yes, skip
+;		TAX
+;		LDA (COLOURPTR),Y			; Get Colour at cursor
+;		STA CURSORCOLOUR			; Save it
+;		TXA
+;		INC BlinkPhase				; count
+;		STA CursorChar				; Remember the character at cursor (to be restored when cursor moves)
+;Be470		EOR #$80				; Flip the reverse bit
+;		STA (ScrPtr),Y				; Put it back on the screen
+;		LDA COLOURV				; Get current colour
+;		STA (COLOURPTR),Y			; Write it
+;}
 
 ;		----------------------------------------- Check IEEE and Cassette status
 
