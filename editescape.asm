@@ -45,7 +45,7 @@ DoEscapeCode	AND #$7F		; Strip top bit
 		CMP #$2F		; Greater than "uparrow"?
 } ELSE {
 		SBC #$40		; Subtract 40 (Start at "@")
-		CMP #$20		; Greater than "uparrow"?
+		CMP #$20		; Greater than "backarrow"?
 }
 		BCS DoESCDONE		; Yes, skip
 
