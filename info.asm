@@ -52,7 +52,7 @@
 !if WEDGE=1     { !pet ",wedge" }
 !if REBOOT=1    { !pet ",reboot" }
 !if EXECUDESK=1 { !pet ",execudesk" }
-!if BACKARROW=1 { !pet ",backarrow" }
+!if BACKARROW>0 { !pet ",backarrow" }
 !if MOT6845=1   { !pet ",mot6845" }
 !if SILENT=1    { !pet ",silent" }
 !if CRUNCH=1    { !pet ",crunch" }

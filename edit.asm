@@ -25,8 +25,8 @@
 ; The following DATE and COMMENT strings will be placed in the IO area (if used).
 ; Take care that comments do not overflow into code space!
 
-!macro DATE    { !pet "2017-03-01" }
-!macro COMMENT { !pet "c1" }
+!macro DATE    { !pet "2017-03-03" }
+!macro COMMENT { !pet "sjg" }
 
 ;================================================================================
 
@@ -38,20 +38,20 @@ OPTROM    = 0   ; Location of EXT code		0=Extended Edit ROM area ($E800-EFFF), 1
 KEYSCAN   = 1   ; Keyboard Scanner		0=Graphic, 1=Business, 2=DIN
 KEYBOARD  = 1	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (requires hardware mod)
 REFRESH   = 1	; Screen refresh:		0=Internal-Euro,1=Internal-NA,2=External-PAL,3=External-NTSC,9=Custom
-REPEATOPT = 1	; Key Repeat Option		0=No (Always ON), 1=Yes
+REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
 COLUMNS   = 80	; Screen Width:			40 or 80 columns
-HERTZ     = 50	; Line Frequency (Clock):	50=Euro,60=N.America
+HERTZ     = 60	; Line Frequency (Clock):	50=Euro,60=N.America
 IRQFIX    = 0   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating
 BOOTCASE  = 0	; Initial Screen Mode		0=Text/Lower, 1=Upper/Graphics
 
 ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
 AUTORUN   = 1   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner and/or wedge.
-BYPASS    = 0   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to bypass custom banner, wedge or other autostart option
+BYPASS    = 1   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to bypass custom banner, wedge or other autostart option
 BANNER    = 6   ; Custom Banner (power on msg)  0=No, N=Banner# (1-5 or 99)     Refer to docs or source. 99=debug message
 WEDGE     = 1	; DOS Wedge			0=No, 1=Yes
 WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
-SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1
+SS40      = 1	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns		Valid when SS40=1
 
 COLOURPET = 0	; ColourPET additions?		0=No, 1=Yes			Also set ESCCODES=1
@@ -64,16 +64,18 @@ BYPASSFG  = 5   ; ColourPET Bypass FG     	0 to 15 RGBI			Colours when AUTOSTART
 BYPASSBG  = 0   ; ColourPET Bypass BG     	0 to 15 RGBI
 
 MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility
-REBOOT    = 0	; Add keyboard reboot? 		0=No, 1=Yes
+REBOOT    = 1	; Add keyboard reboot? 		0=No, 1=Yes
 EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes			Note: Requires BOOT to TEXT mode!
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
 CRUNCH    = 0   ; Remove unneeded code (NOPS) when posible? 0=No, 1=Yes
-BACKARROW = 0   ; Patch for screen mode toggle  0=NO, 1=Yes 2K, 2=Yes EXT	Note: B keyboard scanner only
+BACKARROW = 2   ; Patch for screen mode toggle  0=NO, 1=Yes 2K, 2=Yes EXT	Note: B keyboard scanner only
 INFO      = 1   ; Add project info to code area 0=NO, 1=Yes
 ;
 DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
+
 ;----------------------------------------------------------------------------------------------------------------------------------------
 !IF SS40+COLOURPET>0 { ESCCODES=1 }		; Make sure ESC Codes is ON if SS40 or COLOURPET is enabled
+!IF SS40=1 { SOFT40=0 }                         ; Make sure SOFT40 is OFF if SS40 is enabled
 
 ;
 ; To generate Edit ROMs that are Byte-exact matches to actual Commodore ROMS set the
