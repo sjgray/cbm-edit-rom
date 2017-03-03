@@ -70,7 +70,7 @@
 		!byte $9E,$12			; <YEL><RVS>
 		!pet "     "                    ; bar
 		!byte $92,$E9,$5		; <OFF><diag block><WHT>
-		!pet "      (C) steve j. gray"
+		!pet "      (c) steve j. gray"
 		!byte $0D			; <CR>
 
 		;-- line 4
