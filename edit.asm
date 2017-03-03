@@ -2,6 +2,8 @@
 ; ================
 ; A Project to create replacement EDIT ROMs for the PET/CBM line of computers.
 ; Use MAKE.BAT to assemble (ACME.EXE must be in same folder or in search path).
+; For complete documentation see:
+;      http://www.6502.org/users/sjgray/projects/editrom/index.html
 ;
 ; Edit these VARIABLES to choose which features are included.
 ;
