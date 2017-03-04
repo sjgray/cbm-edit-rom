@@ -1254,7 +1254,7 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e	; BELL chime values
 
 !IF COLUMNS=80 {
 		!SOURCE "screen-80.asm"
-		!IF COLOURPET > 0 { SOURCE "screen-80c.asm" }		; Colour address table (future hardware)
+		!IF COLOURPET > 0 { !SOURCE "screen-80c.asm" }		; Colour address table (future hardware)
 }
 
 !IF COLUMNS=40 {
