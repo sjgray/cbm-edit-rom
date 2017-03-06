@@ -27,7 +27,7 @@
 ; The following DATE and COMMENT strings will be placed in the IO area (if used).
 ; Take care that comments do not overflow into code space!
 
-!macro DATE    { !pet "2017-03-03" }
+!macro DATE    { !pet "2017-03-06" }
 !macro COMMENT { !pet "80 col colourpet" }
 
 ;================================================================================
@@ -92,8 +92,8 @@ DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
 
 ;---------------------- Output filename
 
-!TO "editrom.bin",plain				; Generic output file with no load address
-;!TO "cpet-40-nsjg-ntsc.bin",plain		; ColourPET output file with no load address
+!IF COLOURPET=0 { !TO "editrom.bin",plain }	; Generic output file with no load address
+!IF COLOURPET>0 { !TO "cpetrom.bin",plain }	; ColourPET output file with no load address
 
 ;---------------------- These are the symbol definitions for PET/CBM memory and IO chips
 
