@@ -1347,7 +1347,7 @@ $E7D3:           .BYT 00,00 			; CRTC register data -  40 COL GRAPHICS mode
 
 $E7D5:           .BYT 0E,1E,3E,7E,3E,1E,0E	; BELL chime values
 
-;--------------- POWERS OF 2 TABLE (doesn't seem to be referenced anywhere)
+;--------------- POWERS OF 2 TABLE (used by TAB routine)
 
 $E7DC:           .BYT 80,40,20,10,08,04,02,01	; BIT table
 

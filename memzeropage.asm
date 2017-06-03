@@ -141,7 +141,7 @@ FNLEN		= $d1		; Number of characters in filename
 LA		= $d2		; Current file Logical Address
 SA		= $d3		; Current file Secondary Address
 FA		= $d4		; Current file Device number
-RigMargin	= $d5		; Window RIGHT margin
+RightMargin	= $d5		; Window RIGHT margin
 TAPE1		= $d6		; Pointer: Start of Tape Buffer
 CursorRow	= $d8		; Line where cursor lives
 DATAX		= $d9		; Last Key / Checksum / Misc
@@ -163,7 +163,7 @@ LineLinkTable   = $e0		; 40-Col Line Link Table (to $F8)
 ;		---------------- 80-Column Only Usage (Codebase 1 or 2)
 TopMargin	= $e0		; Window TOP line
 BotMargin	= $e1		; Window BOTTOM line
-LefMargin	= $e2		; Womdpw LEFT margin
+LeftMargin	= $e2		; Window LEFT margin
 XMAX		= $e3		; Maximum characters in input buffer
 RPTFLG		= $e4		; Key REPEAT flag
 KOUNT		= $e5		; Repeat countdown

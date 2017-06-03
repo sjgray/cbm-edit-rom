@@ -16,6 +16,10 @@ IRQ_MAIN
 		JMP (CBINV)	; Vector: BRK Instr. Interrupt [D478]
 Be452		JMP (CINV)	; Vector: Hardware Interrupt   [E455] Points to 'IRQ_NORMAL'
 
+;*********************************************************************************************************
+;** IRQ_NORMAL [$E455]
+;*********************************************************************************************************
+
 ;************** IRQ (Called from Jump Table)
 ; The IRQ is fired when the CRTC chip does a VSYNC, so the timing is
 ; dependent on the CRTC configuration.
@@ -28,13 +32,13 @@ IRQ_NORMAL
 			JSR UDTIME			; Update System Jiffy Clock. KERNAL routine $FFEA 			
 		}
 
+;		--------------------------------------- Blink the cursor
+
 IRQ_NORMAL2						; ie458
 		LDA Blink				; Cursor Blink enable: 0 = Flash Cursor
 		BNE Be474				; skip it
 		DEC BLNCT				; Timer: Countdown to Toggle Cursor
 		BNE Be474				; skip it
-
-;		----------------------------------------- BLINK THE CURSOR
 
 		LDA #$14				; default cursor blink rate (20)
 !if REPEATOPT = 1 {
@@ -52,45 +56,47 @@ ie468		STA BLNCT				; store to blink countdown counter
 Be470		EOR #$80				; Flip the reverse bit
 		STA (ScrPtr),Y				; Put it back on the screen
 
-;		----------------------------------------- Check IEEE and Cassette status
+;		--------------------------------------- Prep for keyboard scanning [$E47B]
 
 Be474		LDY #0
 		LDA PIA1_Port_A 			; Keyboard ROW select - PIA#1, Register 0
 							; Upper bits: IEEE and Cassette
 							; Lower bits: Keyboard ROW select
-
 !if CODEBASE<2 {
 		AND #$F0				; Mask off lower 4 bits (reset keyboard scan row)
 		STA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
 		LDA PIA1_Port_A				; Keyboard ROW select - PIA#1, Register 0				CHIP
 } 
+
+;		--------------------------------------- Check IEEE and Cassette status
+
 		ASL					; Shift upper bits to lower 
 		ASL 
 		ASL 
 		BPL Be487				; Is CASSETTE#1 Sense? No, skip
 
 		STY CAS1				; Yes, Tape Motor Interlock #1
-		LDA PIA1_Cont_B
+		LDA PIA1_Cont_B				; PIA#1 Register 13 (Retrace flag and interrupt
 		ORA #8					; Is CASSETTE#2 Sense?
 		BNE Be490				; No, skip
 
 Be487		LDA CAS1				; Yes, Tape Motor Interlock #1
-		BNE Be493
+		BNE Be493				; No, skip
 
-		LDA PIA1_Cont_B
+		LDA PIA1_Cont_B				; PIA#1 Register 13 (Retrace flag and interrupt)
 		AND #$f7				; Mask off bit 4
-Be490		STA PIA1_Cont_B
+Be490		STA PIA1_Cont_B				; PIA#1 Register 13 (Retrace flag and interrupt)
 Be493		BCC Be49e
 
 		STY CAS2				; Tape Motor Interlock #2
-		LDA VIA_Port_B
+		LDA VIA_Port_B				; VIA Register 0 (flags)
 		ORA #16
 		BNE Be4a7
 Be49e		LDA CAS2				; Tape Motor Interlock #2
 		BNE Be4aa
-		LDA VIA_Port_B
+		LDA VIA_Port_B				; VIA Register 0 (flags)
 		AND #$ef
-Be4a7		STA VIA_Port_B
+Be4a7		STA VIA_Port_B				; VIA Register 0 (flags)
 Be4aa		JSR SCAN_KEYBOARD			; Scan the keyboard
 
 !IF REBOOT=1 {  JSR CheckReboot }			; Check for soft reset ******* should this go above Be474 ?????????????????

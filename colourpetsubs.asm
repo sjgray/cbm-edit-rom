@@ -232,7 +232,7 @@ ColourPET_Scroll_Dest
 ; Replaces equivilent non-colour routine.
 ; Must not modify X since it is used as a line counter in WINDOW_CLEAR.
 
-Erase_To_EOL
+ERASE_TO_EOL
 		TYA					; Save the Current offset
 		PHA					; to the stack
 

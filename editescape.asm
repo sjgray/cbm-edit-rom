@@ -5,13 +5,12 @@
 
 ;-------------- Check for ESC as LAST character
 ;
-; NOTE: We JMP here from EDITROM.ASM. Accumulator holds code of CURRENT character
+; NOTE: We JMP here from EDITROMxx.ASM. Accumulator holds code of CURRENT character
 ;       If we want to continue processing as normal we need to JMP ESC_DONE.
 ;       If we need to modify the action we set DATAX with the new character.
 ;       If we want to skip the rest of the character processing we should JMP IRQ_EPILOG .
 
-CheckESC
-		LDX LASTCHAR 		; Previous character printed
+CheckESC	LDX LASTCHAR 		; Previous character printed
 		CPX #$1B		; <ESC>?
 		BEQ ESC_YES		; Yes, process it
 		CMP #$1B		; Is current Chr ESC?
@@ -31,16 +30,14 @@ ESC_YES		CMP #$1b		; Is current char <ESC>?
 
 ;-------------- Do <ESC><ESC>
 
-DoESCESC
-		LDA #0			; Clear character
+DoESCESC	LDA #0			; Clear character
 		JMP ESCAPE_O		; <ESC>+O (escape)
-
 
 ;-------------- Do <ESC>+KEY Sequence
 
 DoEscapeCode	AND #$7F		; Strip top bit
 		SEC
-!IF COLOURPET = 1 {
+!IF COLOURPET=1 {
 		SBC #$30		; Subtract 30 (Start at "0")
 		CMP #$2F		; Greater than "uparrow"?
 } ELSE {
@@ -66,7 +63,7 @@ DoESCDONE	JMP ESC_DONE
 ;-------------- Esc Sequence Vectors    (*=changed from C128)
 
 ESCVECTORS
-!IF COLOURPET = 1 {
+!IF COLOURPET=1 {
 		!WORD ESCAPE_NUM-1	; Esc-0 Set Colour to Black
 		!WORD ESCAPE_NUM-1	; Esc-1 Set Colour to Medium Grey
 		!WORD ESCAPE_NUM-1	; Esc-2 Set Colour to Blue
@@ -134,20 +131,29 @@ ESCAPE_X	; Esc-x Switch 40/80 Col
 }		
 !IF INFO=0 {
 ESCAPE_BA	; Esc-Backarrow Display Project info
-}		
+}
+
+;-------------- These are codes that are not in 40-COL Codebase C0
+
+!IF CODEBASE=0 {
+ESCAPE_B	; ESC-A Set Window Bottom
+ESCAPE_T	; ESC-B Set Window Top
+ESCAPE_D	; ESC-D Delete Line
+ESCAPE_I	; ESC-I Insert Line
+ESCAPE_J	; ESC-J Start of Line
+}
 
 		JMP IRQ_EPILOG				; Ignore sequence for now
 
 
 ;-------------- New ESC sequences
 
-!IF COLOURPET = 1 {
-ESCAPE_NUM
-		LDA DATAX				; Character
+!IF COLOURPET=1 {
+ESCAPE_NUM	LDA DATAX				; Character
 		SEC
 		SBC #$30				; Subtract 30 (Start at "0")
-ESC_NUM2
-		TAX					; The Colour number becomes the index
+
+ESC_NUM2	TAX					; The Colour number becomes the index
 		LDA COLOURS,X				; Lookup the correct PETSCII code
 		STA DATAX				; replace ESC code with colour code
 		LDA #0					;
@@ -157,11 +163,10 @@ ESC_NUM2
 ;------------------------------------------------------------------------------------------------
 ; ESC-BACKARROW Display Project Info
 !IF INFO=1 {
-ESCAPE_BA
-		lda #<INFOSTRING		; write "wedge active"
-		ldy #>INFOSTRING
-		jsr STROUTZ
-		jmp IRQ_EPILOG
+ESCAPE_BA	LDA #<INFOSTRING		; point to INFO string
+		LDY #>INFOSTRING
+		JSR STROUTZ
+		JMP IRQ_EPILOG
 }
 
 ;------------------------------------------------------------------------------------------------
@@ -178,7 +183,7 @@ ESCAPE_E
 		AND #$F0
 		STA TMPZB7
 		LDX #0
-ESCELoop
+ESCELOOP
 		LDA COLOUR_RAM,X
 		AND #$0F
 		ORA TMPZB7
@@ -199,7 +204,7 @@ ESCELoop
 		ORA TMPZB7
 		STA COLOUR_RAM+750,X	; don't overwrite non-visible locations (used for storage)
 
-!IF COLUMNS = 80 {
+!IF COLUMNS=80 {
 		LDA COLOUR_RAM+1000,X
 		AND #$0F
 		ORA TMPZB7
@@ -222,8 +227,7 @@ ESCELoop
 }
 		INX
 		CPX #250
-		BNE ESCELoop
-
+		BNE ESCELOOP
 }
 		JMP IRQ_EPILOG
 
@@ -239,8 +243,8 @@ ESCAPE_F
 !if COLOURPET=1 {
 		LDX #0
 		LDA COLOURV
-ESCFLoop
-		STA COLOUR_RAM,X
+
+ESCFLOOP	STA COLOUR_RAM,X
 		STA COLOUR_RAM+$100,X
 		STA COLOUR_RAM+$200,X
 		STA COLOUR_RAM+$300-24,X	; don't overwrite non-visible locations (used for storage)
@@ -251,12 +255,12 @@ ESCFLoop
 		STA COLOUR_RAM+$700-48,X	; don't overwrite non-visible locations (used for storage)
 }
 		INX
-		BNE ESCFLoop
+		BNE ESCFLOOP
 }
 
 !if COLOURPET=0 {
 		LDX #0
-ESCFLoop2
+ESCFLOOP2
 		LDA SCREEN_RAM,X
 		EOR #$80
 		STA SCREEN_RAM,X
@@ -292,7 +296,7 @@ ESCFLoop2
 }
 		INX
 		CPX #250
-		BNE ESCFLoop2
+		BNE ESCFLOOP2
 
 }
 		JMP IRQ_EPILOG
@@ -311,7 +315,7 @@ ESCAPE_H						; Esc-h Bell Disable
 
 ;------------------------------------------------------------------------------------------------
 ESCAPE_Q						; Esc-q Erase End
-		JSR Erase_To_EOL
+		JSR ERASE_TO_EOL
 		JMP IRQ_EPILOG
 ;------------------------------------------------------------------------------------------------
 ESCAPE_S						; Esc-s Standard Lowercase (was: Block Cursor)
@@ -444,8 +448,7 @@ EuroSet		STA EUROFLAG
 ;
 ; .A contains character to add to keyboard buffer. If EUROFLAG=1 then check if Y or Z need swapping.
 
-EUROSWAP
-		LDX EUROFLAG		; Flag to swap Z and Y keys; 1=Swap
+EUROSWAP	LDX EUROFLAG		; Flag to swap Z and Y keys; 1=Swap
 		BEQ EUROSWAP_OUT
 
 		CMP #'Z'		; Is it "Z"?
@@ -466,8 +469,7 @@ EUROSWAP_OUT	JMP SCAN_NORM2		; Return to keyboard routine
 ; With future hardware we may be able to switch between REAL 40/80 column mode.
 
 !IF SS40=1 {
-ESCAPE_X	
-		JSR SS40_SwapModes	; Swap 40/80 Modes
+ESCAPE_X	JSR SS40_SwapModes	; Swap 40/80 Modes
 		JMP IRQ_EPILOG		
 }
 
