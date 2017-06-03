@@ -28,3 +28,13 @@
 		!if REFRESH = 9 { !source "crtc-40-custom.asm" }
 	}
 }
+
+!if COLUMNS=32 {
+		; For Tony Ellis' 6847 Project
+		; We will default the 6545 CRTC to 40 columns for now.
+		!if REFRESH = 0 { !source "crtc-40-50hz.asm" }
+		!if REFRESH = 1 { !source "crtc-40-60hz.asm" }
+		!if REFRESH = 2 { !source "crtc-40-pal.asm" }
+		!if REFRESH = 3 { !source "crtc-40-ntsc.asm" }
+		!if REFRESH = 9 { !source "crtc-40-custom.asm" }
+}
