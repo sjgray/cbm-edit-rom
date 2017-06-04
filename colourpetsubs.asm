@@ -192,7 +192,7 @@ CPSL1		INY
 		DEY					; move to the left
 		STA (COLOURPTR),Y			; Write Colour to Colour RAM	@@@@@@@@@@@@@@ ColourPET
 		INY
-		CPY RigMargin
+		CPY RightMargin
 		BNE CPSL1
 		RTS
 
@@ -239,7 +239,7 @@ ERASE_TO_EOL
 		LDA #$20 				; <SPACE>
 CEOL		INY					; next character
 		STA (ScrPtr),Y				; Pointer: Current Screen Line Address @@@@@@@@@@@@@@ ColourPET
-		CPY RigMargin
+ 		CPY RightMargin
 		BCC CEOL				; loop up for more
 
 		PLA					; Pull the offset from the stack
@@ -248,7 +248,7 @@ CEOL		INY					; next character
 		LDA COLOURV				; The current colour
 CEOL2		INY					; Next colour ram location
 		STA (COLOURPTR),Y			; Clear Colour RAM
-		CPY RigMargin
+		CPY RightMargin
 		BCC CEOL2				; loop up for more
 		RTS
 
