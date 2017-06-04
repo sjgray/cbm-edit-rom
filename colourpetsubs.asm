@@ -168,14 +168,14 @@ ColourPET_SyncPointers
 		RTS
 
 ColourPET_SyncPointers2
-		LDA Line_Addr_Lo-1,X			; Screen line address table LO + 1
+		LDA Line_Addr_Lo-1,X			; Screen line address table LO - 1
 		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
-		LDA Line_Addr_Hi-1,X			; Screen line address table HI + 1
+		LDA Line_Addr_Hi-1,X			; Screen line address table HI - 1
 		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
 
-		LDA CLine_Addr_Lo-1,X     		; Screen Line address table LO + 1
+		LDA CLine_Addr_Lo-1,X     		; Screen Line address table LO - 1
 		STA COLOURPTR2				; Second Colour RAM Pointer
-		LDA CLine_Addr_Hi-1,X 			; Screen Line address table HI + 1
+		LDA CLine_Addr_Hi-1,X 			; Screen Line address table HI - 1
 		STA COLOURPTR2+1			;
 		RTS
 
