@@ -6,7 +6,7 @@
 ;--------- Text Mode - 40 Column, 50 Hz, 20 kHz
 
 CRT_CONFIG_TEXT
-    		!byte $31	;  Horizontal Total = 43
+    		!byte $31	;  Horizontal Total = 49
 		!byte $28	;  Horizontal Displayed = 40
 		!byte $29	;  Horizontal Sync Position = 41
 		!byte $0f	;  Horizontal Sync Width = 15
@@ -28,7 +28,7 @@ CRT_CONFIG_TEXT
 ;--------- Graphics Mode - 40 Column, 50 Hz, 20 kHz
 
 CRT_CONFIG_GRAPHICS
-    		!byte $31	;  Horizontal Total = 43
+    		!byte $31	;  Horizontal Total = 49
 		!byte $28	;  Horizontal Displayed = 40
 		!byte $29	;  Horizontal Sync Position = 41
 		!byte $0f	;  Horizontal Sync Width = 15
