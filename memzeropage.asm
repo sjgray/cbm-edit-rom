@@ -187,5 +187,6 @@ BELLMODE	= $f2		; 0=Disable, 1=Enable BELL/CHIME
 EUROFLAG        = $f3		; 0=ASCII, 1=DIN
 MYZP            = $f4           ; LO General ZP pointer
 ;               = $f5           ; HI
+SCN4080BOARD    = $f6		; Flag for Hardware 40/80 Column Switcher board
 }
 

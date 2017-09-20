@@ -452,7 +452,7 @@ CURSOR_TO_LM
 
 FULL_SCREEN	LDA #0					; Top/Left=0
 		TAX
-		JSR WIN_SET_TOP			; Set Window Top
+		JSR WIN_SET_TOP				; Set Window Top
 
 !IF ROWS=25 {	LDA #24	}				; 25 lines   (0-24)
 !IF ROWS=16 {   LDA #15 }				; 16 lines   (0-15) For special case
@@ -1205,6 +1205,14 @@ INITED1		STA JIFFY_CLOCK,X			; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
 ;		--------------------------------------- Init SS40
 
 !IF SS40=1 {
+	!IF HARD4080=1 {
+		LDA #1					; 40/80 Switcher board INSTALLED
+		STA SCN4080BOARD
+	} ELSE {
+		LDA #0					; 40/80 Switcher board NOT installed
+		STA SCN4080BOARD	
+	}
+
 	!IF SS40MODE=80 {
 		JSR SS40_INIT80				; Initialize Switchable Soft-40 to 80 columns
 	} ELSE {

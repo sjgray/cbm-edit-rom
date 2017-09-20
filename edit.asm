@@ -55,6 +55,7 @@ WEDGEMSG  = 1	; Show wedge message?		0=No, 1=Yes
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
 SS40      = 1	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns		Valid when SS40=1
+HARD4080  = 1   ; Hardware 40/80 Board          0=No, 1=Yes			Valid when SS40=1
 
 COLOURPET = 0	; ColourPET additions?		0=No, 1=Yes			Also set ESCCODES=1
 COLOURVER = 1	; ColourPET Hardware Version	0=Beta,1=Release		0=ColourRAM at $8400, 1=$8800 (use for VICE)
