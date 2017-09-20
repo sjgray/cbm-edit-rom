@@ -35,8 +35,8 @@ SS40_SET40	JSR SS40_INIT40				; No, switch it to 40
 SS40_SET80	JSR SS40_INIT80				; Set to 80
 
 SS40_DOIT	JSR CRT_SET_TEXT_SS40			; Program CRTC for Text mode
-		JSR FULL_SCREEN_WINDOW			; Clear windows
-		JSR WINDOW_CLEAR			; Clear the screen
+		JSR FULL_SCREEN				; Clear windows
+		JSR WIN_CLEAR				; Clear the screen
 		RTS		
 
 ;************* Set Screen to TEXT or GRAPHICS MODE

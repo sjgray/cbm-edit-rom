@@ -57,7 +57,6 @@ INSTALL_WEDGE
 ;-------------- MESSAGE
 WEDGESTRING
 		!text "WEDGE INSTALLED"		; message
-		!byte $0D			; <CR>
 		!byte 0				; extra 0 padding
 
 ;-------------- Resident part of the universal DOS wedge
