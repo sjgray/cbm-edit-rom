@@ -32,7 +32,12 @@
 	!if COLUMNS=40  { !pet "40" }
 	!if COLUMNS=80  { !pet "80" }
 	!if SOFT40=1    { !pet " (soft40)" }
-	!if SS40=1      { !pet " (ss40)" }
+	!if SS40=1      {
+		!pet " ("
+		!if HARD4080=1  { !pet "hs" } else { !pet "ss" }
+		!if SS40MODE=40 { !pet "40)" }
+		!if SS40MODE=80 { !pet "80)" }
+	}
 
 !pet " hertz="
 	!if HERTZ=50 { !pet "50" }

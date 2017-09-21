@@ -23,6 +23,7 @@
 ; 4  ANY    GRAPH  Displays "CBM BASIC 4 WITH WEDGE" replacing banner
 ; 5  CPET   GRAPH  Displays C65-like screen with colour bars
 ; 6  80COL  ANY    Displays "commodore basic 4.0 with wedge/esc/ss40" replacing banner
+; 7  80COL  ANY    Displays "commodore basic 4.0 with wedge,esc,reboot,40/80 switcher" replacing banner
 ; 99 ANY    ANY    Displays DATE and COMMENT for debug purposes
 
 ;-----------------------------------------------
@@ -40,6 +41,12 @@
 ;-----------------------------------------------
 ; Custom 8032 - For TEXT MODE startup screen
 ;-----------------------------------------------
+
+!if BANNER=7 {				
+         	!byte $13            		; <HOME> 
+         	!pet "*** commodore basic 4.0 with wedge,esc,reboot,40/80 switcher ***"
+         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+}
 
 !if BANNER=6 {				
          	!byte $13            		; <HOME> 

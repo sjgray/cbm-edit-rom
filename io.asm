@@ -32,7 +32,12 @@
 	!if COLUMNS=40  { !text "40" }
 	!if COLUMNS=80  { !text "80" }
 	!if SOFT40=1    { !text " (soft40)" }
-	!if SS40=1      { !text " (ss40)" }
+	!if SS40=1      {
+		!pet " ("
+		!if HARD4080=1  { !text "hs" } else { !text "ss" }
+		!if SS40MODE=40 { !text "40)" }
+		!if SS40MODE=80 { !text "80)" }
+	}
 
 !text " HERTZ="
 	!if HERTZ=50 { !text "50" }
