@@ -27,7 +27,7 @@
 ; Take care that comments do not overflow into code space!
 
 !macro DATE    { !pet "2017-09-21" }
-!macro COMMENT { !pet "for beta colourpet. " }
+!macro COMMENT { !pet "sjg editrom project. " }
 
 ;----------------------------------------------------------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@ HERTZ     = 60	; Line Frequency (Clock):	50=Euro,60=N.America
 IRQFIX    = 0   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating
 BOOTCASE  = 0	; Initial Screen Mode		0=Text/Lower, 1=Upper/Graphics
 
-ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
-AUTORUN   = 1   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner and/or wedge.
-BYPASS    = 1   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to bypass custom banner, wedge or other autostart option
+ESCCODES  = 0	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
+AUTORUN   = 0   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner and/or wedge.
+BYPASS    = 0   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to bypass custom banner, wedge or other autostart option
 BANNER    = 6   ; Custom Banner (power on msg)  0=No, N=Banner# (1-5 or 99)     Refer to docs or source. 99=debug message
-WEDGE     = 1	; DOS Wedge			0=No, 1=Yes
+WEDGE     = 0	; DOS Wedge			0=No, 1=Yes
 WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
-SS40      = 1	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1
+SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns		Valid when SS40=1
 HARD4080  = 0   ; Hardware 40/80 Board          0=No, 1=Yes			Valid when SS40=1
 
@@ -67,12 +67,12 @@ BYPASSFG  = 5   ; ColourPET Bypass FG     	0 to 15 RGBI			Colours when AUTOSTART
 BYPASSBG  = 0   ; ColourPET Bypass BG     	0 to 15 RGBI
 
 MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility
-REBOOT    = 1	; Add keyboard reboot? 		0=No, 1=Yes
+REBOOT    = 0	; Add keyboard reboot? 		0=No, 1=Yes
 EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes			Note: Requires BOOT to TEXT mode!
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
 CRUNCH    = 0   ; Remove unneeded code (NOPS) when posible? 0=No, 1=Yes
 BACKARROW = 1   ; Patch for screen mode toggle  0=NO, 1=Yes 2K, 2=Yes EXT	Note: B keyboard scanner only
-INFO      = 1   ; Add project info to code area 0=NO, 1=Yes
+INFO      = 0   ; Add project info to code area 0=NO, 1=Yes
 BUGFIX    = 0   ; Correct Known bugs		0=No, 1=Yes			
 ;
 DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
