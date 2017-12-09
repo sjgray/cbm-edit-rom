@@ -132,16 +132,17 @@ SS40Loop	LDA (MYZP),Y				; Pointer
 		CMP #40					; Is it 40?
 		BEQ SS40_HARD40				; Yes,
 
-SS40_HARD80	LDA $16					; 40/80 Board Control line=0 (TA11, Pin 15)
+SS40_HARD80	LDA #16					; 40/80 Board Control line=0 (TA11, Pin 15) = 16 = RVS(16)
 		BNE SS40_SET_4080CONTROL
 
-SS40_HARD40	LDA $16+$8				; 40/80 Board Control line=1 (TA11, Pin 15)
+SS40_HARD40	LDA #24					; 40/80 Board Control line=1 (TA11, Pin 15) = 24 = RVS(16)+TA11(8)
 
 SS40_SET_4080CONTROL
+		SEI					; No interrupts allowed
 		LDX #$0C				; CRTC Register 12 (Start Address HI byte)
 		STX CRT_Address				; Select the Register
 		STA CRT_Status				; Write the data - 40/80 Column mode will now be set!
-
+		CLI					; Allow interrupts again
 SS40_DONE	RTS
 
 
