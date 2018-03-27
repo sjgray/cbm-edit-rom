@@ -42,6 +42,13 @@
 ; Custom 8032 - For TEXT MODE startup screen
 ;-----------------------------------------------
 
+!if BANNER=8 {				
+         	!byte $13            		; <HOME> 
+         	!pet "*** commodore 8296 basic 4.0 with wedge,esc,reboot,80x35 screen ***"
+         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+}
+
+
 !if BANNER=7 {				
          	!byte $13            		; <HOME> 
          	!pet "*** commodore basic 4.0 with wedge,esc,reboot,40/80 switcher ***"
@@ -114,7 +121,7 @@
 }
 
 ;-----------------------------------------------
-; Custom ColourPET message courtesy Christian Dirk - For GRAPHICS MODE startup screen
+; Custom ColourPET message courtesy Christian Dirks - For GRAPHICS MODE startup screen
 ;-----------------------------------------------
 
 !if BANNER=2 {				

@@ -29,8 +29,13 @@
 	!if KEYBOARD=9 { !text "n-sjg2" }	; Modified layout - backarrow replaced with ESC
 
 !text " SCREEN="
+	!if COLUMNS=32  { !text "32" }
 	!if COLUMNS=40  { !text "40" }
 	!if COLUMNS=80  { !text "80" }
+	!if COLUMNS=90  { !text "90" }
+	!if ROWS=16     { !text "x16" }
+	!if ROWS=25     { !text "x25" }
+	!if ROWS=35     { !text "x35" }
 	!if SOFT40=1    { !text " (soft40)" }
 	!if SS40=1      {
 		!pet " ("
@@ -48,6 +53,8 @@
 	!if REFRESH=1 { !text "n.america" }
 	!if REFRESH=2 { !text "pal" }
 	!if REFRESH=3 { !text "ntsc" }
+	!if REFRESH=4 { !text "9inch" }
+	!if REFRESH=5 { !text "8296-35line" }
 
 !text " FEATURES="
 !if ESCCODES=1  { !text "esc-codes" }
