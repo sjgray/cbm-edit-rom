@@ -44,13 +44,13 @@ COLUMNS   = 80	; Screen Width			40,80,90,32 columns		Special cases 32 or 90
 ROWS      = 35  ; Screen Height			25,35,16 rows			Special cases 16 or 35
 HERTZ     = 60	; Line Frequency (Clock):	50=Euro,60=N.America
 IRQFIX    = 0   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating
-BOOTCASE  = 1	; Initial Screen Mode		0=Text/Lower, 1=Upper/Graphics
+BOOTCASE  = 0	; Initial Screen Mode		0=Text/Lower, 1=Upper/Graphics
 
 ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
 AUTORUN   = 1   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner and/or wedge.
 BYPASS    = 1   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to bypass custom banner, wedge or other autostart option
 BANNER    = 8   ; Custom Banner (power on msg)  0=No, N=Banner# (1-7, or 99)    Refer to docs or source. 99=debug message
-WEDGE     = 0	; DOS Wedge			0=No, 1=Yes
+WEDGE     = 1	; DOS Wedge			0=No, 1=Yes
 WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
 SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1
