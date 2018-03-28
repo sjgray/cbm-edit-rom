@@ -35,6 +35,7 @@
 	!if COLUMNS=90  { !text "90" }
 	!if ROWS=16     { !text "x16" }
 	!if ROWS=25     { !text "x25" }
+	!if ROWS=32     { !text "x32" }
 	!if ROWS=35     { !text "x35" }
 	!if SOFT40=1    { !text " (soft40)" }
 	!if SS40=1      {

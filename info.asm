@@ -35,6 +35,7 @@
 	!if COLUMNS=90  { !pet "90" }
 	!if ROWS=16     { !pet "x16" }
 	!if ROWS=25     { !pet "x25" }
+	!if ROWS=32     { !pet "x32" }
 	!if ROWS=35     { !pet "x35" }
 	!if SOFT40=1    { !pet " (soft40)" }
 	!if SS40=1      {

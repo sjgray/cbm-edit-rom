@@ -11,6 +11,7 @@
 		!if REFRESH = 3 { !source "crtc-80-ntsc.asm" }
 		!if REFRESH = 4 { !source "crtc-4080-9inch.asm" }
 		!if REFRESH = 5 { !source "crtc-80x35-60hz.asm" } ;EXPERIMENTAL 80x35 text screen
+		!if REFRESH = 6 { !source "crtc-80x32-60hz.asm" } ;EXPERIMENTAL 80x32 text screen
 		!if REFRESH = 9 { !source "crtc-80-custom.asm" }
 }
 

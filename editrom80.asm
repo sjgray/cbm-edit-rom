@@ -456,6 +456,7 @@ FULL_SCREEN	LDA #0					; Top/Left=0
 
 !IF ROWS=16 {   LDA #15 }				; 16 lines   (0-15) For special case
 !IF ROWS=25 {	LDA #24	}				; 25 lines   (0-24)
+!IF ROWS=32 {	LDA #31	}				; 32 lines   (0-31) For 8296 machines ONLY (they have more screen ram)
 !IF ROWS=35 {	LDA #34	}				; 35 lines   (0-34) For 8296 machines ONLY (they have more screen ram)
 
 !IF COLUMNS=80 {
