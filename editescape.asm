@@ -136,8 +136,8 @@ ESCAPE_BA	; Esc-Backarrow Display Project info
 ;-------------- These are codes that are not in 40-COL Codebase C0
 
 !IF CODEBASE=0 {
-ESCAPE_B	; ESC-A Set Window Bottom
-ESCAPE_T	; ESC-B Set Window Top
+ESCAPE_B	; ESC-B Set Window Bottom
+ESCAPE_T	; ESC-T Set Window Top
 ESCAPE_D	; ESC-D Delete Line
 ESCAPE_I	; ESC-I Insert Line
 ESCAPE_J	; ESC-J Start of Line
