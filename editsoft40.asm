@@ -4,16 +4,17 @@
 ; When 'SS40=1' module is included.
 ; When 'HARD4080=1' we use hardware 40/80 switching
 ; Memory location 'SCN4080BOARD' will be set to 1 in INIT routine when HARD4080 is set to 1.
+; Requires "crt-tables-ss40.asm" 
 ;
 ; Switchable Soft-40 allows the computer to switch from 80 column to 40 column mode.
 ; This can be accomplished in two ways:
 ; 
-; 1) Software Only: Programs the CRTC chip's registers. The screen is still 80 characters wide and the
-;                   characters are still the same width, but the printable area is reduced by adjusting
-;                   the left and right margins.
+; 1) Software Only: Re-programs the CRTC chip's registers to increase the left/right margins and therefore
+;                   reduce the number of characters per line to 40. The characters are still the same width.
+;                   Memory is mapped exactly like 40-column mode, so pokes to the screen will work correctly.
 ;
 ; 2) Hardware Mod:  An add-on board modifies the hardware to behave like "real" 40 or 80 columns. The width
-;                   of the characters changes so that 40 column character are twice as wide as 80 column.
+;                   of the characters changes so that 40 column characters are twice as wide as 80 column.
 ;                   Margins remain the same, and in fact, CRTC registers do not need to be modified. 
 ;
 ; To implement SS40 we need to fix the following routines:
@@ -244,10 +245,7 @@ SS40_SP240
 
 ;************** Additional CRTC Setup Table
 
-		!if REFRESH = 0 { !source "crtc-ss40-50hz.asm" }
-		!if REFRESH = 1 { !source "crtc-ss40-60hz.asm" }
-		!if REFRESH = 2 { !source "crtc-ss40-pal.asm" }
-		!if REFRESH = 3 { !source "crtc-ss40-ntsc.asm" }
+		!source "crtc-tables-ss40.asm"		; Now in separate include file
 
 ;************** Additional Screen Line Address Tables
 ;

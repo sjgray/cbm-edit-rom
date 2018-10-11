@@ -50,12 +50,16 @@
 	!if HERTZ=60 { !text "60" }
 
 !text " REFRESH="
-	!if REFRESH=0 { !text "euro" }
-	!if REFRESH=1 { !text "n.america" }
-	!if REFRESH=2 { !text "pal" }
-	!if REFRESH=3 { !text "ntsc" }
-	!if REFRESH=4 { !text "9inch" }
-	!if REFRESH=5 { !text "8296-35line" }
+	!if REFRESH= 0 { !text "euro" }
+	!if REFRESH= 1 { !text "n.america" }
+	!if REFRESH= 2 { !text "pal" }
+	!if REFRESH= 3 { !text "ntsc" }
+	!if REFRESH= 4 { !text "9inch" }
+	!if REFRESH= 5 { !text "8296-35line" }
+	!if REFRESH= 6 { !text "8296-32line" }
+	!if REFRESH= 7 { !text "8296d-euro" }
+	!if REFRESH= 8 { !text "8296d-n.america" }
+	!if REFRESH=99 { !text "custom" }
 
 !text " FEATURES="
 !if ESCCODES=1  { !text "esc-codes" }

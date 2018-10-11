@@ -15,17 +15,23 @@
 ;
 ; Currently the following are available:
 ;
-; #  MODEL  MODE   DESCRIPTION
-; -  -----  ----   -----------
-; 1  CPET   GRAPH  Displays "COMMODORE COLOURPET" in colour on top of banner
-; 2  CPET   TEXT   Displays "ColourPET BASIC4 + Wedge" replacing banner
-; 3  80COL  TEXT   Displays "Commodore EDITROM Project - Wedge/ESC/SS40" replacing banner
-; 4  ANY    GRAPH  Displays "CBM BASIC 4 WITH WEDGE" replacing banner
-; 5  CPET   GRAPH  Displays C65-like screen with colour bars
-; 6  80COL  ANY    Displays "commodore basic 4.0 with wedge/esc/ss40" replacing banner
-; 7  80COL  ANY    Displays "commodore basic 4.0 with wedge,esc,reboot,40/80 switcher" replacing banner
-; 99 ANY    ANY    Displays DATE and COMMENT for debug purposes
-
+; ##  MODEL  MODE   TYPE MESSAGE / DESCRIPTION                   40                                      80
+; --  -----  ----   ---- "---------!---------!---------!---------!---------!---------!---------!---------!"
+;  1  CPET   GRAPH  OVER "COMMODORE COLOURPET"
+;  2  CPET   TEXT   OVER "ColourPET BASIC4 + Wedge"
+;  3  80COL  TEXT   OVER "Commodore EDITROM Project - Wedge/ESC/SS40"
+;  4  ANY    GRAPH  OVER "CBM BASIC 4 WITH WEDGE"
+;  5  CPET   GRAPH  FULL C65-like screen with colour bars
+;  6  80COL  ANY    OVER "commodore basic 4.0 with wedge/esc/ss40"
+;  7  80COL  ANY    OVER "commodore basic 4.0 with wedge,esc,reboot,40/80 switcher"
+;  8  8296   ANY    OVER "commodore 8296 basic 4.0 with wedge,esc,reboot,80x35 screen"
+;  9  8296   ANY    OVER "commodore 8296 basic 4.0 with wedge,esc,reboot,extended screen"
+; 10  80COL  ANY    OVER "commodore basic 4.0 with wedge,esc,reboot,ss40, execudesk"
+; 11  80COL  ANY    OVER "commodore basic 4.0 with enhanced editor and wedge"
+; 99  ANY    ANY    ADD  Show DATE and COMMENT for debug purposes
+;
+; TYPE: FULL = Replaces all, OVER = Overwrites part, ADD = Adds additional text
+;
 ;-----------------------------------------------
 ; DEBUG BANNER
 ;-----------------------------------------------
@@ -41,6 +47,18 @@
 ;-----------------------------------------------
 ; Custom 8032 - For TEXT MODE startup screen
 ;-----------------------------------------------
+
+!if BANNER=11 {				
+         	!byte $13            		; <HOME> 
+         	!pet "*** commodore basic 4.0 with enhanced editor and wedge ***"
+         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+}
+
+!if BANNER=10 {				
+         	!byte $13            		; <HOME> 
+         	!pet "*** commodore basic 4.0 with wedge,esc,reboot,ss40, execudesk ***"
+         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+}
 
 !if BANNER=9 {				
          	!byte $13            		; <HOME> 

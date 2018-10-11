@@ -5,32 +5,40 @@
 ; SOFT40 ----- Software Defined 40-column modes
 
 !if COLUMNS=80 {
-		!if REFRESH = 0 { !source "crtc-80-50hz.asm" }
-		!if REFRESH = 1 { !source "crtc-80-60hz.asm" }
-		!if REFRESH = 2 { !source "crtc-80-pal.asm" }
-		!if REFRESH = 3 { !source "crtc-80-ntsc.asm" }
-		!if REFRESH = 4 { !source "crtc-4080-9inch.asm" }
-		!if REFRESH = 5 { !source "crtc-80x35-60hz.asm" } ;EXPERIMENTAL 80x35 text screen
-		!if REFRESH = 6 { !source "crtc-80x32-60hz.asm" } ;EXPERIMENTAL 80x32 text screen
-		!if REFRESH = 9 { !source "crtc-80-custom.asm" }
+		!if REFRESH =  0 { !source "crtc-80-50hz.asm" }
+		!if REFRESH =  1 { !source "crtc-80-60hz.asm" }
+		!if REFRESH =  2 { !source "crtc-80-pal.asm" }
+		!if REFRESH =  3 { !source "crtc-80-ntsc.asm" }
+		!if REFRESH =  4 { !source "crtc-4080-9inch.asm" }
+		!if REFRESH =  5 { !source "crtc-80x35-60hz.asm" } 	;EXPERIMENTAL 80x35 text screen
+		!if REFRESH =  6 { !source "crtc-80x32-60hz.asm" } 	;EXPERIMENTAL 80x32 text screen
+		!if REFRESH =  7 { !source "crtc-80-50hz-8296D.asm" }
+		!if REFRESH =  8 { !source "crtc-80-60hz-8296D.asm" }	;TODO - fix for 60Hz!
+		!if REFRESH = 99 { !source "crtc-80-custom.asm" }
 }
 
 !if COLUMNS=40 {
 	!IF SOFT40=1 {
-		!if REFRESH = 0 { !source "crtc-soft40-50hz.asm" }
-		!if REFRESH = 1 { !source "crtc-soft40-60hz.asm" }
-		!if REFRESH = 2 { !source "crtc-soft40-pal.asm" }
-		!if REFRESH = 3 { !source "crtc-soft40-ntsc.asm" }
-		!if REFRESH = 4 { !source "crtc-4080-9inch.asm" }
-		!if REFRESH = 9 { !source "crtc-soft40-custom.asm" }
+		!if REFRESH =  0 { !source "crtc-soft40-50hz.asm" }
+		!if REFRESH =  1 { !source "crtc-soft40-60hz.asm" }
+		!if REFRESH =  2 { !source "crtc-soft40-pal.asm" }
+		!if REFRESH =  3 { !source "crtc-soft40-ntsc.asm" }
+		!if REFRESH =  4 { !source "crtc-4080-9inch.asm" }
+;									 TODO - create missing 5 and 6 here
+		!if REFRESH =  7 { !source "crtc-soft40-50hz.asm" }	;TODO - create proper 8296D config
+		!if REFRESH =  8 { !source "crtc-soft40-60hz.asm" }	;TODO - create proper 8296D config
+		!if REFRESH = 99 { !source "crtc-soft40-custom.asm" }
 
 	} ELSE {
-		!if REFRESH = 0 { !source "crtc-40-50hz.asm" }
-		!if REFRESH = 1 { !source "crtc-40-60hz.asm" }
-		!if REFRESH = 2 { !source "crtc-40-pal.asm" }
-		!if REFRESH = 3 { !source "crtc-40-ntsc.asm" }
-		!if REFRESH = 4 { !source "crtc-4080-9inch.asm" }
-		!if REFRESH = 9 { !source "crtc-40-custom.asm" }
+		!if REFRESH =  0 { !source "crtc-40-50hz.asm" }
+		!if REFRESH =  1 { !source "crtc-40-60hz.asm" }
+		!if REFRESH =  2 { !source "crtc-40-pal.asm" }
+		!if REFRESH =  3 { !source "crtc-40-ntsc.asm" }
+		!if REFRESH =  4 { !source "crtc-4080-9inch.asm" }
+;									 TODO - create missing 5 and 6 here
+		!if REFRESH =  7 { !source "crtc-40-50hz.asm" }		;TODO - create proper 8296D config
+		!if REFRESH =  8 { !source "crtc-40-60hz.asm" }		;TODO - create proper 8296D config
+		!if REFRESH = 99 { !source "crtc-40-custom.asm" }
 	}
 }
 
@@ -41,10 +49,10 @@
 !if COLUMNS=32 {
 		; For Tony Ellis' 6847 Project
 		; We will default the 6545 CRTC to 40 columns for now.
-		!if REFRESH = 0 { !source "crtc-40-50hz.asm" }
-		!if REFRESH = 1 { !source "crtc-40-60hz.asm" }
-		!if REFRESH = 2 { !source "crtc-40-pal.asm" }
-		!if REFRESH = 3 { !source "crtc-40-ntsc.asm" }
-		!if REFRESH = 4 { !source "crtc-4080-9inch.asm" }
-		!if REFRESH = 9 { !source "crtc-40-custom.asm" }
+		!if REFRESH =  0 { !source "crtc-40-50hz.asm" }
+		!if REFRESH =  1 { !source "crtc-40-60hz.asm" }
+		!if REFRESH =  2 { !source "crtc-40-pal.asm" }
+		!if REFRESH =  3 { !source "crtc-40-ntsc.asm" }
+		!if REFRESH =  4 { !source "crtc-4080-9inch.asm" }
+		!if REFRESH = 99 { !source "crtc-40-custom.asm" }
 }

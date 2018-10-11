@@ -26,34 +26,34 @@
 ; The following DATE and COMMENT strings will be placed in the IO area (if used).
 ; Take care that comments do not overflow into code space!
 
-!macro DATE    { !pet "2018-08-20" }
+!macro DATE    { !pet "2018-10-11" }
 !macro COMMENT { !pet "sjg edit rom" }
 
 ;----------------------------------------------------------------------------------------------------------------------------
 
 ; VARIABLE	  FEATURE			VALID OPTIONS			NOTES / FUTURE OPTIONS
 ;---------	  -------			-------------			----------------------
-CODEBASE  = 0   ; Code Base			0=4000, 1=8000, 2=8296		
+CODEBASE  = 1   ; Code Base			0=4000, 1=8000, 2=8296		
 OPTROM    = 0   ; Location of EXT code		0=Extended Edit ROM area ($E800-EFFF), 1=$9000, 2=$A000 (note: code could also extend past end of 1)
 
 KEYSCAN   = 1   ; Keyboard Scanner		0=Graphic, 1=Business, 2=DIN
-KEYBOARD  = 3	; Keyboard type:		0=N-QWERTY ,1=B-QWERTY, 2=DIN, 3=C64, 4=B-SJG, 5=N-SJG, 6=B-QWERTZ, 7=B-AZERTY, 8=CBM-II (req hardware mod)
-REFRESH   = 1	; Screen refresh:		0=Euro, 1=NorthAmerica, 2=PAL, 3=NTSC, 4=9", 5=8296/35-line, 6=8296/32-line, 9=Custom
+KEYBOARD  = 2	; Keyboard type:		0=N-QWERTY ,1=B-QWERTY, 2=DIN, 3=C64, 4=B-SJG, 5=N-SJG, 6=B-QWERTZ, 7=B-AZERTY, 8=CBM-II (req hardware mod)
+REFRESH   = 7	; Screen refresh:		0=Euro, 1=N.America, 2=PAL, 3=NTSC, 4=9", 5=8296/35-line, 6=8296/32-line, 7=8296D Euro, 8=8296D N.A. 99=Custom
 REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
-COLUMNS   = 40	; Screen Width			40,80,90,32 columns		Special cases 32 or 90
+COLUMNS   = 80	; Screen Width			40,80,90,32 columns		Special cases 32 or 90
 ROWS      = 25  ; Screen Height			25,35,16 rows			Special cases 16 or 35
-HERTZ     = 60	; Line Frequency (Clock):	50=Euro,60=N.America
-IRQFIX    = 0   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating
-BOOTCASE  = 1	; Initial Screen Mode		0=Text/Lower, 1=Upper/Graphics
+HERTZ     = 50	; Line Frequency (Clock):	50=Euro,60=N.America
+IRQFIX    = 1   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating
+BOOTCASE  = 0	; Initial Screen Mode		0=Text/Lower, 1=Upper/Graphics
 
-ESCCODES  = 0	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
-AUTORUN   = 0   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner and/or wedge.
-BYPASS    = 0   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to bypass custom banner, wedge or other autostart option
-BANNER    = 0   ; Custom Banner (power on msg)  0=No, N=Banner# (1-9, or 99)    Refer to docs or source. 99=debug message
-WEDGE     = 0	; DOS Wedge			0=No, 1=Yes
+ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
+AUTORUN   = 1   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner and/or wedge.
+BYPASS    = 1   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to bypass custom banner, wedge or other autostart option
+BANNER    = 11  ; Custom Banner (power on msg)  0=No, N=Banner# (1-11, or 99)   Refer to docs or source. 99=debug message
+WEDGE     = 1	; DOS Wedge			0=No, 1=Yes
 WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
-SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1
+SS40      = 1	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns		Valid when SS40=1
 HARD4080  = 0   ; Hardware 40/80 Board          0=No, 1=Yes			Valid when SS40=1
 
@@ -71,8 +71,8 @@ REBOOT    = 0	; Add keyboard reboot? 		0=No, 1=Yes
 EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes			Note: Requires BOOT to TEXT mode!
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
 CRUNCH    = 0   ; Remove unneeded code (NOPS) when posible? 0=No, 1=Yes
-BACKARROW = 0   ; Patch for screen mode toggle  0=NO, 1=Yes 2K, 2=Yes EXT	Note: B keyboard scanner only
-INFO      = 0   ; Add project info to code area 0=NO, 1=Yes
+BACKARROW = 1   ; Patch for screen mode toggle  0=NO, 1=Yes 2K, 2=Yes EXT	Note: B keyboard scanner only
+INFO      = 1   ; Add project info to code area 0=NO, 1=Yes
 BUGFIX    = 0   ; Correct Known bugs		0=No, 1=Yes			
 ;
 DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
