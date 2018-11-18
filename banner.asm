@@ -28,6 +28,7 @@
 ;  9  8296   ANY    OVER "commodore 8296 basic 4.0 with wedge,esc,reboot,extended screen"
 ; 10  80COL  ANY    OVER "commodore basic 4.0 with wedge,esc,reboot,ss40, execudesk"
 ; 11  80COL  ANY    OVER "commodore basic 4.0 with enhanced editor and wedge"
+; 12  40COL  ANY    OVER "cbm basic 4 plus editor+wedge"
 ; 99  ANY    ANY    ADD  Show DATE and COMMENT for debug purposes
 ;
 ; TYPE: FULL = Replaces all, OVER = Overwrites part, ADD = Adds additional text
@@ -47,6 +48,13 @@
 ;-----------------------------------------------
 ; Custom 8032 - For TEXT MODE startup screen
 ;-----------------------------------------------
+
+!if BANNER=12 {
+         	!byte $13            		; <HOME> 
+         	!pet "*** cbm basic 4 plus editor+wedge ***"
+         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+
+}
 
 !if BANNER=11 {				
          	!byte $13            		; <HOME> 
