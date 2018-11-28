@@ -1,71 +1,82 @@
-; PET/CBM EDIT ROM - Extended ROM Code
+; PET/CBM EDIT ROM - Extended ROM Code for CRTC Screen configuration
 ; ================
 ; This code goes in the upper half of the 4K EDIT ROMS
-; NOTE: The code from $E800-E8FF is not visible - fill with copyright or comments
-;
-;*=e800
-;*********************************************************************************************************
-;** Hidden I/O Area used for Copyright and version info text
-;*********************************************************************************************************
-
-!source "copyright-4v4e.asm"
-!fill $e900-*,$ff 				; 169 bytes 
-
-;*=e900
 
 ;*********************************************************************************************************
-;** Start of Extended Code Area [E900]
+;** Program CRTC	[$EBC2]			(called from EDITROM.ASM)
 ;*********************************************************************************************************
 
-!IF CRUNCH=0 {
-           !byte $16,$44,$20,$20,$07,$01	;??????????
-}
+CRT_PROGRAM_EXT
+           PHA
+           JSR CLEAR_KEYFLAGS_210
+           PLA
+           JMP CRT_PROGRAM
 
 ;*********************************************************************************************************
-;** Jump Table for Extended Functions [E609]
-;*********************************************************************************************************
-; (Does anything use this table? - not called from EDITROM itself!)
-
-!IF CRUNCH=0 {
-           JMP CHROUT_WITH_DIACRITICS
-           JMP IS_DIACRITIC_CHAR
-           JMP Screen_Input_Ext
-           JMP Check_Diacritic
-           JMP IS_SPECIAL_KEY
-           JMP IS_VOCAL
-           JMP PET_TO_ASCII			;not called? not in EDITROM.ASM
-           JMP SCAN_KEYBOARD
-
-           !fill $e924-*,$aa			; 6 bytes
-}
-
-;*********************************************************************************************************
-;** Extended Routines [E929-EC4A]
+;** Set Screen to TEXT mode [$EBCA]	(called from EDITROM.ASM)
 ;*********************************************************************************************************
 
-!source "extkeyscan.asm"			;[$E924] New Keyboard Scanner
-!source "extprinting.asm"			;[$EA27] Enhanced printing
-!source "extcrtc.asm"				;[$EBC2] New CRTC programming subs
-!source "extclock.asm"				;[$EC0E] New Jiffy Clock routines
-!source "exttabs.asm"				;[$EC4B] Tab Stops
+CRT_SET_TEXT_EXT
+           LDA KEYFLAGS
+           AND #%00001000 				; Bit 4 set: new char set (low ROM)
+           BEQ CRT_SET_TEXT_OLD_1
 
 ;*********************************************************************************************************
-;** Filler [EC55-EE84]
+;** Set Screen to TEXT mode NEW [$EBD0]
 ;*********************************************************************************************************
 
-!IF CRUNCH=0 {	!fill $ee85-*,$ff }		; 560 bytes!!!!!!!!!!!!!!!!!!!!!!!!!!!
+CRT_SET_TEXT_NEW
+           LDA KEYFLAGS
+           ORA #%00001001
+           STA KEYFLAGS
+           LDA #<CRT_CONFIG_TEXT
+           LDX #>CRT_CONFIG_TEXT
+           LDY #14
+           JMP CRT_PROGRAM
 
 ;*********************************************************************************************************
-;** Extended Keyboard Scanning Tables [EE85]
+;** Set Screen to GRAPHICS mode [$EBDF]
 ;*********************************************************************************************************
 
-!source "extkeytables.asm"
+CRT_SET_GRAPHICS_EXT
+           JSR CLEAR_KEYFLAGS_210
+           AND #%00001000 				; Bit 4 set: new char set (low ROM)
+           BEQ CRT_OLD
+           LDA #<CRT_CONFIG_GRAPHICS
+           LDX #>CRT_CONFIG_GRAPHICS
+           LDY #12
+           JMP CRT_PROGRAM
+
+CRT_OLD    LDA #<CRT_CONFIG_GRAPHICS_OLD
+           LDX #>CRT_CONFIG_GRAPHICS_OLD
+           LDY #12
+           JMP CRT_PROGRAM
 
 ;*********************************************************************************************************
-;** Keyboard Tables [EF5F]
+;** Clear Key Flags [$EBF8]
 ;*********************************************************************************************************
 
-!if KEYBOARD = 0 {!source "kbdx-n.asm" }
-!if KEYBOARD = 1 {!source "kbdx-b.asm" }
-!if KEYBOARD = 2 {!source "kbdx-din.asm" }
-!if KEYBOARD = 3 {!source "kbdx-c64.asm" }
+CLEAR_KEYFLAGS_210
+           LDA KEYFLAGS
+           AND #%11111000
+           STA KEYFLAGS
+           RTS
+
+;*********************************************************************************************************
+;** Set Screen to TEXT mode OLD [$EBFF]
+;*********************************************************************************************************
+
+CRT_SET_TEXT_OLD
+           LDA KEYFLAGS
+           AND #%11110000
+           STA KEYFLAGS
+
+;*********************************************************************************************************
+;** Set Screen to TEXT mode [$EC05]
+;*********************************************************************************************************
+
+CRT_SET_TEXT_OLD_1
+           LDA #<CRT_CONFIG_TEXT_OLD
+           LDX #>CRT_CONFIG_TEXT_OLD
+           LDY #14
+           JMP CRT_PROGRAM

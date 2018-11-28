@@ -129,11 +129,12 @@ CURSOR_HOME	LDX TopMargin				; Go to TOP of window
 ;** Moves cursor to LEFT MARGIN of the current WINDOW.
 ;*********************************************************************************************************
 
-CURSOR_LM
-		LDY LeftMargin				; Get Left margin
+CURSOR_LM	LDY LeftMargin				; Get Left margin
 		STY CursorCol				; Set cursor there
 
-;[E067]		--------------------------------------- Update Cursor ROW - Get pointer from Screen Line Address Tables (and Colour)
+;*********************************************************************************************************
+;** Update Cursor ROW [E067] - Get pointer from Screen Line Address Tables (and Colour)
+;*********************************************************************************************************
 
 UPDATE_CURSOR_ROW
 		LDX CursorRow				; Current Cursor Physical Line Number
@@ -143,6 +144,11 @@ UPDATE_CURSOR_R2
 		DEY
 UPDATE_CURSOR_R3
 		LDA Line_Addr_Lo,X			; Screen Line Addresses LO
+
+;*********************************************************************************************************
+;** Update Screen Pointers
+;*********************************************************************************************************
+
 UPDATE_SCREEN_PTR
 	!IF COLOURPET=1 {
 		JSR ColourPET_SyncPointersX		; Sync Pointers to Current Line
@@ -671,7 +677,6 @@ Be2c5		LDA TABS_SET,X				;   Get TAB from table
 ;[BUG?]		Why does this routine drop into the CTRL-V check? It should do JMP IRQ_EPILOG here
 
 ;[E2D0]		--------------------------------------- Check for Erase to End of line
-;
 
 Be2d0		CMP #$16 				; Is it <Ctrl V>? - Erase to EOL? NOTE: 40-col code has BUG here
 		BNE Be2e0				; No, skip ahead
@@ -932,6 +937,7 @@ Be3cb		DEX
 
 Be3d8		INY
 !IF COLOURPET=0 {
+
 		LDA (SAL),Y				; Read Character from Screen SOURCE
 		STA (ScrPtr),Y				; Write it to Screen DESTINATION
 } ELSE {

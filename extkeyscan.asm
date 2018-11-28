@@ -1,11 +1,12 @@
-; PET/CBM EDIT ROM - Extended Keyboard Scanner from 324243-04 ROM
+; PET/CBM EDIT ROM - Extended Keyboard Scanner from 8296D, 324243-04 ROM
 ; ================   (called from EDITROM.ASM)
 ;
 ; This routine requires two keyboard matrix tables (NORMAL and SHIFTED)
 ;
 ; CAUTION! Uses unused 80 column SCREEN RAM to store results of each row scan!!!!!
 ;          This code WILL NOT WORK on 40 column machines!!!!
-
+;
+;--------- Scan the Keyboard [$E924]
 SCAN_KEYBOARD
            LDA PIA1_Port_A 			; Keyboard row select
            AND #%11110000  			; Select row 0
@@ -112,7 +113,7 @@ Be9ea      CMP #$e0
            BCC StoreKey
            LDY #%11111110
 
-;--------- Store Key
+;--------- Store Key [$E9F0]
 
 StoreKey
            STY STKEY
@@ -121,22 +122,18 @@ Be9f2      STA Key_Image
 Be9f6      RTS
 
 
-;--------- Modifier Active
+;--------- Modifier Active [$E9F7]
 
 ModifyerActive
            LDA KBD_MATRIX-1,Y			;KBD_MATRIX is located in SCREEN_RAM!!!!!!!!!!!!!!!
            ORA ModifierKeys-1,Y			;(table located in EDITROM.ASM)
            EOR #$ff
-
-;--------- ?
-
-Je9ff
-           BNE Bea04
+Je9ff      BNE Bea04
            DEY
            BNE ModifyerActive
 Bea04      RTS
 
-;--------- Get PETSCII   (Local to EDITROMEXT)
+;--------- Get PETSCII [$EA05]  (Local to EDITROMEXT)
 
 GETPETSCII
            LDA KEYBOARD_NORMAL,X		; Get key code from NORMAL table

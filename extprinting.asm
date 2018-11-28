@@ -1,6 +1,10 @@
 ; PET/CBM EDIT ROM - Extended screen printing routines
 ; ================   Handles conditional cursor and combination keys
 
+;*********************************************************************************************************
+;** Handle Conditional [$EA27]
+;*********************************************************************************************************
+
 CONDITIONAL_LR_CURSOR
            CLV
            LDA DATAX
@@ -25,13 +29,15 @@ CONDITIONAL_LR_CURSOR
            JSR CURSOR_LEFT
            JMP Mea80
 
-;--------- Cursor LEFT   				(local)
+;*********************************************************************************************************
+;** Cursor LEFT  [$EA4D]				(local)
+;*********************************************************************************************************
 
 CURSOR_LEFT
-           LDY LefMargin
+           LDY LeftMargin
            CPY CursorCol
            BCC Bea69
-           LDY RigMargin
+           LDY RightMargin
            LDX TopMargin
            CPX CursorRow
            BCS Bea64
@@ -39,13 +45,15 @@ CURSOR_LEFT
            STY CursorCol
            LDX CursorRow
            JMP Update_ScrPtr			;New screen pointer calculation routine (in EDITROM.ASM)
-Bea64      LDY LefMargin
+Bea64      LDY LeftMargin
            STY CursorCol
            RTS
 Bea69      DEC CursorCol
            RTS
 
-;--------- Cursor RIGHT  				(local)
+;*********************************************************************************************************
+;** Cursor RIGHT / Advance Cursor [$EA6C]	(local)
+;*********************************************************************************************************
 
 CURSOR_RIGHT
            PHA
@@ -53,17 +61,19 @@ Bea6d      CPX #$1d
            BNE Bea83
            LDY CursorCol
            INC CursorCol
-           CPY RigMargin
+           CPY RightMargin
            BCC Mea80
            JSR CURSOR_DOWN
-           LDY LefMargin
+           LDY LeftMargin
            STY CursorCol
-Mea80      BIT SET_V_FLAG 				; SOV Set overflow flag
+Mea80      BIT SET_V_FLAG-2 				; SOV Set overflow flag
 Bea83      PLA
            LDY CursorCol
            RTS
 
-;--------- Character Out with Diacritics	(called from EDITROM.ASM)
+;*********************************************************************************************************
+;** Character Out with Diacritics [$EA87]	(called from EDITROM.ASM)
+;*********************************************************************************************************
 
 CHROUT_WITH_DIACRITICS
            CLV
@@ -76,7 +86,7 @@ CHROUT_WITH_DIACRITICS
            LDA (ScrPtr),Y				;---------------(!!!!!!!!!!!!!!!! fix for colour)
            JSR IS_DIACRITIC_CHAR
            BVC Bea9b
-           JMP Restore_Char_at_Cursor
+           JMP RESTORE_CHR_AT_CRSR
 Bea9b      BCC Beaa2
            LDX #$1d
            JSR CURSOR_RIGHT
@@ -85,7 +95,9 @@ Beaa2      LDX INSRT
            DEC INSRT
 Beaa8      RTS
 
-;--------- Is Diacritic Character   (local)
+;*********************************************************************************************************
+;** Is Diacritic Character [$EAA9]  (local)
+;*********************************************************************************************************
 
 IS_DIACRITIC_CHAR
            TAY
@@ -112,7 +124,7 @@ Beacc      LDA Vee9d,X
            PHA
            AND BITMASK,Y
            BEQ Beb0d
-           LDA Veeb7,X
+           LDA SET_V_FLAG,X
            TAX
            PLA
 Beada      LSR 
@@ -136,7 +148,7 @@ Beaee      LDA Veead
            AND Veeae
            BEQ Beb01
            DEX
-           BIT SET_V_FLAG
+           BIT SET_V_FLAG-2
 Beb01      TXA
            ORA KEYFLAGS
            STA KEYFLAGS
@@ -148,6 +160,7 @@ Beb0d      PLA
 Beb0e      PLA
            CLC
            RTS
+
            LDA DATAX
            AND #$7f
            CMP #$20 					; <SPACE>
@@ -163,7 +176,9 @@ Beb26      CLC
 Beb27      PLA
 Beb28      TAX
 
-;--------- Clear Key Flags
+;*********************************************************************************************************
+;** Clear Key Flags [$EB29]
+;*********************************************************************************************************
 
 CLEAR_KEYFLAGS_21
            LDA #%11111001
@@ -172,7 +187,9 @@ CLEAR_KEYFLAGS_21
            TXA
            RTS
 
-;--------- Increase COL
+;*********************************************************************************************************
+;** Increase COL [$EB31]
+;*********************************************************************************************************
 
 INCREASE_COL
            LDX RPTFLG
@@ -180,7 +197,9 @@ INCREASE_COL
            INC CursorCol
            JMP CheckQuote
 
-;--------- ?
+;*********************************************************************************************************
+;** Screen Input Extended [$EB3A]
+;*********************************************************************************************************
 
 Screen_Input_Ext
            LDY CursorCol
@@ -189,7 +208,9 @@ Screen_Input_Ext
            STA DATAX
 Beb43      RTS
 
-;--------- ?
+;*********************************************************************************************************
+;** Check for Diacritic [$EB44]
+;*********************************************************************************************************
 
 Check_Diacritic
            CLV
@@ -210,6 +231,11 @@ Beb55      CMP DIACRITIC_CODES,X
            PLA
            CLC
            RTS
+
+;*********************************************************************************************************
+;** Diacritic Found
+;*********************************************************************************************************
+
 Beb60      LDA DIACRITIC_INDEX,X
            STA RPTFLG					; Repeat flag now used for Diacritic storage??????
            TAX
@@ -217,7 +243,7 @@ Beb66      LDA DIACRITIC_ACTION,X
            DEC RPTFLG
            LSR
            BCC Beb71
-           BIT SET_V_FLAG
+           BIT SET_V_FLAG-2
 Beb71      LSR
            TAX
            PLA
@@ -228,7 +254,9 @@ Beb7b      LDX #0
            STX RPTFLG
 Beb7f      RTS
 
-;--------- Is Special Key
+;*********************************************************************************************************
+;** Is Special Key [$EB80]
+;*********************************************************************************************************
 
 IS_SPECIAL_KEY
            LDY #4
@@ -238,7 +266,9 @@ Beb82      CMP KEYFLAG_TRIGGER,Y
            BPL Beb82
 Beb8a      RTS
 
-;--------- Is Vocal
+;*********************************************************************************************************
+;** Is Vocal [$EB8B]
+;*********************************************************************************************************
 
 IS_VOCAL
            LDX #9
@@ -248,7 +278,9 @@ Beb8d      CMP VOCALS,X
            BPL Beb8d
 Beb95      RTS
 
-;--------- PET to ASCII				(local)
+;*********************************************************************************************************
+;** PET to ASCII	[$EB96]		(local)
+;*********************************************************************************************************
 
 PET_TO_ASCII
            LDX #13

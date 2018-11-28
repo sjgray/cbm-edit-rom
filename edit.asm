@@ -27,28 +27,28 @@
 ; Take care that comments do not overflow into code space!
 
 !macro DATE    { !pet "2018-11-26" }
-!macro COMMENT { !pet "sjg-edit-80-n-50 (2018-11-26)" }
+!macro COMMENT { !pet "sjg-edit-8296d-din-50 (2018-11-27)" }
 
 ;----------------------------------------------------------------------------------------------------------------------------
 
 ; VARIABLE	  FEATURE			VALID OPTIONS			NOTES / FUTURE OPTIONS
 ;---------	  -------			-------------			----------------------
-CODEBASE  = 1   ; Code Base			0=4000, 1=8000, 2=8296		
-OPTROM    = 0   ; Location of EXT code		0=Extended Edit ROM area ($E800-EFFF), 1=$9000, 2=$A000 (note: code could also extend past end of 1)
+CODEBASE  = 2   ; Code Base			0=4000, 1=8000, 2=8296		
+OPTROM    = 0   ; Location of EXT code		0=Ext Edit ($E800-EFFF), 1=$9000, 2=$A000 (note: code could also extend past end of 1)
 
-KEYSCAN   = 0   ; Keyboard Scanner		0=Graphic, 1=Business, 2=DIN
-KEYBOARD  = 0	; Keyboard type:		0=N-QWERTY ,1=B-QWERTY, 2=DIN, 3=C64, 4=B-SJG, 5=N-SJG, 6=B-QWERTZ, 7=B-AZERTY, 8=CBM-II (req hardware mod)
-REFRESH   = 0	; Screen refresh:		0=Euro, 1=N.America, 2=PAL, 3=NTSC, 4=9", 5=8296/35-line, 6=8296/32-line, 7=8296D Euro, 8=8296D N.A. 99=Custom
+KEYSCAN   = 2   ; Keyboard Scanner		0=Graphic, 1=Business,2=DIN
+KEYBOARD  = 2	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
+REFRESH   = 7	; Screen refresh:		0=Euro,1=N.America,2=PAL,3=NTSC,4=9",5=8296/35-line,6=8296/32-line,7=8296D Euro,8=8296D N.A.
 REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
 COLUMNS   = 80	; Screen Width			40,80,90,32 columns		Special cases 32 or 90
 ROWS      = 25  ; Screen Height			25,35,16 rows			Special cases 16 or 35
-HERTZ     = 60	; Line Frequency (Clock):	50=Euro,60=N.America
+HERTZ     = 50	; Line Frequency (Clock):	50=Euro,60=N.America
 IRQFIX    = 1   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating
 BOOTCASE  = 0	; Initial Screen Mode		0=Text/Lower, 1=Upper/Graphics
 
 ESCCODES  = 0	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
 AUTORUN   = 0   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner and/or wedge.
-BYPASS    = 0   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to bypass custom banner, wedge or other autostart option
+BYPASS    = 0   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to bypass
 BANNER    = 12  ; Custom Banner (power on msg)  0=No, N=Banner# (1-12, or 99)   Refer to docs or source. 99=debug message
 WEDGE     = 0	; DOS Wedge			0=No, 1=Yes
 WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes
@@ -60,8 +60,8 @@ HARD4080  = 0   ; Hardware 40/80 Board          0=No, 1=Yes			Valid when SS40=1
 COLOURPET = 0	; ColourPET additions?		0=No, 1=Yes			Also set ESCCODES=1
 COLOURVER = 0	; ColourPET Hardware Version	0=Beta,1=Release		0=ColourRAM at $8400, 1=$8800 (use for VICE)
 COLOURMODE= 0	; ColourPET Hardware Type	0=Digital, 1=Analog
-DEFAULTFG = 5	; ColourPET Foreground colour   0 to 15 RGBI 			0=black 1=dkgrey 2=dkblue 3=ltblue 4=dkgreen 5=ltgreen 6=dkcyan 7=ltcyan
-DEFAULTBG = 0	; ColourPET Background colour   0 to 15 RGBI 			8=dkred 9=ltred 10=dkpurple 11=ltpurple 12=dkyellow 13=ltyellow 14=ltgrey 15=white
+DEFAULTFG = 5	; ColourPET Foreground colour   0 to 15 RGBI 			0=black,1=DKgry,2=DKBlu ,3=LTblu, 4=DKgrn, 5=Grn,   6=DKcyan,7=LTcyan
+DEFAULTBG = 0	; ColourPET Background colour   0 to 15 RGBI 			8=DKred,9=LTred,10=DKpur,11=LTpur,12=DKyel,13=LTyel,14=LTgry,15=white
 DEFAULTBO = 0   ; ColourPET Border colour       0 to 15 RGBI
 BYPASSFG  = 5   ; ColourPET Bypass FG     	0 to 15 RGBI			Colours when AUTOSTART is bypassed
 BYPASSBG  = 0   ; ColourPET Bypass BG     	0 to 15 RGBI

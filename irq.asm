@@ -27,7 +27,9 @@ Be452		JMP (CINV)	; Vector: Hardware Interrupt   [E455] Points to 'IRQ_NORMAL'
 
 IRQ_NORMAL
 		!IF IRQFIX=1 {
-			JMP ADVANCE_TIMER		; was JSR ADVANCE_TIMER
+			!IF CODEBASE=0 { JMP ADVANCE_TIMER }
+			!IF CODEBASE=1 { JMP ADVANCE_TIMER }
+			!IF CODEBASE=2 { JSR ADVANCE_TIMER }
 		} ELSE {
 			JSR UDTIME			; Update System Jiffy Clock. KERNAL routine $FFEA 			
 		}
