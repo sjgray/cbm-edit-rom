@@ -29,6 +29,7 @@
 ; 10  80COL  ANY    OVER "commodore basic 4.0 with wedge,esc,reboot,ss40, execudesk"
 ; 11  80COL  ANY    OVER "commodore basic 4.0 with enhanced editor and wedge"
 ; 12  40COL  ANY    OVER "cbm basic 4 plus editor+wedge"
+; 13  8296D  ANY    OVER "commodore 8296 basic 4.0 with wedge,reboot, backarrow"
 ; 99  ANY    ANY    ADD  Show DATE and COMMENT for debug purposes
 ;
 ; TYPE: FULL = Replaces all, OVER = Overwrites part, ADD = Adds additional text
@@ -36,8 +37,7 @@
 ;-----------------------------------------------
 ; DEBUG BANNER
 ;-----------------------------------------------
-!IF BANNER=99 {
-		!pet "date: "
+!IF BANNER=99 {	!pet "date: "
 		+DATE
 		!byte $0D
 		!pet "comment: "
@@ -45,50 +45,42 @@
 		!byte $0D				
 }
 
-;-----------------------------------------------
-; Custom 8032 - For TEXT MODE startup screen
-;-----------------------------------------------
-
-!if BANNER=12 {
-         	!byte $13            		; <HOME> 
-         	!pet "*** cbm basic 4 plus editor+wedge ***"
+!if BANNER=13 { !byte $13            		; <HOME> 
+         	!pet "*** commodore 8296d basic 4.0 with wedge,reboot,din ***"
          	!byte $0D,$0D,$0D      		; <CR><CR><CR>
-
 }
 
-!if BANNER=11 {				
-         	!byte $13            		; <HOME> 
+!if BANNER=12 {	!byte $13            		; <HOME> 
+         	!pet "*** cbm basic 4 plus editor+wedge ***"
+         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+}
+
+!if BANNER=11 {	!byte $13            		; <HOME> 
          	!pet "*** commodore basic 4.0 with enhanced editor and wedge ***"
          	!byte $0D,$0D,$0D      		; <CR><CR><CR>
 }
 
-!if BANNER=10 {				
-         	!byte $13            		; <HOME> 
+!if BANNER=10 {	!byte $13            		; <HOME> 
          	!pet "*** commodore basic 4.0 with wedge,esc,reboot,ss40, execudesk ***"
          	!byte $0D,$0D,$0D      		; <CR><CR><CR>
 }
 
-!if BANNER=9 {				
-         	!byte $13            		; <HOME> 
+!if BANNER=9 {	!byte $13            		; <HOME> 
          	!pet "*** commodore 8296 basic 4.0 with wedge,esc,reboot,extended screen ***"
          	!byte $0D,$0D,$0D      		; <CR><CR><CR>
 }
 
-!if BANNER=8 {				
-         	!byte $13            		; <HOME> 
+!if BANNER=8 {	!byte $13            		; <HOME> 
          	!pet "*** commodore 8296 basic 4.0 with wedge,esc,reboot,80x35 screen ***"
          	!byte $0D,$0D,$0D      		; <CR><CR><CR>
 }
 
-
-!if BANNER=7 {				
-         	!byte $13            		; <HOME> 
+!if BANNER=7 {	!byte $13            		; <HOME> 
          	!pet "*** commodore basic 4.0 with wedge,esc,reboot,40/80 switcher ***"
          	!byte $0D,$0D,$0D      		; <CR><CR><CR>
 }
 
-!if BANNER=6 {				
-         	!byte $13            		; <HOME> 
+!if BANNER=6 {	!byte $13            		; <HOME> 
          	!pet "*** commodore basic 4.0 with wedge/esc/ss40 ***"
          	!byte $0D,$0D,$0D      		; <CR><CR><CR>
 }
@@ -136,8 +128,7 @@
 ; Custom 4032 - For GRAPHICS MODE startup screen
 ;-----------------------------------------------
 
-!if BANNER=4 {				
-         	!byte $13            		; <HOME> 
+!if BANNER=4 {	!byte $13            		; <HOME> 
          	!pet "*** CBM BASIC 4 WITH WEDGE ***"
          	!byte $0D,$0D,$0D      		; <CR><CR><CR>
 }
@@ -146,8 +137,7 @@
 ; Custom 8032 - For TEXT MODE startup screen
 ;-----------------------------------------------
 
-!if BANNER=3 {				
-         	!byte $13            		; <HOME> 
+!if BANNER=3 {	!byte $13            		; <HOME> 
          	!pet "*** Commodore EDITROM Project - Wedge/ESC/SS40 ***"
          	!byte $0D,$0D,$0D      		; <CR><CR><CR>
 }
@@ -156,9 +146,7 @@
 ; Custom ColourPET message courtesy Christian Dirks - For GRAPHICS MODE startup screen
 ;-----------------------------------------------
 
-!if BANNER=2 {				
-         	!byte $13            		; <HOME> 
-         	!byte $99            		; <GRN>
+!if BANNER=2 {	!byte $13,$99          		; <HOME><GRN>
          	!pet "*** "
          	!byte $1c            		; <RED>
          	!pet "co"
@@ -177,8 +165,7 @@
 ; Custom ColourPET message for TEXT MODE startup screen
 ;-----------------------------------------------
 
-!if BANNER=1 {
-		!byte $93,$5			; <CLS><WHT>
+!if BANNER=1 {	!byte $93,$5			; <CLS><WHT>
 		!pet "*** "
 		!byte $9f			; <LTCYN>
 		!pet "Commodore "

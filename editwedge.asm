@@ -48,7 +48,7 @@ INSTALL_WEDGE
 		sta CHRGETX			; $73=unused byte in CHRGET
 
 !if WEDGEMSG=1 {
-		lda #<WEDGESTRING		; write "wedge active"
+		lda #<WEDGESTRING		; write "wedge installed"
 		ldy #>WEDGESTRING
 		jsr STROUTZ
 }	
