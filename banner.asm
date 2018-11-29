@@ -30,6 +30,9 @@
 ; 11  80COL  ANY    OVER "commodore basic 4.0 with enhanced editor and wedge"
 ; 12  40COL  ANY    OVER "cbm basic 4 plus editor+wedge"
 ; 13  8296D  ANY    OVER "commodore 8296 basic 4.0 with wedge,reboot, backarrow"
+; 14  8296D  ANY    OVER "commodore 8296 basic 4.0 with custom editor rom"
+; 15  8296D  ANY    OVER "commodore 8296d basic 4.0 with custom editor rom"
+; 16  80COL  ANY    OVER "commodore basic 4.0 with custom editor rom"
 ; 99  ANY    ANY    ADD  Show DATE and COMMENT for debug purposes
 ;
 ; TYPE: FULL = Replaces all, OVER = Overwrites part, ADD = Adds additional text
@@ -43,6 +46,21 @@
 		!pet "comment: "
 		+COMMENT
 		!byte $0D				
+}
+
+!if BANNER=16 { !byte $13            		; <HOME> 
+         	!pet "*** commodore basic 4.0 with custom editor rom ***"
+         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+}
+
+!if BANNER=15 { !byte $13            		; <HOME> 
+         	!pet "*** commodore 8296d basic 4.0 with custom editor rom ***"
+         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+}
+
+!if BANNER=14 { !byte $13            		; <HOME> 
+         	!pet "*** commodore 8296 basic 4.0 with custom editor rom ***"
+         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
 }
 
 !if BANNER=13 { !byte $13            		; <HOME> 

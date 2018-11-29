@@ -27,16 +27,16 @@
 ; Take care that comments do not overflow into code space!
 
 !macro DATE    { !pet "2018-11-28" }
-!macro COMMENT { !pet "sjg-edit-8296d-din-50-wedge,bypass (2018-11-28)" }
+!macro COMMENT { !pet "sjg-edit-c1-8296d-din-50-wedge,bypass (2018-11-28)" }
 
 ;----------------------------------------------------------------------------------------------------------------------------
 
 ; VARIABLE	  FEATURE			VALID OPTIONS			NOTES / FUTURE OPTIONS
 ;---------	  -------			-------------			----------------------
-CODEBASE  = 2   ; Code Base			0=4000, 1=8000, 2=8296		
+CODEBASE  = 1   ; Code Base			0=4000, 1=8000, 2=8296		
 OPTROM    = 0   ; Location of EXT code		0=Ext Edit ($E800-EFFF), 1=$9000, 2=$A000 (note: code could also extend past end of 1)
 
-KEYSCAN   = 2   ; Keyboard Scanner		0=Graphic, 1=Business,2=DIN
+KEYSCAN   = 1   ; Keyboard Scanner		0=Graphic, 1=Business,2=DIN
 KEYBOARD  = 2	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
 REFRESH   = 7	; Screen refresh:		0=Euro,1=N.America,2=PAL,3=NTSC,4=9",5=8296/35-line,6=8296/32-line,7=8296D Euro,8=8296D N.A.
 REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
@@ -46,14 +46,14 @@ HERTZ     = 50	; Line Frequency (Clock):	50=Euro,60=N.America
 IRQFIX    = 1   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating.
 BOOTCASE  = 0	; Initial Screen Mode		0=Text/Lower, 1=Upper/Graphics
 
-ESCCODES  = 0	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
+ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
 AUTORUN   = 1   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner and/or wedge.
 BYPASS    = 1   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to bypass.
-BANNER    = 13  ; Custom Banner (power on msg)  0=No, N=Banner# (1-12, or 99)   Valid when AUTORUN=1. Refer to docs or source. 99=debug message
+BANNER    = 15  ; Custom Banner (power on msg)  0=No, N=Banner# (1-12, or 99)   Valid when AUTORUN=1. Refer to docs or source. 99=debug message
 WEDGE     = 1	; DOS Wedge			0=No, 1=Yes			Valid when AUTORUN=1.
 WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
-SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1.
+SS40      = 1	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1.
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns		Valid when SS40=1.
 HARD4080  = 0   ; Hardware 40/80 Board          0=No, 1=Yes			Valid when SS40=1.
 
@@ -67,12 +67,12 @@ BYPASSFG  = 5   ; ColourPET Bypass FG     	0 to 15 RGBI			Colours when AUTOSTART
 BYPASSBG  = 0   ; ColourPET Bypass BG     	0 to 15 RGBI
 
 MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility.
-REBOOT    = 0	; Add keyboard reboot? 		0=No, 1=Yes
+REBOOT    = 1	; Add keyboard reboot? 		0=No, 1=Yes
 EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes			Note: Requires BOOT to TEXT mode!
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
 CRUNCH    = 1   ; Remove unneeded code?		0=No, 1=Yes			Removes NOPs, filler, and unreachable code.
 BACKARROW = 0   ; Patch for screen mode toggle  0=NO, 1=Yes 2K, 2=Yes EXT	Note: B keyboard scanner only.
-INFO      = 0   ; Add project info to code area 0=NO, 1=Yes
+INFO      = 1   ; Add project info to code area 0=NO, 1=Yes
 BUGFIX    = 0   ; Correct Known bugs		0=No, 1=Yes			
 ;
 DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
