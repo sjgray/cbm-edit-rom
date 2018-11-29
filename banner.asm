@@ -33,6 +33,7 @@
 ; 14  8296D  ANY    OVER "commodore 8296 basic 4.0 with custom editor rom"
 ; 15  8296D  ANY    OVER "commodore 8296d basic 4.0 with custom editor rom"
 ; 16  80COL  ANY    OVER "commodore basic 4.0 with custom editor rom"
+; 17  40COL  ANY    OVER "cbm basic 4 custom editrom"
 ; 99  ANY    ANY    ADD  Show DATE and COMMENT for debug purposes
 ;
 ; TYPE: FULL = Replaces all, OVER = Overwrites part, ADD = Adds additional text
@@ -46,6 +47,11 @@
 		!pet "comment: "
 		+COMMENT
 		!byte $0D				
+}
+
+!if BANNER=17 { !byte $13            		; <HOME> 
+         	!pet "*** cbm basic 4 with custom editrom ***"
+         	!byte $0D,$0D,$0D      		; <CR><CR><CR>
 }
 
 !if BANNER=16 { !byte $13            		; <HOME> 
