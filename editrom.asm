@@ -56,7 +56,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS					; Calculate bottom line of screen for deb
 		!IF SS40 = 1      { !SOURCE "editsoft40.asm" }
 		!IF BACKARROW = 2 { !SOURCE "editbarrow.asm" }
 INFOSTRING	
-		!IF INFO = 1      { !SOURCE "info.asm" }
+		!IF INFO > 0      { !SOURCE "info.asm" }
 
 		!IF OPTROM=0 { !FILL $F000-*,$FF }			; PAD to 4K ##########################
 	}

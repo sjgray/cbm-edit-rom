@@ -162,8 +162,21 @@ ESC_NUM2	TAX					; The Colour number becomes the index
 }
 ;------------------------------------------------------------------------------------------------
 ; ESC-BACKARROW Display Project Info
-!IF INFO=1 {
-ESCAPE_BA	LDA #<INFOSTRING		; point to INFO string
+
+ESCAPE_BA
+
+;-------------- DISPLAY FONT ON SCREEN
+!IF INFO = 2 {
+		LDY #0				; Y=0
+INFLOOP		TYA				; LOOP[  A=Y
+		STA SCREEN_RAM,Y		; Put it on the screen
+		INY				; Next position and character
+		BNE INFLOOP			; ] Loop for more
+}
+
+;-------------- DISPLAY PROJECT INFO		
+!IF INFO > 0 {
+		LDA #<INFOSTRING		; point to INFO string
 		LDY #>INFOSTRING
 		JSR STROUTZ
 		JMP IRQ_EPILOG
