@@ -34,7 +34,7 @@
 ; VARIABLE	  FEATURE			VALID OPTIONS			NOTES / FUTURE OPTIONS
 ;---------	  -------			-------------			----------------------
 CODEBASE  = 1   ; Code Base			0=4000, 1=8000, 2=8296		
-OPTROM    = 2   ; Location of EXT code		0=Ext Edit ($E800-EFFF), 1=$9000, 2=$A000 (note: code could also extend past end of 1)
+OPTROM    = 1   ; Location of EXT code		0=Ext Edit ($E800-EFFF), 1=$9000, 2=$A000 (note: code could also extend past end of 1)
 
 KEYSCAN   = 1   ; Keyboard Scanner		0=Graphic,1=Business,2=DIN
 KEYBOARD  = 1	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
