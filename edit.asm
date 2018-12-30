@@ -26,8 +26,8 @@
 ; The following DATE and COMMENT strings will be placed in the IO area (if used).
 ; Take care that comments do not overflow into code space!
 
-!macro DATE    { !pet "2018-12-29" }
-!macro COMMENT { !pet "sjg-edit-c1-b-60-optrom2-esc-wedge-execudesk-reboot-backarrow (2018-12-29)" }
+!macro DATE    { !pet "2018-12-30" }
+!macro COMMENT { !pet "sjg-edit-c1-b-60-optrom2-esc-wedge-execudesk-reboot-backarrow (2018-12-30)" }
 
 ;----------------------------------------------------------------------------------------------------------------------------
 
