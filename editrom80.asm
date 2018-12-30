@@ -1198,15 +1198,15 @@ INITED1		STA JIFFY_CLOCK,X			; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
 
 ;		--------------------------------------- Set IRQ Vector - Normally $E455 or $E900 for Execudesk
 
-!IF EXECUDESK=0 {
-		LDA #<IRQ_NORMAL			; Normal IRQ Vector LO
-		STA CINV
-		LDA #>IRQ_NORMAL			; Normal IRQ Vector HI
-		STA CINV+1
-} ELSE {
+!IF EXECUDESK=1 {
 		LDA #<IRQ_EDESK				; Execudesk IRQ Vector LO
 		STA CINV
 		LDA #>IRQ_EDESK				; Execudesk IRQ Vector HI
+		STA CINV+1
+} ELSE {
+		LDA #<IRQ_NORMAL			; Normal IRQ Vector LO
+		STA CINV
+		LDA #>IRQ_NORMAL			; Normal IRQ Vector HI
 		STA CINV+1
 }
 

@@ -26,15 +26,15 @@
 ; The following DATE and COMMENT strings will be placed in the IO area (if used).
 ; Take care that comments do not overflow into code space!
 
-!macro DATE    { !pet "2018-12-05" }
-!macro COMMENT { !pet "sjg-edit-c1-b-60-esc-wedge-reboot-backarrow (2018-12-05)" }
+!macro DATE    { !pet "2018-12-29" }
+!macro COMMENT { !pet "sjg-edit-c1-b-60-optrom2-esc-wedge-execudesk-reboot-backarrow (2018-12-29)" }
 
 ;----------------------------------------------------------------------------------------------------------------------------
 
 ; VARIABLE	  FEATURE			VALID OPTIONS			NOTES / FUTURE OPTIONS
 ;---------	  -------			-------------			----------------------
 CODEBASE  = 1   ; Code Base			0=4000, 1=8000, 2=8296		
-OPTROM    = 0   ; Location of EXT code		0=Ext Edit ($E800-EFFF), 1=$9000, 2=$A000 (note: code could also extend past end of 1)
+OPTROM    = 2   ; Location of EXT code		0=Ext Edit ($E800-EFFF), 1=$9000, 2=$A000 (note: code could also extend past end of 1)
 
 KEYSCAN   = 1   ; Keyboard Scanner		0=Graphic,1=Business,2=DIN
 KEYBOARD  = 1	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
@@ -68,7 +68,7 @@ BYPASSBG  = 0   ; ColourPET Bypass BG     	0 to 15 RGBI
 
 MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility.
 REBOOT    = 1	; Add keyboard reboot? 		0=No, 1=Yes
-EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes			Note: Requires BOOT to TEXT mode!
+EXECUDESK = 2	; Add Execudesk Menu?		0=No, 1=Yes, 2=Yes/OPTROM>0	Note: Requires BOOT to TEXT mode!
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
 CRUNCH    = 0   ; Remove unneeded code?		0=No, 1=Yes			Removes NOPs, filler, and unreachable code.
 BACKARROW = 1   ; Patch for screen mode toggle  0=NO, 1=Yes 2K, 2=Yes EXT	Note: B keyboard scanner only.

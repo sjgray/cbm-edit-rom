@@ -1206,15 +1206,15 @@ INITED2		STA TABS+1,X				; LOOP[   TAB table $03F0
 
 ;		--------------------------------------- Set IRQ Vector - Normally $E455 or $E900 for Execudesk
 
-!IF EXECUDESK=0 {
+!IF EXECUDESK=1 {
+		LDA #<IRQ_EDESK				; Execudesk IRQ Vector LO
+		STA CINV
+		LDA #>IRQ_EDESK				; Execudesk IRQ Vector HI
+		STA CINV+1
+} ELSE {
 		LDA #<IRQ_NORMAL			; Normal IRQ Vector LO
 		STA CINV
 		LDA #>IRQ_NORMAL			; Normal IRQ Vector HI
-		STA CINV+1
-} ELSE {
-		LDA #<IRQ_EDESK				; Execudesk IRQ Vector LO
-		STA CINV	
-		LDA #>IRQ_EDESK				; Execudesk IRQ Vector HI
 		STA CINV+1
 }
 ;		--------------- Continue

@@ -14,8 +14,9 @@
 
 AUTODISPATCH
 		JSR ERASE_SYS
-		!IF BANNER > 0 { JSR SHOW_BANNER   }
-		!IF WEDGE  > 0 { JSR INSTALL_WEDGE }
+		!IF BANNER > 0 { JSR SHOW_BANNER   }		; Display Custom Banner Message
+		!IF WEDGE  > 0 { JSR INSTALL_WEDGE }		; Install DOS Wedge
+		!IF EXECUDESK =2 { JSR EDESKMENU }		; Run Execudesk Menu
 		RTS
 
 ERASE_SYS

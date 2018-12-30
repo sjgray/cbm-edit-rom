@@ -45,8 +45,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS					; Calculate bottom line of screen for deb
 		!IF OPTROM=1 { *=$9000 }  				; Assemble to option ROM at $9000
 		!IF OPTROM=2 { *=$A000 }  				; Assemble to option ROM at $A000
 		!IF OPTROM=99 {!SOURCE "io.asm"}			; Special case for development purposes
-
-		!IF EXECUDESK = 1 { !SOURCE "execudesk.asm" }
+		
 		!IF AUTORUN   = 1 { !SOURCE "editautorun.asm" }
 		!IF BANNER > 0    { !SOURCE "editbanner.asm" }
 		!IF WEDGE = 1	  { !SOURCE "editwedge.asm" }
@@ -55,6 +54,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS					; Calculate bottom line of screen for deb
 		!IF REBOOT = 1    { !SOURCE "editreboot.asm" }
 		!IF SS40 = 1      { !SOURCE "editsoft40.asm" }
 		!IF BACKARROW = 2 { !SOURCE "editbarrow.asm" }
+		!IF EXECUDESK > 0 { !SOURCE "execudesk.asm" }
 INFOSTRING	
 		!IF INFO > 0      { !SOURCE "info.asm" }
 

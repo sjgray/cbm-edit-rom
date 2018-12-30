@@ -1,9 +1,12 @@
 ; PET/CBM EDIT ROM - EXECUDESK 
 ; ================
-; Execudesk is a power-on menu system for 8296 machines
+; Execudesk is a power-on menu system originally released for 8296 machines, but will work on any 4000/8000 model.
 ; NOTE: The Execudesk menu requires that the machine boot to TEXT mode!
 ;
-;---- patch - set IRQ vector to EXECUDESK IRQ HANDLER at $E900
+; IMPORTANT!: Execudesk relies on detecting the "*" character at the top left of the screen! Replacing the BANNER
+;             with one that does not have the "*" will prevent Execudesk from starting and cause unpredictable operation.
+;
+;---- patch - set IRQ vector to EXECUDESK IRQ HANDLER at $E900 (normally)
 ;
 ; $E621: A9 00     LDA #<IRQ_EDESK
 ; $E623: 85 90     STA $<INTVEC 		;hardware interrupt vector LO
