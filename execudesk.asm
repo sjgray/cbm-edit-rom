@@ -14,10 +14,13 @@
 ; $E627: 85 91     STA $<INTVEC + 1 		;hardware interrupt vector HI
 
 ;----- new code in upper edit rom area
+; When EXECUDESK=1 the IRQ HANDLER must be present
+; When EXECUDESK=2 the MENU is called from the AutoRUN code.
 
+!IF EXECUDESK=1 {
 IRQ_EDESK
 		JMP EDESK_IRQ_HANDLER			; Skip over menu strings
-
+}
 
 ;--------------- Execudesk Menu Strings
 ;
@@ -231,6 +234,9 @@ ED_MOMENT	!byte $93					; <CLS>
 		!byte $0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D
 		!byte 0
 
+
+!IF EXECUDESK=1 {
+
 ;--------------- New IRQ Handler entry point. 
 ;
 ; This IRQ handler checks for an "*" at the top of the screen, indicating that the computer has booted.
@@ -270,6 +276,7 @@ EXECU_PREP	SEI					; Disable interrupts
 		PHA
 		PHA
 		JMP IRQ_NORMAL				; Do Normal IRQ
+}
 
 ;--------------- Execudesk Menu System
 
