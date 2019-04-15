@@ -1342,7 +1342,7 @@ RUN_STRING	!byte $44,$cc,$22,$2a,$0d		; dL"*<RETURN>
 ;** High bytes are calculated and put in the Link-link table
 ;*********************************************************************************************************
 
-!source "screen-40-lo.asm"
+!source "screen0v.asm"
 
 ;*********************************************************************************************************
 ;** CRTC Chip Register Setup Tables (2K ROMs) [E7B1]

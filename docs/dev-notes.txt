@@ -1,0 +1,42 @@
+PET/CBM Editor ROM Project - Development Notes
+==============================================
+
+This document is for adding notes, info, observations etc during development.
+
+
+Introduction
+------------
+
+The Editor ROM on PET/CBM machines is a ROM chip that is part of the overall firmware of
+the machine. It works along side the KERNAL and BASIC ROMs. The purpose of the Editor ROM
+is to consolodate all code that is customized for the hardware. In this way Commodore could
+sell different versions in different markets.
+
+The Editor ROM controls all screen editing, screen output, keyboard input, and IRQ handling,
+including clock updating. It contains tables to initialize the CRTC (screen) controller as
+well as the keyboard matrix.  
+
+The Editor ROM is mapped into the CPU address space from $E000 to $EFFF, however there is
+an area from $E800-$E8FF that is used for I/O chips. Early Editor ROMs were 2KB in size
+from $E000 to $E7FF. Later ROMs, usually international versions (French, DIN etc) were
+4K in size from $E000 to $EFFF with the ROM at the IO range inaccessable to the cpu.
+
+The KERNAL and BASIC directly call code in the Editor ROM at 5 fixed locations, so these
+entry points must be preserved. Strangely, there is a JUMP TABLE starting at $E000 but
+it is not used by the KERNAL or BASIC, but could be used by user-written software.
+
+
+Zero-page usage
+---------------
+
+BASIC, EDITOR, and KERNAL use almost every byte of zero page for themselves. However, there
+is a difference in usage for 40-column vs 80-column Editor ROMs. The 40-column ROM has
+a feature called Line Linking. This is how the editor code tracks which lines should be
+treated as 40 column (single) or 80-column (double/linked). For example if you type or print
+on a line it will start as a 40-column line. The moment you type on the 40th column the
+cursor will wrap to the next line and now the two lines are linked. They are treated as a
+virtual 80-column line. You can see this by filling up both lines then moving back to the
+first line and deleting characters. Characters from the second line will be pulled up to the
+first line.
+
+

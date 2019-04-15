@@ -26,8 +26,8 @@
 ; The following DATE and COMMENT strings will be placed in the IO area (if used).
 ; Take care that comments do not overflow into code space!
 
-!macro DATE    { !pet "2019-01-26" }
-!macro COMMENT { !pet "sjg-edit-80-b-50-esc-wedge-ss80-reboot-backarrow (2019-01-26)" }
+!macro DATE    { !pet "2019-04-15" }
+!macro COMMENT { !pet "sjg-edit-80-b-50-esc-wedge-ss80-reboot-backarrow (2019-04-15)" }
 
 ;----------------------------------------------------------------------------------------------------------------------------
 
@@ -70,10 +70,10 @@ MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for 
 REBOOT    = 1	; Add keyboard reboot? 		0=No, 1=Yes
 EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes, 2=Yes/OPTROM>0	Note: Requires BOOT to TEXT mode!
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
-CRUNCH    = 0   ; Remove unneeded code?		0=No, 1=Yes			Removes NOPs, filler, and unreachable code.
+CRUNCH    = 1   ; Remove unneeded code?		0=No, 1=Yes			Removes NOPs, filler, and unreachable code.
 BACKARROW = 1   ; Patch for screen mode toggle  0=NO, 1=Yes 2K, 2=Yes EXT	Note: B keyboard scanner only.
 INFO      = 1   ; Add project info to code area 0=NO, 1=Yes,2=Yes+FONT		INFO=2 shows character set at top of screen
-BUGFIX    = 0   ; Correct Known bugs		0=No, 1=Yes			
+BUGFIX    = 1   ; Correct Known bugs		0=No, 1=Yes			
 ;
 DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
 

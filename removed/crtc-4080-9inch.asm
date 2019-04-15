@@ -1,5 +1,7 @@
 ; PET/CBM EDIT ROM - CRTC Setup Tables
-; ================   40 or 80 Column x 25 Lines, 50 Hz Line, 16kHz Horizontal?? (for built-in 9" monitor)
+; ================ 
+; FORMAT: 40 or 80 Column x 25 Lines, 50 Hz Line, 16kHz Horizontal?? (for built-in 9" monitor)
+; ROM   : Custom
 ;
 ; These CRTC values were supplied by Toni Ellis. They are for use with the small 9" CRTC monitor.
 ;

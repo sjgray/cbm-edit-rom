@@ -1,6 +1,7 @@
 ; PET/CBM EDIT ROM - CRTC Setup Tables
-; ================   40 Column x 25 Lines, 60 Hz Line, 20 kHz Horizonal (for built-in monitor)
-
+; ================
+; FORMAT: 40 Column x 25 Lines, 60 Hz Line, 20 kHz Horizonal (for built-in monitor)
+; ROM   : 901499-01   
 ; These tables are used to program the CRTC chip to set the screen to the proper rows, columns, and timing 
 
 ;--------- Text Mode - 40 Column, 60 Hz, 20 kHz

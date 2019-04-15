@@ -86,10 +86,7 @@
 ;** Keyboard Tables [EF5F]
 ;*********************************************************************************************************
 
-!if KEYBOARD = 0 {!source "kbdx-n.asm" }
-!if KEYBOARD = 1 {!source "kbdx-b.asm" }
-!if KEYBOARD = 2 {!source "kbdx-din.asm" }
-!if KEYBOARD = 3 {!source "kbdx-c64.asm" }
+!source "keyboard.asm"
 
 !fill $f000-*,$00 				;pad to 4K
 

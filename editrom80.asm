@@ -1383,23 +1383,8 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e	; BELL chime values
 ;** Screen Line Address Tables  [E755][E76E]
 ;*********************************************************************************************************
 
-!IF COLUMNS=80 {
-		!SOURCE "screen-80.asm"						; Screen RAM address table
-		!IF COLOURPET > 0 { !SOURCE "screen-80c.asm" }			; Colour address table (future hardware)
-}
-
-!IF COLUMNS=40 {
-		!SOURCE "screen-40.asm"						; Screen RAM address table
-		!IF COLOURPET > 0 {
-			!IF COLOURVER = 0 { !SOURCE "screen-40c!.asm" }		; Colour address table with colour shift compensation
-			!IF COLOURVER = 1 { !SOURCE "screen-40c.asm" }		; Colour address table 
-		}
-}
-
-!IF COLUMNS=32 {
-		!SOURCE "screen-32.asm"						; Screen RAM address table special case
-		!IF COLOURPET > 0 { !SOURCE "screen-32c.asm" }			; Colour address table for special case
-}
+		!SOURCE "screen1v.asm"						; Screen RAM address table
+		!IF COLOURPET > 0 { !SOURCE "screen1c.asm" }			; Colour address table (future hardware)
 
 ;*********************************************************************************************************
 ;** Small patches here  [E787]

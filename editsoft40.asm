@@ -245,14 +245,13 @@ SS40_SP240
 
 ;************** Additional CRTC Setup Table
 
-		!source "crtc-tables-ss40.asm"		; Now in separate include file
+		!source "crtc-reg-ss40.asm"		; Now in separate include file
 
 ;************** Additional Screen Line Address Tables
 ;
 ; The primary screen line table will be set to 80 column, so the additional
 ; table is for the 40 column screen
 
-!SOURCE "screen2-40.asm"				; Add the Character RAM table
-
-!IF COLOURPET=1 { !SOURCE "screen2-40c.asm" }		; Add the Colour RAM table
+		!SOURCE "screen2v.asm"				; Add the Character RAM table
+		!IF COLOURPET=1 { !SOURCE "screen2c.asm" }	; Add the Colour RAM table
 

@@ -1,5 +1,7 @@
 ; PET/CBM EDIT ROM - CRTC Setup Tables
-; ================   40 Column x 25 Line, 50 Hz, PAL for external monitor/TV
+; ================
+; FORMAT: 40 Column x 25 Line, 50 Hz, PAL for external monitor/TV
+; ROM   : Custom
 ;
 ; These tables are used to program the CRTC chip to set the screen to the proper rows, columns, and timing 
 ; 40 column, PAL as provided by Christian Dirk
