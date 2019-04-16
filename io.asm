@@ -17,16 +17,17 @@
 }
 
 !text " KEYBOARD="
-	!if KEYBOARD=0 { !text "n-qwerty" }
-	!if KEYBOARD=1 { !text "b-qwerty" }	; QWERTY layout
-	!if KEYBOARD=2 { !text "din" }
-	!if KEYBOARD=3 { !text "c64/vic" }
-	!if KEYBOARD=4 { !text "b-sjg" }	; Modified layout - cursor keys, esc etc
-	!if KEYBOARD=5 { !text "n-sjg" }	; Modified layout - @ replaced with ESC, backarrow becomes @
-	!if KEYBOARD=6 { !text "b-qwertz" }	; QWERTZ layout
-	!if KEYBOARD=7 { !text "b-azerty" }	; AZERTY layout
-	!if KEYBOARD=8 { !text "cbm-ii" }	; CBM-II keyboard (requires hardware mod)
-	!if KEYBOARD=9 { !text "n-sjg2" }	; Modified layout - backarrow replaced with ESC
+	!if KEYBOARD= 0 { !text "n-qwerty" }
+	!if KEYBOARD= 1 { !text "b-qwerty" }	; QWERTY layout
+	!if KEYBOARD= 2 { !text "din" }
+	!if KEYBOARD= 3 { !text "c64/vic" }
+	!if KEYBOARD= 4 { !text "b-sjg" }	; Modified layout - cursor keys, esc etc
+	!if KEYBOARD= 5 { !text "n-sjg" }	; Modified layout - @ replaced with ESC, backarrow becomes @
+	!if KEYBOARD= 6 { !text "b-qwertz" }	; QWERTZ layout
+	!if KEYBOARD= 7 { !text "b-azerty" }	; AZERTY layout
+	!if KEYBOARD= 8 { !text "cbm-ii" }	; CBM-II keyboard (requires hardware mod)
+	!if KEYBOARD= 9 { !text "n-sjg2" }	; Modified layout - backarrow replaced with ESC
+	!if KEYBOARD=11 { !text "ted" }		; TED series (C16,C116,Plus/4 etc)
 
 !text " SCREEN="
 	!if COLUMNS=32  { !text "32" }
@@ -55,10 +56,11 @@
 	!if REFRESH= 2 { !text "pal" }
 	!if REFRESH= 3 { !text "ntsc" }
 	!if REFRESH= 4 { !text "9inch" }
-	!if REFRESH= 5 { !text "8296-35line" }
-	!if REFRESH= 6 { !text "8296-32line" }
-	!if REFRESH= 7 { !text "8296d-euro" }
-	!if REFRESH= 8 { !text "8296d-n.america" }
+	!if REFRESH=82 { !text "8296d-v1" }
+	!if REFRESH=83 { !text "8296d-v2" }
+	!if REFRESH=90 { !text "8296(d)-n.a." }
+	!if REFRESH=91 { !text "8296(d)-n.a." }
+	!if REFRESH=92 { !text "8296(d)-n.a." }
 	!if REFRESH=99 { !text "custom" }
 
 !text " FEATURES="

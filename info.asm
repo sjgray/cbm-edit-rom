@@ -17,16 +17,17 @@
 }
 
 !pet " keyboard="
-	!if KEYBOARD=0 { !pet "n-qwerty" }
-	!if KEYBOARD=1 { !pet "b-qwerty" }	; QWERTY layout
-	!if KEYBOARD=2 { !pet "din" }
-	!if KEYBOARD=3 { !pet "c64/vic" }
-	!if KEYBOARD=4 { !pet "b-sjg" }	; Modified layout - cursor keys, esc etc
-	!if KEYBOARD=5 { !pet "n-sjg" }	; Modified layout - @ replaced with ESC, backarrow becomes @
-	!if KEYBOARD=6 { !pet "b-qwertz" }	; QWERTZ layout
-	!if KEYBOARD=7 { !pet "b-azerty" }	; AZERTY layout
-	!if KEYBOARD=8 { !pet "cbm-ii" }	; CBM-II keyboard (requires hardware mod)
-	!if KEYBOARD=9 { !pet "n-sjg2" }	; Modified layout - backarrow replaced with ESC
+	!if KEYBOARD= 0 { !pet "n-qwerty" }
+	!if KEYBOARD= 1 { !pet "b-qwerty" }	; QWERTY layout
+	!if KEYBOARD= 2 { !pet "din" }
+	!if KEYBOARD= 3 { !pet "c64/vic" }
+	!if KEYBOARD= 4 { !pet "b-sjg" }	; Modified layout - cursor keys, esc etc
+	!if KEYBOARD= 5 { !pet "n-sjg" }	; Modified layout - @ replaced with ESC, backarrow becomes @
+	!if KEYBOARD= 6 { !pet "b-qwertz" }	; QWERTZ layout
+	!if KEYBOARD= 7 { !pet "b-azerty" }	; AZERTY layout
+	!if KEYBOARD= 8 { !pet "cbm-ii" }	; CBM-II keyboard (requires hardware mod)
+	!if KEYBOARD= 9 { !pet "n-sjg2" }	; Modified layout - backarrow replaced with ESC
+	!if KEYBOARD=11 { !pet "ted" }		; TED Series (C16,C116,Plus/4 etc)
 
 !pet " screen="
 	!if COLUMNS=32  { !pet "32" }
@@ -50,16 +51,17 @@
 	!if HERTZ=60 { !pet "60" }
 
 !pet " refresh="
-	!if REFRESH= 0 { !pet "euro" }
-	!if REFRESH= 1 { !pet "n.america" }
-	!if REFRESH= 2 { !pet "pal" }
-	!if REFRESH= 3 { !pet "ntsc" }
-	!if REFRESH= 4 { !pet "9inch" }
-	!if REFRESH= 5 { !pet "8296-35line" }
-	!if REFRESH= 6 { !pet "8296-32line" }
-	!if REFRESH= 7 { !pet "8296d-euro" }
-	!if REFRESH= 8 { !pet "8296d-n.america" }
-	!if REFRESH=99 { !pet "custom" }
+	!if REFRESH=  0 { !pet "euro" }
+	!if REFRESH=  1 { !pet "n.america" }
+	!if REFRESH=  2 { !pet "pal" }
+	!if REFRESH=  3 { !pet "ntsc" }
+	!if REFRESH=  4 { !pet "9inch" }
+	!if REFRESH= 82 { !pet "8296d-v1" }
+	!if REFRESH= 83 { !pet "8296d-v2" }
+	!if REFRESH= 90 { !pet "8296(d)-n.a." }
+	!if REFRESH= 91 { !pet "8296(d)-n.a." }
+	!if REFRESH= 92 { !pet "8296(d)-n.a." }
+	!if REFRESH= 99 { !pet "custom" }
 
 !pet " features="
 !if ESCCODES=1  { !pet "esc-codes" }
