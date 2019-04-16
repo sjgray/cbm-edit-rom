@@ -1,8 +1,8 @@
-; PET/CBM EDIT ROM - Screen line address table - Screen 1 @ $8800 Attributes (colour)
+; PET/CBM EDIT ROM - Screen line address table - Screen 1 @ $8400 Attributes (colour)
 ; ================
 ;
 ; These tables are used to calculate the starting address of each line on the screen
-; These tables are shifted on byte to correct for colour shift in ColourPET BETA design,
+; These tables are shifted one byte to correct for colour shift in ColourPET BETA design,
 ; and colour memory starts at $8400.
 
 ;---------- 32 characters wide 

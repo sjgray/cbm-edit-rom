@@ -11,8 +11,8 @@
 
 ;---------------------- Soft 40x25, 50 Hz, 20 kHz for 12" Internal Monitor (inverted video)
 !IF REFRESH=0 {
-CRT_CONFIG_TEXT:	!byte $31,$14,$1f,$0f,$28,$05,$19,$21,$00,$09,$00,$00,$10,$00,$00,$00,$00,$00 
-CRT_CONFIG_GRAPHICS: 	!byte $31,$14,$1f,$0f,$28,$05,$19,$21,$00,$07,$00,$00,$10,$00,$00,$00,$00,$00
+CRT_CONFIG_TEXT:	!byte $31,$14,$1F,$0F,$31,$00,$19,$25,$00,$09,$00,$00,$10,$00,$00,$00,$00,$00 
+CRT_CONFIG_GRAPHICS: 	!byte $31,$14,$1F,$0F,$31,$00,$19,$25,$00,$07,$00,$00,$10,$00,$00,$00,$00,$00
 }
 
 ;---------------------- Soft 40x25, 60 Hz, 20 kHz for 12" Internal Monitor (inverted video)

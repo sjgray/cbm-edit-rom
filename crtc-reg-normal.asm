@@ -41,7 +41,6 @@ CRT_CONFIG_GRAPHICS:	!byte $3F,$28,$30,$8E,$20,$00,$19,$1C,$00,$07,$00,$00,$00,$
 }
 
 ;---------------------- 40/80x25, 60 Hz, 15 kHz for 9" Internal Monitor (non-inverted video)
-; **** NEEDS FIXED ****
 !IF REFRESH=5 {
 CRT_CONFIG_TEXT:	!byte $3F,$28,$30,$8E,$20,$00,$19,$1C,$00,$09,$00,$00,$00,$00,$00,$00,$00,$00 
 CRT_CONFIG_GRAPHICS:	!byte $3F,$28,$30,$8E,$20,$00,$19,$1C,$00,$07,$00,$00,$00,$00,$00,$00,$00,$00 
