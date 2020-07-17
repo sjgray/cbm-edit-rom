@@ -1,9 +1,12 @@
 ; PET/CBM EDIT ROM - Keyboard Matrix Tables for KEYSCAN-N, KEYSCAN-B scanner code
 ; ================
 ; 
-; Notes: 00 = Shift , 10 = Repeat, +80 = Unshiftable , FF   = No Key
-;        KP = Keypad, S- = Shift , GR- = Graphic Code, NONE = No Key
-;        CTRL- = CTRL+key , SHC- = Shift-CTRL+key, A- = Accent
+; Notes:
+;	Modifier Keys: 00 = Shift, 10 = Repeat, 80 = CTRL
+;	Special Codes: Bit 7 set (+$80) = Unshiftable, FF = No Key
+;       Labelling:
+;	   KP = Keypad, S- = Shift , GR- = Graphic Code, NONE = No Key
+;          CTRL- = CTRL+key , SHC- = Shift-CTRL+key, A- = Accent
 
 KEYBOARD_NORMAL
 
@@ -212,13 +215,13 @@ KEYBOARD_NORMAL
 ;
 ; The TED keyboards have different connectors depending on model. Also, the pinouts
 ; do not group the ROWs and COLs so you will need to make an adapter cable.
-; TED keyboard have 4 separate cursor keys meaning no SHIFT is needed. This will likely
+; TED keyboards have 4 separate cursor keys meaning no SHIFT is needed. This will likely
 ; conflict with the keyboard scanner which uses the TOP BIT of the character to indicate
 ; it cannot be shifted. Cursor UP and LEFT are normally shifted.
 ;
 ; Due to the nature of the keyboard and different labelling, the following changes are made:
 ;
-; * Code Change: SHIFT=01 with 00
+; * Code Change: SHIFT=01 with 00, CTRL with 80
 ; * Reassign   : POUND as \=5C, C= as TEXT/GRAPHICS mode
 ; * Reassign   : F1 as TEXT=0E, F2 as DELETE LINE=15, F3 as ERASE TO START=16, HELP as SCROLL DOWN=19
 ;
@@ -231,7 +234,7 @@ KEYBOARD_NORMAL
 ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====  ===
 !byte $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF ; NONE   NONE   NONE   NONE   NONE   NONE   NONE   NONE   ROW0/A -
 !byte $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF ; NONE   NONE   NONE   NONE   NONE   NONE   NONE   NONE   ROW1/B -
-!byte $31,$13,$  ,$03,$20,$0E,$51,$32 ;	1      CLR    CTRL   STOP   SPACE  C=     Q      2      ROW2/C 5
+!byte $31,$13,$00,$03,$20,$0E,$51,$32 ;	1      CLR    CTRL   STOP   SPACE  C=     Q      2      ROW2/C 5
 !byte $33,$57,$41,$00,$5A,$53,$45,$34 ; 3      W      A      SHIFT  Z      S      E      4      ROW3/D 7
 !byte $35,$52,$44,$58,$43,$46,$54,$36 ; 5      R      D      X      C      F      T      6      ROW4/E 11
 !byte $37,$59,$47,$56,$42,$48,$55,$38 ; 7      Y      G      V      B      H      U      8      ROW5/F 10
@@ -239,4 +242,46 @@ KEYBOARD_NORMAL
 !byte $11,$50,$4C,$2C,$2E,$3B,$2D,$91 ; DOWN   P      L      ,      .      :      -      UP     ROW7/H 1
 !byte $9D,$2A,$3B,$2F,$1B,$3D,$2B,$1D ; LEFT   *      ;      /      ESC    =      +      RIGHT  ROW8/I 15
 !byte $14,$0D,$5C,$40,$0E,$15,$16,$19 ; DEL    RETURN POUND  @      F1     F2     F3     HELP   ROW9/J 18
+}
+
+;----------- C128 Keyboard - Requires hardware mod for larger matrix
+;
+; This table is taken from a C128 ROM disassembly and re-formatted
+; This has not been tested! It looks like the ROWS and COLUMNS are
+; reversed compared to the PET/CBM keyboard scanner. This will either
+; require re-ordering the matrix, or re-wiring/adapting the connector.
+;
+; CHANGES:
+;           SHIFT ($01) to SHIFT ($00)
+;           CTRL  ($04) to CTRL  ($80)
+;           ALT   ($08) to SHIFT ($00)
+;           NOSCRL($FF) to SHIFT ($00)
+; PIN
+; 1   GROUND
+; 2   NO PIN (keyed)
+; 4   +5V
+; 
+; Keys not in matrix:
+;    RESTORE  = pin 1 and pin 3
+;    40/80    = pin 1 and pin 24
+;    CAPS LOCK= pin 1 and pin 25
+;
+; *** THIS KEYBOARD MATRIX HAS NOT BEEN TESTED!!!!
+;
+!IF KEYBOARD=12 {
+
+;PIN: 12  11  10  5   8   7   6   9
+;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES  PIN
+;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====  ===
+!byte $14,$0D,$1D,$88,$85,$86,$87,$11 ; DEL    RETURN RIGHT  .      .      .      .      DOWN   ROW0   13
+!byte $33,$57,$41,$34,$5A,$53,$45,$00 ; 3      w      a      4      z      s      e      SHIFT  ROW1   19
+!byte $35,$52,$44,$36,$43,$46,$54,$58 ; 5      r      d      6      c      f      t      x      ROW2   18
+!byte $37,$59,$47,$38,$42,$48,$55,$56 ; 7      y      g      8      b      h      u      v      ROW3   17
+!byte $39,$49,$4A,$30,$4D,$4B,$4F,$4E ; 9      i      j      0      m      k      o      n      ROW4   16
+!byte $2B,$50,$4C,$2D,$2E,$3A,$40,$2C ; +      p      l      -      .      :      @      ,      ROW5   15
+!byte $5C,$2A,$3B,$13,$00,$3D,$5E,$2F ; \      *      ;      HOME   SHIFT  =      ^      /      ROW6   14
+!byte $31,$5F,$80,$32,$20,$02,$51,$03 ; 1      BARROW CTRL   2      SPACE  CBM    q      STOP   ROW7   20
+!byte $84,$38,$35,$09,$32,$34,$37,$31 ; HELP   8      5      TAB    2      4      7      1      ROW8   21
+!byte $1B,$2B,$2D,$0A,$0D,$36,$39,$33 ; ESC    +      -      LF     ENTER  6      9      3      ROW9   22
+!byte $08,$30,$2E,$91,$11,$9D,$1D,$00 ; ALT    0      .      UP     DOWN   LEFT   RIGHT  NOSCRL ROW10  23
 }
