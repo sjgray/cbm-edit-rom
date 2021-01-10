@@ -37,8 +37,8 @@ CODEBASE  = 1   ; Code Base			0=4000, 1=8000, 2=8296
 OPTROM    = 0   ; Location of EXT code		0=Ext Edit ($E800-EFFF), 1=$9000, 2=$A000 (note: code could also extend past end of 1)
 
 KEYSCAN   = 0   ; Keyboard Scanner		0=Graphic,1=Business,2=DIN
-KEYBOARD  = 5	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
-REFRESH   = 3	; Screen refresh:		0=Euro,1=N.America,2=PAL,3=NTSC,4=9",82=8296D#1,83=8296D#2,90=32-line,91=35-line,92=90x35,99=Custom
+KEYBOARD  = 0	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
+REFRESH   = 1	; Screen refresh:		0=Euro,1=N.America,2=PAL,3=NTSC,4=9",82=8296D#1,83=8296D#2,90=32-line,91=35-line,92=90x35,99=Custom
 REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
 COLUMNS   = 80	; Screen Width			40,80,90,32 columns		Special cases 32 or 90.
 ROWS      = 25  ; Screen Height			25,35,16 rows			Special cases 16 or 35.
@@ -46,13 +46,13 @@ HERTZ     = 60	; Line Frequency (Clock):	50=Euro,60=N.America
 IRQFIX    = 0   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating.
 BOOTCASE  = 1	; Initial Screen Mode		0=Text/Lower, 1=Upper/Graphics
 
-ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
-AUTORUN   = 1   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner and/or wedge.
-BYPASS    = 1   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to bypass.
+ESCCODES  = 0	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
+AUTORUN   = 0   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner and/or wedge.
+BYPASS    = 0   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to bypass.
 BANNER    = 99  ; Custom Banner (power on msg)  0=No, N=Banner# (1-16,98, or 99)   Valid when AUTORUN=1. Refer to docs or source. 99=custom message
-WEDGE     = 1	; DOS Wedge			0=No, 1=Yes			Valid when AUTORUN=1.
+WEDGE     = 0	; DOS Wedge			0=No, 1=Yes			Valid when AUTORUN=1.
 WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes
-SOFT40    = 1	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
+SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
 SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1.
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns		Valid when SS40=1.
 HARD4080  = 0   ; Hardware 40/80 Board          0=No, 1=Yes			Valid when SS40=1.
@@ -72,8 +72,8 @@ REBOOT    = 0	; Add keyboard reboot? 		0=No, 1=Yes
 EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes, 2=Yes/OPTROM>0	Note: Requires BOOT to TEXT mode!
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
 CRUNCH    = 0   ; Remove unneeded code?		0=No, 1=Yes			Removes NOPs, filler, and unreachable code.
-BACKARROW = 0   ; Patch for screen mode toggle  0=NO, 1=Yes 2K, 2=Yes EXT	Note: B keyboard scanner only.
-INFO      = 1   ; Add project info to code area 0=NO, 1=Yes,2=Yes+FONT		INFO=2 shows character set at top of screen
+BACKARROW = 1   ; Patch for screen mode toggle  0=NO, 1=Yes 2K, 2=Yes EXT	Note: B keyboard scanner only.
+INFO      = 0   ; Add project info to code area 0=NO, 1=Yes,2=Yes+FONT		INFO=2 shows character set at top of screen
 BUGFIX    = 1   ; Correct Known bugs		0=No, 1=Yes			
 ;
 DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
