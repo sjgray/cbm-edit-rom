@@ -52,7 +52,7 @@ BYPASS    = 0   ; Check for key to bypass 	0=No, 1=Yes			Hold key on ROW9 to byp
 BANNER    = 99  ; Custom Banner (power on msg)  0=No, N=Banner# (1-16,98, or 99)   Valid when AUTORUN=1. Refer to docs or source. 99=custom message
 WEDGE     = 0	; DOS Wedge			0=No, 1=Yes			Valid when AUTORUN=1.
 WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes
-SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
+SOFT40    = 1	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
 SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1.
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns		Valid when SS40=1.
 HARD4080  = 0   ; Hardware 40/80 Board          0=No, 1=Yes			Valid when SS40=1.
