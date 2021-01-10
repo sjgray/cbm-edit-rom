@@ -56,8 +56,10 @@ INSTALL_WEDGE
 
 ;-------------- MESSAGE
 WEDGESTRING
-		!text "WEDGE INSTALLED"		; message
+!if WEDGEMSG=1 {
+		!pet "wedge installed"		; message
 		!byte 0				; extra 0 padding
+}
 
 ;-------------- Resident part of the universal DOS wedge
 ; When installed, the CHRGET routine points here.

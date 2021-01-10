@@ -1,2 +1,2 @@
 @rem pet/cbm edit roms - assembler directives are at the top of "edit.asm"... change as needed
-acme editrom.asm 
+acme -r editrom.txt editrom.asm 

@@ -10,7 +10,11 @@
 ; Common settings for "normal" machines (4000,8000,8296,SuperPET) with 12" monitor
 ; NOTE: The 8296D uses a different monitor than the 8296 and requires a different register table (see below)
 
-;---------------------- 40/80x25, 50 Hz, 20 kHz for 12" Internal Monitor (inverted video)
+; REGISTER#->>>      DECIMAL: 00  01  02  03  04  05  06  07  08  09  10  11  12  13  14  15  16  17
+;                        HEX: 00  01  02  03  04  05  06  07  08  09  0A  0B  0C  0D  0E  0F  10  11  
+;                             ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==
+;
+;---------------------- 40/80x25, 50 Hz, 20 kHz for 12" Internal Monitor (inverted video R12=$10)
 !IF REFRESH=0 {
 CRT_CONFIG_TEXT:	!byte $31,$28,$29,$0f,$27,$00,$19,$20,$00,$09,$00,$00,$10,$00,$00,$00,$00,$00 
 CRT_CONFIG_GRAPHICS:	!byte $31,$28,$29,$0f,$31,$00,$19,$25,$00,$07,$00,$00,$10,$00,$00,$00,$00,$00

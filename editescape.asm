@@ -37,12 +37,12 @@ DoESCESC	LDA #0			; Clear character
 
 DoEscapeCode	AND #$7F		; Strip top bit
 		SEC
-!IF COLOURPET=1 {
+!IF (COLOURPET=1) OR (VIDSWITCH=1) {
 		SBC #$30		; Subtract 30 (Start at "0")
-		CMP #$2F		; Greater than "uparrow"?
+		CMP #$2F		; Make sure it is in range!
 } ELSE {
 		SBC #$40		; Subtract 40 (Start at "@")
-		CMP #$20		; Greater than "backarrow"?
+		CMP #$20		; Make sure it is in range!
 }
 		BCS DoESCDONE		; Yes, skip
 
@@ -63,7 +63,12 @@ DoESCDONE	JMP ESC_DONE
 ;-------------- Esc Sequence Vectors    (*=changed from C128)
 
 ESCVECTORS
-!IF COLOURPET=1 {
+
+;--------------- COLOURPET ESC Codes: ESC 0 to 9 plus :;<=>?
+;                Set Colour to specified value (0 to 15).
+;
+!IF (COLOURPET=1) OR (VIDSWITCH=1) {
+  !IF (COLOURPET=1) {
 		!WORD ESCAPE_NUM-1	; Esc-0 Set Colour to Black
 		!WORD ESCAPE_NUM-1	; Esc-1 Set Colour to Medium Grey
 		!WORD ESCAPE_NUM-1	; Esc-2 Set Colour to Blue
@@ -80,7 +85,35 @@ ESCVECTORS
 		!WORD ESCAPE_NUM-1	; Esc-= Set Colour to Yellow
 		!WORD ESCAPE_NUM-1	; Esc-> Set Colour to Light Grey
 		!WORD ESCAPE_NUM-1	; Esc-? Set Colour to White
+} ELSE {
+
+;--------------- VIDSWITCH ESC Codes: ESC 0 to 9
+;                Sets a specific video mode immediately (and temporarily)
+;                For manually setting the video mode, when testing different
+;                monitors and/or NTSC/PAL composite adapters.
+;                COLOURPET and VIDSWITCH cannot be combined!
+;
+		!WORD ESCAPE_SETVID-1	; Esc-0 Set to Video MODE 0
+		!WORD ESCAPE_VID-1	; Esc-1 Set to Video MODE 1
+		!WORD ESCAPE_VID-1	; Esc-2 Set to Video MODE 2
+		!WORD ESCAPE_VID-1	; Esc-3 Set to Video MODE 3
+		!WORD ESCAPE_VID-1	; Esc-4 Set to Video MODE 4
+		!WORD ESCAPE_VID-1	; Esc-5 Set to Video MODE 5
+		!WORD ESCAPE_VID-1	; Esc-6 Set to Video MODE 6
+		!WORD ESCAPE_VID-1	; Esc-7 Set to Video MODE 7
+		!WORD ESCAPE_VID-1	; Esc-8 Set to Video MODE 8
+		!WORD ESCAPE_VID-1	; Esc-9 Set to Video MODE 9
+		!WORD NOESCAPE-1	; NONE
+		!WORD NOESCAPE-1	; NONE
+		!WORD NOESCAPE-1	; NONE
+		!WORD NOESCAPE-1	; NONE
+		!WORD NOESCAPE-1	; NONE
+		!WORD NOESCAPE-1	; NONE
+  }
 }
+
+;-------------- Normal ESC Codes
+
 		!WORD ESCAPE_AT-1	; Esc-@ Clear Remainder of Screen
 		!WORD ESCAPE_A-1	; Esc-a Auto Insert
 		!WORD ESCAPE_B-1	; Esc-b Bottom
@@ -128,7 +161,8 @@ ESCAPE_M	; Esc-m Scroll Off
 
 !IF SS40=0 {
 ESCAPE_X	; Esc-x Switch 40/80 Col
-}		
+}
+		
 !IF INFO=0 {
 ESCAPE_BA	; Esc-Backarrow Display Project info
 }
@@ -143,10 +177,14 @@ ESCAPE_I	; ESC-I Insert Line
 ESCAPE_J	; ESC-J Start of Line
 }
 
-		JMP IRQ_EPILOG				; Ignore sequence for now
+NOESCAPE	JMP IRQ_EPILOG				; Ignore sequence for now
 
 
-;-------------- New ESC sequences
+;====================================================================================
+; New ESC sequences
+;====================================================================================
+
+;-------------- ColourPET Colours
 
 !IF COLOURPET=1 {
 ESCAPE_NUM	LDA DATAX				; Character
@@ -158,11 +196,61 @@ ESC_NUM2	TAX					; The Colour number becomes the index
 		STA DATAX				; replace ESC code with colour code
 		LDA #0					;
 		JMP ESC_DONE2				; return and process
+}
+
+;-------------- Video Configuration Switching
+
+!IF VIDSWITCH=1 {
+ESCAPE_VID	LDA DATAX				; Character
+		SEC
+		SBC #$30				; Subtract 30 (Start at "0")
+		ASL
+		ASL
+		ASL
+		ASL					; multiply by 16 (# of bytes per each set)
+		TAY					; Y is offset into table
+		LDX #0					; byte counter
+
+ESCVLOOP	LDA VIDMODE0,Y				; Get byte from table at offset Y
+		STX CRT_Address				; Select the CRTC register 			CHIP
+		STA CRT_Status				; Write to the register				CHIP
+		INY					; Next table byte
+		INX					; count
+		CPX #14					; We copy R0 to R13. 14/15 are always zero.
+		BMI ESCVLOOP				; loop for more
+		LDA #0					;
+		JMP IRQ_EPILOG				; Ignore sequence for now
+
+;-------------- VIDEO MODES TABLE
+;
+; These are CRTC register sets. There are 16 bytes per set to make calculations simpler.
+; Use ESC+0 to ESC+9 to select a set to configure the CRTC controller.
+; NOTE: The CRTC registers can be updated using CHR codes 14 and 142 causing the video
+;       to revert to the default CRTC settings as set from the main code. This feature
+;       is handy for hardware testing or using an external composite adapter.
+;
+;         REGISTER -> R0 R1 R2 R3 R4  R5 R6 R7 R8 R9 R10 R11 R12 R13 Rxx Rxx   DESCRIPTION
+;                     -- -- -- -- -- --- -- -- -- -- --- --- --- --- --- ---   -----------
+VIDMODE0 	!byte 49,40,41,15,40,  3,25,29, 0, 9,  0,  0, 16,  0,  0,  0 ; 40/80 TEXT     NA
+VIDMODE1        !byte 49,40,41,15,32,  5,25,33, 0, 7,  0,  0, 16,  0,  0,  0 ; 40/80 GRAPHIC  NA
+VIDMODE2	!byte 49,40,41,15,39,  0,25,32, 0, 9,  0,  0, 16,  0,  0,  0 ; 40/80 TEXT     EURO
+VIDMODE3	!byte 49,40,41,15,49,  0,25,37, 0, 7,  0,  0, 16,  0,  0,  0 ; 40/80 GRAPHIC  EURO
+VIDMODE4	!byte 58,40,44, 8,32,  9,25,29, 0, 9,  0,  0, 16,  0,  0,  0 ; 8296D TEXT     EURO
+VIDMODE5	!byte 58,40,44, 8,41,  3,25,34, 0, 7,  0,  0, 16,  0,  0,  0 ; 8296D GRAPHIC  EURO
+VIDMODE6        !byte 63,40,50,18,30,  6,25,28, 0, 7,  0,  0, 16,  0,  0,  0 ; NTSC
+VIDMODE7	!byte 63,40,50,18,30,  6,25,28, 0, 7,  0,  0,  0,  0,  0,  0 ; NTSC / INVERT VIDEO
+VIDMODE8	!byte 63,40,47,20,36,123,25,32, 0, 7,  0,  0, 16,  0,  0,  0 ; PAL
+VIDMODE9        !byte 63,40,47,20,36,123,25,32, 0, 7,  0,  0,  0,  0,  0,  0 ; PAL  / INVERT VIDEO
+;
+; Extra Modes. You can substitute this mode for any above if you want
+;VIDMODEXXXX	!byte 49,20,31,15,40,  5,25,33, 0, 9,  0,  0, 16,  0,  0,  0 ; 20/40 TEXT     NA
 
 }
+
 ;------------------------------------------------------------------------------------------------
 ; ESC-BACKARROW Display Project Info
 
+!IF INFO>0 {
 ESCAPE_BA
 
 ;-------------- DISPLAY FONT ON SCREEN
@@ -180,6 +268,7 @@ INFLOOP		TYA				; LOOP[  A=Y
 		LDY #>INFOSTRING
 		JSR STROUTZ
 		JMP IRQ_EPILOG
+}
 }
 
 ;------------------------------------------------------------------------------------------------
