@@ -204,8 +204,24 @@ GS_DONE		jsr SCROUT			; write char to screen
 prepare_fn
 		iny				; count filename length
 		lda (TXTPTR),y
+		beq end_name
+		cmp #'"'			; quote character
 		bne prepare_fn
-		dey 
+
+handle_quote	lda wedge_char
+		bmi end_name
+		ora #$80
+		sta wedge_char 
+		tya
+		ldy #0
+		clc
+		adc TXTPTR
+		sta TXTPTR
+		bcc prepare_fn
+		inc TXTPTR+1
+		bne prepare_fn
+
+end_name	dey 
 		sty FNLEN			; store length
 		ldx TXTPTR
 		inx
@@ -215,6 +231,8 @@ prepare_fn
 		lda wedge_unit
 		sta FA
 		lda wedge_char			; load/run?
+		and #$7f
+		sta wedge_char
 		bne to_loadrun			; yes
 
 ;-------------- DIRECTORY
