@@ -181,12 +181,12 @@ SCAN_REC        STA KEYPRESSED          ; Current Key Pressed: 255 = No Key
                 BCS SCAN_OUT            ; Exit if buffer full
                 STA KEYD,X              ; Put the key into the buffer
 
-;!IF BACKARROW=0 {                      ; only triggers on normal key, not Shift/CBM
+!IF BACKARROW=0 {                       ; only triggers on normal key, not Shift/CBM
                 INX                     ; Increment character count
                 STX CharsInBuffer       ; No. of Chars. in Keyboard Buffer (Queue)
-;} ELSE {
-;                JSR TestBackArrow       ; Patch/Hack to use SHIFT-BACKARROW as screen mode toggle (text/graphic)
-;}
+} ELSE {
+                JSR TestBackArrow       ; Patch/Hack to use SHIFT-BACKARROW as screen mode toggle (text/graphic)
+}
 
 !if KEYBOARD != 1 {
 ;               Compensate for STOP key not in standard position
