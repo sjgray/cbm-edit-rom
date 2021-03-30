@@ -177,7 +177,11 @@ SCAN_NORM2	LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 		CPX XMAX		; Size of Keyboard Buffer
 		BCS SCAN_OUT		; Exit if buffer full
 		STA KEYD,X		; Put the key into the buffer
+!IF BACKARROW=0 {
 		INX			; Increment character count
 		STX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
+} ELSE {
+                JSR TestBackArrow       ; Patch/Hack to use SHIFT-"@" as screen mode toggle (text/graphics)
+}
 
 SCAN_OUT	RTS

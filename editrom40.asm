@@ -1012,7 +1012,7 @@ ADVANCE_TIMER	JSR UDTIME				; Update System Jiffy Clock. KERNAL routine $FFEA
 !IF KEYSCAN=0 { !SOURCE "keyscan-g.asm" }		; Graphic Keyboard
 !IF KEYSCAN=1 { !SOURCE "keyscan-b.asm" }		; Business Keyboard
 !IF KEYSCAN=2 { !SOURCE "keyscan-din.asm" }		; German DIN Keyboard
-!IF KEYSCAN=3 { !SOURCE "keyscan-c64.asm" }		; C64 Keyboard  (future implementation)
+!IF KEYSCAN=3 { !SOURCE "keyscan-c64.asm" }		; C64 Keyboard
 !IF KEYSCAN=4 { !SOURCE "keyscan-cbm2.asm" }		; CBM2 Keyboard (future implementation)
 
 ;*********************************************************************************************************
