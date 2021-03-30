@@ -67,6 +67,8 @@ KBD_Decode_Pointer
 
 ; NOTE: I've seen this before, and this shows how messed up things are...
 ; The ROWS and COLS are reversed and INVERTED. C0 should be R7, C1 should be R6
+; ... which probably all just depends on how your keyboard scanner interprets them,
+; as I had to transpose the scanner tables below from what the comment refers to
 
 KBD_NORMAL           ; keyboard decode table - unshifted
 KBD_CBMKEY           ; keyboard decode table - commodore
@@ -74,29 +76,32 @@ KBD_CONTROL          ; keyboard decode table - control
 KBD_CTRLCBM          ; keyboard decode table - control - cbm
 ;
 ;                                         ---- ---- ---- ---- ---- ---- ---- ----
-   !byte $31,$33,$35,$37,$39,$2B,$5C,$14 ;   1    3    5    7    9    +    £  DEL
-   !byte $5F,$57,$52,$59,$49,$50,$2A,$0D ; LFT    W    R    Y    I    P    *  RET
-   !byte $04,$41,$44,$47,$4A,$4C,$3B,$1D ; CTL    A    D    G    J    L    ;  RGT    
-   !byte $03,$01,$58,$56,$4E,$2C,$2F,$11 ; RUN  LSH    X    V    N    -  HOM   DN
-   !byte $20,$5A,$43,$42,$4D,$2E,$01,$85 ; SPC    Z    C    B    M    .  RSH   F1
-   !byte $02,$53,$46,$48,$4B,$3A,$3D,$86 ; CBM    S    F    H    K    :    =   F3
-   !byte $51,$45,$54,$55,$4F,$40,$5E,$87 ;   Q    E    T    U    O    @   UP   F5
-   !byte $32,$34,$36,$38,$30,$2D,$13,$88 ;   2    4    6    8    0    ,    /   F7
+   !byte $88,$13,$2D,$30,$38,$36,$34,$32 ;  F7    /    ,    0    8    6    4    2
+   !byte $87,$5E,$40,$4F,$55,$54,$45,$51 ;  F5   UP    @    O    U    T    E    Q
+   !byte $86,$3D,$3A,$4B,$48,$46,$53,$02 ;  F3    =    :    K    H    F    S  CBM
+   !byte $85,$01,$2e,$4d,$42,$43,$5a,$20 ;  F1  RSH    .    M    B    C    Z  SPC
+   !byte $11,$2f,$2c,$4e,$56,$58,$01,$03 ;  DN  HOM    -    N    V    X  LSH  STP
+   !byte $1D,$3B,$4C,$4A,$47,$44,$41,$04 ; RGT    ;    L    J    G    D    A  CTL
+   !byte $0D,$2A,$50,$49,$59,$52,$57,$5F ; RET    *    P    I    Y    R    W  LFT
+   !byte $14,$5C,$2B,$39,$37,$35,$33,$31 ; DEL    £    +    9    7    5    3    1
 
 KBD_SHIFTED          ; keyboard decode table - shifted
 KBD_CBMSHIFT         ; keyboard decode table - shift - cbm
 KBD_CTRLSHIFT        ; keyboard decode table - shift - ctrl
 KBD_CTRLCBMSHIFT     ; keyboard decode table - shift - ctrl - cbm
 
-   !byte $21,$23,$25,$27,$29,$DB,$A9,$94
-   !byte $5F,$D7,$D2,$D9,$C9,$D0,$C0,$8D
-   !byte $04,$C1,$C4,$C7,$CA,$CC,$5D,$9D
-   !byte $83,$01,$D8,$D6,$CE,$3C,$3F,$91
-   !byte $A0,$DA,$C3,$C2,$CD,$3E,$01,$89
-   !byte $02,$D3,$C6,$C8,$CB,$5B,$3D,$8A
-   !byte $D1,$C5,$D4,$D5,$CF,$BA,$DE,$8B
-   !byte $22,$24,$26,$28,$30,$DD,$93,$8C
+   !byte $8c,$93,$dd,$30,$28,$26,$24,$22
+   !byte $8b,$de,$ba,$cf,$d5,$d4,$c5,$d1
+   !byte $8a,$3d,$5b,$cb,$c8,$c6,$d3,$02
+   !byte $89,$01,$3e,$cd,$c2,$c3,$da,$a0
+   !byte $91,$3f,$3c,$ce,$d6,$d8,$01,$83
+   !byte $9d,$5d,$cc,$ca,$c7,$c4,$c1,$04
+   !byte $8d,$c0,$d0,$c9,$d9,$d2,$d7,$5f
+   !byte $94,$a9,$db,$29,$27,$25,$23,$21
 
+
+; note: the following are not tranposed yet
+;
 ; CBM key
 ;   !byte $21,$23,$25,$27,$29,$A6,$A8,$94
 ;   !byte $5F,$B3,$B2,$B7,$A2,$AF,$DF,$8D

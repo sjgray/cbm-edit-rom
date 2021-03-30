@@ -18,34 +18,7 @@
                      ; r1|    4    E    S    Z  LSH    A    W    3
                      ; r0|    2    Q  CBM   SP  RUN  CTL  LFT    1
 
-
-
-; The correspondence between the key pressed and the number stored 
-; now stored temporarily in Key_Image is as follows:
-
-; $00   1      $10   unused $20   [SPC]  $30   Q
-; $01   3      $11   A      $21   Z      $31   E
-; $02   5      $12   D      $22   C      $32   T
-; $03   7      $13   G      $23   B      $33   U
-; $04   9      $14   J      $24   M      $34   O
-; $05   +      $15   L      $25   .      $35   @
-; $06   [PND]  $16   ;      $26   unused $36   [U ARROW]
-; $07   [DEL]  $17   [RIGHT]$27   [F1]   $37   [F5]   
-; $08   [<-]   $18   [STOP] $28   unused $38   2
-; $09   W      $19   unused $29   S      $39   4
-; $0A   R      $1A   X      $2A   F      $3A   6
-; $0B   Y      $1B   V      $2B   H      $3B   8
-; $0C   I      $1C   N      $2C   K      $3C   0
-; $0D   P      $1D   ,      $2D   :      $3D   -
-; $0E   *      $1E   /      $2E   =      $3E   [HOME]
-; $0F   [RET]  $1F   [DOWN] $2F   [F3]   $3F   [F7]
-
-; The addresses of the tables are:
-
-;   KBD_NORMAL          ; unshifted
-;   KBD_SHIFTED         ; shifted
-;   KBD_CBMKEY          ; commodore
-;   KBD_CONTROL         ; control
+; Note: for the PET keyboard scan routine, the table needs to be transposed.
 
 ; KEYFLAGS
 ; 
@@ -85,7 +58,7 @@ SCAN_KEYBOARD
                 AND #$7F
                 STA RPTFLG              ; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
 
-                LDX #$40                ; 64 bytes in table. X is used as offset into the table
+                LDX #$3f                ; 64 bytes in table. X is used as offset into the table
 
 SCAN_ROW
                 LDY #$08                ; Number of Columns to check = 8 (normal keyboards)
@@ -100,7 +73,7 @@ SCAN_COL        LSR                     ; Shift the value right
 ;-------------- We have a key press. Look it up in the keyboard matrix
 
                 PHA                     ; Save for later
-                LDA KBD_NORMAL-1,X      ; Read Keyboard Matrix (X is offset)
+                LDA KBD_NORMAL,X        ; Read Keyboard Matrix (X is offset)
                 CMP #$05                ; 1=shift, 2=CBM, 3=STOP, 4=CTRL
                 BCS SCAN_NOSH           ; Is it SHIFT key? No, skip
                 CMP #$03                ; STOP key?
@@ -110,7 +83,7 @@ SCAN_COL        LSR                     ; Shift the value right
 
                 ORA KEYFLAGS            ; Bitmap: 1=SHIFT, 2=CBM, 4=CTRL
                 STA KEYFLAGS
-                BNE SCAN_NEXT           ; No, skip
+                BNE SCAN_NEXT           ; No, skip (KBD_NORMAL has no $00, so jump always)
 
 ;-------------- Non-SHIFT key
 
@@ -134,7 +107,7 @@ SCAN_NORPT      CMP #$FF                ; Is it "no key"?
 
 SCAN_NEXT       PLA                     ; Restore value from keyboard scan for next loop
 SCAN_NEXT2      DEX                     ; Decrement keyboard table offset
-                BEQ SCAN_GOT            ; If 0 we have completed the entire matrix...Process Key Image
+                BMI SCAN_GOT            ; If $ff we have completed the entire matrix...Process Key Image
 
                 DEY                     ; Next COLUMN
                 BNE SCAN_COL            ; Go back up for next column bit
@@ -142,23 +115,20 @@ SCAN_NEXT2      DEX                     ; Decrement keyboard table offset
 ;-------------- Completed all bits in ROW, Increment ROW
 
                 INC PIA1_Port_A         ; Next Keyboard ROW
-                BNE SCAN_ROW            ; More? Yes, loop back
+                BNE SCAN_ROW            ; Always. (counting down XR ends loop)
 
 ;-------------- Process shift/cbm/ctrl keys
 
 SCAN_GOT
-                LDA KEYFLAGS
-;                ASL                     ; clears Carry
-                CLC                      ; note: remove if ASL is used
-                TAY
-                LDA KBD_Decode_Pointer,y
-                ADC Key_Image            ; add index in table to ptr
-                TAX
-;                LDA KBD_Decode_Pointer+1,y
-;                BEQ DECODE_PAGE0
+                LDA Key_Image
+                CMP #$ff
+                BEQ DECODE_DONE
+                LDY KEYFLAGS
+                CLC                     
+                ADC KBD_Decode_Pointer,Y ; Load base address for keytable (as offset to KBD_NORMAL)
+                TAX                     
+                ; could do LDA KBD_Page_Indicator,Y:BNE NOT_KBD_NORMAL to change which base to use for index in X
                 LDA KBD_NORMAL,x
-;                BNE DECODE_DONE
-;DECODE_PAGE0    LDA KBD_NORMAL+$0100,x
 
 ;-------------- Process Key Image
 
@@ -168,9 +138,10 @@ DECODE_DONE     STA Key_Image           ; Key Image
 
                 LDX #$10
                 STX DELAY               ; Repeat Delay Counter
-                BNE SCAN_REC
+                BNE SCAN_REC            ; always
 
-SCAN_PRESS      BIT RPTFLG              ; Check Repeat Flag: $80 = Repeat, $40 = disable
+SCAN_PRESS      TAY                     ; save from repeat processing
+                BIT RPTFLG              ; Check Repeat Flag: $80 = Repeat, $40 = disable
                 BMI SCAN_DELAY2
                 BVS SCAN_OUT            ; Exit
                 CMP #$FF                ; No key?
@@ -197,15 +168,11 @@ SCAN_DELAY2     DEC KOUNT               ; Repeat Speed Counter
                 LDX CharsInBuffer       ; No. of Chars. in Keyboard Buffer (Queue)
                 DEX                     ; One less
                 BPL SCAN_OUT            ; Exit
+                TYA                     ; restore char for fall-through
 
 SCAN_REC        STA KEYPRESSED          ; Current Key Pressed: 255 = No Key
                 CMP #$FF                ; No Key?
                 BEQ SCAN_OUT            ; Yes, exit
-
-                TAX
-                PHP
-                AND #$7F                ; Mask off upper bit (non-shiftable flag in key matrix byte)
-                PLP
 
 ;-------------- Handle keyboard buffer
 
@@ -213,12 +180,13 @@ SCAN_REC        STA KEYPRESSED          ; Current Key Pressed: 255 = No Key
                 CPX XMAX                ; Size of Keyboard Buffer
                 BCS SCAN_OUT            ; Exit if buffer full
                 STA KEYD,X              ; Put the key into the buffer
-!IF BACKARROW=0 {
+
+;!IF BACKARROW=0 {                      ; only triggers on normal key, not Shift/CBM
                 INX                     ; Increment character count
                 STX CharsInBuffer       ; No. of Chars. in Keyboard Buffer (Queue)
-} ELSE {
-                JSR TestBackArrow       ; Patch/Hack to use SHIFT-BACKARROW as screen mode toggle (text/graphic)
-}
+;} ELSE {
+;                JSR TestBackArrow       ; Patch/Hack to use SHIFT-BACKARROW as screen mode toggle (text/graphic)
+;}
 
 !if KEYBOARD != 1 {
 ;               Compensate for STOP key not in standard position
