@@ -23,7 +23,11 @@ CheckLoop
 		DEY					; ROW=ROW-1
 		BPL CheckLoop				; Get more if not <0
 
-		JMP ($FFFC)				; All keys match, so reset!
+		!IF UPET=1 {
+			JMP RebootUPet
+		} ELSE {
+			JMP ($FFFC)			; All keys match, so reset!
+		}
 
 CheckOut	RTS
 
