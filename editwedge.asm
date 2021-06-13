@@ -105,7 +105,6 @@ nospace		cmp #$3e			; '>'
 		beq command_or_status
 		cmp #$23			; '#'
 		beq default_device
-		iny 
 		sta wedge_char			; save load/run character
 		cmp #$2f			; '/'
 		beq to_prepare_fn
@@ -199,8 +198,8 @@ GS_DONE		jsr SCROUT			; write char to screen
 		jmp READY
 
 ;------------------------------------------------------------------------------
-;###### TODO: if we have quotes in our string, then they should be handled here
-;------------------------------------------------------------------------------
+; identify filename to load/run, includes quote handling
+
 prepare_fn
 		iny				; count filename length
 		lda (TXTPTR),y
@@ -272,6 +271,7 @@ to_loadrun:	bne loadrun
 to_stoplisting:	bne stoplisting
 to_list_blocks:	bne list_blocks
 
+
 ;-------------- Continuation of DIRECTORY
 
 listing
@@ -333,3 +333,4 @@ startprg	jsr STXTPT			; reset TXTPTR
 		jmp NEWSTT			; RUN
 
 loaderr		jmp FILENOTFOUND		; FILE NOT FOUND, return to basic
+
