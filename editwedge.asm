@@ -105,7 +105,6 @@ nospace		cmp #$3e			; '>'
 		beq command_or_status
 		cmp #$23			; '#'
 		beq default_device
-		iny 
 		sta wedge_char			; save load/run character
 		cmp #$2f			; '/'
 		beq to_prepare_fn
