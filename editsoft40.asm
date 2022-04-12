@@ -25,11 +25,15 @@
 ; * FULL_SCREEN_WINDOW	- Sets the screen dimensions (Usually hardcoded to 80x25 or 40x25)
 ; * UPDATE_CURSOR_ROW   - Sets screen pointers
 ;
-; To switch between 40/80 column we also need to include ESC codes (ESC-X to switch)
+; To switch between 40/80 column we need a new method to activate the switch. The easiest is to include
+; ESC codes (ESC-X to switch). To switch without ESC codes we would need to (re)define some CHR$()
+; codes, or use a keyboard shortcut such as backarrow.
 ;
-; SCN4080BOARD low memory location will be set to "1" on powerup if board is installed.
-; We can change this to "0" if we want to use the SOFTWARE method to do 40 columns.
-
+; Variable (memory) Usage:
+; SCNWIDTH...... Current Screen Width (40 or 80)
+; SCN4080BOARD.. Flag for Hardware 40/80 board. Set to "1" on powerup if board is enabled.
+;                We can manually change this to "0" if we want to use the SOFTWARE method.
+;
 ;************** Init Switchable Soft-40
 
 SS40_INIT80	LDA #80					; Set 80 column mode
@@ -255,3 +259,12 @@ SS40_SP240
 		!SOURCE "screen2v.asm"				; Add the Character RAM table
 		!IF COLOURPET=1 { !SOURCE "screen2c.asm" }	; Add the Colour RAM table
 
+; ------------- For CODEBASE 0 we need to supply a 40-column "Line_Addr_Hi" table
+
+!IF CODEBASE=0 {
+Line_Addr_Hi	!byte $80,$80,$80,$80,$80,$80,$80,$81,$81,$81
+		!byte $81,$81,$81,$82,$82,$82,$82,$82,$82,$82
+		!byte $83,$83,$83,$83,$83
+!if ROWS>25 {	!byte $83,$84,$84,$84,$84,$84,$84,$85,$85,$85 }
+
+}

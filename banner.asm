@@ -34,6 +34,7 @@
 ; 15  8296D  ANY    OVER "commodore 8296d basic 4.0 with custom editor rom"
 ; 16  80COL  ANY    OVER "commodore basic 4.0 with custom editor rom"
 ; 17  40COL  ANY    OVER "cbm basic 4 custom editrom"
+; 18  40COL  ANY    OVER "commodore basic 4.0 *** hard40/80,n"
 ; 98  ANY    ANY    ADD  Show DATE and COMMENT for debug purposes
 ; 99  CUSTOM ...    ...  Your own banner text
 ;
@@ -45,8 +46,9 @@
 !IF BANNER=99 {
 		!byte $13
 ;Screen columns:      44444444444444444444444444v44444444444448888888888888888888888888888888888888888
-		!pet "*** commodore basic 4.0 *** esc,soft40/80,wedge,n-sjg keyboard"
-		!byte $0D,$0D,$0D      		; <CR><CR><CR>
+		!pet "*** commodore basic 4.0 *** hard40/80,n",$0D
+		!pet "waltermixx edition!"
+		!byte $0D      			; <CR><CR><CR>
 }
 
 ;-----------------------------------------------
@@ -59,6 +61,11 @@
 		!pet "comment: "
 		+COMMENT
 		!byte $0D				
+}
+
+!IF BANNER=18 {	!byte $13
+		!pet "*** commodore basic 4.0 *** hard40/80,n"
+		!byte $0D,$0D,$0D      		; <CR><CR><CR>
 }
 
 !if BANNER=17 { !byte $13            		; <HOME> 

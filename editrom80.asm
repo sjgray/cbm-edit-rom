@@ -48,24 +48,24 @@
 ;** There are FIVE hard-coded entry points: $E0A7, $E116, $E202, $E442, $E600
 ;*********************************************************************************************************
 
-EDITOR		JMP RESET_EDITOR			; Main Initialization (called from Kernal power up reset at $FD16) 
-		JMP GETKEY				; Get Character From Keyboard Buffer	(FIXED ENTRY POINT. Must not move!)
-		JMP INPUT_CHARACTER			; Input From Screen or Keyboard		(FIXED ENTRY POINT. Must not move!)
-		JMP CHROUT_SCREEN			; Output to Screen			(FIXED ENTRY POINT. Must not move!)
-		JMP IRQ_MAIN				; Main IRQ Handler			(FIXED ENTRY POINT. Must not move!)
-		JMP IRQ_NORMAL				; Actual IRQ (clock, keyboard scan)
-		JMP IRQ_END				; Return From Interrupt			(FIXED ENTRY POINT. Must not move!)
-		JMP WIN_CLEAR				; Clear Window
-		JMP CRT_SET_TEXT			; Set CRTC to TEXT mode
-		JMP CRT_SET_GRAPHICS			; Set CRTC to GRAPHICS mode
-		JMP CRT_PROGRAM				; Program CRTC (Table pointer in A/X, chr set in Y)
-		JMP WIN_SCROLL_DN			; Scroll Window DOWN
-		JMP WIN_SCROLL_UP			; Scroll Window UP
-		JMP SCAN_KEYBOARD			; Scan Keyboard
-		JMP BEEP				; Ring BELL/CHIME
-		JMP SET_REPEAT_MODE			; Set REPEAT MODE
-		JMP WIN_SET_TOP				; Set Window Top
-		JMP WIN_SET_BOT				; Set Window Bottom
+EDITOR		JMP RESET_EDITOR	; [E000] Main Initialization (called from Kernal power up reset at $FD16) 
+		JMP GETKEY		; [E003] Get Character From Keyboard Buffer	(FIXED ENTRY POINT. Must not move!)
+		JMP INPUT_CHARACTER	; [E006] Input From Screen or Keyboard		(FIXED ENTRY POINT. Must not move!)
+		JMP CHROUT_SCREEN	; [E009] Output to Screen			(FIXED ENTRY POINT. Must not move!)
+		JMP IRQ_MAIN		; [E00C] Main IRQ Handler			(FIXED ENTRY POINT. Must not move!)
+		JMP IRQ_NORMAL		; [E00F] Actual IRQ (clock, keyboard scan)
+		JMP IRQ_END		; [E012] Return From Interrupt			(FIXED ENTRY POINT. Must not move!)
+		JMP WIN_CLEAR		; [E015] Clear Window
+		JMP CRT_SET_TEXT	; [E018] Set CRTC to TEXT mode
+		JMP CRT_SET_GRAPHICS	; [E01B] Set CRTC to GRAPHICS mode
+		JMP CRT_PROGRAM		; [E01E] Program CRTC (Table pointer in A/X, chr set in Y)
+		JMP WIN_SCROLL_DN	; [E021] Scroll Window DOWN
+		JMP WIN_SCROLL_UP	; [E024] Scroll Window UP
+		JMP SCAN_KEYBOARD	; [E027] Scan Keyboard
+		JMP BEEP		; [E02A] Ring BELL/CHIME
+		JMP SET_REPEAT_MODE	; [E02D] Set REPEAT MODE
+		JMP WIN_SET_TOP		; [E030] Set Window Top
+		JMP WIN_SET_BOT		; [E033] Set Window Bottom
 
 ;*********************************************************************************************************
 ;** SET_REPEAT_MODE  [E036]  (Called from Jump Table)
@@ -102,7 +102,7 @@ RESET_EDITOR
 !IF BOOTCASE=1 { JSR CRT_SET_GRAPHICS }			; Set Screen to GRAPHICS mode
 
 ;*********************************************************************************************************
-;** WINDOOW_CLEAR  [E051]  (Called from Jump Table)
+;** WIN_CLEAR  [E051]  (Called from Jump Table)
 ;** This routine Clears the current window. It clears ONLY the screen memory specified.
 ;** Since this is the 80-column codebase there is no line-linking code. Both LO and HI
 ;** screen address tables are in ROM.
@@ -460,21 +460,11 @@ FULL_SCREEN	LDA #0					; Top/Left=0
 		TAX
 		JSR WIN_SET_TOP				; Set Window Top
 
-!IF ROWS=16 {   LDA #15 }				; 16 lines   (0-15) For special case
-!IF ROWS=25 {	LDA #24	}				; 25 lines   (0-24)
-!IF ROWS=32 {	LDA #31	}				; 32 lines   (0-31) For 8296 machines ONLY (they have more screen ram)
-!IF ROWS=35 {	LDA #34	}				; 35 lines   (0-34) For 8296 machines ONLY (they have more screen ram)
+		LDA #ROWS-1				; Number of Hard-coded Screen Rows - Nomally 25 (0-24). 32+ for 8296 only
 
-!IF COLUMNS=80 {
-	!IF SS40=1 {
-		LDX SCNWIDTH				; Current SS40 screen width
-	} ELSE {
-		LDX #$4f 				; 80 columns (0-79)
-	}
+!IF SS40=1 {	LDX SCNWIDTH				; Current SS40 screen width
+   } ELSE {	LDX #COLUMNS-1 				; Hard-coded Screen Width (Normally 0-79)
 }
-
-!IF COLUMNS=40 { LDX #39 }				; 40 columns (0-39)
-!IF COLUMNS=32 { LDX #31 }				; 32 columns (0-31)
 
 ;*********************************************************************************************************
 ;** WIN_SET_BOT  [E1DC]
@@ -1227,7 +1217,7 @@ INITED1		STA JIFFY_CLOCK,X			; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
 		JSR SS40_INIT40				; Initialize Switchable Soft-40 to 40 columns
 	}
 }
-;		---------------------------------------
+;		--------------------------------------- Continue
 
 		LDA #9
 		STA XMAX				; Size of Keyboard Buffer
@@ -1324,7 +1314,7 @@ BEEP							; Single BEEP
 !IF SILENT=0 {
 		LDY CHIME				; Chime Time FLAG
 } ELSE {
-		NOP
+		!IF CRUNCH=0 { NOP }			; To keep code aligned
 		RTS
 }
 

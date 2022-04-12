@@ -49,25 +49,25 @@
 ;** There are FIVE hard-coded entry points: $E0A7, $E116, $E202, $E442, $E600
 ;*********************************************************************************************************
 
-EDITOR
-		JMP RESET_EDITOR			; Main Initialization (called from Kernal power up reset) 
-		JMP GETKEY				; Get Character From Keyboard Buffer (FIXED ENTRY POINT. Must not move!)
-		JMP INPUT_CHARACTER			; Input From Screen or Keyboard	(FIXED ENTRY POINT. Must not move!)
-		JMP CHROUT_SCREEN			; Output to Screen		(FIXED ENTRY POINT. Must not move!)
-		JMP IRQ_MAIN				; Main IRQ Handler		(FIXED ENTRY POINT. Must not move!)
-		JMP IRQ_NORMAL				; Actual IRQ (clock, keyboard scan)
-		JMP IRQ_END				; Return From Interrupt		(FIXED ENTRY POINT. Must not move!)
-		JMP WIN_CLEAR				; Clear Window
-		JMP CRT_SET_TEXT_EXT			; Set CRTC to TEXT mode
-		JMP CRT_SET_GRAPHICS_EXT		; Set CRTC to GRAPHICS mode
-		JMP CRT_PROGRAM_EXT			; Program CRTC (Table pointer in A/X, chr set in Y)
-		JMP WIN_SCROLL_DN			; Scroll DOWN
-		JMP WIN_SCROLL_UP			; Scroll UP
-		JMP OLD_SCAN_KEYBOARD			; Scan Keyboard
-		JMP BEEP				; Ring BELL/CHIME
-		JMP BEEP				; Was: Set REPEAT MODE
-		JMP WIN_SET_TOP				; Set Window Top
-		JMP WIN_SET_BOT				; Set Window Bottom
+EDITOR		JMP RESET_EDITOR	; [E000] Main Initialization (called from Kernal power up reset at $FD16) 
+		JMP GETKEY		; [E003] Get Character From Keyboard Buffer	(FIXED ENTRY POINT. Must not move!)
+		JMP INPUT_CHARACTER	; [E006] Input From Screen or Keyboard		(FIXED ENTRY POINT. Must not move!)
+		JMP CHROUT_SCREEN	; [E009] Output to Screen			(FIXED ENTRY POINT. Must not move!)
+		JMP IRQ_MAIN		; [E00C] Main IRQ Handler			(FIXED ENTRY POINT. Must not move!)
+		JMP IRQ_NORMAL		; [E00F] Actual IRQ (clock, keyboard scan)
+		JMP IRQ_END		; [E012] Return From Interrupt			(FIXED ENTRY POINT. Must not move!)
+		JMP WIN_CLEAR		; [E015] Clear Window
+		JMP CRT_SET_TEXT	; [E018] Set CRTC to TEXT mode
+		JMP CRT_SET_GRAPHICS	; [E01B] Set CRTC to GRAPHICS mode
+		JMP CRT_PROGRAM		; [E01E] Program CRTC (Table pointer in A/X, chr set in Y)
+		JMP WIN_SCROLL_DN	; [E021] Scroll Window DOWN
+		JMP WIN_SCROLL_UP	; [E024] Scroll Window UP
+		JMP SCAN_KEYBOARD	; [E027] Scan Keyboard
+		JMP BEEP		; [E02A] Ring BELL/CHIME
+		JMP SET_REPEAT_MODE	; [E02D] Set REPEAT MODE
+		JMP WIN_SET_TOP		; [E030] Set Window Top
+		JMP WIN_SET_BOT		; [E033] Set Window Bottom
+
 
 ;*********************************************************************************************************
 ;** SET_REPEAT_MODE  [E036]  (Called from Jump Table)

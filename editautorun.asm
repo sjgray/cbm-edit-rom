@@ -14,9 +14,10 @@
 
 AUTODISPATCH
 		JSR ERASE_SYS
-		!IF BANNER > 0 { JSR SHOW_BANNER   }		; Display Custom Banner Message
-		!IF WEDGE  > 0 { JSR INSTALL_WEDGE }		; Install DOS Wedge
+		!IF BANNER > 0   { JSR SHOW_BANNER   }		; Display Custom Banner Message
+		!IF WEDGE  > 0   { JSR INSTALL_WEDGE }		; Install DOS Wedge
 		!IF EXECUDESK =2 { JSR EDESKMENU }		; Run Execudesk Menu
+		!IF AUTOBOOT > 0 { JSR DOBOOT }			; Do Disk Boot
 		RTS
 
 ERASE_SYS
@@ -73,7 +74,7 @@ AUTO_SYS
 		!IF OPTROM=2 {!text "SYS40960"}		; Autostart is located at $A000!
 		!byte $0D,0				; <CR> and zero pad byte
 
-;------------- TEXT to erase SYS and READY from screen
+;-------------- TEXT to erase SYS and READY from screen
 
 ERASE_TXT
 		!byte $91			; <UP>
@@ -83,3 +84,16 @@ ERASE_TXT
 		!byte $0D			; <CR>
 		!byte $91,$91,$91,$91		; <UP><UP><UP><UP>
 		!byte 0
+
+;-------------- Disk Autoboot
+; This puts the SHIFT RUN/STOP code into the keyboard buffer and the system
+; will take care of the rest!
+
+!IF AUTOBOOT >0 {
+DOBOOT
+		LDA #$83			; SHIFT RUN/STOP
+		STA KEYD			; First position of Keyboard Input Buffer
+		LDA #1				; One character
+		STA $9E				; Set number of characters in keyboard buffer
+		RTS
+}

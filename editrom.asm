@@ -6,8 +6,8 @@
 ;---------------------- Get User Variables and validate some settings, and set output file
 
 !SOURCE "edit.asm"							; Include USER-DEFINED variables
-!IF SS40+COLOURPET>0 { ESCCODES=1 }					; Make sure ESC Codes is ON if SS40 or COLOURPET is enabled
-!IF SS40=1 { SOFT40=0 }                         			; Make sure SOFT40 is OFF if SS40 is enabled
+!IF COLOURPET>0 { ESCCODES=1 }						; Make sure ESC Codes is ON if SS40 or COLOURPET is enabled
+!IF SS40=1      { SOFT40=0 }                         			; Make sure SOFT40 is OFF if SS40 is enabled
 !IF COLOURPET=0 { !TO "editrom.bin",plain }				; Generic output file with no load address
 !IF COLOURPET>0 { !TO "cpetrom.bin",plain }				; ColourPET output file with no load address
 

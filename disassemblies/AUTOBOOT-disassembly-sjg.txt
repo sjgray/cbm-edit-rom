@@ -40,7 +40,7 @@ CHROUT    = $FFD2   	;Kernal Print a byte
 ;
 ;----- Code
 ;
-$E000: 4C EF E1  JMP  L_E1EF
+$E000: 4C EF E1  JMP  L_E1EF ;This is the EDITOR Init jump, but now points to autoboot code
 $E003: 4C A7 E0  JMP  L_E0A7
 $E006: 4C 16 E1  JMP  L_E116
 $E009: 4C 02 E2  JMP  L_E202
@@ -341,7 +341,7 @@ $E1EE:           .BYT AA                      ;filler
 
 ;--------------- Autoboot - stuff keyboard buffer using table at $E039 (9 bytes)
 L_E1EF:
-$E1EF: 20 4B E0  JSR  L_E04B
+$E1EF: 20 4B E0  JSR  L_E04B	;This is the normal EDITOR INIT code
 $E1F2: A2 09     LDX #$09
 L_E1F4:
 $E1F4: BD 39 E0  LDA $E039,X
@@ -351,6 +351,7 @@ $E1FB: 10 F7     BPL L_E1F4
 $E1FD: A9 09     LDA #$09
 $E1FF: 85 9E     STA $9E
 $E201: 60        RTS
+
 ;--------------- end of autoboot mod
 
 L_E202:

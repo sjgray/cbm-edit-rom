@@ -3,6 +3,7 @@
 ; Descriptions are from Butterfield's memory maps from Transactor
 
 ;		--------------- Common Usage (All Codebases)
+
 Basic_USR 	= $00		; USR Jump
 USRADD 		= $01		; USR Jump
 CHARAC 		= $03		; Search Character
@@ -155,12 +156,23 @@ CAS2		= $fa		; Cassette #2 status
 STAL		= $fb		; Tape start address/ MLM
 MEMUSS		= $fd		; MLM / DOS pointer / Misc
 
-!IF CODEBASE=0 {
 ;		---------------- 40-Column Only Usage (Codebase 0)
+;		*** Currently, We cannot use ESC codes with CODEBASE 0 because this area is used for line linking!
+;		*** The line link table uses 24 bytes, 1 for each line (line 25 can never be linked)
+;		*** The line link table also holds the HI byte for the 40-col screen line table. It may be possible to
+;		*** Move the HI byte back into ROM like in the 80 column code, then pack the 24 bytes down to 3 using
+;		*** BITS instead. This would free 21 bytes that could be used for 80-column plus enhanced features.
+;		*** However, the code to handle BIT-based line linking would be more complicated and take more code.
+
+!IF CODEBASE=0 {
 LineLinkTable   = $e0		; 40-Col Line Link Table (to $F8)
 
 } ELSE {
+
 ;		---------------- 80-Column Only Usage (Codebase 1 or 2)
+;		*** These are the normal 80-column screen editor locations. Since we have 80 columns there is no need
+;		*** for a line-link table, therefor we can use this for enhanced 80-column functions (windowing).
+
 TopMargin	= $e0		; Window TOP line
 BotMargin	= $e1		; Window BOTTOM line
 LeftMargin	= $e2		; Window LEFT margin
@@ -176,17 +188,42 @@ SCROV		= $eb		; Screen Output Vector (EB/EC)
 JIFFY6DIV5	= $f8		; TI clock adjust (speed by 6/5)
 }
 
-!IF ESCCODES = 1 {
 ;		---------------- These are Customized Locations
-;               NOTE!: With Codebase 1 the area from $ED-$F7 are unused
-;                      With Codebase 0 the area is part of the LineWrap Table
-;
-SCNWIDTH	= $f0		; Screen Mode (40 or 80) for SS40
-LASTCHAR	= $f1		; Last Key Pressed
-BELLMODE	= $f2		; 0=Disable, 1=Enable BELL/CHIME
-EUROFLAG        = $f3		; 0=ASCII, 1=DIN
-MYZP            = $f4           ; LO General ZP pointer
-;               = $f5           ; HI
-SCN4080BOARD    = $f6		; Flag for Hardware 40/80 Column Switcher board
+;      		*** With Codebase 1 the area from $ED-$F7 are unused
+;      		*** With Codebase 0 the area is part of the LineWrap Table
+;		***  ( can these move to TAPE BUFFER#1? - will conflict with tape and some ML programs)
+
+; If ESC codes are not active but Backarrow Hack is set to Toggle 40/80
+; then define Screen Width Location
+!IF (ESCCODES = 0) AND (BACKARROW>0) AND (BACKACTION=1) {
+SCNWIDTH	= $0381		; Screen Mode (40 or 80) for SS40
 }
 
+!IF ESCCODES = 1 {
+  !IF CODEBASE = 0 {
+
+;               *** CODEBASE 0 must avoid line-link table! We will use TAPE#2 buffer (which DOS uses)
+
+SCNWIDTH	= $0381		; Screen Mode (40 or 80) for SS40
+LASTCHAR	= $0382		; Last Key Pressed - used to remember ESC key
+BELLMODE	= $0383		; 0=Disable, 1=Enable BELL/CHIME
+EUROFLAG        = $0384		; 0=ASCII, 1=DIN
+SCN4080BOARD    = $0385		; Flag for Hardware 40/80 Column Switcher board
+
+MYZP            = $00           ; LO General ZP pointer (we don't have a good location for this!)
+;                 $01           ; HI                    (we will take over the USR jump vector which is rarely used)
+
+  } ELSE {
+;               *** CODEBASE 1/2 can safely go where line-link table would be
+
+SCNWIDTH	= $f0		; Screen Mode (40 or 80) for SS40
+LASTCHAR	= $f1		; Last Key Pressed - used to remember ESC key
+BELLMODE	= $f2		; 0=Disable, 1=Enable BELL/CHIME
+EUROFLAG        = $f3		; 0=ASCII, 1=DIN
+SCN4080BOARD    = $f4		; Flag for Hardware 40/80 Column Switcher board
+MYZP            = $f5           ; LO General ZP pointer
+;                 $f6           ; HI
+;                 $f7		; not used
+
+  }
+}

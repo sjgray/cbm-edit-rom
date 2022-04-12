@@ -219,7 +219,7 @@ prepare_fn
 
 ;-------------- DIRECTORY
 
-		lda #0
+		lda #0				; Clear the status flag
 		sta STATUS
 		lda #$60			; DATA SA 0
 		sta SA
@@ -231,10 +231,10 @@ prepare_fn
 		ldy #3
 list_blocks
 		sty FNLEN
-		jsr ACPTR
+		jsr ACPTR			; read byte from IEEE
 		sta MEMUSS			; store blocks LSB
-		ldy STATUS
-		bne to_stoplisting
+		ldy STATUS			; check the status. is it non-zero?
+		bne to_stoplisting		; yes
 		jsr ACPTR
 		sta MEMUSS + 1			; store blocks MSB
 		ldy STATUS
@@ -259,28 +259,34 @@ to_list_blocks:	bne list_blocks
 listing
 		jsr SCROUT
 LISTLOOP	jsr ACPTR			; read byte from IEEE
-		ldx STATUS
-		bne stoplisting
-		cmp #0
-		beq newline
+		ldx STATUS			; was it successful?
+		bne stoplisting			; no, so exit
+		cmp #0				; Is it end of line
+		beq newline			; yes, jump ahead
 		jsr SCROUT			; write filename and type
-		jsr STOPEQ			; abort listing with STOP key
-		beq stoplisting
+		jsr STOPEQ			; Was STOP key pressed?
+		beq stoplisting			; Yes, we're done. Jump out
 		jsr GETIN			; pause listing with SPACE key
 		beq LISTLOOP			; no key pressed -> continue
 		cmp #32				; <space>?
-		bne LISTLOOP			; only space pauses listing
-listwait	jsr GETIN
-		beq listwait			; wait for any key
+		bne LISTLOOP			; No, go back for more
+
+listwait	jsr GETIN			; get a key
+		beq listwait			; 0=no key, so keep waiting
+
 		bne LISTLOOP			; then continue
 
+;-------------- end of directory entry
+
 newline		lda #$0D			; <CR>
-		jsr SCROUT
+		jsr SCROUT			; print it
 		ldy #2
 		bne to_list_blocks
 
+;-------------- listing is done - end or stop key pressed
+
 stoplisting	jsr CLSEI			; close file with $E0, unlisten
-;		jsr CRLF
+
 		pla 
 		pla 
 		jmp READY			; BASIC warm start

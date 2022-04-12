@@ -40,24 +40,24 @@
 ;** There are FIVE hard-coded entry points: $E0A7, $E116, $E202, $E442, $E600
 ;*********************************************************************************************************
 
-EDITOR		JMP RESET_EDITOR			; Main Initialization (called from Kernal power up reset at $FD16) 
-		JMP GETKEY				; Get Character From Keyboard Buffer	(FIXED ENTRY POINT. Must not move!)
-		JMP INPUT_CHARACTER			; Input From Screen or Keyboard		(FIXED ENTRY POINT. Must not move!)
-		JMP CHROUT_SCREEN			; Output to Screen			(FIXED ENTRY POINT. Must not move!)
-		JMP IRQ_MAIN				; Main IRQ Handler			(FIXED ENTRY POINT. Must not move!)
-		JMP IRQ_NORMAL				; Actual IRQ (clock, keyboard scan)
-		JMP IRQ_END				; Return From Interrupt			(FIXED ENTRY POINT. Must not move!)
-		JMP WINDOW_CLEAR			; Clear Window
-		JMP CRT_SET_TEXT			; Set CRTC to TEXT mode
-		JMP CRT_SET_GRAPHICS			; Set CRTC to GRAPHICS mode
-		JMP CRT_PROGRAM				; Program CRTC (Table pointer in A/X, chr set in Y)
-		JMP WINDOW_SCROLL_DOWN			; Scroll DOWN
-		JMP WINDOW_SCROLL_UP			; Scroll UP
-		JMP SCAN_KEYBOARD			; Scan Keyboard
-		JMP BEEP				; Ring BELL/CHIME
-		JMP NOTSUPPORTED 			; Set REPEAT Flag   (Function Not supported)
-		JMP NOTSUPPORTED 			; Set Window Top    (Function Not supported)
-		JMP NOTSUPPORTED 			; Set Window Bottom (Function Not supported)
+EDITOR		JMP RESET_EDITOR	; [E000] Main Initialization (called from Kernal power up reset at $FD16) 
+		JMP GETKEY		; [E003] Get Character From Keyboard Buffer	(FIXED ENTRY POINT. Must not move!)
+		JMP INPUT_CHARACTER	; [E006] Input From Screen or Keyboard		(FIXED ENTRY POINT. Must not move!)
+		JMP CHROUT_SCREEN	; [E009] Output to Screen			(FIXED ENTRY POINT. Must not move!)
+		JMP IRQ_MAIN		; [E00C] Main IRQ Handler			(FIXED ENTRY POINT. Must not move!)
+		JMP IRQ_NORMAL		; [E00F] Actual IRQ (clock, keyboard scan)
+		JMP IRQ_END		; [E012] Return From Interrupt			(FIXED ENTRY POINT. Must not move!)
+		JMP WIN_CLEAR		; [E015] Clear Window
+		JMP CRT_SET_TEXT	; [E018] Set CRTC to TEXT mode
+		JMP CRT_SET_GRAPHICS	; [E01B] Set CRTC to GRAPHICS mode
+		JMP CRT_PROGRAM		; [E01E] Program CRTC (Table pointer in A/X, chr set in Y)
+		JMP WIN_SCROLL_DN	; [E021] Scroll DOWN
+		JMP WIN_SCROLL_UP	; [E024] Scroll UP
+		JMP SCAN_KEYBOARD	; [E027] Scan Keyboard
+		JMP BEEP		; [E02A] Ring BELL/CHIME
+		JMP NOTSUPPORTED 	; [E02D] Set REPEAT Flag   (Function Not supported)
+		JMP NOTSUPPORTED 	; [E030] Set Window Top    (Function Not supported)
+		JMP NOTSUPPORTED 	; [E033] Set Window Bottom (Function Not supported)
 
 ;*********************************************************************************************************
 ;** RESET_EDITOR  [E04B]  (Called from Jump Table)
@@ -78,39 +78,16 @@ RESET_EDITOR
 		JSR BEEP_BEEP 				; Ring BELL
 
 ;*********************************************************************************************************
-;** WINDOW_CLEAR  [$E042]  (Called from Jump Table) 
+;** WIN_CLEAR  [$E042]  (Called from Jump Table) 
 ;** This routine clears the screen. Since there is no windowing it clears EVERY byte in the screen memory,
 ;** including non-visible bytes. It also calculates the HI byte of the start of each screen line and
 ;** stores it into the Screen Line Link table. LO bytes are stored in ROM at $E798. These addresses are
 ;** used for printing to the screen. Entries with HI BIT CLEARED are linked to the line above it.
 ;*********************************************************************************************************
+; This routine will go here in it's usual spot for fixed 40/80 column option, however,
+; if we are using SS40 then the routine will not fit so we must relocate it!
 
-WINDOW_CLEAR	LDX #$18				; 24 lines
-		LDA #$C0				; $83C0 = Address of first character on last line of screen?
-		LDY #$83		
-
-WCLOOP		STY LineLinkTable,X			; LOOP[      Save HI byte of screen address to table
-		SEC					;
-		SBC #$28				;   Subtract 40 characters (one physical line)
-		BCS WCSKIP1				;   did we move past page? No, skip ahead
-		DEY					;   Yes, next page
-WCSKIP1		DEX					;   Previous line
-		BPL WCLOOP				; ] Loop up for more
-
-		STY ScrPtr+1				; Store in screen pointer HI
-		INX					; X=0
-		STX ReverseFlag    			; Clear RVS Flag
-		STX ScrPtr    				; Store 0 to screen Pointer LO (pointer should point to $8000 - HOME position)
-
-;[$E05A]	------------------------------- Clear all Screen Memory 
-
-		LDA #$20				; <SPACE>
-CLS_LOOP	STA SCREEN_RAM,X			; LOOP[  Screen RAM page 1
-		STA SCREEN_RAM+$100,X			;        Screen RAM page 2
-		STA SCREEN_RAM+$200,X			;        Screen RAM page 3
-		STA SCREEN_RAM+$300,X			;        Screen RAM page 4 (this also clears non-visible)
-		INX					;   Next position
-		BNE CLS_LOOP				; ] Loop back for more
+!IF SS40=0 { !SOURCE "editrom40cls.asm" }
 
 ;*********************************************************************************************************
 ;** CURSOR_HOME  [$E06B]
@@ -132,18 +109,28 @@ CURSOR_LM	LDX CursorRow   			; Get Current Cursor Physical Line Number
 		STA ScrPtr+1				; Store in Current Screen Line Address HI
 		LDA Line_Addr_Lo,X			; Get the LO byte from table in ROM
 		STA ScrPtr    				; Store to Current Screen Line Address LO
-		LDA #$27       				; 40 characters/line minus 1 = 39
-		STA RightMargin   			; Set Physical Screen Line Length = 40
-		CPX #$18				; Line 24? (0-24) last line cannot be linked
+
+!IF SS40=0 {	LDA #COLUMNS-1 				; Fixed Screen Width -1
+} ELSE {        LDA SCNWIDTH				; Soft Screen Width
+		SBC #1 }				; -1
+
+		STA RightMargin   			; Set Physical Screen Line Length
+		CPX #ROWS-1				; Line 24? (0-24) last line cannot be linked
 		BEQ CLM_SKIP1				; Yes, skip ahead
 		LDA LineLinkTable+1,X 			; Check next line in screen line link table
 		BMI CLM_SKIP1  				; Is HIGH bit set? (negative value) Yes, so NO linked line
-		LDA #$4F				; No, then line is linked. 79 = two screen lines
+		LDA #79					; No, then line is linked (two screen lines)
 		STA RightMargin   			; Store in Physical Screen Line Length
 CLM_SKIP1 	LDA CursorCol   			; Cursor Column on Current Line
-		CMP #$28				; Is it greater than 40?
+
+!IF SS40=0 {    CMP #COLUMNS				; Is it greater than Fixed Screen Width?
+} ELSE {	CMP SCNWIDTH }				; Is it greater than SCNWIDTH?
+
 		BCC NOTSUPPORTED			; No, skip
-		SBC #$28				; Yes, subtract 40
+
+!IF SS40=0 {    SBC #COLUMNS				; Yes, subtract Fixed Screen Width
+} ELSE {	SBC SCNWIDTH }				; Yes, subtract SCNWIDTH
+
 		STA CursorCol   			; Cursor Column on Current Line
 
 ;-------------- Unsupported Functions Jump Here [$E098]
@@ -155,7 +142,7 @@ NOTSUPPORTED	RTS
 ;** Get a KEY from keyboard buffer. Reads a character from 'KEYD' then shifts remaining buffer characters
 ;** If there is NO key it will return $FF.
 ;*********************************************************************************************************
-!FILL $e0a7-*,$aa ; FIXED ENTRY POINT! This must not move!
+!FILL $e0a7-*,$aa ; FIXED ENTRY POINT! This must not move! (approx 14 bytes filler for std rom)
 ;#########################################################################################################
 
 GETKEY
@@ -354,20 +341,22 @@ CTS_SKIP2
 } ELSE {
 		JSR Put_ColourChar_at_Cursor		; Put character AND Colour on screen
 }
-		INC CursorCol   			; Cursor Column on Current Line
-		LDY RightMargin   			; Physical Screen Line Length
-		CPY CursorCol   			; Cursor Column on Current Line
-		BCS IRQ_EPILOG
+		INC CursorCol   			; Move to next column
+		LDY RightMargin   			; Physical Screen Line Length (Right Margin)
+		CPY CursorCol   			; Get Column again. Compare to Right Margin
+		BCS IRQ_EPILOG				; Is it past the Margin? Yes, we are done
+;               ----------------------------------------
 		LDX CursorRow   			; Current Cursor Physical Line Number
-		CPY #$4F				; 79=maximum line length (2 physical lines) minus 1
-		BNE CTS_SKIP3
-		JSR LINKLINES				; Set 80-column line indicator
+		CPY #79					; 79=maximum line length (2 physical lines in 40-column mode) minus 1
+							; ##### We need to decide if we will link two 80 column lines????
+		BNE CTS_SKIP3				; It's not at the end, so skip ahead
+		JSR LINKLINES				; If it is then link them! 
 		JSR CURSOR_DOWN				; Move Cursor to next line
 		LDA #$00				; First character on line
 		STA CursorCol   			; Cursor Column on Current Line
 		BEQ IRQ_EPILOG
 
-CTS_SKIP3	CPX #$18				; Last screen line?
+CTS_SKIP3	CPX #ROWS-1				; Last screen line?
 		BNE LINKLINES2				; No, continue
 		JSR SCROLL_UP				; Yes, Scroll screen and adjust line link
 
@@ -395,7 +384,7 @@ IRQE_1		PLA
 ;** X hold physical line#. Checks ROW to make sure it's not on last line.
 ;*********************************************************************************************************
 
-LINKLINES	CPX #$17				; Are we at last screen ROW? 23 ?
+LINKLINES	CPX #ROWS-2				; Check if we are below ROW 23?
 		BCS LL_SKIP				; Yes, skip out
 		LDA LineLinkTable+2,X			; No, safe to link the next line to this one
 		ORA #$80				; Link the line by SETTING the upper bit
@@ -409,7 +398,7 @@ LINKLINES2	JSR LINKLINES3				; Adjust line link and move to start of line
 
 ;		--------------------------------------- Scroll screen UP [$E1C4]
 
-SCROLL_UP	JSR WINDOW_SCROLL_UP			; Scroll Screen Up
+SCROLL_UP	JSR WIN_SCROLL_UP			; Scroll Screen Up
 		DEC InputRow   				; Cursor Y-X Pos. at Start of INPUT
 		DEC CursorRow   			; Current Cursor Physical Line Number
 		LDX CursorRow   			; Current Cursor Physical Line Number
@@ -431,7 +420,11 @@ LINKLINES3	ASL LineLinkTable+1,X 			; Shift to lose HI BIT
 ;** Back to previous line when actioning DEL or LEFT 
 ;*********************************************************************************************************
 
-CURSOR_TO_EOPL	LDY #$27				; Column 39
+CURSOR_TO_EOPL
+!IF SS40=0 {	LDY #COLUMNS-1				; Hard-coded Screen Width-1 (ie: 39)
+} ELSE {	LDY SCNWIDTH				; Soft Screen Width
+		DEY }					; -1
+
 		LDX CursorRow   			; Get Current Cursor Physical Line Number
 		BNE PL_SKIP1				; Is it Zero? No, ok to proceed, so skip ahead
 		STX CursorCol   			; Yes, movement is invalid. Cursor Column on Current Line
@@ -443,7 +436,7 @@ PL_SKIP1	LDA LineLinkTable-1,X			; Get PREVIOUS line's Line Link value
 		BMI PL_SKIP2				; Is HI BIT SET? Yes, skip ahead
 		DEX					; No, it's ok to go back to previous line
 		LDA LineLinkTable-1,X			; Get PREVIOUS line's Line Link value
-		LDY #$4F				; Column 79
+		LDY #COLUMNS*2-1			; Hard-coded Two Screen Lines - 1 (ie: 79)
 
 PL_SKIP2	DEX
 		STX CursorRow   			; Current Cursor Physical Line Number
@@ -456,7 +449,7 @@ PL_SKIP2	DEX
 
 ;*********************************************************************************************************
 ;** CHROUT_SCREEN [E202] (Called from Jump Table)
-;** $E202 - FIXED ENTRY POINT! Some BASIC/KERNAL bypass the Jump Table and jump directly here
+;** $E202 - FIXED ENTRY POINT! Some BASIC/KERNAL rouines bypass the Jump Table and jump directly here
 ;** Output Character to Screen Dispatch 
 ;*********************************************************************************************************
 !FILL $e202-*,$aa ; FIXED ENTRY POINT! This must not move!
@@ -602,7 +595,8 @@ COU_SKIP12	CMP #$11				; Is it <CRSR-DOWN>?
 		BNE COU_SKIP14				; No, skip ahead
 		CLC
 		TYA
-		ADC #$28				; Add 40 for next line
+!IF SS40=0 {	ADC #COLUMNS				; Add Fixed Screen Width for next line
+} ELSE {	ADC SCNWIDTH }				; Add Soft Screen Width
 		TAY
 		CMP RightMargin   			; Compare it to Screen Line Length
 		BCC COU_SKIP10				; Less, so it's ok
@@ -704,9 +698,9 @@ CHECK_INSERT	LDY RightMargin   			; Right margin
 		CPY CursorCol				; Cursor Column on Current Line
 		BNE DO_INSERT
 
-COH_SKIP4	CPY #$4F				; Column 79?
+COH_SKIP4	CPY #COLUMNS*2-1			; Hard Coded Screen Width*2-1 (79)
 		BEQ COU_SKIP11				; Yes, go back up for more
-		JSR WINDOW_SCROLL_DOWN			; Check for and perform scrolling DOWN
+		JSR WIN_SCROLL_DN			; Check for and perform scrolling DOWN
 
 ;[E306]		--------------------------------------- Do INSERT
 
@@ -742,9 +736,11 @@ COH_CHECK1	CMP #$11				; Is it <CRSR-UP>? (SHIFT-CRSR-DOWN)
 ;[E32A]		--------------------------------------- Do Cursor UP
 
 		LDA CursorCol   			; Cursor Column on Current Line
-		CMP #$28				; Is it column 40?
-		BCC COH_SKIP7				; No, skip ahead
-		SBC #$28				; Yes, subtract 40
+!IF SS40=0 {	CMP #COLUMNS				; Compare to Fixed Screen Width
+} ELSE {	CMP SCNWIDTH }				; Compare to Soft Screen Width
+		BCC COH_SKIP7				; Is it less? No, skip ahead
+!IF SS40=0 {	SBC #COLUMNS				; Yes, subtract Fixed Screen Width
+} ELSE {	SBC SCNWIDTH }				; Yes, subtract Soft Screen Width
 		STA CursorCol   			; Cursor Column on Current Line
 		BCS COH_FINISH
 
@@ -762,7 +758,7 @@ COH_SKIP8	DEX
 		JSR CURSOR_LM				; Cursor to start of line
 		LDA CursorCol   			; Cursor Column on Current Line
 		CLC
-		ADC #$28
+		ADC #COLUMNS
 		STA CursorCol				; Cursor Column on Current Line
 		BNE COH_FINISH
 
@@ -789,7 +785,7 @@ COH_CHECK3	CMP #$1D				; Is it <CRSR-LEFT>? (SHIFT-CRSR-RIGHT)
 
 COH_CHECK4	CMP #$13				; Is it <CLR>? (SHIFT-HOME)
 		BNE COH_CHECK5				; No, skip ahead
-		JSR WINDOW_CLEAR			; Yes, Clear the Screen
+		JSR WIN_CLEAR			; Yes, Clear the Screen
 COH_FINISH	JMP IRQ_EPILOG				; Finish Up
 
 ;[E376]		--------------------------------------- Check for ERASE TO START OF LINE
@@ -853,9 +849,9 @@ CURSOR_DOWN	SEC
 		LDX CursorRow   			; Current Cursor Physical Line Number
 
 CD_LOOP1	INX					; LOOP[
-		CPX #$19				;   Last line of screen?
+		CPX #ROWS				;   Last line of screen?
 		BNE CD_SKIP
-		JSR WINDOW_SCROLL_UP			;   Scroll Screen Up
+		JSR WIN_SCROLL_UP			;   Scroll Screen Up
 
 CD_SKIP		LDA LineLinkTable,X			;   Screen Line Link Table / Editor Temps (40 col)
 		BPL CD_LOOP1				; ] Is HI bit CLEAR? Yes then go back for more
@@ -868,7 +864,7 @@ CD_SKIP		LDA LineLinkTable,X			;   Screen Line Link Table / Editor Temps (40 col
 ;*********************************************************************************************************
 
 CURSOR_RETURN	JSR CURSOR_DOWN				; Move to next line
-		LDA #$00				; Column 0
+		LDA #0					; Column 0
 		STA CursorCol   			; Set Cursor Column on Current Line
 
 ;*********************************************************************************************************
@@ -877,7 +873,7 @@ CURSOR_RETURN	JSR CURSOR_DOWN				; Move to next line
 ;*********************************************************************************************************
 
 ESCAPE_O				
-ESCAPE		LDA #$00
+ESCAPE		LDA #0
 		STA INSRT  				; Flag: Insert Mode, >0 = # INSTs
 		STA ReverseFlag    			; Flag: Print Reverse Chars. -1=Yes
 		STA QuoteMode   			; Flag: Editor in Quote Mode
@@ -887,13 +883,13 @@ ESCAPE		LDA #$00
 		JMP IRQ_EPILOG				; Finish Up
 
 ;*********************************************************************************************************
-;** WINDOW_SCROLL_UP / ESCAPE_V  [E3D1] (Called from Jump Table)
+;** WIN_SCROLL_UP / ESCAPE_V  [E3D1] (Called from Jump Table)
 ;** Scrolls entire screen UP. Also scroll up line-link table
 ;*********************************************************************************************************
 
 ESCAPE_V
-WINDOW_SCROLL_UP
-		LDX #$19				; 25 screen lines
+WIN_SCROLL_UP
+		LDX #ROWS				; Hard-coded Screen Lines (normally 25)
 		STX CursorRow   			; Current Cursor Physical Line Number
 
 WSU_LOOP1	LDX #$FF
@@ -906,7 +902,7 @@ WSU_LOOP2	INX					; LOOP[
 		LDA LineLinkTable,X			;   Screen Line Link Table (address table HI)
 		ORA #$80				;   Make sure HI BIT is set
 		STA ScrPtr+1				;   Set up pointer HI for screen scrolling 
-		CPX #$18				;   Last Line?
+		CPX #ROWS-1				;   Last Line?
 		BCS WSU_SKIP2				;   Yes, so skip ahead to exit loop
 		LDY LineLinkTable+1,X			;   No, so get NEXT Line's Line Link entry
 		BMI WSU_SKIP1				;   is HI BIT set? Yes, leave it as is and skip ahead
@@ -921,7 +917,8 @@ WSU_SKIP1	STA LineLinkTable,X			;   Store it in the CURRENT Line Link entry (IE 
 
 ;[E3F9]		--------------------------------------- Now we scroll the video screen lines
 
-		LDY #$27				;   40 characters per line
+!IF SS40=0 {	LDY #COLUMNS-1				;   Hard-coded Screen Width
+ } ELSE {	LDY SCNWIDTH }				;   Soft Screen Width
 
 WSU_LOOP3	LDA (SAL),Y 				;   LOOP[[  Read character from screen
 		STA (ScrPtr),Y 				;     Write it back
@@ -933,7 +930,10 @@ WSU_SKIP2	STA LineLinkTable,X			; Store to Screen Line Link Table
 
 ;[E406]		--------------------------------------- Clear the last screen line
 
-		LDY #$27				; 40 characters on line
+!IF SS40=0 {	LDY #COLUMNS-1				;   Hard-coded Screen Width
+} ELSE {	LDY SCNWIDTH				;   Soft Screen Width
+		DEY }					;   -1
+
 		LDA #$20				; <SPACE>
 
 WSU_LOOP4	STA (ScrPtr),Y 				; LOOP[  Write <SPACE> to the screen
@@ -971,10 +971,10 @@ CSC_SKIP	LDX CursorRow   			; Current Cursor Physical Line Number
 		RTS
 
 !IF CRUNCH = 0 {
-		TAX
-		TAX
-		TAX
-		TAX
+		TAX					; Filler
+		TAX					; Filler
+		TAX					; Filler
+		TAX					; Filler
 }
 
 ;*********************************************************************************************************
@@ -986,7 +986,7 @@ ADVANCE_TIMER	JSR UDTIME				; Update System Jiffy Clock. KERNAL routine $FFEA
 		LDA JIFFY6DIV5				; Counter to speed TI by 6/5 (40col)
 		CMP #$06				; 6 IRQ's?
 		BNE IRQ_NORMAL2				; No, do normal IRQ
-		LDA #$00				; Reset IRQ adjustment counter
+		LDA #0					; Reset IRQ adjustment counter
 		STA JIFFY6DIV5 				; Counter to speed TI by 6/5 (40col)
 		BEQ ADVANCE_TIMER			; was IRQ_MAIN		; Do normal IRQ
 
@@ -1033,6 +1033,17 @@ CHECK_TAB	TYA
 		LDA TABS+1,X				; Get the BITS for that group of tabs (Table of 80 bits to set TABs)
 		BIT TABS   				; Set FLAG for testing???? (Table of 80 bits to set TABs)
 		RTS
+
+;################################################################################
+;## WIN_CLEAR  [$RELOCATED]  (Called from Jump Table) 
+;################################################################################
+; When the Soft40 option is enabled we must relocate this routine here since it will not fit in it's normal
+; location. When finished we must jump back to the end of it's normal position
+
+!IF SS40=1 {
+		!SOURCE "editrom40cls.asm" 
+		JMP CURSOR_HOME				;The WIN_CLR routine flows into the HOME routine
+}
 
 ;################################################################################
 		!fill $e600-*,$aa	;########################################
@@ -1168,7 +1179,6 @@ BELLENABLED	BEQ BELLDONE
 		STA VIA_ACR
 		LDA #15
 		STA VIA_Shift
-
 		LDX #7					; Size of BELL table
 BELLOOP1	LDA SOUND_TAB-1,X			; LOOP[
 		STA VIA_Timer_2_Lo
@@ -1217,7 +1227,25 @@ INITED2		STA TABS+1,X				; LOOP[   TAB table $03F0
 		LDA #>IRQ_NORMAL			; Normal IRQ Vector HI
 		STA CINV+1
 }
-;		--------------- Continue
+
+;		--------------------------------------- Init SS40
+
+!IF SS40=1 {
+	!IF HARD4080=1 {
+		LDA #1					; 40/80 Switcher board INSTALLED
+		STA SCN4080BOARD
+	} ELSE {
+		LDA #0					; 40/80 Switcher board NOT installed
+		STA SCN4080BOARD	
+	}
+
+	!IF SS40MODE=80 {
+		JSR SS40_INIT80				; Initialize Switchable Soft-40 to 80 columns
+	} ELSE {
+		JSR SS40_INIT40				; Initialize Switchable Soft-40 to 40 columns
+	}
+}
+;		--------------------------------------- Continue
 
 		LDA #$03				; 3=Screen
 		STA DFLTO  				; Set Default Output (CMD) to Screen
@@ -1252,6 +1280,13 @@ INITED2		STA TABS+1,X				; LOOP[   TAB table $03F0
 		STA DELAY				; Repeat key countdown (40col)
 		STA KOUNT 				; Delay between repeats (40col)
 
+;		--------------------------------------- Patches for new features here
+
+!IF ESCCODES=1 {
+		LDA #1					; 1=Enabled
+		STA BELLMODE				; Flag to Enable BELL
+}
+
 !IF AUTORUN=1 {	JSR AUTOSTART }				; Do Autostart Prep
 
 		RTS
@@ -1259,10 +1294,10 @@ INITED2		STA TABS+1,X				; LOOP[   TAB table $03F0
 ;************** Check for screen scrolling [$E6EA]
 
 ESCAPE_W						; Esc-w Scroll Down
-WINDOW_SCROLL_DOWN
+WIN_SCROLL_DN
 		LDX CursorRow  				; Get Current Cursor Physical Line Number
 		INX					; Next line
-		CPX #$18				; Will it be the last line on the screen (24)?
+		CPX #ROWS-1				; Will it be the last line on the screen (24)?
 		BEQ CLEAR_SCREEN_LINE 			; Yes, Clear a screen line and move cursor to start of line
 		BCC SCROLL_DOWN				; No it's less, Scroll screen lines DOWN
 		JMP SCROLL_UP				; No it's more, Scroll screen up
@@ -1274,7 +1309,7 @@ WINDOW_SCROLL_DOWN
 ;** stored in 'CursorRow'.  Adjusts ALL Line Links.
 ;*********************************************************************************************************
 
-SCROLL_DOWN	LDX #$17				; Start at bottom of the screen (ROW 24 minus 1)
+SCROLL_DOWN	LDX #ROWS-2				; Start at bottom of the screen (ROW 24 minus 1)
 SD_LOOP1 	LDA LineLinkTable+1,X			; LOOP[  Get NEXT line's HI byte from Line Link table
 		ORA #$80				;   Make sure HI bit is set
 		STA SAL+1				;   Store it to destination screen pointer
@@ -1285,7 +1320,11 @@ SD_SKIP		STA LineLinkTable+1,X			;   Store it back to Line link table
 		TYA
 		ORA #$80				;   SET HI bit
 		STA ScrPtr+1				;   Store to screen line SOURCE pointer
-		LDY #$27				;   40 characters per line minus 1 (0-39)
+
+!IF SS40=0 {	LDY #COLUMNS-1				;   Hard-coded Screen Width-1 (ie: 39)
+  } ELSE   {    LDY SCNWIDTH				;   Soft Screen Width
+		DEY }					;   -1
+
 		LDA Line_Addr_Lo+1,X			;   Get screen's LO byte from Screen line address table
 		STA SAL    				;   Store it to DESTINATION screen pointer
 		LDA Line_Addr_Lo,X			;   Get Previous lines LO byte from Screen line address table
@@ -1315,7 +1354,11 @@ CLEAR_SCREEN_LINE
 		STA LineLinkTable,X			; Store it to the Line Link Table
 		LDA Line_Addr_Lo,X			; Get screen line's address LO byte from ROM table
 		STA ScrPtr    				; Store it to screen pointer LO
-		LDY #$27				; Y=40 columns
+
+!IF SS40=0 {	LDY #COLUMNS-1				; Hard-coded Screen Width-1
+   } ELSE {	LDY SCNWIDTH				; Soft Screen Width
+		DEY }					; -1
+
 		LDA #$20				; <SPACE>
 
 CSL_LOOP	STA (ScrPtr),Y				; LOOP[    Write SPACE to screen
@@ -1342,7 +1385,7 @@ RUN_STRING	!byte $44,$cc,$22,$2a,$0d		; dL"*<RETURN>
 ;** High bytes are calculated and put in the Link-link table
 ;*********************************************************************************************************
 
-!source "screen0v.asm"
+!SOURCE "screen0v.asm"
 
 ;*********************************************************************************************************
 ;** CRTC Chip Register Setup Tables (2K ROMs) [E7B1]
@@ -1374,7 +1417,7 @@ POWERSOF2       !byte $80,$40,$20,$10,$08,$04,$02,$01	; BIT table
 ;** SMALL PATCHES HERE
 ;*********************************************************************************************************
 
-!IF BACKARROW = 1 { !SOURCE "editbarrow.asm" }	; Patch for Back Arrow toggling of screen mode
+!IF BACKARROW = 1 { !SOURCE "editbarrow.asm" }		; Patch for Back Arrow
 
 ;*********************************************************************************************************
 ;** FILLER
