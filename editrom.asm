@@ -55,6 +55,7 @@ DBLINE = SCREEN_RAM + 24 * COLUMNS					; Calculate bottom line of screen for deb
 		!IF SS40 = 1      { !SOURCE "editsoft40.asm" }
 		!IF BACKARROW = 2 { !SOURCE "editbarrow.asm" }
 		!IF EXECUDESK > 0 { !SOURCE "execudesk.asm" }
+		!IF UPET = 1      { !SOURCE "upet.asm" }
 INFOSTRING	
 		!IF INFO > 0      { !SOURCE "info.asm" }
 

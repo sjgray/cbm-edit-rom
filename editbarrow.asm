@@ -6,10 +6,21 @@
 ; 1=Toggle 40/80 Column Mode (either soft40 or hardware 40/80)
 
 TestBackArrow
+!IF KEYBOARD=0 {                        ; Graphics keyboard -> "@" as top left key
+                                        ; Note: scanner clears KEYFLAGS, so can only be seen on bit 7 set
+		CMP #$c0		; Is it (shifted) "@" key? (top left key)
+} ELSE {                                ; others use left arrow as top left key
 		LDY KEYFLAGS		; Is it a Shifted Char?
 		BEQ TestBAExit		; No, so exit and store key
+<<<<<<< HEAD
 		CMP #$5F		; Is it BackArrow key?
 		BEQ DoBackArrow		; Yes, toggle the screen mode then RETURN (do not store key!)
+=======
+		CMP #$5F		; Is it BackArrow key? (top left key)
+}
+		BEQ ToggleScreen	; Yes, toggle the screen mode then RETURN (do not store key!)
+
+>>>>>>> origin/master
 TestBAExit	INX			; No, Increment character count
 		STX CharsInBuffer	; Num Chars in Keyboard Buffer
 		RTS
