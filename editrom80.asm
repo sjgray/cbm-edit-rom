@@ -672,7 +672,7 @@ Be2d0		CMP #$16 				; Is it <Ctrl V>? - Erase to EOL? NOTE: 40-col code has BUG 
 		BNE Be2e0				; No, skip ahead
 
 ;[E2D4]		--------------------------------------- Erase to End of Line
-
+ERASE_TO_EOL
 		LDA #$20				; <SPACE>
 		DEY
 
@@ -724,7 +724,7 @@ COH_SKIP1	CMP #$20 				; Is it a Control Character?
 
 ;		--------------------------------------- Check for SHIFT-RETURN
 
-COH_SKIP2     	CMP #13 				; Is it <SHIFT><RETURN>?
+COH_SKIP2     	CMP #$0D 				; Is it <SHIFT><RETURN>?
            	BNE COH_SKIP3				; No, skip ahead
 		JMP CURSOR_RETURN			; Yes, handle it
 
@@ -796,7 +796,7 @@ COH_CHECK1	CMP #$11 				; Is it <CRSR-UP>? (SHIFT-CRSR-DOWN)
 		JSR UPDATE_CURSOR_ROW
 		BNE Be38c
 
-;		--------------------------------------- Check for RVS
+;		--------------------------------------- Check for RVS OFF
 
 Be358		CMP #$12 				; Is it <OFF>?  (SHIFT-RVS)
 		BNE Be360				; No, skip ahead
@@ -819,8 +819,8 @@ Be36f		DEC CursorCol				; Move one position LEFT
 
 Be373		CMP #$13 				; Is it <CLR>? (SHIFT-HOME)
 		BNE Be37c				; No, skip ahead
-		JSR WIN_CLEAR			; Yes, clear the screen/window
-		BNE Be38c
+		JSR WIN_CLEAR				; Yes, clear the screen/window
+		BNE Be38c				; Finish Up
 
 ;		--------------------------------------- Check for SET TAB
 
@@ -1219,9 +1219,9 @@ INITED1		STA JIFFY_CLOCK,X			; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
 }
 ;		--------------------------------------- Continue
 
-		LDA #9
+		LDA #$09
 		STA XMAX				; Size of Keyboard Buffer
-		LDA #3
+		LDA #$03
 		STA DFLTO				; Default Output (CMD) Device (3)
 		LDA #15
 		STA PIA1_Port_A 			; Keyboard ROW select
@@ -1380,10 +1380,14 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e	; BELL chime values
 ;** Small patches here  [E787]
 ;*********************************************************************************************************
 
-!IF BACKARROW = 1 { !SOURCE "editbarrow.asm" }		; Patch for BackArrow toggling of screen mode
+!IF BACKARROW >0 { !SOURCE "editbarrow.asm" }		; Patch for BackArrow toggling of screen mode
 
 ;#########################################################################################################
 !IF CRUNCH=0 {	!byte $cd }		; to match 901474-04
-		!fill $e800-*,$aa	; 78 bytes - Fill to end of 2K
+
+;*********************************************************************************************************
+;** FILLER
+;*********************************************************************************************************
+		!FILL $e800-*,$aa	; 78 bytes - Fill to end of 2K
 ;#########################################################################################################
 ;END! DO NOT ADD ANYTHING BELOW THIS LINE!!!!!!!!

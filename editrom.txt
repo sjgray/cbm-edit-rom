@@ -37,7 +37,7 @@
     26                          ; The following DATE and COMMENT strings will be placed in the IO area (if used).
     27                          ; Take care that comments do not overflow into code space!
     28                          
-    29                          !macro DATE      { !pet "2022-04-10" }
+    29                          !macro DATE      { !pet "2022-04-12" }
     30                          !macro COMMENT   { !pet "sjg-editrom" }
     31                          
     32                          ;----------------------------------------------------------------------------------------------------------------------------
@@ -81,29 +81,31 @@
     70                          BYPASSFG  = 5   ; ColourPET Bypass FG     	0 to 15 RGBI			Colours when AUTOSTART is bypassed.
     71                          BYPASSBG  = 0   ; ColourPET Bypass BG     	0 to 15 RGBI
     72                          
-    73                          MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility.
-    74                          REBOOT    = 0	; Add keyboard reboot? 		0=No, 1=Yes
-    75                          EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes, 2=Yes/OPTROM	Note: Requires BOOT to TEXT mode!
-    76                          SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
-    77                          CRUNCH    = 0   ; Remove unneeded code?		0=No, 1=Yes			Removes NOPs, filler, and unreachable code.
-    78                          BACKARROW = 0   ; Backarrow Hack code?		0=NO, 1=Yes, 2=Yes EXT		Where to put the Action Code. Note: B keyboard scanner only.
-    79                          BACKACTION= 0   ; Backarrow Action		0=Text/Graphic, 2=40/80		Which Action?
-    80                          INFO      = 0   ; Add project info to code area 0=NO, 1=Yes,2=Yes+FONT		INFO=2 shows character set at top of screen
-    81                          BUGFIX    = 0   ; Correct Known bugs		0=No, 1=Yes			
-    82                          ;
-    83                          DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
-    84                          
-    85                          ;----------------------------------------------------------------------------------------------------------------------------------------
-    86                          ; To generate Edit ROMs that are Byte-exact matches to actual Commodore ROMS set the
-    87                          ; following options (If an option is not listed assume "0"):
-    88                          ;
-    89                          ; 901498-01 -> CODEBASE=0,KEYSCAN=0,KEYBOARD=0,COLUMNS=40,REFRESH=1,BOOTCASE=1,HERTZ=50,REPEATOPT=0   [edit-4-40-n-50Hz]
-    90                          ; 901499-01 -> CODEBASE=0,KEYSCAN=0,KEYBOARD=0,COLUMNS=40,REFRESH=1,BOOTCASE=1,HERTZ=60,REPEATOPT=0   [edit-4-40-n-60Hz]
-    91                          ; 901474-04 -> CODEBASE=1,KEYSCAN=1,KEYBOARD=1,COLUMNS=80,REFRESH=0,BOOTCASE=0,HERTZ=50,REPEATOPT=1   [edit-4-80-b-50Hz]
-    92                          ; 324243-04 -> CODEBASE=2,KEYSCAN=2,KEYBOARD=2,COLUMNS=80,REFRESH=0,BOOTCASE=0,HERTZ=50,REPEATOPT=0   [edit-4-80-din-50Hz] (8296D)
-    93                          ;
-    94                          ; Additional Edit ROMs will be listed as they are tested and verified as byte-exact.
-    95                          ;----------------------------------------------------------------------------------------------------------------------------------------
+    73                          UPET      = 1   ; Is a Micro-PET                0=No, 1=Yes                     For special Reboot
+    74                          
+    75                          MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility.
+    76                          REBOOT    = 0	; Add keyboard reboot? 		0=No, 1=Yes
+    77                          EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes, 2=Yes/OPTROM	Note: Requires BOOT to TEXT mode!
+    78                          SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
+    79                          CRUNCH    = 0   ; Remove unneeded code?		0=No, 1=Yes			Removes NOPs, filler, and unreachable code.
+    80                          BACKARROW = 1   ; Backarrow Hack code?		0=NO, 1=Yes, 2=Yes EXT		Enable Backarrow, and where to put the code.
+    81                          BACKACTION= 0   ; Backarrow Action		0=Text/Graphic, 2=40/80		Which Backarrow Action?
+    82                          INFO      = 0   ; Add project info to code area 0=NO, 1=Yes,2=Yes+FONT		INFO=2 shows character set at top of screen
+    83                          BUGFIX    = 0   ; Correct Known bugs		0=No, 1=Yes			
+    84                          ;
+    85                          DEBUG 	  = 0	; Add debugging			0=No, 1=Yes
+    86                          
+    87                          ;----------------------------------------------------------------------------------------------------------------------------------------
+    88                          ; To generate Edit ROMs that are Byte-exact matches to actual Commodore ROMS set the
+    89                          ; following options (If an option is not listed assume "0"):
+    90                          ;
+    91                          ; 901498-01 -> CODEBASE=0,KEYSCAN=0,KEYBOARD=0,COLUMNS=40,REFRESH=1,BOOTCASE=1,HERTZ=50,REPEATOPT=0   [edit-4-40-n-50Hz]
+    92                          ; 901499-01 -> CODEBASE=0,KEYSCAN=0,KEYBOARD=0,COLUMNS=40,REFRESH=1,BOOTCASE=1,HERTZ=60,REPEATOPT=0   [edit-4-40-n-60Hz]
+    93                          ; 901474-04 -> CODEBASE=1,KEYSCAN=1,KEYBOARD=1,COLUMNS=80,REFRESH=0,BOOTCASE=0,HERTZ=50,REPEATOPT=1   [edit-4-80-b-50Hz]
+    94                          ; 324243-04 -> CODEBASE=2,KEYSCAN=2,KEYBOARD=2,COLUMNS=80,REFRESH=0,BOOTCASE=0,HERTZ=50,REPEATOPT=0   [edit-4-80-din-50Hz] (8296D)
+    95                          ;
+    96                          ; Additional Edit ROMs will be listed as they are tested and verified as byte-exact.
+    97                          ;----------------------------------------------------------------------------------------------------------------------------------------
 
 ; ******** Source: editrom.asm
      8                          						; Include USER-DEFINED variables
@@ -1940,15 +1942,20 @@
    177  e57c eceb03             		CPX XMAX		; Size of Keyboard Buffer
    178  e57f b006               		BCS SCAN_OUT		; Exit if buffer full
    179  e581 9d6f02             		STA KEYD,X		; Put the key into the buffer
-   180  e584 e8                 		INX			; Increment character count
-   181  e585 869e               		STX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
-   182                          
+   180                          !IF BACKARROW=0 {
+   181                          		INX			; Increment character count
+   182                          		STX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
+   183                          } ELSE {
+   184  e584 20e5e7                             JSR TestBackArrow       ; Patch/Hack to use SHIFT-"@" as screen mode toggle (text/graphics)
+   185                          }
+   186                          
+   187  e587 60                 SCAN_OUT	RTS
 
 ; ******** Source: editrom40.asm
-  1012  e587 60                 }		; Graphic Keyboard
+  1012                          }		; Graphic Keyboard
   1013                          !IF KEYSCAN=1 { !SOURCE "keyscan-b.asm" }		; Business Keyboard
   1014                          !IF KEYSCAN=2 { !SOURCE "keyscan-din.asm" }		; German DIN Keyboard
-  1015                          !IF KEYSCAN=3 { !SOURCE "keyscan-c64.asm" }		; C64 Keyboard  (future implementation)
+  1015                          !IF KEYSCAN=3 { !SOURCE "keyscan-c64.asm" }		; C64 Keyboard
   1016                          !IF KEYSCAN=4 { !SOURCE "keyscan-cbm2.asm" }		; CBM2 Keyboard (future implementation)
   1017                          
   1018                          ;*********************************************************************************************************
@@ -2610,6 +2617,7 @@
     10                          }	; Graphic (Normal) Keyboard Scanner - Simple
     11                          !if KEYSCAN=1 { !source "keyboard-tables1.asm" }	; Business Keyboard Scanner - Simple with code for specific shifted keys
     12                          !if KEYSCAN=2 { !source "keyboard-tables2.asm" }	; Extended Keyboard Scanner - Two Tables (Normal and Shifted)
+    13                          !if KEYSCAN=3 { !source "keyboard-tables3.asm" }	; C64 keyboard tables
 
 ; ******** Source: editrom40.asm
   1373                          
@@ -2827,13 +2835,56 @@
   1417                          ;** SMALL PATCHES HERE
   1418                          ;*********************************************************************************************************
   1419                          
-  1420                          !IF BACKARROW = 1 { !SOURCE "editbarrow.asm" }		; Patch for Back Arrow
+
+; ******** Source: editbarrow.asm
+     1                          ; PET/CBM EDIT ROM - BackArrow Hack/Patch
+     2                          ; ================ - Adapted from 8096 edit rom found at World of Commodore 2015
+     3                          ;
+     4                          ; The BACKACTION variable determines which action code is included:
+     5                          ; 0=Toggle Screen Text/Graphic Font
+     6                          ; 1=Toggle 40/80 Column Mode (either soft40 or hardware 40/80)
+     7                          
+     8                          TestBackArrow
+     9                          !IF KEYBOARD=0 {                        ; Graphics keyboard -> "@" as top left key
+    10                                                                  ; Note: scanner clears KEYFLAGS, so can only be seen on bit 7 set
+    11  e7e5 c9c0               		CMP #$c0		; Is it (shifted) "@" key? (top left key)
+    12                          } ELSE {                                ; others use left arrow as top left key
+    13                          		LDY KEYFLAGS		; Is it a Shifted Char?
+    14                          		BEQ TestBAExit		; No, so exit and store key
+    15                          		CMP #$5F		; Is it BackArrow key?
+    16                          }
+    17  e7e7 f004               		BEQ DoBackArrow		; Yes, perform the action then RETURN (do not store key!)
+    18                          
+    19  e7e9 e8                 TestBAExit	INX			; No, Increment character count
+    20  e7ea 869e               		STX CharsInBuffer	; Num Chars in Keyboard Buffer
+    21  e7ec 60                 		RTS
+    22                          
+    23                          ;---------------------------------------- Do the action
+    24                          ; BACKACTION=0 to toggle Text/Graphics mode
+    25                          ; BACKACTION=1 to toggle 40/80 column
+    26                          
+    27                          DoBackArrow:
+    28                          
+    29                          !IF BACKACTION=0 {
+    30  e7ed ad4ce8             		LDA VIA_PCR 		; VIA PCR - Reg#C
+    31  e7f0 4902               		EOR #$02		; toggle bit 1 (graphic/text mode bit)
+    32  e7f2 8d4ce8             		STA VIA_PCR 		; VIA PCR - Reg#C
+    33  e7f5 60                 		RTS
+    34                          }
+    35                          
+    36                          !IF BACKACTION=1 {
+    37                          		JMP SS40_SwapModes	; Swap 40/80 mode
+    38                          }
+
+; ******** Source: editrom40.asm
+  1420                          }		; Patch for Back Arrow
   1421                          
   1422                          ;*********************************************************************************************************
   1423                          ;** FILLER
   1424                          ;*********************************************************************************************************
-  1425  e7e5 aaaaaaaaaaaaaaaa...!FILL $e800-*,$aa	; Fill to end of 2K
+  1425  e7f6 aaaaaaaaaaaaaaaa...!FILL $e800-*,$aa	; Fill to end of 2K
   1426                          ;#########################################################################################################
+  1427                          ;END! DO NOT ADD ANYTHING BELOW THIS LINE!!!!!!!!
 
 ; ******** Source: editrom.asm
     31                          				; 40-column CODEBASE
@@ -2863,9 +2914,10 @@
     55                          		!IF SS40 = 1      { !SOURCE "editsoft40.asm" }
     56                          		!IF BACKARROW = 2 { !SOURCE "editbarrow.asm" }
     57                          		!IF EXECUDESK > 0 { !SOURCE "execudesk.asm" }
-    58                          INFOSTRING	
-    59                          		!IF INFO > 0      { !SOURCE "info.asm" }
-    60                          
-    61                          		!IF OPTROM=0 { !FILL $F000-*,$FF }			; PAD to 4K ##########################
-    62                          	}
-    63                          }
+    58                          		!IF UPET = 1      { !SOURCE "upet.asm" }
+    59                          INFOSTRING	
+    60                          		!IF INFO > 0      { !SOURCE "info.asm" }
+    61                          
+    62                          		!IF OPTROM=0 { !FILL $F000-*,$FF }			; PAD to 4K ##########################
+    63                          	}
+    64                          }

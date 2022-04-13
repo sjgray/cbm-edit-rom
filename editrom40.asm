@@ -785,7 +785,7 @@ COH_CHECK3	CMP #$1D				; Is it <CRSR-LEFT>? (SHIFT-CRSR-RIGHT)
 
 COH_CHECK4	CMP #$13				; Is it <CLR>? (SHIFT-HOME)
 		BNE COH_CHECK5				; No, skip ahead
-		JSR WIN_CLEAR			; Yes, Clear the Screen
+		JSR WIN_CLEAR				; Yes, Clear the Screen
 COH_FINISH	JMP IRQ_EPILOG				; Finish Up
 
 ;[E376]		--------------------------------------- Check for ERASE TO START OF LINE
@@ -1367,7 +1367,7 @@ CSL_LOOP	STA (ScrPtr),Y				; LOOP[    Write SPACE to screen
 		JMP CURSOR_LM				; Cursor to start of line
 
 ;*********************************************************************************************************
-;** Keyboard Decoding Table  [E6D1]
+;** Keyboard Decoding Table  [E???]
 ;*********************************************************************************************************
 
 !SOURCE "keyboard.asm"
@@ -1417,11 +1417,11 @@ POWERSOF2       !byte $80,$40,$20,$10,$08,$04,$02,$01	; BIT table
 ;** SMALL PATCHES HERE
 ;*********************************************************************************************************
 
-!IF BACKARROW = 1 { !SOURCE "editbarrow.asm" }		; Patch for Back Arrow
+!IF BACKARROW >0 { !SOURCE "editbarrow.asm" }		; Patch for Back Arrow
 
 ;*********************************************************************************************************
 ;** FILLER
 ;*********************************************************************************************************
-!FILL $e800-*,$aa	; Fill to end of 2K
+		!FILL $e800-*,$aa	; Fill to end of 2K
 ;#########################################################################################################
 ;END! DO NOT ADD ANYTHING BELOW THIS LINE!!!!!!!!

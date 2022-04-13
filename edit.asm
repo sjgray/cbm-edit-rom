@@ -26,7 +26,7 @@
 ; The following DATE and COMMENT strings will be placed in the IO area (if used).
 ; Take care that comments do not overflow into code space!
 
-!macro DATE      { !pet "2022-04-10" }
+!macro DATE      { !pet "2022-04-12" }
 !macro COMMENT   { !pet "sjg-editrom" }
 
 ;----------------------------------------------------------------------------------------------------------------------------
@@ -77,8 +77,8 @@ REBOOT    = 0	; Add keyboard reboot? 		0=No, 1=Yes
 EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes, 2=Yes/OPTROM	Note: Requires BOOT to TEXT mode!
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
 CRUNCH    = 0   ; Remove unneeded code?		0=No, 1=Yes			Removes NOPs, filler, and unreachable code.
-BACKARROW = 0   ; Backarrow Hack code?		0=NO, 1=Yes, 2=Yes EXT		Where to put the Action Code. Note: B keyboard scanner only.
-BACKACTION= 0   ; Backarrow Action		0=Text/Graphic, 2=40/80		Which Action?
+BACKARROW = 1   ; Backarrow Hack code?		0=NO, 1=Yes, 2=Yes EXT		Enable Backarrow, and where to put the code.
+BACKACTION= 0   ; Backarrow Action		0=Text/Graphic, 2=40/80		Which Backarrow Action?
 INFO      = 0   ; Add project info to code area 0=NO, 1=Yes,2=Yes+FONT		INFO=2 shows character set at top of screen
 BUGFIX    = 0   ; Correct Known bugs		0=No, 1=Yes			
 ;
