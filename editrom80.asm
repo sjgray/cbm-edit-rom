@@ -672,7 +672,7 @@ Be2d0		CMP #$16 				; Is it <Ctrl V>? - Erase to EOL? NOTE: 40-col code has BUG 
 		BNE Be2e0				; No, skip ahead
 
 ;[E2D4]		--------------------------------------- Erase to End of Line
-ERASE_TO_EOL
+
 		LDA #$20				; <SPACE>
 		DEY
 
