@@ -35,6 +35,7 @@
 ; 16  80COL  ANY    OVER "commodore basic 4.0 with custom editor rom"
 ; 17  40COL  ANY    OVER "cbm basic 4 custom editrom"
 ; 18  40COL  ANY    OVER "commodore basic 4.0 *** hard40/80,n"
+; 19  40COL  ANY    OVER "commodore basic 4.0 *** disk boot"
 ; 98  ANY    ANY    ADD  Show DATE and COMMENT for debug purposes
 ; 99  CUSTOM ...    ...  Your own banner text
 ;
@@ -61,6 +62,11 @@
 		!pet "comment: "
 		+COMMENT
 		!byte $0D				
+}
+
+!IF BANNER=19 {	!byte $13
+		!pet "*** commodore basic 4.0 *** disk boot"
+		!byte $0D,$0D,$0D      		; <CR><CR><CR>
 }
 
 !IF BANNER=18 {	!byte $13

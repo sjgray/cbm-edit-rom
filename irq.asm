@@ -101,7 +101,7 @@ Be49e		LDA CAS2				; Tape Motor Interlock #2
 Be4a7		STA VIA_Port_B				; VIA Register 0 (flags)
 Be4aa		JSR SCAN_KEYBOARD			; Scan the keyboard
 
-!IF REBOOT=1 {  JSR CheckReboot }			; Check for soft reset ******* should this go above Be474 ?????????????????
+!IF KEYRESET=1 {  JSR CheckReboot }			; Check for soft reset ******* should this go above Be474 ?????????????????
 
 		JMP IRQ_END				; Return from Interrupt
 

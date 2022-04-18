@@ -99,8 +99,8 @@ SET_REPEAT_MODE
 RESET_EDITOR
 		JSR INIT_EDITOR
 
-!IF BOOTCASE=0 { JSR CRT_SET_TEXT_NEW }			; Set Screen to TEXT mode
-!IF BOOTCASE=1 { JSR CRT_SET_GRAPHICS_NEW }		; Set Screen to GRAPHICS mode
+!IF FONTSET=0	{ JSR CRT_SET_TEXT_NEW }		; Set Screen to TEXT mode
+!IF FONTSET=1	{ JSR CRT_SET_GRAPHICS_NEW }		; Set Screen to GRAPHICS mode
 
 ;*********************************************************************************************************
 ;** WINDOOW_CLEAR  [E051]  (Called from Jump Table)

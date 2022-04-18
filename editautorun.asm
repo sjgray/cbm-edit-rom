@@ -17,7 +17,7 @@ AUTODISPATCH
 		!IF BANNER > 0   { JSR SHOW_BANNER   }		; Display Custom Banner Message
 		!IF WEDGE  > 0   { JSR INSTALL_WEDGE }		; Install DOS Wedge
 		!IF EXECUDESK =2 { JSR EDESKMENU }		; Run Execudesk Menu
-		!IF AUTOBOOT > 0 { JSR DOBOOT }			; Do Disk Boot
+		!IF DISKBOOT > 0 { JSR DOBOOT }			; Do Disk Boot
 		RTS
 
 ERASE_SYS
@@ -85,11 +85,13 @@ ERASE_TXT
 		!byte $91,$91,$91,$91		; <UP><UP><UP><UP>
 		!byte 0
 
-;-------------- Disk Autoboot
+;============================================================================================
+; DISK AUTOBOOT
+;============================================================================================
 ; This puts the SHIFT RUN/STOP code into the keyboard buffer and the system
 ; will take care of the rest!
 
-!IF AUTOBOOT >0 {
+!IF DISKBOOT >0 {
 DOBOOT
 		LDA #$83			; SHIFT RUN/STOP
 		STA KEYD			; First position of Keyboard Input Buffer

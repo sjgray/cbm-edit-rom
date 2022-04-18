@@ -259,10 +259,17 @@ SS40_SP240
 		!SOURCE "screen2v.asm"				; Add the Character RAM table
 		!IF COLOURPET=1 { !SOURCE "screen2c.asm" }	; Add the Colour RAM table
 
-; ------------- For CODEBASE 0 we need to supply a 40-column "Line_Addr_Hi" table
+; ------------- For CODEBASE 0 we need to supply a "Line_Addr_Hi" table
+;
+
+;***************************************************************************
+;** Need to investigate the Line Address HI for Software switchable 40/80 **
+;** and how it integrates into the line linking routines                  ** 
+;***************************************************************************
 
 !IF CODEBASE=0 {
-Line_Addr_Hi	!byte $80,$80,$80,$80,$80,$80,$80,$81,$81,$81
+
+Line_Addr_Hi2	!byte $80,$80,$80,$80,$80,$80,$80,$81,$81,$81
 		!byte $81,$81,$81,$82,$82,$82,$82,$82,$82,$82
 		!byte $83,$83,$83,$83,$83
 !if ROWS>25 {	!byte $83,$84,$84,$84,$84,$84,$84,$85,$85,$85 }

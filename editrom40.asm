@@ -71,8 +71,8 @@ RESET_EDITOR
 		JSR ColourPET_Init			; Initialize ColourPET settings
 }
 
-!IF BOOTCASE=0 { JSR CRT_SET_TEXT }			; Set Screen to TEXT mode
-!IF BOOTCASE=1 { JSR CRT_SET_GRAPHICS }			; Set Screen to GRAPHICS mode
+!IF FONTSET=0	{ JSR CRT_SET_TEXT }			; Set Screen to TEXT mode
+!IF FONTSET=1	{ JSR CRT_SET_GRAPHICS }		; Set Screen to GRAPHICS mode
 
 		JSR BEEP_BEEP 				; Ring BELL
 		JSR BEEP_BEEP 				; Ring BELL
@@ -142,7 +142,9 @@ NOTSUPPORTED	RTS
 ;** Get a KEY from keyboard buffer. Reads a character from 'KEYD' then shifts remaining buffer characters
 ;** If there is NO key it will return $FF.
 ;*********************************************************************************************************
-!FILL $e0a7-*,$aa ; FIXED ENTRY POINT! This must not move! (approx 14 bytes filler for std rom)
+
+		!FILL $e0a7-*,$aa ; FIXED ENTRY POINT! This must not move! (approx 14 bytes filler for std rom)
+
 ;#########################################################################################################
 
 GETKEY
@@ -246,7 +248,9 @@ PL_SKIP 	INY					; last checked was not space so move one forward
 ;** INPUT_CHARACTER [E116] (Called from Jump Table) - FIXED ENTRY POINT!!!!!
 ;** Push X and Y to stack then call Input a Character routine via pointer
 ;*********************************************************************************************************
-!FILL $e116-*,$aa ; FIXED ENTRY POINT! This must not move!
+
+		!FILL $e116-*,$aa ; FIXED ENTRY POINT! This must not move!
+
 ;#########################################################################################################
 
 INPUT_CHARACTER	TYA
@@ -357,7 +361,10 @@ CTS_SKIP2
 		BEQ IRQ_EPILOG
 
 CTS_SKIP3	CPX #ROWS-1				; Last screen line?
-		BNE LINKLINES2				; No, continue
+
+!IF SS40=0 {	BNE LINKLINES2				; No, continue
+} ELSE {	JMP LINKLINES2 }			; No, continue (code has been relocated too far for branching)
+
 		JSR SCROLL_UP				; Yes, Scroll screen and adjust line link
 
 ;*********************************************************************************************************
@@ -383,37 +390,9 @@ IRQE_1		PLA
 ;** IE: two physical lines become one logical line.
 ;** X hold physical line#. Checks ROW to make sure it's not on last line.
 ;*********************************************************************************************************
+; If SS40=0 then we include the code here in it's normal location, otherwise we relocate it to EXT space.
 
-LINKLINES	CPX #ROWS-2				; Check if we are below ROW 23?
-		BCS LL_SKIP				; Yes, skip out
-		LDA LineLinkTable+2,X			; No, safe to link the next line to this one
-		ORA #$80				; Link the line by SETTING the upper bit
-		STA LineLinkTable+2,X			; Store to line link table
-LL_SKIP		RTS
-
-;		--------------------------------------- Convert 40 character line to 80 characters [$E1BE]
-
-LINKLINES2	JSR LINKLINES3				; Adjust line link and move to start of line
-		JMP IRQ_EPILOG				; Finish Up
-
-;		--------------------------------------- Scroll screen UP [$E1C4]
-
-SCROLL_UP	JSR WIN_SCROLL_UP			; Scroll Screen Up
-		DEC InputRow   				; Cursor Y-X Pos. at Start of INPUT
-		DEC CursorRow   			; Current Cursor Physical Line Number
-		LDX CursorRow   			; Current Cursor Physical Line Number
-
-;		------------------------------- Adjust Line Link and Move to start of line [$E1CD]
-
-LINKLINES3	ASL LineLinkTable+1,X 			; Shift to lose HI BIT
-		LSR LineLinkTable+1,X 			; HI BIT is now CLEARED
-		JSR LINKLINES				; Set line link
-		LDA CursorCol   			; Get Cursor Column on Current Line
-		PHA					; Remember column
-		JSR CURSOR_LM				; Cursor to start of line
-		PLA					; Restore column
-		STA CursorCol   			; Store Cursor Column on Current Line
-		RTS
+		!IF SS40=0 {!SOURCE "editrom40link.asm" }
 
 ;*********************************************************************************************************
 ;** CURSOR_TO_EOPL [$E1DE]
@@ -452,7 +431,9 @@ PL_SKIP2	DEX
 ;** $E202 - FIXED ENTRY POINT! Some BASIC/KERNAL rouines bypass the Jump Table and jump directly here
 ;** Output Character to Screen Dispatch 
 ;*********************************************************************************************************
-!FILL $e202-*,$aa ; FIXED ENTRY POINT! This must not move!
+
+		!FILL $e202-*,$aa ; FIXED ENTRY POINT! This must not move!
+
 ;#########################################################################################################
 
 CHROUT_SCREEN	PHA
@@ -553,8 +534,8 @@ COU_SKIP5
 		LDA #$20				; <SPACE>
 		STA (ScrPtr),Y				; Put it on the screen!
 !IF COLOURPET=1 {
-		LDA COLOURV				; Get the current Colour	@@@@@@@@@@@@@@@ ColourPET
-		STA (COLOURPTR),Y			; Put it to Colour MEM		@@@@@@@@@@@@@@@ ColourPET
+		LDA COLOURV				; Get the current Colour		@@@@@@@@@@@@@@@ ColourPET
+		STA (COLOURPTR),Y			; Put it to Colour MEM			@@@@@@@@@@@@@@@ ColourPET
 }
 		BNE COU_SKIP11
 
@@ -804,7 +785,8 @@ COH_CHECK5
 ;*********************************************************************************************************
 
 ESCAPE_P
-ERASE_TO_SOL	LDA #$20				; <SPACE>
+ERASE_TO_SOL
+		LDA #$20				; <SPACE>
 		LDY #0					; Start at Left Margin
 ESOL_LOOP	CPY CursorCol   			; LOOP[  Cursor Column on Current Line
 		BCS COH_FINISH				;   Finish up
@@ -886,63 +868,9 @@ ESCAPE		LDA #0
 ;** WIN_SCROLL_UP / ESCAPE_V  [E3D1] (Called from Jump Table)
 ;** Scrolls entire screen UP. Also scroll up line-link table
 ;*********************************************************************************************************
+; IF SS40=0 then we include the routine here in it's normal location, otherwise relocate it to EXT space.
 
-ESCAPE_V
-WIN_SCROLL_UP
-		LDX #ROWS				; Hard-coded Screen Lines (normally 25)
-		STX CursorRow   			; Current Cursor Physical Line Number
-
-WSU_LOOP1	LDX #$FF
-
-;[E3D7]		--------------------------------------- Set up screen pointers, scroll line link table entry for the current line
-
-WSU_LOOP2	INX					; LOOP[
-		LDA Line_Addr_Lo,X			;   Screen line address table LO
-		STA ScrPtr    				;   Set up Pointer LO for screen scrolling
-		LDA LineLinkTable,X			;   Screen Line Link Table (address table HI)
-		ORA #$80				;   Make sure HI BIT is set
-		STA ScrPtr+1				;   Set up pointer HI for screen scrolling 
-		CPX #ROWS-1				;   Last Line?
-		BCS WSU_SKIP2				;   Yes, so skip ahead to exit loop
-		LDY LineLinkTable+1,X			;   No, so get NEXT Line's Line Link entry
-		BMI WSU_SKIP1				;   is HI BIT set? Yes, leave it as is and skip ahead
-		AND #$7F				;   No, then CLEAR HI BIT
-
-WSU_SKIP1	STA LineLinkTable,X			;   Store it in the CURRENT Line Link entry (IE scroll the high bits UP)
-		TYA
-		ORA #$80				;   Set HI BIT
-		STA SAL+1				;   $C8
-		LDA Line_Addr_Lo+1,X			;   Screen line address table
-		STA SAL    				;   Pointer: Tape Buffer/ Screen Scrolling
-
-;[E3F9]		--------------------------------------- Now we scroll the video screen lines
-
-!IF SS40=0 {	LDY #COLUMNS-1				;   Hard-coded Screen Width
- } ELSE {	LDY SCNWIDTH }				;   Soft Screen Width
-
-WSU_LOOP3	LDA (SAL),Y 				;   LOOP[[  Read character from screen
-		STA (ScrPtr),Y 				;     Write it back
-		DEY					;     Next character
-		BPL WSU_LOOP3				;   ]] Loop back for more
-		BMI WSU_LOOP2				; ] Loop back for more
-
-WSU_SKIP2	STA LineLinkTable,X			; Store to Screen Line Link Table
-
-;[E406]		--------------------------------------- Clear the last screen line
-
-!IF SS40=0 {	LDY #COLUMNS-1				;   Hard-coded Screen Width
-} ELSE {	LDY SCNWIDTH				;   Soft Screen Width
-		DEY }					;   -1
-
-		LDA #$20				; <SPACE>
-
-WSU_LOOP4	STA (ScrPtr),Y 				; LOOP[  Write <SPACE> to the screen
-		DEY					;   Next character
-		BPL WSU_LOOP4				; ] Loop back for more
-
-		DEC CursorRow   			; Current Cursor Physical Line Number
-		LDA LineLinkTable			; Screen Line Link Table / Editor Temps (40 col)
-		BPL WSU_LOOP1				; ] Loop back for more
+		!IF SS40=0 { !SOURCE "editrom40scrollup.asm" }
 
 ;*********************************************************************************************************
 ;** Check Keyboard Scroll Control  [E415]
@@ -996,7 +924,9 @@ ADVANCE_TIMER	JSR UDTIME				; Update System Jiffy Clock. KERNAL routine $FFEA
 ;** The CRTC chip's V-Sync line is fed to a VIA to generate IRQ's. When an IRQ is triggered, the
 ;** Clock is updated, the keyboard scanned, ieee polled and tape monitored.
 ;*********************************************************************************************************
-!FILL $e442-*,$aa ; FIXED ENTRY POINT! This routine must not move!
+
+		!FILL $e442-*,$aa ; FIXED ENTRY POINT! This routine must not move!
+
 ;#########################################################################################################
 
 !SOURCE "irq.asm"
@@ -1417,7 +1347,7 @@ POWERSOF2       !byte $80,$40,$20,$10,$08,$04,$02,$01	; BIT table
 ;** SMALL PATCHES HERE
 ;*********************************************************************************************************
 
-!IF BACKARROW >0 { !SOURCE "editbarrow.asm" }		; Patch for Back Arrow
+!IF BACKARROW =1 { !SOURCE "editbarrow.asm" }		; Patch for Back Arrow
 
 ;*********************************************************************************************************
 ;** FILLER

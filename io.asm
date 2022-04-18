@@ -61,6 +61,7 @@
 	!if REFRESH=90 { !text "8296(d)-n.a." }
 	!if REFRESH=91 { !text "8296(d)-n.a." }
 	!if REFRESH=92 { !text "8296(d)-n.a." }
+	!if REFRESH=98 { !text "special" }
 	!if REFRESH=99 { !text "custom" }
 
 !text " FEATURES="
@@ -69,13 +70,14 @@
 !if BYPASS=1    { !text "+bypass" }
 !if BANNER>0    { !text ",banner" }
 !if WEDGE=1     { !text ",wedge" }
-!if REBOOT=1    { !text ",reboot" }
+!if KEYRESET=1  { !text ",keyreset" }
+!if DISKBOOT=1  { !text ",disk boot" }
 !if EXECUDESK=1 { !text ",execudesk" }
 !if BACKARROW>0 { !text ",backarrow" }
-!if MOT6845=1   { !text ",mot6845" }
 !if SILENT=1    { !text ",silent" }
 !if CRUNCH=1    { !text ",crunch" }
+!if MOT6845=1   { !text ",mot6845" }
 !if DEBUG=1     { !text ",debug" }
 !text ". COMMENT="
 +COMMENT
-!fill $E900-*,$20 
+
