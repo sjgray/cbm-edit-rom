@@ -81,7 +81,7 @@
     70                          
     71                          COLOURVER = 1	; ColourPET Hardware Version	0=Beta,1=Normal/uPET		0=ColourRAM at $8400, 1=$8800 (use for VICE).
     72                          COLOURMODE= 0	; ColourPET Hardware Type	0=Digital, 1=Analog
-    73                          DEFAULTFG = 5	; ColourPET Foreground colour   0 to 15 RGBI 			0=black,1=DkGry,2=DkBlu ,3=LtBlu, 4=DkGrn, 5=Grn,   6=DkCyan,7=LtCyan
+    73                          DEFAULTFG = 2	; ColourPET Foreground colour   0 to 15 RGBI 			0=black,1=DkGry,2=DkBlu ,3=LtBlu, 4=DkGrn, 5=Grn,   6=DkCyan,7=LtCyan
     74                          DEFAULTBG = 2	; ColourPET Background colour   0 to 15 RGBI 			8=DKred,9=LTred,10=DKpur,11=LTpur,12=DkYel,13=LtYel,14=LtGry,15=White
     75                          DEFAULTBO = 2   ; ColourPET Border colour       0 to 15 RGBI
     76                          BYPASSFG  = 5   ; ColourPET Bypass FG     	0 to 15 RGBI			Colours when AUTOSTART is bypassed.
@@ -4650,7 +4650,7 @@
     68  ee23 a900               		LDA #0
     69  ee25 8dde8f             		STA COLOURCOUNT			; Reset Colour Count
     70                          
-    71  ee28 a905               		LDA #DEFAULTFG			; Default Foreground Colour
+    71  ee28 a902               		LDA #DEFAULTFG			; Default Foreground Colour
     72  ee2a 8ddb8f             		STA COLOURFG
     73  ee2d a902               		LDA #DEFAULTBG			; Default Background Colour
     74  ee2f 8ddc8f             		STA COLOURBG

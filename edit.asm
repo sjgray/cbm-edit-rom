@@ -70,7 +70,7 @@ UPET      = 1   ; Is a Ultra-PET/Micro-PET?     0=No, 1=Yes                     
 
 COLOURVER = 1	; ColourPET Hardware Version	0=Beta,1=Normal/uPET		0=ColourRAM at $8400, 1=$8800 (use for VICE).
 COLOURMODE= 0	; ColourPET Hardware Type	0=Digital, 1=Analog
-DEFAULTFG = 5	; ColourPET Foreground colour   0 to 15 RGBI 			0=black,1=DkGry,2=DkBlu ,3=LtBlu, 4=DkGrn, 5=Grn,   6=DkCyan,7=LtCyan
+DEFAULTFG = 2	; ColourPET Foreground colour   0 to 15 RGBI 			0=black,1=DkGry,2=DkBlu ,3=LtBlu, 4=DkGrn, 5=Grn,   6=DkCyan,7=LtCyan
 DEFAULTBG = 2	; ColourPET Background colour   0 to 15 RGBI 			8=DKred,9=LTred,10=DKpur,11=LTpur,12=DkYel,13=LtYel,14=LtGry,15=White
 DEFAULTBO = 2   ; ColourPET Border colour       0 to 15 RGBI
 BYPASSFG  = 5   ; ColourPET Bypass FG     	0 to 15 RGBI			Colours when AUTOSTART is bypassed.
