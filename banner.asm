@@ -22,20 +22,20 @@
 ;  3  80COL  TEXT   OVER "Commodore EDITROM Project - Wedge/ESC/SS40"
 ;  4  ANY    GRAPH  OVER "CBM BASIC 4 WITH WEDGE"
 ;  5  CPET   GRAPH  FULL C65-like screen with colour bars
-;  6  80COL  ANY    OVER "commodore basic 4.0 with wedge/esc/ss40"
-;  7  80COL  ANY    OVER "commodore basic 4.0 with wedge,esc,reboot,40/80 switcher"
-;  8  8296   ANY    OVER "commodore 8296 basic 4.0 with wedge,esc,reboot,80x35 screen"
-;  9  8296   ANY    OVER "commodore 8296 basic 4.0 with wedge,esc,reboot,extended screen"
-; 10  80COL  ANY    OVER "commodore basic 4.0 with wedge,esc,reboot,ss40, execudesk"
-; 11  80COL  ANY    OVER "commodore basic 4.0 with enhanced editor and wedge"
-; 12  40COL  ANY    OVER "cbm basic 4 plus editor+wedge"
-; 13  8296D  ANY    OVER "commodore 8296 basic 4.0 with wedge,reboot, backarrow"
-; 14  8296D  ANY    OVER "commodore 8296 basic 4.0 with custom editor rom"
-; 15  8296D  ANY    OVER "commodore 8296d basic 4.0 with custom editor rom"
-; 16  80COL  ANY    OVER "commodore basic 4.0 with custom editor rom"
-; 17  40COL  ANY    OVER "cbm basic 4 custom editrom"
-; 18  40COL  ANY    OVER "commodore basic 4.0 *** hard40/80,n"
-; 19  40COL  ANY    OVER "commodore basic 4.0 *** disk boot"
+;  6  80COL  ANY    OVER "*** commodore basic 4.0 with wedge/esc/ss40"
+;  7  80COL  ANY    OVER "*** commodore basic 4.0 with wedge,esc,reboot,40/80 switcher"
+;  8  8296   ANY    OVER "*** commodore 8296 basic 4.0 with wedge,esc,reboot,80x35 screen"
+;  9  8296   ANY    OVER "*** commodore 8296 basic 4.0 with wedge,esc,reboot,extended screen"
+; 10  80COL  ANY    OVER "*** commodore basic 4.0 with wedge,esc,reboot,ss40, execudesk"
+; 11  80COL  ANY    OVER "*** commodore basic 4.0 with enhanced editor and wedge"
+; 12  40COL  ANY    OVER "*** cbm basic 4 plus editor+wedge ***"
+; 13  8296D  ANY    OVER "*** commodore 8296 basic 4.0 with wedge,reboot, backarrow ***"
+; 14  8296D  ANY    OVER "*** commodore 8296 basic 4.0 with custom editor rom ***"
+; 15  8296D  ANY    OVER "*** commodore 8296d basic 4.0 with custom editor rom ***"
+; 16  80COL  ANY    OVER "*** commodore basic 4.0 with custom editor rom ***"
+; 17  40COL  ANY    OVER "*** cbm basic 4 custom editrom ***"
+; 18  40COL  ANY    OVER "*** commodore basic 4.0 *** hard40/80,n"
+; 19  40COL  ANY    OVER "*** commodore basic 4.0 *** disk boot"
 ; 98  ANY    ANY    ADD  Show DATE and COMMENT for debug purposes
 ; 99  CUSTOM ...    ...  Your own banner text
 ;
@@ -139,13 +139,19 @@
 ; TIP: Set foreground and background colour to <BLUE> to hide initial banner message
 ;-----------------------------------------------
 !IF BANNER=5 {
-		!byte $5,$1F,$93		; <WHT><BLUE><CLS>
+		!byte $5,$1F,$93,142		; <WHT><BLUE><CLS><GRAPHICS>
 		
 		;-- line 1		
 		!byte $1C,$12			;<RED><RVS>
 		!pet "         "		; bar
 		!byte $92,$E9,$5		; <OFF><diag block><WHT>
+
+!IF UPET=1 {
+		!pet "  the ultra-pet development prototype"
+} ELSE {
 		!pet "  the commodore colourpet"
+}
+
 		!byte $0D			; <CR>
 
 		;-- line 2
@@ -157,7 +163,13 @@
 		!byte $9E,$12			; <YEL><RVS>
 		!pet "     "                    ; bar
 		!byte $92,$E9,$5		; <OFF><diag block><WHT>
+
+!IF UPET=1 {
+		!pet "      by andre fachat"
+} ELSE {
 		!pet "      (c) steve j. gray"
+}
+
 		!byte $0D			; <CR>
 
 		;-- line 4

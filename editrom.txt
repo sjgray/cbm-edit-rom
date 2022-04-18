@@ -34,7 +34,7 @@
     23                          ; The following DATE and COMMENT strings will be placed in the IO area (if used).
     24                          ; Take care that comments do not overflow into code space!
     25                          
-    26                          !macro DATE      { !pet "2022-04-17" }
+    26                          !macro DATE      { !pet "2022-04-18" }
     27                          !macro COMMENT   { !pet "sjg-editrom" }
     28                          
     29                          ;----------------------------------------------------------------------------------------------------------------------------
@@ -50,16 +50,16 @@
     39                          REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
     40                          COLUMNS   = 80	; Screen Width			40,80,90,32 columns		Special cases 32 or 90.
     41                          ROWS      = 25  ; Screen Height			25,35,16 rows			Special cases 16 or 35.
-    42                          HERTZ     = 60	; Line Frequency (Clock):	50=Euro,60=N.America
+    42                          HERTZ     = 50	; Line Frequency (Clock):	50=Euro,60=N.America
     43                          IRQFIX    = 0   ; Fix Jiffy Clock		0=No, 1=Yes			Still needs investigating.
-    44                          FONTSET   = 0	; Initial Screen Font		0=Text/Lower, 1=Upper/Graphics	Generally: 40xx machines=1, 8xxx machines=0
+    44                          FONTSET   = 1	; Initial Screen Font		0=Text/Lower, 1=Upper/Graphics	Generally: 40xx machines=1, 8xxx machines=0
     45                          
     46                          ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
     47                          VIDSWITCH = 0   ; Video Switching               0=No, 1=Yes			Requires ESC Codes! ESC+0 to ESC+9 to Switch CRTC parameters.
     48                          
     49                          AUTORUN   = 1   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner,wedge, or disk boot
     50                          BYPASS    = 0   ; Check for key to bypass 	0=No, 1=Yes			Valid when AUTORUN=1. Hold key on ROW9 to bypass.
-    51                          BANNER    = 19  ; Custom Banner (power on msg)	0=No, N=Banner# (1-19,98,99)    Valid when AUTORUN=1. Refer to docs or source. 99=custom message
+    51                          BANNER    = 5   ; Custom Banner (power on msg)	0=No, N=Banner# (1-19,98,99)    Valid when AUTORUN=1. Refer to docs or source. 99=custom message
     52                          WEDGE     = 1	; DOS Wedge			0=No, 1=Yes			Valid when AUTORUN=1.
     53                          WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes			Valid when AUTORUN=1 and WEDGE>0.
     54                          DISKBOOT  = 0	; Boot first file on disk?	0=No, 1=Yes			Valid when AUTORUN=1.
@@ -79,11 +79,11 @@
     68                          COLOURPET = 1	; ColourPET additions?		0=No, 1=Yes			Requires ESC Codes! ESC+0 to ESC+? to set Colour (unless VIDSWITCH=1).
     69                          UPET      = 1   ; Is a Ultra-PET/Micro-PET?     0=No, 1=Yes                     For special Reboot - Andre Fachat's project
     70                          
-    71                          COLOURVER = 0	; ColourPET Hardware Version	0=Beta,1=Normal/uPET		0=ColourRAM at $8400, 1=$8800 (use for VICE).
+    71                          COLOURVER = 1	; ColourPET Hardware Version	0=Beta,1=Normal/uPET		0=ColourRAM at $8400, 1=$8800 (use for VICE).
     72                          COLOURMODE= 0	; ColourPET Hardware Type	0=Digital, 1=Analog
     73                          DEFAULTFG = 5	; ColourPET Foreground colour   0 to 15 RGBI 			0=black,1=DkGry,2=DkBlu ,3=LtBlu, 4=DkGrn, 5=Grn,   6=DkCyan,7=LtCyan
-    74                          DEFAULTBG = 0	; ColourPET Background colour   0 to 15 RGBI 			8=DKred,9=LTred,10=DKpur,11=LTpur,12=DkYel,13=LtYel,14=LtGry,15=White
-    75                          DEFAULTBO = 0   ; ColourPET Border colour       0 to 15 RGBI
+    74                          DEFAULTBG = 2	; ColourPET Background colour   0 to 15 RGBI 			8=DKred,9=LTred,10=DKpur,11=LTpur,12=DkYel,13=LtYel,14=LtGry,15=White
+    75                          DEFAULTBO = 2   ; ColourPET Border colour       0 to 15 RGBI
     76                          BYPASSFG  = 5   ; ColourPET Bypass FG     	0 to 15 RGBI			Colours when AUTOSTART is bypassed.
     77                          BYPASSBG  = 0   ; ColourPET Bypass BG     	0 to 15 RGBI
     78                          
@@ -717,11 +717,11 @@
     95                          !IF COLOURPET=0 {
     96                          		JSR INIT_EDITOR				; Initialize Editor
     97                          } ELSE {
-    98  e037 20a1ed             		JSR ColourPET_Init			; Initialize ColourPET settings, then INIT_EDITOR
+    98  e037 2020ee             		JSR ColourPET_Init			; Initialize ColourPET settings, then INIT_EDITOR
     99                          }
    100                          
-   101  e03a 2062e0             !IF FONTSET=0	{ JSR CRT_SET_TEXT }			; Set Screen to TEXT mode
-   102                          !IF FONTSET=1	{ JSR CRT_SET_GRAPHICS }			; Set Screen to GRAPHICS mode
+   101                          !IF FONTSET=0	{ JSR CRT_SET_TEXT }			; Set Screen to TEXT mode
+   102  e03a 206ae0             !IF FONTSET=1	{ JSR CRT_SET_GRAPHICS }			; Set Screen to GRAPHICS mode
    103                          
    104                          ;*********************************************************************************************************
    105                          ;** WIN_CLEAR  [E051]  (Called from Jump Table)
@@ -734,7 +734,7 @@
    112  e03f ca                 		DEX					; prep for loop
    113  e040 e8                 WC_LOOP		INX					; LOOP[  Next line
    114  e041 2058e0             		JSR UPDATE_CURSOR_R2			;   was: CURSOR_LM  ; Was: Cursor_BOL
-   115  e044 2058ee             		JSR ERASE_TO_EOL			;   Erase the line
+   115  e044 20d7ee             		JSR ERASE_TO_EOL			;   Erase the line
    116  e047 e4e1               		CPX BotMargin				;   Check if at the last line
    117  e049 90f5               		BCC WC_LOOP				; ] No, go do next line
    118                          
@@ -773,7 +773,7 @@
    151                          
    152                          UPDATE_SCREEN_PTR
    153                          	!IF COLOURPET=1 {
-   154  e05e 20eaed             		JSR ColourPET_SyncPointersX		; Sync Pointers to Current Line
+   154  e05e 2069ee             		JSR ColourPET_SyncPointersX		; Sync Pointers to Current Line
    155                          	} ELSE {
    156                          		!IF SS40=1 {
    157                          			JSR SS40_SyncPointersX		; Update screen pointers based on current screen width
@@ -1099,7 +1099,7 @@
    371                          !IF COLOURPET=0 {
    372                          		JSR RESTORE_CHR_AT_CRSR			; Put character on screen
    373                          } ELSE {
-   374  e185 2070ee             		JSR Put_ColourChar_at_Cursor		; Put character AND Colour on screen
+   374  e185 20efee             		JSR Put_ColourChar_at_Cursor		; Put character AND Colour on screen
    375                          }
    376                          ;		--------------------------------------- Handle screen wrap
    377                          
@@ -1244,7 +1244,7 @@
    516                          ;[PATCH]	--------------------------------------- Check for ESC Character
    517                          
    518                          !IF ESCCODES=1 {
-   519  e216 4c2feb             		JMP CheckESC				; Check for ESC as last Char, then ESC as current Char. If so, perform it.
+   519  e216 4caeeb             		JMP CheckESC				; Check for ESC as last Char, then ESC as current Char. If so, perform it.
    520  e219 85f1               ESC_DONE	STA LASTCHAR				; Save the character
    521                          
    522                          } ELSE {
@@ -1257,7 +1257,7 @@
    529                          ;[E21D]		--------------------------------------- Reload character and check high bit
    530                          
    531  e21b a5d9               CHROUT_CHECK	LDA DATAX				; Current Character to Print
-   532  e21d 2066ed             !IF COLOURPET=1 { JSR CheckColourCodes }		; Check table of color values @@@@@@@@@@@@@@@@ COLOURPET
+   532  e21d 20e5ed             !IF COLOURPET=1 { JSR CheckColourCodes }		; Check table of color values @@@@@@@@@@@@@@@@ COLOURPET
    533  e220 1003               		BPL CHROUT_LO				; Is top bit CLEAR? Yes, handle UNSHIFTED Character
    534  e222 4cf9e2             		JMP CHROUT_HI				; No, Handle SHIFTED Character
    535                          
@@ -1312,7 +1312,7 @@
    584                          		CPY RightMargin				;   Is it at the Right margin?
    585                          		BNE Be251				; ] No, so go back for more
    586                          } ELSE {
-   587  e252 2026ee             		JSR ColourPET_Scroll_Left		; Scroll both Screen and Colour LEFT	@@@@@@@@@@@@@@ ColourPET
+   587  e252 20a5ee             		JSR ColourPET_Scroll_Left		; Scroll both Screen and Colour LEFT	@@@@@@@@@@@@@@ ColourPET
    588                          }
    589                          
    590                          ;[E25C]		--------------------------------------- Entry point for "80240.PRG"
@@ -1320,7 +1320,7 @@
    592  e255 a920               Be25c		LDA #$20 				; <SPACE>
    593  e257 91c4               		STA (ScrPtr),Y				; put it on the screen!
    594                          !IF COLOURPET=1 {
-   595  e259 adda8b             		LDA COLOURV				; Get the current Colour	@@@@@@@@@@@@@@@ ColourPET
+   595  e259 adda8f             		LDA COLOURV				; Get the current Colour	@@@@@@@@@@@@@@@ ColourPET
    596  e25c 91c0               		STA (COLOURPTR),Y			; put it to Colour MEM		@@@@@@@@@@@@@@@ ColourPET
    597                          }
    598  e25e d037               		BNE Be299
@@ -1408,7 +1408,7 @@
    680  e2d6 91c4               		STA (ScrPtr),Y				; Write it to the screen
    681                          !IF COLOURPET=1 {
    682  e2d8 48                 		PHA
-   683  e2d9 adda8b             		LDA COLOURV				; Current Colour		@@@@@@@@@@@@@@ COLOURPET
+   683  e2d9 adda8f             		LDA COLOURV				; Current Colour		@@@@@@@@@@@@@@ COLOURPET
    684  e2dc 91c0               		STA (COLOURPTR),Y			; Write it to Colour RAM	@@@@@@@@@@@@@@ COLOURPET
    685  e2de 68                 		PLA
    686                          }
@@ -1490,7 +1490,7 @@
    762                          		CPY CursorCol
    763                          		BNE INS_LOOP1
    764                          } ELSE {
-   765  e327 2038ee             		JSR ColourPET_Insert
+   765  e327 20b7ee             		JSR ColourPET_Insert
    766                          }
    767  e32a a920               		LDA #$20 				; <SPACE>
    768  e32c 91c4               		STA (ScrPtr),Y				; Write it to the Screen
@@ -1583,7 +1583,7 @@
    855  e397 b0f0               		BCS Be38c				;   Yes, skip ahead
    856  e399 91c4               		STA (ScrPtr),Y				;   No, Write it to the screen
    857                          !IF COLOURPET=1 {
-   858  e39b adda8b             		LDA COLOURV				;   Current Colour
+   858  e39b adda8f             		LDA COLOURV				;   Current Colour
    859  e39e 91c0               		STA (COLOURPTR),Y			;   Write Current Colour to colour RAM
    860                          }
    861  e3a0 c8                 		INY					;   Move to next column
@@ -1650,7 +1650,7 @@
    922                          		JSR SS40_SyncPointers2
    923                          	}
    924                          } ELSE {
-   925  e3d5 2011ee             		JSR ColourPET_SyncPointers2 		; Synchronize Pointers	@@@@@@@@@@@@@@@ COLOURPET
+   925  e3d5 2090ee             		JSR ColourPET_SyncPointers2 		; Synchronize Pointers	@@@@@@@@@@@@@@@ COLOURPET
    926                          }
    927                          
    928  e3d8 c8                 Be3d8		INY
@@ -1659,7 +1659,7 @@
    931                          		LDA (SAL),Y				; Read Character from Screen SOURCE
    932                          		STA (ScrPtr),Y				; Write it to Screen DESTINATION
    933                          } ELSE {
-   934  e3d9 204fee             		JSR ColourPET_Scroll_Dest
+   934  e3d9 20ceee             		JSR ColourPET_Scroll_Dest
    935                          }
    936  e3dc c4d5               		CPY RightMargin
    937  e3de 90f8               		BCC Be3d8
@@ -1689,7 +1689,7 @@
    961                          		JSR SS40_SyncPointers
    962                          	}
    963                          } ELSE {
-   964  e3ed 20fced             		JSR ColourPET_SyncPointers		; Synchronize Pointers	@@@@@@@@@@@@@@@ COLOURPET
+   964  e3ed 207bee             		JSR ColourPET_SyncPointers		; Synchronize Pointers	@@@@@@@@@@@@@@@ COLOURPET
    965                          }
    966                          
    967  e3f0 c8                 Be3f3		INY
@@ -1697,13 +1697,13 @@
    969                          		LDA (SAL),Y				; Read Character from Screen SOURCE
    970                          		STA (ScrPtr),Y				; Write to Screen DESTINATION
    971                          } ELSE {
-   972  e3f1 204fee             		JSR ColourPET_Scroll_Dest		; Scroll Character and Colour RAM	
+   972  e3f1 20ceee             		JSR ColourPET_Scroll_Dest		; Scroll Character and Colour RAM	
    973                          }
    974  e3f4 c4d5               		CPY RightMargin
    975  e3f6 90f8               		BCC Be3f3
    976  e3f8 b0eb               		BCS Be3e6
    977                          
-   978  e3fa 2058ee             Be3fe		JSR ERASE_TO_EOL			; Clear the bottom line
+   978  e3fa 20d7ee             Be3fe		JSR ERASE_TO_EOL			; Clear the bottom line
    979                          
    980                          ;*********************************************************************************************************
    981                          ;** Check Keyboard Scroll Control E40B]
@@ -1898,7 +1898,7 @@
    101  e4af 8d40e8             Be4a7		STA VIA_Port_B				; VIA Register 0 (flags)
    102  e4b2 20bbe4             Be4aa		JSR SCAN_KEYBOARD			; Scan the keyboard
    103                          
-   104  e4b5 20a4ee             !IF KEYRESET=1 {  JSR CheckReboot }			; Check for soft reset ******* should this go above Be474 ?????????????????
+   104  e4b5 2023ef             !IF KEYRESET=1 {  JSR CheckReboot }			; Check for soft reset ******* should this go above Be474 ?????????????????
    105                          
    106  e4b8 4c00e6             		JMP IRQ_END				; Return from Interrupt
    107                          
@@ -2068,7 +2068,7 @@
    148                          
    149                          SCAN_NORM
    150                          
-   151  e560 4c23ed             !IF ESCCODES=1 { JMP EUROSWAP }		; Check if Eurokeys need swapping
+   151  e560 4ca2ed             !IF ESCCODES=1 { JMP EUROSWAP }		; Check if Eurokeys need swapping
    152                          
    153  e563 a69e               SCAN_NORM2	LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
    154  e565 e4e3               		CPX XMAX		; Size of Keyboard Buffer
@@ -3095,13 +3095,13 @@
     12                          
     13                          !IF COLOURPET = 1 {
     14  e827 20434f4c4f555250...	!text " COLOURPET-"
-    15  e832 62657461           	!if COLOURVER=0 { !text "beta" }
-    16                          	!if COLOURVER=1 { !text "release" }
+    15                          	!if COLOURVER=0 { !text "beta" }
+    16  e832 72656c65617365     	!if COLOURVER=1 { !text "release" }
     17                          }
     18                          
-    19  e836 204b4559424f4152...!text " KEYBOARD="
+    19  e839 204b4559424f4152...!text " KEYBOARD="
     20                          	!if KEYBOARD= 0 { !text "n-qwerty" }
-    21  e840 622d717765727479   	!if KEYBOARD= 1 { !text "b-qwerty" }	; QWERTY layout
+    21  e843 622d717765727479   	!if KEYBOARD= 1 { !text "b-qwerty" }	; QWERTY layout
     22                          	!if KEYBOARD= 2 { !text "din" }
     23                          	!if KEYBOARD= 3 { !text "c64/vic" }
     24                          	!if KEYBOARD= 4 { !text "b-sjg" }	; Modified layout - cursor keys, esc etc
@@ -3112,13 +3112,13 @@
     29                          	!if KEYBOARD= 9 { !text "n-sjg2" }	; Modified layout - backarrow replaced with ESC
     30                          	!if KEYBOARD=11 { !text "ted" }		; TED series (C16,C116,Plus/4 etc)
     31                          
-    32  e848 2053435245454e3d   !text " SCREEN="
+    32  e84b 2053435245454e3d   !text " SCREEN="
     33                          	!if COLUMNS=32  { !text "32" }
     34                          	!if COLUMNS=40  { !text "40" }
-    35  e850 3830               	!if COLUMNS=80  { !text "80" }
+    35  e853 3830               	!if COLUMNS=80  { !text "80" }
     36                          	!if COLUMNS=90  { !text "90" }
     37                          	!if ROWS=16     { !text "x16" }
-    38  e852 783235             	!if ROWS=25     { !text "x25" }
+    38  e855 783235             	!if ROWS=25     { !text "x25" }
     39                          	!if ROWS=32     { !text "x32" }
     40                          	!if ROWS=35     { !text "x35" }
     41                          	!if SOFT40=1    { !text " (soft40)" }
@@ -3129,13 +3129,13 @@
     46                          		!if SS40MODE=80 { !text "80)" }
     47                          	}
     48                          
-    49  e855 20484552545a3d     !text " HERTZ="
-    50                          	!if HERTZ=50 { !text "50" }
-    51  e85c 3630               	!if HERTZ=60 { !text "60" }
+    49  e858 20484552545a3d     !text " HERTZ="
+    50  e85f 3530               	!if HERTZ=50 { !text "50" }
+    51                          	!if HERTZ=60 { !text "60" }
     52                          
-    53  e85e 2052454652455348...!text " REFRESH="
+    53  e861 2052454652455348...!text " REFRESH="
     54                          	!if REFRESH= 0 { !text "euro" }
-    55  e867 6e2e616d65726963...	!if REFRESH= 1 { !text "n.america" }
+    55  e86a 6e2e616d65726963...	!if REFRESH= 1 { !text "n.america" }
     56                          	!if REFRESH= 2 { !text "pal" }
     57                          	!if REFRESH= 3 { !text "ntsc" }
     58                          	!if REFRESH= 4 { !text "9inch" }
@@ -3147,27 +3147,27 @@
     64                          	!if REFRESH=98 { !text "special" }
     65                          	!if REFRESH=99 { !text "custom" }
     66                          
-    67  e870 2046454154555245...!text " FEATURES="
-    68  e87a 6573632d636f6465...!if ESCCODES=1  { !text "esc-codes" }
-    69  e883 2c6175746f72756e   !if AUTORUN=1   { !text ",autorun" }
+    67  e873 2046454154555245...!text " FEATURES="
+    68  e87d 6573632d636f6465...!if ESCCODES=1  { !text "esc-codes" }
+    69  e886 2c6175746f72756e   !if AUTORUN=1   { !text ",autorun" }
     70                          !if BYPASS=1    { !text "+bypass" }
-    71  e88b 2c62616e6e6572     !if BANNER>0    { !text ",banner" }
-    72  e892 2c7765646765       !if WEDGE=1     { !text ",wedge" }
-    73  e898 2c6b657972657365...!if KEYRESET=1  { !text ",keyreset" }
+    71  e88e 2c62616e6e6572     !if BANNER>0    { !text ",banner" }
+    72  e895 2c7765646765       !if WEDGE=1     { !text ",wedge" }
+    73  e89b 2c6b657972657365...!if KEYRESET=1  { !text ",keyreset" }
     74                          !if DISKBOOT=1  { !text ",disk boot" }
     75                          !if EXECUDESK=1 { !text ",execudesk" }
-    76  e8a1 2c6261636b617272...!if BACKARROW>0 { !text ",backarrow" }
+    76  e8a4 2c6261636b617272...!if BACKARROW>0 { !text ",backarrow" }
     77                          !if SILENT=1    { !text ",silent" }
-    78  e8ab 2c6372756e6368     !if CRUNCH=1    { !text ",crunch" }
+    78  e8ae 2c6372756e6368     !if CRUNCH=1    { !text ",crunch" }
     79                          !if MOT6845=1   { !text ",mot6845" }
     80                          !if DEBUG=1     { !text ",debug" }
-    81  e8b2 2e20434f4d4d454e...!text ". COMMENT="
-    82  e8bc 534a472d45444954...+COMMENT
+    81  e8b5 2e20434f4d4d454e...!text ". COMMENT="
+    82  e8bf 534a472d45444954...+COMMENT
     83                          
 
 ; ******** Source: editrom.asm
     64                          					; Filler not visible due to I/O space!
-    65  e8c7 2020202020202020...	!fill $E900-*,$20 
+    65  e8ca 2020202020202020...	!fill $E900-*,$20 
     66                          
     67                          ;=======================================================================
     68                          ; CODEBASE 2 Code
@@ -3215,7 +3215,7 @@
     15                          AUTODISPATCH
     16  e900 200ae9             		JSR ERASE_SYS
     17  e903 204ce9             		!IF BANNER > 0   { JSR SHOW_BANNER   }		; Display Custom Banner Message
-    18  e906 207fe9             		!IF WEDGE  > 0   { JSR INSTALL_WEDGE }		; Install DOS Wedge
+    18  e906 20fee9             		!IF WEDGE  > 0   { JSR INSTALL_WEDGE }		; Install DOS Wedge
     19                          		!IF EXECUDESK =2 { JSR EDESKMENU }		; Run Execudesk Menu
     20                          		!IF DISKBOOT > 0 { JSR DOBOOT }			; Do Disk Boot
     21  e909 60                 		RTS
@@ -3356,20 +3356,20 @@
     22                          ;  3  80COL  TEXT   OVER "Commodore EDITROM Project - Wedge/ESC/SS40"
     23                          ;  4  ANY    GRAPH  OVER "CBM BASIC 4 WITH WEDGE"
     24                          ;  5  CPET   GRAPH  FULL C65-like screen with colour bars
-    25                          ;  6  80COL  ANY    OVER "commodore basic 4.0 with wedge/esc/ss40"
-    26                          ;  7  80COL  ANY    OVER "commodore basic 4.0 with wedge,esc,reboot,40/80 switcher"
-    27                          ;  8  8296   ANY    OVER "commodore 8296 basic 4.0 with wedge,esc,reboot,80x35 screen"
-    28                          ;  9  8296   ANY    OVER "commodore 8296 basic 4.0 with wedge,esc,reboot,extended screen"
-    29                          ; 10  80COL  ANY    OVER "commodore basic 4.0 with wedge,esc,reboot,ss40, execudesk"
-    30                          ; 11  80COL  ANY    OVER "commodore basic 4.0 with enhanced editor and wedge"
-    31                          ; 12  40COL  ANY    OVER "cbm basic 4 plus editor+wedge"
-    32                          ; 13  8296D  ANY    OVER "commodore 8296 basic 4.0 with wedge,reboot, backarrow"
-    33                          ; 14  8296D  ANY    OVER "commodore 8296 basic 4.0 with custom editor rom"
-    34                          ; 15  8296D  ANY    OVER "commodore 8296d basic 4.0 with custom editor rom"
-    35                          ; 16  80COL  ANY    OVER "commodore basic 4.0 with custom editor rom"
-    36                          ; 17  40COL  ANY    OVER "cbm basic 4 custom editrom"
-    37                          ; 18  40COL  ANY    OVER "commodore basic 4.0 *** hard40/80,n"
-    38                          ; 19  40COL  ANY    OVER "commodore basic 4.0 *** disk boot"
+    25                          ;  6  80COL  ANY    OVER "*** commodore basic 4.0 with wedge/esc/ss40"
+    26                          ;  7  80COL  ANY    OVER "*** commodore basic 4.0 with wedge,esc,reboot,40/80 switcher"
+    27                          ;  8  8296   ANY    OVER "*** commodore 8296 basic 4.0 with wedge,esc,reboot,80x35 screen"
+    28                          ;  9  8296   ANY    OVER "*** commodore 8296 basic 4.0 with wedge,esc,reboot,extended screen"
+    29                          ; 10  80COL  ANY    OVER "*** commodore basic 4.0 with wedge,esc,reboot,ss40, execudesk"
+    30                          ; 11  80COL  ANY    OVER "*** commodore basic 4.0 with enhanced editor and wedge"
+    31                          ; 12  40COL  ANY    OVER "*** cbm basic 4 plus editor+wedge ***"
+    32                          ; 13  8296D  ANY    OVER "*** commodore 8296 basic 4.0 with wedge,reboot, backarrow ***"
+    33                          ; 14  8296D  ANY    OVER "*** commodore 8296 basic 4.0 with custom editor rom ***"
+    34                          ; 15  8296D  ANY    OVER "*** commodore 8296d basic 4.0 with custom editor rom ***"
+    35                          ; 16  80COL  ANY    OVER "*** commodore basic 4.0 with custom editor rom ***"
+    36                          ; 17  40COL  ANY    OVER "*** cbm basic 4 custom editrom ***"
+    37                          ; 18  40COL  ANY    OVER "*** commodore basic 4.0 *** hard40/80,n"
+    38                          ; 19  40COL  ANY    OVER "*** commodore basic 4.0 *** disk boot"
     39                          ; 98  ANY    ANY    ADD  Show DATE and COMMENT for debug purposes
     40                          ; 99  CUSTOM ...    ...  Your own banner text
     41                          ;
@@ -3398,9 +3398,9 @@
     64                          		!byte $0D				
     65                          }
     66                          
-    67  e954 13                 !IF BANNER=19 {	!byte $13
-    68  e955 2a2a2a20434f4d4d...		!pet "*** commodore basic 4.0 *** disk boot"
-    69  e97a 0d0d0d             		!byte $0D,$0D,$0D      		; <CR><CR><CR>
+    67                          !IF BANNER=19 {	!byte $13
+    68                          		!pet "*** commodore basic 4.0 *** disk boot"
+    69                          		!byte $0D,$0D,$0D      		; <CR><CR><CR>
     70                          }
     71                          
     72                          !IF BANNER=18 {	!byte $13
@@ -3473,106 +3473,118 @@
    139                          ; TIP: Set foreground and background colour to <BLUE> to hide initial banner message
    140                          ;-----------------------------------------------
    141                          !IF BANNER=5 {
-   142                          		!byte $5,$1F,$93		; <WHT><BLUE><CLS>
+   142  e954 051f938e           		!byte $5,$1F,$93,142		; <WHT><BLUE><CLS><GRAPHICS>
    143                          		
    144                          		;-- line 1		
-   145                          		!byte $1C,$12			;<RED><RVS>
-   146                          		!pet "         "		; bar
-   147                          		!byte $92,$E9,$5		; <OFF><diag block><WHT>
-   148                          		!pet "  the commodore colourpet"
-   149                          		!byte $0D			; <CR>
-   150                          
-   151                          		;-- line 2
-   152                          		!byte $96,$12			; <LT RED><RVS>
-   153                          		!pet "       "			; bar
-   154                          		!byte $92,$E9,$0D		; <OFF><diag block><CR>
-   155                          
-   156                          		;-- line 3
-   157                          		!byte $9E,$12			; <YEL><RVS>
-   158                          		!pet "     "                    ; bar
-   159                          		!byte $92,$E9,$5		; <OFF><diag block><WHT>
-   160                          		!pet "      (c) steve j. gray"
-   161                          		!byte $0D			; <CR>
-   162                          
-   163                          		;-- line 4
-   164                          		!byte $99,$12			; <LT GRN><RVS>
-   165                          		!pet "   "			; bar
-   166                          		!byte $92,$E9,$5		; <OFF><diag block><WHT>
-   167                          		!pet "        basic 4.0  31743 bytes free"
-   168                          		!byte $0D
-   169                          
-   170                          		;-- line 5,6
-   171                          		!byte $0D
-   172                          		!pet "mod keyboard and wedge"
-   173                          		!byte $0D				
-   174                          }
-   175                          
-   176                          ;-----------------------------------------------
-   177                          ; Custom 4032 - For GRAPHICS MODE startup screen
-   178                          ;-----------------------------------------------
-   179                          
-   180                          !if BANNER=4 {	!byte $13            		; <HOME> 
-   181                                   	!pet "*** CBM BASIC 4 WITH WEDGE ***"
-   182                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
-   183                          }
-   184                          
-   185                          ;-----------------------------------------------
-   186                          ; Custom 8032 - For TEXT MODE startup screen
-   187                          ;-----------------------------------------------
-   188                          
-   189                          !if BANNER=3 {	!byte $13            		; <HOME> 
-   190                                   	!pet "*** Commodore EDITROM Project - Wedge/ESC/SS40 ***"
-   191                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
-   192                          }
-   193                          
-   194                          ;-----------------------------------------------
-   195                          ; Custom ColourPET message courtesy Christian Dirks - For GRAPHICS MODE startup screen
-   196                          ;-----------------------------------------------
-   197                          
-   198                          !if BANNER=2 {	!byte $13,$99          		; <HOME><GRN>
-   199                                   	!pet "*** "
-   200                                   	!byte $1c            		; <RED>
-   201                                   	!pet "co"
-   202                                   	!byte $99            		; <GRN>
-   203                                   	!pet "lo"
-   204                                   	!byte $9a            		; <BLU>
-   205                                   	!pet "ur"
-   206                                   	!byte $9e            		; <YEL>
-   207                                   	!pet "pet"
-   208                                   	!byte $99            		; <GRN>
-   209                                   	!pet " basic 4.0 + wedge ***"   ; message
-   210                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
-   211                          }
-   212                          
-   213                          ;-----------------------------------------------
-   214                          ; Custom ColourPET message for TEXT MODE startup screen
-   215                          ;-----------------------------------------------
-   216                          
-   217                          !if BANNER=1 {	!byte $93,$5			; <CLS><WHT>
-   218                          		!pet "*** "
-   219                          		!byte $9f			; <LTCYN>
-   220                          		!pet "Commodore "
-   221                          		!byte $1c			; <RED>
-   222                          		!pet "Co"
-   223                          		!byte $99			; <GRN>
-   224                          		!pet "lo"
-   225                          		!byte $9a			; <BLU>
-   226                          		!pet "ur"
-   227                          		!byte $9e			; <YEL>
-   228                          		!pet "PET"
-   229                          		!byte $05			; <WHT>
-   230                          		!pet " ***"
-   231                          		!byte 11,11
-   232                          		!byte $0D			; <cr>
-   233                          }
-   234                          
-   235                          ;-----------------------------------------------
-   236                          ; Unspecified values
-   237                          ;-----------------------------------------------
-   238                          
+   145  e958 1c12               		!byte $1C,$12			;<RED><RVS>
+   146  e95a 2020202020202020...		!pet "         "		; bar
+   147  e963 92e905             		!byte $92,$E9,$5		; <OFF><diag block><WHT>
+   148                          
+   149                          !IF UPET=1 {
+   150  e966 202054484520554c...		!pet "  the ultra-pet development prototype"
+   151                          } ELSE {
+   152                          		!pet "  the commodore colourpet"
+   153                          }
+   154                          
+   155  e98b 0d                 		!byte $0D			; <CR>
+   156                          
+   157                          		;-- line 2
+   158  e98c 9612               		!byte $96,$12			; <LT RED><RVS>
+   159  e98e 20202020202020     		!pet "       "			; bar
+   160  e995 92e90d             		!byte $92,$E9,$0D		; <OFF><diag block><CR>
+   161                          
+   162                          		;-- line 3
+   163  e998 9e12               		!byte $9E,$12			; <YEL><RVS>
+   164  e99a 2020202020         		!pet "     "                    ; bar
+   165  e99f 92e905             		!byte $92,$E9,$5		; <OFF><diag block><WHT>
+   166                          
+   167                          !IF UPET=1 {
+   168  e9a2 2020202020204259...		!pet "      by andre fachat"
+   169                          } ELSE {
+   170                          		!pet "      (c) steve j. gray"
+   171                          }
+   172                          
+   173  e9b7 0d                 		!byte $0D			; <CR>
+   174                          
+   175                          		;-- line 4
+   176  e9b8 9912               		!byte $99,$12			; <LT GRN><RVS>
+   177  e9ba 202020             		!pet "   "			; bar
+   178  e9bd 92e905             		!byte $92,$E9,$5		; <OFF><diag block><WHT>
+   179  e9c0 2020202020202020...		!pet "        basic 4.0  31743 bytes free"
+   180  e9e3 0d                 		!byte $0D
+   181                          
+   182                          		;-- line 5,6
+   183  e9e4 0d                 		!byte $0D
+   184  e9e5 4d4f44204b455942...		!pet "mod keyboard and wedge"
+   185  e9fb 0d                 		!byte $0D				
+   186                          }
+   187                          
+   188                          ;-----------------------------------------------
+   189                          ; Custom 4032 - For GRAPHICS MODE startup screen
+   190                          ;-----------------------------------------------
+   191                          
+   192                          !if BANNER=4 {	!byte $13            		; <HOME> 
+   193                                   	!pet "*** CBM BASIC 4 WITH WEDGE ***"
+   194                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   195                          }
+   196                          
+   197                          ;-----------------------------------------------
+   198                          ; Custom 8032 - For TEXT MODE startup screen
+   199                          ;-----------------------------------------------
+   200                          
+   201                          !if BANNER=3 {	!byte $13            		; <HOME> 
+   202                                   	!pet "*** Commodore EDITROM Project - Wedge/ESC/SS40 ***"
+   203                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   204                          }
+   205                          
+   206                          ;-----------------------------------------------
+   207                          ; Custom ColourPET message courtesy Christian Dirks - For GRAPHICS MODE startup screen
+   208                          ;-----------------------------------------------
+   209                          
+   210                          !if BANNER=2 {	!byte $13,$99          		; <HOME><GRN>
+   211                                   	!pet "*** "
+   212                                   	!byte $1c            		; <RED>
+   213                                   	!pet "co"
+   214                                   	!byte $99            		; <GRN>
+   215                                   	!pet "lo"
+   216                                   	!byte $9a            		; <BLU>
+   217                                   	!pet "ur"
+   218                                   	!byte $9e            		; <YEL>
+   219                                   	!pet "pet"
+   220                                   	!byte $99            		; <GRN>
+   221                                   	!pet " basic 4.0 + wedge ***"   ; message
+   222                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   223                          }
+   224                          
+   225                          ;-----------------------------------------------
+   226                          ; Custom ColourPET message for TEXT MODE startup screen
+   227                          ;-----------------------------------------------
+   228                          
+   229                          !if BANNER=1 {	!byte $93,$5			; <CLS><WHT>
+   230                          		!pet "*** "
+   231                          		!byte $9f			; <LTCYN>
+   232                          		!pet "Commodore "
+   233                          		!byte $1c			; <RED>
+   234                          		!pet "Co"
+   235                          		!byte $99			; <GRN>
+   236                          		!pet "lo"
+   237                          		!byte $9a			; <BLU>
+   238                          		!pet "ur"
+   239                          		!byte $9e			; <YEL>
+   240                          		!pet "PET"
+   241                          		!byte $05			; <WHT>
+   242                          		!pet " ***"
+   243                          		!byte 11,11
+   244                          		!byte $0D			; <cr>
+   245                          }
+   246                          
+   247                          ;-----------------------------------------------
+   248                          ; Unspecified values
+   249                          ;-----------------------------------------------
+   250                          
 
 ; ******** Source: editbanner.asm
-    27  e97d 0000               
+    27  e9fc 0000               
     28                          
     29                          
 
@@ -3619,22 +3631,22 @@
     37                          ; This patches the CHRGET routine in Zero Page to point to the WEDGE interpreter
     38                          
     39                          INSTALL_WEDGE
-    40  e97f a990               		lda #<resident_wedge		; patch CHRGET JMP address
-    41  e981 8571               		sta CHRGET+1 			; to jump into wedge
-    42  e983 a9e9               		lda #>resident_wedge
-    43  e985 8572               		sta CHRGET+2
-    44  e987 a94c               		lda #$4c			; insert JMP command in CHRGET routine
-    45  e989 8570               		sta CHRGET
+    40  e9fe a90f               		lda #<resident_wedge		; patch CHRGET JMP address
+    41  ea00 8571               		sta CHRGET+1 			; to jump into wedge
+    42  ea02 a9ea               		lda #>resident_wedge
+    43  ea04 8572               		sta CHRGET+2
+    44  ea06 a94c               		lda #$4c			; insert JMP command in CHRGET routine
+    45  ea08 8570               		sta CHRGET
     46                          
-    47  e98b a908               		lda #8				; init default device
-    48  e98d 8573               		sta CHRGETX			; $73=unused byte in CHRGET
+    47  ea0a a908               		lda #8				; init default device
+    48  ea0c 8573               		sta CHRGETX			; $73=unused byte in CHRGET
     49                          
     50                          !if WEDGEMSG=1 {
     51                          		lda #<WEDGESTRING		; write "wedge installed"
     52                          		ldy #>WEDGESTRING
     53                          		jsr STROUTZ
     54                          }	
-    55  e98f 60                 		rts				; exit to BASIC
+    55  ea0e 60                 		rts				; exit to BASIC
     56                          
     57                          ;-------------- MESSAGE
     58                          WEDGESTRING
@@ -3650,75 +3662,75 @@
     68                          		wedge_unit = CHRGETX		; default device, unused byte in CHRGET
     69                          		wedge_char = SAVELA		; $B3 -0 if @># else load/run char / ^
     70                          
-    71  e990 e677               		inc TXTPTR			; increment text pointer 
-    72  e992 d002               		bne MAIN2
-    73  e994 e678               		inc TXTPTR + 1
+    71  ea0f e677               		inc TXTPTR			; increment text pointer 
+    72  ea11 d002               		bne MAIN2
+    73  ea13 e678               		inc TXTPTR + 1
     74                          MAIN2 
     75                          
     76                          ; if MAINS is stacked, CHRGET is called from direct mode. abort if not called from there
     77                          
-    78  e996 86b3               		stx wedge_char			; save X
-    79  e998 ba                 		tsx 
-    80  e999 bd0101             		lda STACK+1,x
-    81  e99c c90f               		cmp #<MAINS
-    82  e99e d037               		bne restabort
-    83  e9a0 bd0201             		lda STACK+2,x
-    84  e9a3 c9b4               		cmp #>MAINS
-    85  e9a5 d030               		bne restabort			; abort if textpointer doesn't point to $0200
+    78  ea15 86b3               		stx wedge_char			; save X
+    79  ea17 ba                 		tsx 
+    80  ea18 bd0101             		lda STACK+1,x
+    81  ea1b c90f               		cmp #<MAINS
+    82  ea1d d037               		bne restabort
+    83  ea1f bd0201             		lda STACK+2,x
+    84  ea22 c9b4               		cmp #>MAINS
+    85  ea24 d030               		bne restabort			; abort if textpointer doesn't point to $0200
     86                          
-    87  e9a7 a577               		lda TXTPTR
-    88  e9a9 d02e               		bne abort
-    89  e9ab a578               		lda TXTPTR + 1
-    90  e9ad c902               		cmp #2
-    91  e9af d028               		bne abort
+    87  ea26 a577               		lda TXTPTR
+    88  ea28 d02e               		bne abort
+    89  ea2a a578               		lda TXTPTR + 1
+    90  ea2c c902               		cmp #2
+    91  ea2e d028               		bne abort
     92                          
-    93  e9b1 a000               		ldy #0				; NUL when @>#
-    94  e9b3 84b3               		sty wedge_char			; else load/run character /^
+    93  ea30 a000               		ldy #0				; NUL when @>#
+    94  ea32 84b3               		sty wedge_char			; else load/run character /^
     95                          
-    96  e9b5 b177               testchar	lda (TXTPTR),y
-    97  e9b7 c920               		cmp #32				; skip leading spaces
-    98  e9b9 d004               		bne nospace
-    99  e9bb e677               		inc TXTPTR
-   100  e9bd d0f6               		bne testchar
+    96  ea34 b177               testchar	lda (TXTPTR),y
+    97  ea36 c920               		cmp #32				; skip leading spaces
+    98  ea38 d004               		bne nospace
+    99  ea3a e677               		inc TXTPTR
+   100  ea3c d0f6               		bne testchar
    101                          
-   102  e9bf c93e               nospace		cmp #$3e			; '>'
-   103  e9c1 f019               		beq command_or_status
-   104  e9c3 c940               		cmp #$40			; '@'
-   105  e9c5 f015               		beq command_or_status
-   106  e9c7 c923               		cmp #$23			; '#'
-   107  e9c9 f01c               		beq default_device
-   108  e9cb 85b3               		sta wedge_char			; save load/run character
-   109  e9cd c92f               		cmp #$2f			; '/'
-   110  e9cf f057               		beq to_prepare_fn
-   111  e9d1 c95e               		cmp #$5e			; '^'
-   112  e9d3 f053               		beq to_prepare_fn
-   113  e9d5 d002               		bne abort
+   102  ea3e c93e               nospace		cmp #$3e			; '>'
+   103  ea40 f019               		beq command_or_status
+   104  ea42 c940               		cmp #$40			; '@'
+   105  ea44 f015               		beq command_or_status
+   106  ea46 c923               		cmp #$23			; '#'
+   107  ea48 f01c               		beq default_device
+   108  ea4a 85b3               		sta wedge_char			; save load/run character
+   109  ea4c c92f               		cmp #$2f			; '/'
+   110  ea4e f057               		beq to_prepare_fn
+   111  ea50 c95e               		cmp #$5e			; '^'
+   112  ea52 f053               		beq to_prepare_fn
+   113  ea54 d002               		bne abort
    114                          
-   115  e9d7 a6b3               restabort	ldx wedge_char			; restore X
-   116  e9d9 4c7600             abort		jmp CHRGOT
+   115  ea56 a6b3               restabort	ldx wedge_char			; restore X
+   116  ea58 4c7600             abort		jmp CHRGOT
    117                          
    118                          ;-------------- COMMAND OR STATUS
    119                          
    120                          command_or_status
-   121  e9dc c8                 		iny 
-   122  e9dd b177               		lda (TXTPTR),y
-   123  e9df f049               		beq get_status
-   124  e9e1 c924               		cmp #'$'			; '$'
-   125  e9e3 f06b               		beq prepare_fn
-   126  e9e5 d01d               		bne send_cmd
+   121  ea5b c8                 		iny 
+   122  ea5c b177               		lda (TXTPTR),y
+   123  ea5e f049               		beq get_status
+   124  ea60 c924               		cmp #'$'			; '$'
+   125  ea62 f06b               		beq prepare_fn
+   126  ea64 d01d               		bne send_cmd
    127                          
    128                          ;-------------- SET DEVICE
    129                          
    130                          default_device
-   131  e9e7 e677               		inc TXTPTR
-   132  e9e9 b177               		lda (TXTPTR),y			; Y is still 0
-   133  e9eb d00c               		bne set_device			; parameter given -> set device number
+   131  ea66 e677               		inc TXTPTR
+   132  ea68 b177               		lda (TXTPTR),y			; Y is still 0
+   133  ea6a d00c               		bne set_device			; parameter given -> set device number
    134                          
-   135  e9ed a673               		ldx wedge_unit			; show current device number
-   136  e9ef 98                 		tya
-   137  e9f0 2083cf             		jsr INTOUT
-   138  e9f3 2034d5             		jsr CRLF
-   139  e9f6 4cffb3             		jmp READY
+   135  ea6c a673               		ldx wedge_unit			; show current device number
+   136  ea6e 98                 		tya
+   137  ea6f 2083cf             		jsr INTOUT
+   138  ea72 2034d5             		jsr CRLF
+   139  ea75 4cffb3             		jmp READY
    140                          
    141                          set_device
    142                          		; prerequsites for RDINT: 
@@ -3726,201 +3738,201 @@
    144                          		; - A contains that first char
    145                          		; - Carry is cleared
    146                          
-   147  e9f9 18                 		clc
-   148  e9fa 20f6b8             		jsr RDINT			; convert string to unsigned int
-   149  e9fd a511               		lda LINNUM			; LSB of converted number
-   150  e9ff 8573               		sta wedge_unit
-   151  ea01 4cffb3             		jmp READY
+   147  ea78 18                 		clc
+   148  ea79 20f6b8             		jsr RDINT			; convert string to unsigned int
+   149  ea7c a511               		lda LINNUM			; LSB of converted number
+   150  ea7e 8573               		sta wedge_unit
+   151  ea80 4cffb3             		jmp READY
    152                          	
    153                          ;-------------- SEND COMMAND
    154                          
-   155  ea04 a573               send_cmd	lda wedge_unit
-   156  ea06 85d4               		sta FA
-   157  ea08 a96f               		lda #$6f			; DATA SA 15
-   158  ea0a 85d3               		sta SA
-   159  ea0c 20d5f0             		jsr LISTN			; LISTEN 
-   160  ea0f a5d3               		lda SA
-   161  ea11 2043f1             		jsr SECND			; send secondary address
+   155  ea83 a573               send_cmd	lda wedge_unit
+   156  ea85 85d4               		sta FA
+   157  ea87 a96f               		lda #$6f			; DATA SA 15
+   158  ea89 85d3               		sta SA
+   159  ea8b 20d5f0             		jsr LISTN			; LISTEN 
+   160  ea8e a5d3               		lda SA
+   161  ea90 2043f1             		jsr SECND			; send secondary address
    162                          
-   163  ea14 e677               SENDCMD2	inc TXTPTR
-   164  ea16 a000               		ldy #0			
-   165  ea18 b177               		lda (TXTPTR),y
-   166  ea1a f006               		beq SENDCMDDONE	
-   167  ea1c 209ef1             		jsr CIOUT			; send char to IEEE
-   168  ea1f b8                 		clv 
-   169  ea20 50f2               		bvc SENDCMD2			; branch always
+   163  ea93 e677               SENDCMD2	inc TXTPTR
+   164  ea95 a000               		ldy #0			
+   165  ea97 b177               		lda (TXTPTR),y
+   166  ea99 f006               		beq SENDCMDDONE	
+   167  ea9b 209ef1             		jsr CIOUT			; send char to IEEE
+   168  ea9e b8                 		clv 
+   169  ea9f 50f2               		bvc SENDCMD2			; branch always
    170                          
-   171  ea22 20b9f1             SENDCMDDONE	jsr UNLSN
-   172  ea25 18                 		clc
-   173  ea26 9002               		bcc get_status
+   171  eaa1 20b9f1             SENDCMDDONE	jsr UNLSN
+   172  eaa4 18                 		clc
+   173  eaa5 9002               		bcc get_status
    174                          
    175                          ;-------------- Relative Branch forwarder
    176                          
-   177  ea28 f026               to_prepare_fn:	beq prepare_fn		
+   177  eaa7 f026               to_prepare_fn:	beq prepare_fn		
    178                          
    179                          ;-------------- GET STATUS
    180                          
-   181  ea2a 8477               get_status	sty TXTPTR
-   182  ea2c a573               		lda wedge_unit
-   183  ea2e 85d4               		sta FA
-   184  ea30 20d2f0             		jsr TALK			; TALK
-   185  ea33 a96f               		lda #$6f			; DATA SA 15
-   186  ea35 85d3               		sta SA
-   187  ea37 2043f1             		jsr SECND			; send secondary address
+   181  eaa9 8477               get_status	sty TXTPTR
+   182  eaab a573               		lda wedge_unit
+   183  eaad 85d4               		sta FA
+   184  eaaf 20d2f0             		jsr TALK			; TALK
+   185  eab2 a96f               		lda #$6f			; DATA SA 15
+   186  eab4 85d3               		sta SA
+   187  eab6 2043f1             		jsr SECND			; send secondary address
    188                          
-   189  ea3a 20c0f1             GS_NEXTCHAR	jsr ACPTR			; read byte from IEEE bus
-   190  ea3d c90d               		cmp #$0D			; last byte = CR?		
-   191  ea3f f006               		beq GS_DONE
-   192  ea41 2002e2             		jsr SCROUT			; write char to screen
-   193  ea44 b8                 		clv 
-   194  ea45 50f3               		bvc GS_NEXTCHAR			; branch always
+   189  eab9 20c0f1             GS_NEXTCHAR	jsr ACPTR			; read byte from IEEE bus
+   190  eabc c90d               		cmp #$0D			; last byte = CR?		
+   191  eabe f006               		beq GS_DONE
+   192  eac0 2002e2             		jsr SCROUT			; write char to screen
+   193  eac3 b8                 		clv 
+   194  eac4 50f3               		bvc GS_NEXTCHAR			; branch always
    195                          
-   196  ea47 2002e2             GS_DONE		jsr SCROUT			; write char to screen
-   197  ea4a 20aef1             		jsr UNTLK			; UNTALK
-   198  ea4d 4cffb3             		jmp READY
+   196  eac6 2002e2             GS_DONE		jsr SCROUT			; write char to screen
+   197  eac9 20aef1             		jsr UNTLK			; UNTALK
+   198  eacc 4cffb3             		jmp READY
    199                          
    200                          ;------------------------------------------------------------------------------
    201                          ; identify filename to load/run, includes quote handling
    202                          
    203                          prepare_fn
-   204  ea50 c8                 		iny				; count filename length
-   205  ea51 b177               		lda (TXTPTR),y
-   206  ea53 f01a               		beq end_name
-   207  ea55 c922               		cmp #'"'			; quote character
-   208  ea57 d0f7               		bne prepare_fn
+   204  eacf c8                 		iny				; count filename length
+   205  ead0 b177               		lda (TXTPTR),y
+   206  ead2 f01a               		beq end_name
+   207  ead4 c922               		cmp #'"'			; quote character
+   208  ead6 d0f7               		bne prepare_fn
    209                          
-   210  ea59 a5b3               handle_quote	lda wedge_char
-   211  ea5b 3012               		bmi end_name
-   212  ea5d 0980               		ora #$80
-   213  ea5f 85b3               		sta wedge_char 
-   214  ea61 98                 		tya
-   215  ea62 a000               		ldy #0
-   216  ea64 18                 		clc
-   217  ea65 6577               		adc TXTPTR
-   218  ea67 8577               		sta TXTPTR
-   219  ea69 90e5               		bcc prepare_fn
-   220  ea6b e678               		inc TXTPTR+1
-   221  ea6d d0e1               		bne prepare_fn
+   210  ead8 a5b3               handle_quote	lda wedge_char
+   211  eada 3012               		bmi end_name
+   212  eadc 0980               		ora #$80
+   213  eade 85b3               		sta wedge_char 
+   214  eae0 98                 		tya
+   215  eae1 a000               		ldy #0
+   216  eae3 18                 		clc
+   217  eae4 6577               		adc TXTPTR
+   218  eae6 8577               		sta TXTPTR
+   219  eae8 90e5               		bcc prepare_fn
+   220  eaea e678               		inc TXTPTR+1
+   221  eaec d0e1               		bne prepare_fn
    222                          
-   223  ea6f 88                 end_name	dey 
-   224  ea70 84d1               		sty FNLEN			; store length
-   225  ea72 a677               		ldx TXTPTR
-   226  ea74 e8                 		inx
-   227  ea75 86da               		stx FNADR
-   228  ea77 a578               		lda TXTPTR + 1
-   229  ea79 85db               		sta FNADR + 1
-   230  ea7b a573               		lda wedge_unit
-   231  ea7d 85d4               		sta FA
-   232  ea7f a5b3               		lda wedge_char			; load/run?
-   233  ea81 297f               		and #$7f
-   234  ea83 85b3               		sta wedge_char
-   235  ea85 d039               		bne to_loadrun			; yes
+   223  eaee 88                 end_name	dey 
+   224  eaef 84d1               		sty FNLEN			; store length
+   225  eaf1 a677               		ldx TXTPTR
+   226  eaf3 e8                 		inx
+   227  eaf4 86da               		stx FNADR
+   228  eaf6 a578               		lda TXTPTR + 1
+   229  eaf8 85db               		sta FNADR + 1
+   230  eafa a573               		lda wedge_unit
+   231  eafc 85d4               		sta FA
+   232  eafe a5b3               		lda wedge_char			; load/run?
+   233  eb00 297f               		and #$7f
+   234  eb02 85b3               		sta wedge_char
+   235  eb04 d039               		bne to_loadrun			; yes
    236                          
    237                          ;-------------- DIRECTORY
    238                          
-   239  ea87 a900               		lda #0				; Clear the status flag
-   240  ea89 8596               		sta STATUS
-   241  ea8b a960               		lda #$60			; DATA SA 0
-   242  ea8d 85d3               		sta SA
-   243  ea8f 20a5f4             		jsr OPENI			; open file
-   244  ea92 20d2f0             		jsr TALK
-   245  ea95 a5d3               		lda SA
-   246  ea97 2043f1             		jsr SECND
+   239  eb06 a900               		lda #0				; Clear the status flag
+   240  eb08 8596               		sta STATUS
+   241  eb0a a960               		lda #$60			; DATA SA 0
+   242  eb0c 85d3               		sta SA
+   243  eb0e 20a5f4             		jsr OPENI			; open file
+   244  eb11 20d2f0             		jsr TALK
+   245  eb14 a5d3               		lda SA
+   246  eb16 2043f1             		jsr SECND
    247                          
-   248  ea9a a003               		ldy #3
+   248  eb19 a003               		ldy #3
    249                          list_blocks
-   250  ea9c 84d1               		sty FNLEN
-   251  ea9e 20c0f1             		jsr ACPTR			; read byte from IEEE
-   252  eaa1 85fd               		sta MEMUSS			; store blocks LSB
-   253  eaa3 a496               		ldy STATUS			; check the status. is it non-zero?
-   254  eaa5 d01b               		bne to_stoplisting		; yes
-   255  eaa7 20c0f1             		jsr ACPTR
-   256  eaaa 85fe               		sta MEMUSS + 1			; store blocks MSB
-   257  eaac a496               		ldy STATUS
-   258  eaae d012               		bne to_stoplisting
-   259  eab0 a4d1               		ldy FNLEN
-   260  eab2 88                 		dey 
-   261  eab3 d0e7               		bne list_blocks
-   262  eab5 a6fd               		ldx MEMUSS
-   263  eab7 a5fe               		lda MEMUSS + 1
-   264  eab9 2083cf             		jsr INTOUT			; write #blocks to screen
-   265  eabc a920               		lda #' '
-   266  eabe d006               		bne listing			; branch always
+   250  eb1b 84d1               		sty FNLEN
+   251  eb1d 20c0f1             		jsr ACPTR			; read byte from IEEE
+   252  eb20 85fd               		sta MEMUSS			; store blocks LSB
+   253  eb22 a496               		ldy STATUS			; check the status. is it non-zero?
+   254  eb24 d01b               		bne to_stoplisting		; yes
+   255  eb26 20c0f1             		jsr ACPTR
+   256  eb29 85fe               		sta MEMUSS + 1			; store blocks MSB
+   257  eb2b a496               		ldy STATUS
+   258  eb2d d012               		bne to_stoplisting
+   259  eb2f a4d1               		ldy FNLEN
+   260  eb31 88                 		dey 
+   261  eb32 d0e7               		bne list_blocks
+   262  eb34 a6fd               		ldx MEMUSS
+   263  eb36 a5fe               		lda MEMUSS + 1
+   264  eb38 2083cf             		jsr INTOUT			; write #blocks to screen
+   265  eb3b a920               		lda #' '
+   266  eb3d d006               		bne listing			; branch always
    267                          
    268                          ;-------------- Relative Branch forwarder
    269                          
-   270  eac0 d03b               to_loadrun:	bne loadrun
-   271  eac2 d031               to_stoplisting:	bne stoplisting
-   272  eac4 d0d6               to_list_blocks:	bne list_blocks
+   270  eb3f d03b               to_loadrun:	bne loadrun
+   271  eb41 d031               to_stoplisting:	bne stoplisting
+   272  eb43 d0d6               to_list_blocks:	bne list_blocks
    273                          
    274                          
    275                          ;-------------- Continuation of DIRECTORY
    276                          
    277                          listing
-   278  eac6 2002e2             		jsr SCROUT
-   279  eac9 20c0f1             LISTLOOP	jsr ACPTR			; read byte from IEEE
-   280  eacc a696               		ldx STATUS			; was it successful?
-   281  eace d025               		bne stoplisting			; no, so exit
-   282  ead0 c900               		cmp #0				; Is it end of line
-   283  ead2 f018               		beq newline			; yes, jump ahead
-   284  ead4 2002e2             		jsr SCROUT			; write filename and type
-   285  ead7 2035f3             		jsr STOPEQ			; Was STOP key pressed?
-   286  eada f019               		beq stoplisting			; Yes, we're done. Jump out
-   287  eadc 20e4ff             		jsr GETIN			; pause listing with SPACE key
-   288  eadf f0e8               		beq LISTLOOP			; no key pressed -> continue
-   289  eae1 c920               		cmp #32				; <space>?
-   290  eae3 d0e4               		bne LISTLOOP			; No, go back for more
+   278  eb45 2002e2             		jsr SCROUT
+   279  eb48 20c0f1             LISTLOOP	jsr ACPTR			; read byte from IEEE
+   280  eb4b a696               		ldx STATUS			; was it successful?
+   281  eb4d d025               		bne stoplisting			; no, so exit
+   282  eb4f c900               		cmp #0				; Is it end of line
+   283  eb51 f018               		beq newline			; yes, jump ahead
+   284  eb53 2002e2             		jsr SCROUT			; write filename and type
+   285  eb56 2035f3             		jsr STOPEQ			; Was STOP key pressed?
+   286  eb59 f019               		beq stoplisting			; Yes, we're done. Jump out
+   287  eb5b 20e4ff             		jsr GETIN			; pause listing with SPACE key
+   288  eb5e f0e8               		beq LISTLOOP			; no key pressed -> continue
+   289  eb60 c920               		cmp #32				; <space>?
+   290  eb62 d0e4               		bne LISTLOOP			; No, go back for more
    291                          
-   292  eae5 20e4ff             listwait	jsr GETIN			; get a key
-   293  eae8 f0fb               		beq listwait			; 0=no key, so keep waiting
+   292  eb64 20e4ff             listwait	jsr GETIN			; get a key
+   293  eb67 f0fb               		beq listwait			; 0=no key, so keep waiting
    294                          
-   295  eaea d0dd               		bne LISTLOOP			; then continue
+   295  eb69 d0dd               		bne LISTLOOP			; then continue
    296                          
    297                          ;-------------- end of directory entry
    298                          
-   299  eaec a90d               newline		lda #$0D			; <CR>
-   300  eaee 2002e2             		jsr SCROUT			; print it
-   301  eaf1 a002               		ldy #2
-   302  eaf3 d0cf               		bne to_list_blocks
+   299  eb6b a90d               newline		lda #$0D			; <CR>
+   300  eb6d 2002e2             		jsr SCROUT			; print it
+   301  eb70 a002               		ldy #2
+   302  eb72 d0cf               		bne to_list_blocks
    303                          
    304                          ;-------------- listing is done - end or stop key pressed
    305                          
-   306  eaf5 202ff7             stoplisting	jsr CLSEI			; close file with $E0, unlisten
+   306  eb74 202ff7             stoplisting	jsr CLSEI			; close file with $E0, unlisten
    307                          
-   308  eaf8 68                 		pla 
-   309  eaf9 68                 		pla 
-   310  eafa 4cffb3             		jmp READY			; BASIC warm start
+   308  eb77 68                 		pla 
+   309  eb78 68                 		pla 
+   310  eb79 4cffb3             		jmp READY			; BASIC warm start
    311                          
    312                          ;-------------- LOAD / RUN
    313                          
    314                          loadrun
-   315  eafd a900               		lda #0				; Clear status byte
-   316  eaff 8596               		sta STATUS
-   317  eb01 859d               		sta VERCK			; LOAD=0, VERIFY=1
-   318  eb03 2056f3             		jsr LOADOP			; LOAD without pointer change
+   315  eb7c a900               		lda #0				; Clear status byte
+   316  eb7e 8596               		sta STATUS
+   317  eb80 859d               		sta VERCK			; LOAD=0, VERIFY=1
+   318  eb82 2056f3             		jsr LOADOP			; LOAD without pointer change
    319                          
-   320  eb06 a596               		lda STATUS			; Did it load?
-   321  eb08 2910               		and #$10
-   322  eb0a d020               		bne loaderr			; No, exit out
+   320  eb85 a596               		lda STATUS			; Did it load?
+   321  eb87 2910               		and #$10
+   322  eb89 d020               		bne loaderr			; No, exit out
    323                          
-   324  eb0c a5ca               		lda EAL+1			; end of program MSB
-   325  eb0e 852b               		sta VARTAB+1			; start of basic variables MSB
-   326  eb10 a5c9               		lda EAL				; end of program LSB
-   327  eb12 852a               		sta VARTAB			; start of basic variables LSB
+   324  eb8b a5ca               		lda EAL+1			; end of program MSB
+   325  eb8d 852b               		sta VARTAB+1			; start of basic variables MSB
+   326  eb8f a5c9               		lda EAL				; end of program LSB
+   327  eb91 852a               		sta VARTAB			; start of basic variables LSB
    328                          
-   329  eb14 2034d5             		jsr CRLF
-   330  eb17 20e9b5             		jsr RSTXCLR			; reset TXTPTR and perform CLR
-   331  eb1a 20b6b4             		jsr LINKPRG			; rebuild chaining of BASIC lines
+   329  eb93 2034d5             		jsr CRLF
+   330  eb96 20e9b5             		jsr RSTXCLR			; reset TXTPTR and perform CLR
+   331  eb99 20b6b4             		jsr LINKPRG			; rebuild chaining of BASIC lines
    332                          
-   333  eb1d a5b3               		lda wedge_char
-   334  eb1f c92f               		cmp #$2f			; if '/' then load only, omit RUN
-   335  eb21 d003               		bne startprg			; '^' --> RUN
-   336  eb23 4cffb3             		jmp READY			; load only, exit with BASIC warm start
+   333  eb9c a5b3               		lda wedge_char
+   334  eb9e c92f               		cmp #$2f			; if '/' then load only, omit RUN
+   335  eba0 d003               		bne startprg			; '^' --> RUN
+   336  eba2 4cffb3             		jmp READY			; load only, exit with BASIC warm start
    337                          
-   338  eb26 2022b6             startprg	jsr STXTPT			; reset TXTPTR
-   339  eb29 4c4ab7             		jmp NEWSTT			; RUN
+   338  eba5 2022b6             startprg	jsr STXTPT			; reset TXTPTR
+   339  eba8 4c4ab7             		jmp NEWSTT			; RUN
    340                          
-   341  eb2c 4c25f4             loaderr		jmp FILENOTFOUND		; FILE NOT FOUND, return to basic
+   341  ebab 4c25f4             loaderr		jmp FILENOTFOUND		; FILE NOT FOUND, return to basic
    342                          
 
 ; ******** Source: editrom.asm
@@ -3944,55 +3956,55 @@
     10                          ;       If we need to modify the action we set DATAX with the new character.
     11                          ;       If we want to skip the rest of the character processing we should JMP IRQ_EPILOG .
     12                          
-    13  eb2f a6f1               CheckESC	LDX LASTCHAR 		; Previous character printed
-    14  eb31 e01b               		CPX #$1B		; <ESC>?
-    15  eb33 f00c               		BEQ ESC_YES		; Yes, process it
-    16  eb35 c91b               		CMP #$1B		; Is current Chr ESC?
-    17  eb37 f003               		BEQ ESC_NOW		; Yes, 
-    18  eb39 4c19e2             		JMP ESC_DONE		; No, back to normal checking
+    13  ebae a6f1               CheckESC	LDX LASTCHAR 		; Previous character printed
+    14  ebb0 e01b               		CPX #$1B		; <ESC>?
+    15  ebb2 f00c               		BEQ ESC_YES		; Yes, process it
+    16  ebb4 c91b               		CMP #$1B		; Is current Chr ESC?
+    17  ebb6 f003               		BEQ ESC_NOW		; Yes, 
+    18  ebb8 4c19e2             		JMP ESC_DONE		; No, back to normal checking
     19                          
     20                          ;-------------- ESC is current Chr
     21                          
-    22  eb3c 85f1               ESC_NOW		STA LASTCHAR		; Remember it
-    23  eb3e 4c99e1             		JMP IRQ_EPILOG		; don't process anything
+    22  ebbb 85f1               ESC_NOW		STA LASTCHAR		; Remember it
+    23  ebbd 4c99e1             		JMP IRQ_EPILOG		; don't process anything
     24                          
     25                          ;-------------- Process ESC sequence
     26                          
-    27  eb41 c91b               ESC_YES		CMP #$1b		; Is current char <ESC>?
-    28  eb43 f002               		BEQ DoESCESC		; Yes, Do <ESC><ESC>
-    29  eb45 d005               		BNE DoEscapeCode	; No,  Do <ESC>+KEY
+    27  ebc0 c91b               ESC_YES		CMP #$1b		; Is current char <ESC>?
+    28  ebc2 f002               		BEQ DoESCESC		; Yes, Do <ESC><ESC>
+    29  ebc4 d005               		BNE DoEscapeCode	; No,  Do <ESC>+KEY
     30                          
     31                          ;-------------- Do <ESC><ESC>
     32                          
-    33  eb47 a900               DoESCESC	LDA #0			; Clear character
-    34  eb49 4cbde3             		JMP ESCAPE_O		; <ESC>+O (escape)
+    33  ebc6 a900               DoESCESC	LDA #0			; Clear character
+    34  ebc8 4cbde3             		JMP ESCAPE_O		; <ESC>+O (escape)
     35                          
     36                          ;-------------- Do <ESC>+KEY Sequence
     37                          
-    38  eb4c 297f               DoEscapeCode	AND #$7F		; Strip top bit
-    39  eb4e 38                 		SEC
+    38  ebcb 297f               DoEscapeCode	AND #$7F		; Strip top bit
+    39  ebcd 38                 		SEC
     40                          !IF (COLOURPET=1) OR (VIDSWITCH=1) {
-    41  eb4f e930               		SBC #$30		; Subtract 30 (Start at "0")
-    42  eb51 c92f               		CMP #$2F		; Make sure it is in range!
+    41  ebce e930               		SBC #$30		; Subtract 30 (Start at "0")
+    42  ebd0 c92f               		CMP #$2F		; Make sure it is in range!
     43                          } ELSE {
     44                          		SBC #$40		; Subtract 40 (Start at "@")
     45                          		CMP #$20		; Make sure it is in range!
     46                          }
-    47  eb53 b00f               		BCS DoESCDONE		; Yes, skip
+    47  ebd2 b00f               		BCS DoESCDONE		; Yes, skip
     48                          
-    49  eb55 a200               		LDX #0
-    50  eb57 86f1               		STX LASTCHAR		; Clear Last Char
+    49  ebd4 a200               		LDX #0
+    50  ebd6 86f1               		STX LASTCHAR		; Clear Last Char
     51                          
-    52  eb59 0a                 		ASL
-    53  eb5a aa                 		TAX
-    54  eb5b bd68eb             		LDA ESCVECTORS+1,X	; ESC Sequence Vectors
-    55  eb5e 48                 		PHA
-    56  eb5f bd67eb             		LDA ESCVECTORS,X	; ESC Sequence Vectors
-    57  eb62 48                 		PHA			; Push address to stack so RTS will jump to selected routine
+    52  ebd8 0a                 		ASL
+    53  ebd9 aa                 		TAX
+    54  ebda bde7eb             		LDA ESCVECTORS+1,X	; ESC Sequence Vectors
+    55  ebdd 48                 		PHA
+    56  ebde bde6eb             		LDA ESCVECTORS,X	; ESC Sequence Vectors
+    57  ebe1 48                 		PHA			; Push address to stack so RTS will jump to selected routine
     58                          ;		LDA #0			; Clear Character
-    59  eb63 60                 		RTS
+    59  ebe2 60                 		RTS
     60                          
-    61  eb64 4c19e2             DoESCDONE	JMP ESC_DONE
+    61  ebe3 4c19e2             DoESCDONE	JMP ESC_DONE
     62                          
     63                          ;-------------- Esc Sequence Vectors    (*=changed from C128)
     64                          
@@ -4003,22 +4015,22 @@
     69                          ;
     70                          !IF (COLOURPET=1) OR (VIDSWITCH=1) {
     71                            !IF (COLOURPET=1) {
-    72  eb67 c9eb               		!WORD ESCAPE_NUM-1	; Esc-0 Set Colour to Black
-    73  eb69 c9eb               		!WORD ESCAPE_NUM-1	; Esc-1 Set Colour to Medium Grey
-    74  eb6b c9eb               		!WORD ESCAPE_NUM-1	; Esc-2 Set Colour to Blue
-    75  eb6d c9eb               		!WORD ESCAPE_NUM-1	; Esc-3 Set Colour to Light Blue
-    76  eb6f c9eb               		!WORD ESCAPE_NUM-1	; Esc-4 Set Colour to Green
-    77  eb71 c9eb               		!WORD ESCAPE_NUM-1	; Esc-5 Set Colour to Light Green
-    78  eb73 c9eb               		!WORD ESCAPE_NUM-1	; Esc-6 Set Colour to Dark Cyan
-    79  eb75 c9eb               		!WORD ESCAPE_NUM-1	; Esc-7 Set Colour to Light Cyan
-    80  eb77 c9eb               		!WORD ESCAPE_NUM-1	; Esc-8 Set Colour to Red
-    81  eb79 c9eb               		!WORD ESCAPE_NUM-1	; Esc-9 Set Colour to Light Red
-    82  eb7b c9eb               		!WORD ESCAPE_NUM-1	; Esc-: Set Colour to Dark Purple
-    83  eb7d c9eb               		!WORD ESCAPE_NUM-1	; Esc-; Set Colour to Purple
-    84  eb7f c9eb               		!WORD ESCAPE_NUM-1	; Esc-< Set Colour to Dark Yellow
-    85  eb81 c9eb               		!WORD ESCAPE_NUM-1	; Esc-= Set Colour to Yellow
-    86  eb83 c9eb               		!WORD ESCAPE_NUM-1	; Esc-> Set Colour to Light Grey
-    87  eb85 c9eb               		!WORD ESCAPE_NUM-1	; Esc-? Set Colour to White
+    72  ebe6 48ec               		!WORD ESCAPE_NUM-1	; Esc-0 Set Colour to Black
+    73  ebe8 48ec               		!WORD ESCAPE_NUM-1	; Esc-1 Set Colour to Medium Grey
+    74  ebea 48ec               		!WORD ESCAPE_NUM-1	; Esc-2 Set Colour to Blue
+    75  ebec 48ec               		!WORD ESCAPE_NUM-1	; Esc-3 Set Colour to Light Blue
+    76  ebee 48ec               		!WORD ESCAPE_NUM-1	; Esc-4 Set Colour to Green
+    77  ebf0 48ec               		!WORD ESCAPE_NUM-1	; Esc-5 Set Colour to Light Green
+    78  ebf2 48ec               		!WORD ESCAPE_NUM-1	; Esc-6 Set Colour to Dark Cyan
+    79  ebf4 48ec               		!WORD ESCAPE_NUM-1	; Esc-7 Set Colour to Light Cyan
+    80  ebf6 48ec               		!WORD ESCAPE_NUM-1	; Esc-8 Set Colour to Red
+    81  ebf8 48ec               		!WORD ESCAPE_NUM-1	; Esc-9 Set Colour to Light Red
+    82  ebfa 48ec               		!WORD ESCAPE_NUM-1	; Esc-: Set Colour to Dark Purple
+    83  ebfc 48ec               		!WORD ESCAPE_NUM-1	; Esc-; Set Colour to Purple
+    84  ebfe 48ec               		!WORD ESCAPE_NUM-1	; Esc-< Set Colour to Dark Yellow
+    85  ec00 48ec               		!WORD ESCAPE_NUM-1	; Esc-= Set Colour to Yellow
+    86  ec02 48ec               		!WORD ESCAPE_NUM-1	; Esc-> Set Colour to Light Grey
+    87  ec04 48ec               		!WORD ESCAPE_NUM-1	; Esc-? Set Colour to White
     88                          } ELSE {
     89                          
     90                          ;--------------- VIDSWITCH ESC Codes: ESC 0 to 9
@@ -4048,38 +4060,38 @@
    114                          
    115                          ;-------------- Normal ESC Codes
    116                          
-   117  eb87 c6eb               		!WORD ESCAPE_AT-1	; Esc-@ Clear Remainder of Screen
-   118  eb89 c6eb               		!WORD ESCAPE_A-1	; Esc-a Auto Insert
-   119  eb8b dde5               		!WORD ESCAPE_B-1	; Esc-b Bottom
-   120  eb8d c6eb               		!WORD ESCAPE_C-1	; Esc-c Cancel Auto Insert
-   121  eb8f ebe2               		!WORD ESCAPE_D-1	; Esc-d Delete Line
-   122  eb91 d9eb               		!WORD ESCAPE_E-1	; Esc-e ?     / Fill BG    (was: Cursor Non Flash)
-   123  eb93 3aec               		!WORD ESCAPE_F-1	; Esc-f Flash / Fill FG+BG (was: Cursor Flash)
-   124  eb95 5dec               		!WORD ESCAPE_G-1	; Esc-g Bell Enable
-   125  eb97 64ec               		!WORD ESCAPE_H-1	; Esc-h Bell Disable
-   126  eb99 bee5               		!WORD ESCAPE_I-1	; Esc-i Insert Line
-   127  eb9b c0e1               		!WORD ESCAPE_J-1	; Esc-j Start-of-Line
-   128  eb9d c6eb               		!WORD ESCAPE_K-1	; Esc-k End-of-Line
-   129  eb9f c6eb               		!WORD ESCAPE_L-1	; Esc-l Scroll On
-   130  eba1 c6eb               		!WORD ESCAPE_M-1	; Esc-m Scroll Off
-   131  eba3 37ed               		!WORD ESCAPE_N-1	; Esc-n Screen Normal
-   132  eba5 bce3               		!WORD ESCAPE_O-1	; Esc-o Escape all modes (Also: <ESC><ESC>)
-   133  eba7 90e3               		!WORD ESCAPE_P-1	; Esc-p Erase Begin
-   134  eba9 6bec               		!WORD ESCAPE_Q-1	; Esc-q Erase End
-   135  ebab 3fed               		!WORD ESCAPE_R-1	; Esc-r Screen Reverse
-   136  ebad 71ec               		!WORD ESCAPE_S-1	; Esc-s Text/Lowercase Mode * (was: Block Cursor)
-   137  ebaf 9ee5               		!WORD ESCAPE_T-1	; Esc-t Top
-   138  ebb1 77ec               		!WORD ESCAPE_U-1	; Esc-u Graphics/Uppercase Mode * (was: Underline Cursor)
-   139  ebb3 e1e3               		!WORD ESCAPE_V-1	; Esc-v Scroll Up
-   140  ebb5 c9e3               		!WORD ESCAPE_W-1	; Esc-w Scroll Down
-   141  ebb7 c6eb               		!WORD ESCAPE_X-1	; Esc-x Switch 40/80 Col
-   142  ebb9 47ed               		!WORD ESCAPE_Y-1	; Esc-y Normal Chr Set * (was: Set Default Tabs)
-   143  ebbb 4fed               		!WORD ESCAPE_Z-1	; Esc-z Alternate Chr Set * (was: Clear All Tabs)
-   144  ebbd 7dec               		!WORD ESCAPE_LB-1	; Esc-[ Mark Start
-   145  ebbf 16ed               		!WORD ESCAPE_BS-1	; Esc-\ Toggle ASCII / DIN
-   146  ebc1 a3ec               		!WORD ESCAPE_RB-1	; Esc-] Mark End (Copy)
-   147  ebc3 f0ec               		!WORD ESCAPE_UA-1	; Esc-UPARROW Paste
-   148  ebc5 c6eb               		!WORD ESCAPE_BA-1	; Esc-BACKARROW Display Project Info
+   117  ec06 45ec               		!WORD ESCAPE_AT-1	; Esc-@ Clear Remainder of Screen
+   118  ec08 45ec               		!WORD ESCAPE_A-1	; Esc-a Auto Insert
+   119  ec0a dde5               		!WORD ESCAPE_B-1	; Esc-b Bottom
+   120  ec0c 45ec               		!WORD ESCAPE_C-1	; Esc-c Cancel Auto Insert
+   121  ec0e ebe2               		!WORD ESCAPE_D-1	; Esc-d Delete Line
+   122  ec10 58ec               		!WORD ESCAPE_E-1	; Esc-e ?     / Fill BG    (was: Cursor Non Flash)
+   123  ec12 b9ec               		!WORD ESCAPE_F-1	; Esc-f Flash / Fill FG+BG (was: Cursor Flash)
+   124  ec14 dcec               		!WORD ESCAPE_G-1	; Esc-g Bell Enable
+   125  ec16 e3ec               		!WORD ESCAPE_H-1	; Esc-h Bell Disable
+   126  ec18 bee5               		!WORD ESCAPE_I-1	; Esc-i Insert Line
+   127  ec1a c0e1               		!WORD ESCAPE_J-1	; Esc-j Start-of-Line
+   128  ec1c 45ec               		!WORD ESCAPE_K-1	; Esc-k End-of-Line
+   129  ec1e 45ec               		!WORD ESCAPE_L-1	; Esc-l Scroll On
+   130  ec20 45ec               		!WORD ESCAPE_M-1	; Esc-m Scroll Off
+   131  ec22 b6ed               		!WORD ESCAPE_N-1	; Esc-n Screen Normal
+   132  ec24 bce3               		!WORD ESCAPE_O-1	; Esc-o Escape all modes (Also: <ESC><ESC>)
+   133  ec26 90e3               		!WORD ESCAPE_P-1	; Esc-p Erase Begin
+   134  ec28 eaec               		!WORD ESCAPE_Q-1	; Esc-q Erase End
+   135  ec2a beed               		!WORD ESCAPE_R-1	; Esc-r Screen Reverse
+   136  ec2c f0ec               		!WORD ESCAPE_S-1	; Esc-s Text/Lowercase Mode * (was: Block Cursor)
+   137  ec2e 9ee5               		!WORD ESCAPE_T-1	; Esc-t Top
+   138  ec30 f6ec               		!WORD ESCAPE_U-1	; Esc-u Graphics/Uppercase Mode * (was: Underline Cursor)
+   139  ec32 e1e3               		!WORD ESCAPE_V-1	; Esc-v Scroll Up
+   140  ec34 c9e3               		!WORD ESCAPE_W-1	; Esc-w Scroll Down
+   141  ec36 45ec               		!WORD ESCAPE_X-1	; Esc-x Switch 40/80 Col
+   142  ec38 c6ed               		!WORD ESCAPE_Y-1	; Esc-y Normal Chr Set * (was: Set Default Tabs)
+   143  ec3a ceed               		!WORD ESCAPE_Z-1	; Esc-z Alternate Chr Set * (was: Clear All Tabs)
+   144  ec3c fcec               		!WORD ESCAPE_LB-1	; Esc-[ Mark Start
+   145  ec3e 95ed               		!WORD ESCAPE_BS-1	; Esc-\ Toggle ASCII / DIN
+   146  ec40 22ed               		!WORD ESCAPE_RB-1	; Esc-] Mark End (Copy)
+   147  ec42 6fed               		!WORD ESCAPE_UA-1	; Esc-UPARROW Paste
+   148  ec44 45ec               		!WORD ESCAPE_BA-1	; Esc-BACKARROW Display Project Info
    149                          
    150                          ;=============== ESCAPE CODES not in normal PET code
    151                          ;
@@ -4111,7 +4123,7 @@
    177                          ESCAPE_J	; ESC-J Start of Line
    178                          }
    179                          
-   180  ebc7 4c99e1             NOESCAPE	JMP IRQ_EPILOG				; Ignore sequence for now
+   180  ec46 4c99e1             NOESCAPE	JMP IRQ_EPILOG				; Ignore sequence for now
    181                          
    182                          
    183                          ;====================================================================================
@@ -4121,15 +4133,15 @@
    187                          ;-------------- ColourPET Colours
    188                          
    189                          !IF COLOURPET=1 {
-   190  ebca a5d9               ESCAPE_NUM	LDA DATAX				; Character
-   191  ebcc 38                 		SEC
-   192  ebcd e930               		SBC #$30				; Subtract 30 (Start at "0")
+   190  ec49 a5d9               ESCAPE_NUM	LDA DATAX				; Character
+   191  ec4b 38                 		SEC
+   192  ec4c e930               		SBC #$30				; Subtract 30 (Start at "0")
    193                          
-   194  ebcf aa                 ESC_NUM2	TAX					; The Colour number becomes the index
-   195  ebd0 bd93ee             		LDA COLOURS,X				; Lookup the correct PETSCII code
-   196  ebd3 85d9               		STA DATAX				; replace ESC code with colour code
-   197  ebd5 a900               		LDA #0					;
-   198  ebd7 4c1be2             		JMP ESC_DONE2				; return and process
+   194  ec4e aa                 ESC_NUM2	TAX					; The Colour number becomes the index
+   195  ec4f bd12ef             		LDA COLOURS,X				; Lookup the correct PETSCII code
+   196  ec52 85d9               		STA DATAX				; replace ESC code with colour code
+   197  ec54 a900               		LDA #0					;
+   198  ec56 4c1be2             		JMP ESC_DONE2				; return and process
    199                          }
    200                          
    201                          ;-------------- Video Configuration Switching
@@ -4215,57 +4227,57 @@
    281                          ESCAPE_E
    282                          
    283                          !if COLOURPET=1 {
-   284  ebda adda8b             		LDA COLOURV
-   285  ebdd 29f0               		AND #$F0
-   286  ebdf 85b7               		STA TMPZB7
-   287  ebe1 a200               		LDX #0
+   284  ec59 adda8f             		LDA COLOURV
+   285  ec5c 29f0               		AND #$F0
+   286  ec5e 85b7               		STA TMPZB7
+   287  ec60 a200               		LDX #0
    288                          ESCELOOP
-   289  ebe3 bd0084             		LDA COLOUR_RAM,X
-   290  ebe6 290f               		AND #$0F
-   291  ebe8 05b7               		ORA TMPZB7
-   292  ebea 9d0084             		STA COLOUR_RAM,X
+   289  ec62 bd0088             		LDA COLOUR_RAM,X
+   290  ec65 290f               		AND #$0F
+   291  ec67 05b7               		ORA TMPZB7
+   292  ec69 9d0088             		STA COLOUR_RAM,X
    293                          
-   294  ebed bdfa84             		LDA COLOUR_RAM+250,X
-   295  ebf0 290f               		AND #$0F
-   296  ebf2 05b7               		ORA TMPZB7
-   297  ebf4 9dfa84             		STA COLOUR_RAM+250,X
+   294  ec6c bdfa88             		LDA COLOUR_RAM+250,X
+   295  ec6f 290f               		AND #$0F
+   296  ec71 05b7               		ORA TMPZB7
+   297  ec73 9dfa88             		STA COLOUR_RAM+250,X
    298                          
-   299  ebf7 bdf485             		LDA COLOUR_RAM+500,X
-   300  ebfa 290f               		AND #$0F
-   301  ebfc 05b7               		ORA TMPZB7
-   302  ebfe 9df485             		STA COLOUR_RAM+500,X
+   299  ec76 bdf489             		LDA COLOUR_RAM+500,X
+   300  ec79 290f               		AND #$0F
+   301  ec7b 05b7               		ORA TMPZB7
+   302  ec7d 9df489             		STA COLOUR_RAM+500,X
    303                          
-   304  ec01 bdee86             		LDA COLOUR_RAM+750,X
-   305  ec04 290f               		AND #$0F
-   306  ec06 05b7               		ORA TMPZB7
-   307  ec08 9dee86             		STA COLOUR_RAM+750,X	; don't overwrite non-visible locations (used for storage)
+   304  ec80 bdee8a             		LDA COLOUR_RAM+750,X
+   305  ec83 290f               		AND #$0F
+   306  ec85 05b7               		ORA TMPZB7
+   307  ec87 9dee8a             		STA COLOUR_RAM+750,X	; don't overwrite non-visible locations (used for storage)
    308                          
    309                          !IF COLUMNS=80 {
-   310  ec0b bde887             		LDA COLOUR_RAM+1000,X
-   311  ec0e 290f               		AND #$0F
-   312  ec10 05b7               		ORA TMPZB7
-   313  ec12 9de887             		STA COLOUR_RAM+1000,X
+   310  ec8a bde88b             		LDA COLOUR_RAM+1000,X
+   311  ec8d 290f               		AND #$0F
+   312  ec8f 05b7               		ORA TMPZB7
+   313  ec91 9de88b             		STA COLOUR_RAM+1000,X
    314                          
-   315  ec15 bde288             		LDA COLOUR_RAM+1250,X
-   316  ec18 290f               		AND #$0F
-   317  ec1a 05b7               		ORA TMPZB7
-   318  ec1c 9de288             		STA COLOUR_RAM+1250,X
+   315  ec94 bde28c             		LDA COLOUR_RAM+1250,X
+   316  ec97 290f               		AND #$0F
+   317  ec99 05b7               		ORA TMPZB7
+   318  ec9b 9de28c             		STA COLOUR_RAM+1250,X
    319                          
-   320  ec1f bddc89             		LDA COLOUR_RAM+1500,X
-   321  ec22 290f               		AND #$0F
-   322  ec24 05b7               		ORA TMPZB7
-   323  ec26 9ddc89             		STA COLOUR_RAM+1500,X
+   320  ec9e bddc8d             		LDA COLOUR_RAM+1500,X
+   321  eca1 290f               		AND #$0F
+   322  eca3 05b7               		ORA TMPZB7
+   323  eca5 9ddc8d             		STA COLOUR_RAM+1500,X
    324                          
-   325  ec29 bdd68a             		LDA COLOUR_RAM+1750,X
-   326  ec2c 290f               		AND #$0F
-   327  ec2e 05b7               		ORA TMPZB7
-   328  ec30 9dd68a             		STA COLOUR_RAM+1750,X	; don't overwrite non-visible locations (used for storage)
+   325  eca8 bdd68e             		LDA COLOUR_RAM+1750,X
+   326  ecab 290f               		AND #$0F
+   327  ecad 05b7               		ORA TMPZB7
+   328  ecaf 9dd68e             		STA COLOUR_RAM+1750,X	; don't overwrite non-visible locations (used for storage)
    329                          }
-   330  ec33 e8                 		INX
-   331  ec34 e0fa               		CPX #250
-   332  ec36 d0ab               		BNE ESCELOOP
+   330  ecb2 e8                 		INX
+   331  ecb3 e0fa               		CPX #250
+   332  ecb5 d0ab               		BNE ESCELOOP
    333                          }
-   334  ec38 4c99e1             		JMP IRQ_EPILOG
+   334  ecb7 4c99e1             		JMP IRQ_EPILOG
    335                          
    336                          
    337                          ;------------------------------------------------------------------------------------------------
@@ -4277,21 +4289,21 @@
    343                          ESCAPE_F
    344                          
    345                          !if COLOURPET=1 {
-   346  ec3b a200               		LDX #0
-   347  ec3d adda8b             		LDA COLOURV
+   346  ecba a200               		LDX #0
+   347  ecbc adda8f             		LDA COLOURV
    348                          
-   349  ec40 9d0084             ESCFLOOP	STA COLOUR_RAM,X
-   350  ec43 9d0085             		STA COLOUR_RAM+$100,X
-   351  ec46 9d0086             		STA COLOUR_RAM+$200,X
-   352  ec49 9de886             		STA COLOUR_RAM+$300-24,X	; don't overwrite non-visible locations (used for storage)
+   349  ecbf 9d0088             ESCFLOOP	STA COLOUR_RAM,X
+   350  ecc2 9d0089             		STA COLOUR_RAM+$100,X
+   351  ecc5 9d008a             		STA COLOUR_RAM+$200,X
+   352  ecc8 9de88a             		STA COLOUR_RAM+$300-24,X	; don't overwrite non-visible locations (used for storage)
    353                          !IF COLUMNS = 80 {
-   354  ec4c 9de887             		STA COLOUR_RAM+$400-24,X
-   355  ec4f 9de888             		STA COLOUR_RAM+$500-24,X
-   356  ec52 9de889             		STA COLOUR_RAM+$600-24,X
-   357  ec55 9dd08a             		STA COLOUR_RAM+$700-48,X	; don't overwrite non-visible locations (used for storage)
+   354  eccb 9de88b             		STA COLOUR_RAM+$400-24,X
+   355  ecce 9de88c             		STA COLOUR_RAM+$500-24,X
+   356  ecd1 9de88d             		STA COLOUR_RAM+$600-24,X
+   357  ecd4 9dd08e             		STA COLOUR_RAM+$700-48,X	; don't overwrite non-visible locations (used for storage)
    358                          }
-   359  ec58 e8                 		INX
-   360  ec59 d0e5               		BNE ESCFLOOP
+   359  ecd7 e8                 		INX
+   360  ecd8 d0e5               		BNE ESCFLOOP
    361                          }
    362                          
    363                          !if COLOURPET=0 {
@@ -4335,32 +4347,32 @@
    401                          		BNE ESCFLOOP2
    402                          
    403                          }
-   404  ec5b 4c99e1             		JMP IRQ_EPILOG
+   404  ecda 4c99e1             		JMP IRQ_EPILOG
    405                          
    406                          ;------------------------------------------------------------------------------------------------
    407                          ESCAPE_G						; Esc-g Bell Enable
-   408  ec5e a901               		LDA #1
-   409  ec60 85f2               		STA BELLMODE
-   410  ec62 4c99e1             		JMP IRQ_EPILOG
+   408  ecdd a901               		LDA #1
+   409  ecdf 85f2               		STA BELLMODE
+   410  ece1 4c99e1             		JMP IRQ_EPILOG
    411                          
    412                          ;------------------------------------------------------------------------------------------------
    413                          ESCAPE_H						; Esc-h Bell Disable
-   414  ec65 a900               		LDA #0
-   415  ec67 85f2               		STA BELLMODE
-   416  ec69 4c99e1             		JMP IRQ_EPILOG
+   414  ece4 a900               		LDA #0
+   415  ece6 85f2               		STA BELLMODE
+   416  ece8 4c99e1             		JMP IRQ_EPILOG
    417                          
    418                          ;------------------------------------------------------------------------------------------------
    419                          ESCAPE_Q						; Esc-q Erase End
-   420  ec6c 2058ee             		JSR ERASE_TO_EOL
-   421  ec6f 4c99e1             		JMP IRQ_EPILOG
+   420  eceb 20d7ee             		JSR ERASE_TO_EOL
+   421  ecee 4c99e1             		JMP IRQ_EPILOG
    422                          ;------------------------------------------------------------------------------------------------
    423                          ESCAPE_S						; Esc-s Standard Lowercase (was: Block Cursor)
-   424  ec72 2062e0             		JSR CRT_SET_TEXT			; Set Lowercase/Text Mode
-   425  ec75 4c99e1             		JMP IRQ_EPILOG
+   424  ecf1 2062e0             		JSR CRT_SET_TEXT			; Set Lowercase/Text Mode
+   425  ecf4 4c99e1             		JMP IRQ_EPILOG
    426                          ;------------------------------------------------------------------------------------------------
    427                          ESCAPE_U						; Esc-u Uppercase (was: Underline Cursor - not supported on PET)
-   428  ec78 206ae0             		JSR CRT_SET_GRAPHICS			; Set Uppercase/Graphics Mode
-   429  ec7b 4c99e1             		JMP IRQ_EPILOG
+   428  ecf7 206ae0             		JSR CRT_SET_GRAPHICS			; Set Uppercase/Graphics Mode
+   429  ecfa 4c99e1             		JMP IRQ_EPILOG
    430                          
    431                          ;-------------- Copy/Paste functions
    432                          ;
@@ -4375,97 +4387,97 @@
    441                          ;-------------- ESC-[ Mark Start
    442                          
    443                          ESCAPE_LB
-   444  ec7e ad7a02             		LDA TAPEB1				; Read Buffer Identifier
-   445  ec81 c91b               		CMP #27					; is it ESC?
-   446  ec83 f00a               		BEQ ESCLB_SET				; Yes, Start Mark, so skip initialize
+   444  ecfd ad7a02             		LDA TAPEB1				; Read Buffer Identifier
+   445  ed00 c91b               		CMP #27					; is it ESC?
+   446  ed02 f00a               		BEQ ESCLB_SET				; Yes, Start Mark, so skip initialize
    447                          
-   448  ec85 a900               		LDA #0					; Initialize buffer -
-   449  ec87 8d7b02             		STA TAPEB1+1				; Set Buffer Length to zero
-   450  ec8a a91b               		LDA #27					; Buffer identifier = ESC
-   451  ec8c 8d7a02             		STA TAPEB1				; Set Buffer identifier
+   448  ed04 a900               		LDA #0					; Initialize buffer -
+   449  ed06 8d7b02             		STA TAPEB1+1				; Set Buffer Length to zero
+   450  ed09 a91b               		LDA #27					; Buffer identifier = ESC
+   451  ed0b 8d7a02             		STA TAPEB1				; Set Buffer identifier
    452                          ESCLB_SET	
-   453  ec8f a5c5               		LDA ScrPtr+1				; Copy HI byte of line pointer
-   454  ec91 8d7d02             		STA TAPEB1+3				; to buffer
-   455  ec94 a5c4               		LDA ScrPtr				; Get LO byte of line pointer
-   456  ec96 18                 		CLC
-   457  ec97 65c6               		ADC CursorCol				; Add cursor offset
-   458  ec99 8d7c02             		STA TAPEB1+2				;   to buffer
-   459  ec9c 9003               		BCC ESCLB_SKIP				; do we need to update HI byte?
-   460  ec9e ee7d02             		INC TAPEB1+3				; yes, increment it
-   461  eca1 4c99e1             ESCLB_SKIP	JMP IRQ_EPILOG				; Return
+   453  ed0e a5c5               		LDA ScrPtr+1				; Copy HI byte of line pointer
+   454  ed10 8d7d02             		STA TAPEB1+3				; to buffer
+   455  ed13 a5c4               		LDA ScrPtr				; Get LO byte of line pointer
+   456  ed15 18                 		CLC
+   457  ed16 65c6               		ADC CursorCol				; Add cursor offset
+   458  ed18 8d7c02             		STA TAPEB1+2				;   to buffer
+   459  ed1b 9003               		BCC ESCLB_SKIP				; do we need to update HI byte?
+   460  ed1d ee7d02             		INC TAPEB1+3				; yes, increment it
+   461  ed20 4c99e1             ESCLB_SKIP	JMP IRQ_EPILOG				; Return
    462                          
    463                          ;--------------- ESC-] Mark End (Copy to buffer)
    464                          
    465                          ESCAPE_RB	
-   466  eca4 ad7a02             		LDA TAPEB1				; Read Buffer Identifier
-   467  eca7 c91b               		CMP #27					; is it ESC?
-   468  eca9 d043               		BNE ESCRB_EXIT				; No Start Mark, so exit out
+   466  ed23 ad7a02             		LDA TAPEB1				; Read Buffer Identifier
+   467  ed26 c91b               		CMP #27					; is it ESC?
+   468  ed28 d043               		BNE ESCRB_EXIT				; No Start Mark, so exit out
    469                          		
    470                          ESCRB_INIT
-   471  ecab ad7d02             		LDA TAPEB1+3				; Copy Hi byte of paste buffer pointer
-   472  ecae 85c8               		STA SAL+1				;   to work pointer
-   473  ecb0 ad7c02             		LDA TAPEB1+2				; Copy Lo byte of paste buffer pointer
-   474  ecb3 85c7               		STA SAL					;   to work pointer
+   471  ed2a ad7d02             		LDA TAPEB1+3				; Copy Hi byte of paste buffer pointer
+   472  ed2d 85c8               		STA SAL+1				;   to work pointer
+   473  ed2f ad7c02             		LDA TAPEB1+2				; Copy Lo byte of paste buffer pointer
+   474  ed32 85c7               		STA SAL					;   to work pointer
    475                          
-   476  ecb5 a5c5               		LDA ScrPtr+1				; Copy Hi byte of screen pointer
-   477  ecb7 85ca               		STA EAL+1				;   to work pointer 2
-   478  ecb9 a5c4               		LDA ScrPtr				; Copy Lo byte of screen pointer
-   479  ecbb 18                 		CLC
-   480  ecbc 65c6               		ADC CursorCol				; Add cursor position
-   481  ecbe 85c9               		STA EAL					;   to work pointer 2
-   482  ecc0 9002               		BCC ESCRB_SKIP				; do we need to update Hi byte?
-   483  ecc2 e6ca               		INC EAL+1				; yes, increment it
+   476  ed34 a5c5               		LDA ScrPtr+1				; Copy Hi byte of screen pointer
+   477  ed36 85ca               		STA EAL+1				;   to work pointer 2
+   478  ed38 a5c4               		LDA ScrPtr				; Copy Lo byte of screen pointer
+   479  ed3a 18                 		CLC
+   480  ed3b 65c6               		ADC CursorCol				; Add cursor position
+   481  ed3d 85c9               		STA EAL					;   to work pointer 2
+   482  ed3f 9002               		BCC ESCRB_SKIP				; do we need to update Hi byte?
+   483  ed41 e6ca               		INC EAL+1				; yes, increment it
    484                          
-   485  ecc4 a200               ESCRB_SKIP	LDX #0					; length counter
-   486  ecc6 a000               		LDY #0					; offet for pointer
+   485  ed43 a200               ESCRB_SKIP	LDX #0					; length counter
+   486  ed45 a000               		LDY #0					; offet for pointer
    487                          ESCRB_LOOP
-   488  ecc8 b1c7               		LDA (SAL),Y				; read byte from screen (SAL is updated, y never changes)
-   489  ecca 9d7e02             		STA TAPEB1+4,X				; Store in buffer (x is index)
+   488  ed47 b1c7               		LDA (SAL),Y				; read byte from screen (SAL is updated, y never changes)
+   489  ed49 9d7e02             		STA TAPEB1+4,X				; Store in buffer (x is index)
    490                          
-   491  eccd a5c8               		LDA SAL+1				; Get HI byte
-   492  eccf c5ca               		CMP EAL+1				; Does it match?
-   493  ecd1 d006               		BNE ESCRB_CHECK				; no, keep going
-   494  ecd3 a5c7               		LDA SAL					; get lo byte of pointer
-   495  ecd5 c5c9               		CMP EAL					; does it match?
+   491  ed4c a5c8               		LDA SAL+1				; Get HI byte
+   492  ed4e c5ca               		CMP EAL+1				; Does it match?
+   493  ed50 d006               		BNE ESCRB_CHECK				; no, keep going
+   494  ed52 a5c7               		LDA SAL					; get lo byte of pointer
+   495  ed54 c5c9               		CMP EAL					; does it match?
    496                          
-   497  ecd7 b00d               		BCS ESCRB_DONE				; yes, finish up
+   497  ed56 b00d               		BCS ESCRB_DONE				; yes, finish up
    498                          
-   499  ecd9 e8                 ESCRB_CHECK	INX
-   500  ecda e6c7               		INC SAL					; Increment pointer LO byte
-   501  ecdc a5c7               		LDA SAL					; read it
-   502  ecde d002               		BNE ESCRB2				; is byte 0? No, skip hi byte
-   503  ece0 e6c8               		INC SAL+1				; yes, increment hi byte
+   499  ed58 e8                 ESCRB_CHECK	INX
+   500  ed59 e6c7               		INC SAL					; Increment pointer LO byte
+   501  ed5b a5c7               		LDA SAL					; read it
+   502  ed5d d002               		BNE ESCRB2				; is byte 0? No, skip hi byte
+   503  ed5f e6c8               		INC SAL+1				; yes, increment hi byte
    504                          
-   505  ece2 e0a0               ESCRB2		CPX #160				; Are we at maximum buffer length?
-   506  ece4 d0e2               		BNE ESCRB_LOOP				; No, loop back for more
+   505  ed61 e0a0               ESCRB2		CPX #160				; Are we at maximum buffer length?
+   506  ed63 d0e2               		BNE ESCRB_LOOP				; No, loop back for more
    507                          
-   508  ece6 8e7b02             ESCRB_DONE	STX TAPEB1+1				; Store string length
-   509  ece9 a900               		LDA #0
-   510  eceb 9d7f02             		STA TAPEB1+5,X				; Store a ZERO at end for STROUT routine
-   511  ecee 4c99e1             ESCRB_EXIT	JMP IRQ_EPILOG				; Return
+   508  ed65 8e7b02             ESCRB_DONE	STX TAPEB1+1				; Store string length
+   509  ed68 a900               		LDA #0
+   510  ed6a 9d7f02             		STA TAPEB1+5,X				; Store a ZERO at end for STROUT routine
+   511  ed6d 4c99e1             ESCRB_EXIT	JMP IRQ_EPILOG				; Return
    512                          
    513                          ;--------------- ESC-UPARROW - Copy from buffer to screen
    514                          ESCAPE_UA	
-   515  ecf1 ad7a02             		LDA TAPEB1				; Read Buffer Identifier
-   516  ecf4 c91b               		CMP #27					; is it ESC?
-   517  ecf6 d01c               		BNE ESCUA_OUT				; No Start Mark, so exit out
+   515  ed70 ad7a02             		LDA TAPEB1				; Read Buffer Identifier
+   516  ed73 c91b               		CMP #27					; is it ESC?
+   517  ed75 d01c               		BNE ESCUA_OUT				; No Start Mark, so exit out
    518                          
-   519  ecf8 20aee6             		JSR BEEP
-   520  ecfb a97e               		lda #<TAPEB1+4				; setup string address
-   521  ecfd 85c7               		STA SAL
-   522  ecff a002               		ldy #>TAPEB1+4
-   523  ed01 85c8               		STA SAL+1
+   519  ed77 20aee6             		JSR BEEP
+   520  ed7a a97e               		lda #<TAPEB1+4				; setup string address
+   521  ed7c 85c7               		STA SAL
+   522  ed7e a002               		ldy #>TAPEB1+4
+   523  ed80 85c8               		STA SAL+1
    524                          
-   525  ed03 a000               ESCUA_LOOP	LDY #0					; counter
-   526  ed05 b1c7               		LDA (SAL),Y				; get byte from buffer
-   527  ed07 f00b               		BEQ ESCUA_OUT
-   528  ed09 20d2ff             		JSR BSOUT				; print it
-   529  ed0c e6c7               		INC SAL
-   530  ed0e d0f3               		BNE ESCUA_LOOP
-   531  ed10 e6c8               		INC SAL+1
-   532  ed12 d0ef               		BNE ESCUA_LOOP
+   525  ed82 a000               ESCUA_LOOP	LDY #0					; counter
+   526  ed84 b1c7               		LDA (SAL),Y				; get byte from buffer
+   527  ed86 f00b               		BEQ ESCUA_OUT
+   528  ed88 20d2ff             		JSR BSOUT				; print it
+   529  ed8b e6c7               		INC SAL
+   530  ed8d d0f3               		BNE ESCUA_LOOP
+   531  ed8f e6c8               		INC SAL+1
+   532  ed91 d0ef               		BNE ESCUA_LOOP
    533                          
-   534  ed14 4c99e1             ESCUA_OUT	JMP IRQ_EPILOG				; Return		
+   534  ed93 4c99e1             ESCUA_OUT	JMP IRQ_EPILOG				; Return		
    535                          
    536                          
    537                          ;-------------- Eurokey Functions
@@ -4473,28 +4485,28 @@
    539                          ; These functions SET or CLEAR the EUROFLAG location.
    540                          ; A '0' means use ASCII layout. A '1' means use DIN layout (swap Y and Z)
    541                          
-   542  ed17 a5f3               ESCAPE_BS	LDA EUROFLAG
-   543  ed19 4901               		EOR #1
+   542  ed96 a5f3               ESCAPE_BS	LDA EUROFLAG
+   543  ed98 4901               		EOR #1
    544                          
-   545  ed1b 85f3               EuroSet		STA EUROFLAG
-   546  ed1d 20aee6             		JSR BEEP
-   547  ed20 4c99e1             		JMP IRQ_EPILOG
+   545  ed9a 85f3               EuroSet		STA EUROFLAG
+   546  ed9c 20aee6             		JSR BEEP
+   547  ed9f 4c99e1             		JMP IRQ_EPILOG
    548                          
    549                          ;-------------- Check if Euro keys need swapping
    550                          ;
    551                          ; .A contains character to add to keyboard buffer. If EUROFLAG=1 then check if Y or Z need swapping.
    552                          
-   553  ed23 a6f3               EUROSWAP	LDX EUROFLAG		; Flag to swap Z and Y keys; 1=Swap
-   554  ed25 f00e               		BEQ EUROSWAP_OUT
+   553  eda2 a6f3               EUROSWAP	LDX EUROFLAG		; Flag to swap Z and Y keys; 1=Swap
+   554  eda4 f00e               		BEQ EUROSWAP_OUT
    555                          
-   556  ed27 c95a               		CMP #'Z'		; Is it "Z"?
-   557  ed29 d004               		BNE EUROSWAP2
-   558  ed2b a959               		LDA #'Y'		; Yes, swap with "Y"
-   559  ed2d d006               		BNE EUROSWAP_OUT
-   560  ed2f c959               EUROSWAP2	CMP #'Y'		; Is it "Y"?
-   561  ed31 d002               		BNE EUROSWAP_OUT
-   562  ed33 a95a               		LDA #'Z'		; Yes, swap with "Z"
-   563  ed35 4c63e5             EUROSWAP_OUT	JMP SCAN_NORM2		; Return to keyboard routine
+   556  eda6 c95a               		CMP #'Z'		; Is it "Z"?
+   557  eda8 d004               		BNE EUROSWAP2
+   558  edaa a959               		LDA #'Y'		; Yes, swap with "Y"
+   559  edac d006               		BNE EUROSWAP_OUT
+   560  edae c959               EUROSWAP2	CMP #'Y'		; Is it "Y"?
+   561  edb0 d002               		BNE EUROSWAP_OUT
+   562  edb2 a95a               		LDA #'Z'		; Yes, swap with "Z"
+   563  edb4 4c63e5             EUROSWAP_OUT	JMP SCAN_NORM2		; Return to keyboard routine
    564                          
    565                          
    566                          ;-------------- Switchable 40/80 column Functions
@@ -4520,49 +4532,49 @@
    586                          ; If MOT6845=1 then Register 12 is read and then manipulated.
    587                          
    588                          ESCAPE_N						; ESC-N = Screen Normal
-   589  ed38 205ced             		JSR CRTPREP
+   589  edb7 20dbed             		JSR CRTPREP
    590                          	!if MOT6845=1 {
    591                          		ORA #%00010000				; Set BIT 4
    592                          	} else {
-   593  ed3b a910               		LDA #16					; Normal screen, Normal chr set
+   593  edba a910               		LDA #16					; Normal screen, Normal chr set
    594                          	}
-   595  ed3d 4c55ed             		JMP CRTUPDATE
+   595  edbc 4cd4ed             		JMP CRTUPDATE
    596                          
    597                          ESCAPE_R						; ESC-R = Screen Reverse
-   598  ed40 205ced             		JSR CRTPREP
+   598  edbf 20dbed             		JSR CRTPREP
    599                          	!if MOT6845=1 {
    600                          		AND #%11101111				; Clear BIT 4
    601                          	} else {
-   602  ed43 a900               		LDA #0					; Reverse screen, Normal chr set
+   602  edc2 a900               		LDA #0					; Reverse screen, Normal chr set
    603                          	}
-   604  ed45 4c55ed             		JMP CRTUPDATE
+   604  edc4 4cd4ed             		JMP CRTUPDATE
    605                          
    606                          ESCAPE_Y						; ESC-Y = Normal Chr Set    (B-series). Was: Set Default Tabs (C128)
-   607  ed48 205ced             		JSR CRTPREP
+   607  edc7 20dbed             		JSR CRTPREP
    608                          	!if MOT6845=1 {
    609                          		AND #%11011111				; Clear BIT 5
    610                          	} else {
-   611  ed4b a910               		LDA #16					; Normal screen, Normal chr set
+   611  edca a910               		LDA #16					; Normal screen, Normal chr set
    612                          	}
-   613  ed4d 4c55ed             		JMP CRTUPDATE
+   613  edcc 4cd4ed             		JMP CRTUPDATE
    614                          				
    615                          ESCAPE_Z						; ESC-Z = Alternate Chr Set (B-Series). Was: Clear All Tabs (C128)
-   616  ed50 205ced             		JSR CRTPREP
+   616  edcf 20dbed             		JSR CRTPREP
    617                          	!if MOT6845=1 {
    618                          		ORA #%00100000				; Set BIT 5
    619                          	} else {
-   620  ed53 a930               		LDA #48					; Normal screen, Alternate chr set
+   620  edd2 a930               		LDA #48					; Normal screen, Alternate chr set
    621                          	}
    622                          CRTUPDATE
-   623  ed55 8d81e8             		STA CRT_Status				; Write the Value to previously selected register
-   624  ed58 58                 		CLI					; Enable Interrupts
-   625  ed59 4c99e1             		JMP IRQ_EPILOG				; Continue
+   623  edd4 8d81e8             		STA CRT_Status				; Write the Value to previously selected register
+   624  edd7 58                 		CLI					; Enable Interrupts
+   625  edd8 4c99e1             		JMP IRQ_EPILOG				; Continue
    626                          
-   627  ed5c 78                 CRTPREP		SEI
-   628  ed5d a90c               		LDA #12					; CRTC Register#12 - Display Address HI
-   629  ed5f 8d80e8             		STA CRT_Address				; Select the Register 
-   630  ed62 ad81e8             		LDA CRT_Status				; Read the Value (if CRTC chip is NOT a Motorola6845 then this will not work)
-   631  ed65 60                 		RTS
+   627  eddb 78                 CRTPREP		SEI
+   628  eddc a90c               		LDA #12					; CRTC Register#12 - Display Address HI
+   629  edde 8d80e8             		STA CRT_Address				; Select the Register 
+   630  ede1 ad81e8             		LDA CRT_Status				; Read the Value (if CRTC chip is NOT a Motorola6845 then this will not work)
+   631  ede4 60                 		RTS
 
 ; ******** Source: editrom.asm
    102                          
@@ -4591,38 +4603,38 @@
     21                          
     22                          !if DEBUG = 1 { INC DBLINE+9 }			; DEBUG
     23                          
-    24  ed66 48                 		PHA				; Save the character
-    25  ed67 a20f                  		LDX #$0F			; Table has 15 entries
-    26  ed69 dd93ee             ccloop		CMP COLOURS,X			; Does it match code from table?
-    27  ed6c f00a               		BEQ ccfound			; Yes, done
-    28  ed6e ca                 		DEX				; 
-    29  ed6f 10f8               		BPL ccloop			; loop for more
+    24  ede5 48                 		PHA				; Save the character
+    25  ede6 a20f                  		LDX #$0F			; Table has 15 entries
+    26  ede8 dd12ef             ccloop		CMP COLOURS,X			; Does it match code from table?
+    27  edeb f00a               		BEQ ccfound			; Yes, done
+    28  eded ca                 		DEX				; 
+    29  edee 10f8               		BPL ccloop			; loop for more
     30                          
-    31  ed71 a200               ccnotfound	LDX #0				; not found
-    32  ed73 8ede8b             		STX COLOURCOUNT			; Clear the Count
-    33  ed76 f027               		BEQ ccexit			; no match, exit 
+    31  edf0 a200               ccnotfound	LDX #0				; not found
+    32  edf2 8ede8f             		STX COLOURCOUNT			; Clear the Count
+    33  edf5 f027               		BEQ ccexit			; no match, exit 
     34                          
-    35  ed78 eede8b             ccfound		INC COLOURCOUNT			; Count code
-    36  ed7b 8a                 		TXA
-    37  ed7c aede8b             		LDX COLOURCOUNT			; 
-    38  ed7f e001               		CPX #1				; FIRST?
-    39  ed81 d003               		BNE cc3		
-    40  ed83 8ddb8b             		STA COLOURFG			; Set the FG colour		
+    35  edf7 eede8f             ccfound		INC COLOURCOUNT			; Count code
+    36  edfa 8a                 		TXA
+    37  edfb aede8f             		LDX COLOURCOUNT			; 
+    38  edfe e001               		CPX #1				; FIRST?
+    39  ee00 d003               		BNE cc3		
+    40  ee02 8ddb8f             		STA COLOURFG			; Set the FG colour		
     41                          
-    42  ed86 e002               cc3		CPX #2				; SECOND?
-    43  ed88 d003               		BNE cc4
-    44  ed8a 8ddc8b             		STA COLOURBG			; Set the BG colour
+    42  ee05 e002               cc3		CPX #2				; SECOND?
+    43  ee07 d003               		BNE cc4
+    44  ee09 8ddc8f             		STA COLOURBG			; Set the BG colour
     45                          
-    46  ed8d e003               cc4		CPX #3				; THIRD?
-    47  ed8f d00b               		BNE cc5
-    48  ed91 8ddd8b             		STA COLOURBORDER		; Set the BORDER colour
-    49  ed94 8de08b             		STA COLOURREGBORDER		; Store it in the BORDER register
-    50  ed97 a900               		LDA #0
-    51  ed99 8dde8b             		STA COLOURCOUNT			; Reset count
+    46  ee0c e003               cc4		CPX #3				; THIRD?
+    47  ee0e d00b               		BNE cc5
+    48  ee10 8ddd8f             		STA COLOURBORDER		; Set the BORDER colour
+    49  ee13 8de08f             		STA COLOURREGBORDER		; Store it in the BORDER register
+    50  ee16 a900               		LDA #0
+    51  ee18 8dde8f             		STA COLOURCOUNT			; Reset count
     52                          
-    53  ed9c 20bbed             cc5		JSR SetColourValue   		; Set the FG/BG value
-    54  ed9f 68                 ccexit		PLA				; Restore the Character
-    55  eda0 60                 		RTS
+    53  ee1b 203aee             cc5		JSR SetColourValue   		; Set the FG/BG value
+    54  ee1e 68                 ccexit		PLA				; Restore the Character
+    55  ee1f 60                 		RTS
     56                          
     57                          ;-------------- Initialize ColourPET
     58                          ;
@@ -4633,22 +4645,22 @@
     63                          
     64                          		!IF COLOURPET = 2 { JSR ClearColourRAM }
     65                          
-    66  eda1 200fe6             		JSR INIT_EDITOR			; Do Normal Initialization
+    66  ee20 200fe6             		JSR INIT_EDITOR			; Do Normal Initialization
     67                          
-    68  eda4 a900               		LDA #0
-    69  eda6 8dde8b             		STA COLOURCOUNT			; Reset Colour Count
+    68  ee23 a900               		LDA #0
+    69  ee25 8dde8f             		STA COLOURCOUNT			; Reset Colour Count
     70                          
-    71  eda9 a905               		LDA #DEFAULTFG			; Default Foreground Colour
-    72  edab 8ddb8b             		STA COLOURFG
-    73  edae a900               		LDA #DEFAULTBG			; Default Background Colour
-    74  edb0 8ddc8b             		STA COLOURBG
-    75  edb3 a900               		LDA #DEFAULTBO			; Default Border Colour
+    71  ee28 a905               		LDA #DEFAULTFG			; Default Foreground Colour
+    72  ee2a 8ddb8f             		STA COLOURFG
+    73  ee2d a902               		LDA #DEFAULTBG			; Default Background Colour
+    74  ee2f 8ddc8f             		STA COLOURBG
+    75  ee32 a902               		LDA #DEFAULTBO			; Default Border Colour
     76                          		
     77                          ;-------------- Set Border Colour and update Register
     78                          
     79                          SetColourAndBorder
-    80  edb5 8ddd8b             		STA COLOURBORDER		; Set the BORDER colour
-    81  edb8 8de08b             		STA COLOURREGBORDER		; Store it in the BORDER register
+    80  ee34 8ddd8f             		STA COLOURBORDER		; Set the BORDER colour
+    81  ee37 8de08f             		STA COLOURREGBORDER		; Store it in the BORDER register
     82                          
     83                          ;-------------- Set Colour
     84                          ;
@@ -4663,19 +4675,19 @@
     93                          SetColourValue
     94                          
     95                          !if COLOURMODE=0 {
-    96  edbb addc8b             		LDA COLOURBG			; Get the BG colour
-    97  edbe 0a                 		ASL				; move BG colour to upper nibble
-    98  edbf 0a                 		ASL
-    99  edc0 0a                 		ASL
-   100  edc1 0a                 		ASL
-   101  edc2 18                 		CLC
-   102  edc3 6ddb8b             		ADC COLOURFG			; Add the FG colour
+    96  ee3a addc8f             		LDA COLOURBG			; Get the BG colour
+    97  ee3d 0a                 		ASL				; move BG colour to upper nibble
+    98  ee3e 0a                 		ASL
+    99  ee3f 0a                 		ASL
+   100  ee40 0a                 		ASL
+   101  ee41 18                 		CLC
+   102  ee42 6ddb8f             		ADC COLOURFG			; Add the FG colour
    103                          } ELSE {
    104                          		LDX COLOURFG			; Get the FG index
    105                          		LDA RGBTABLE,X			; Convert it to Analog RRRGGGBB
    106                          }
-   107  edc6 8dda8b             		STA COLOURV			; Store it
-   108  edc9 60                 		RTS
+   107  ee45 8dda8f             		STA COLOURV			; Store it
+   108  ee48 60                 		RTS
    109                          
    110                          ;-------------- Clear Colour Ram - Green on Black
    111                          ;
@@ -4684,22 +4696,22 @@
    114                          ; NOTE: This routine clears ALL colour ram INCLUDING areas used for storage!!!!!!
    115                          
    116                          ClearColourRAM
-   117  edca a905               		LDA #5
-   118  edcc a200               		LDX #0
+   117  ee49 a905               		LDA #5
+   118  ee4b a200               		LDX #0
    119                          CCRAM1		
-   120  edce 9d0084             		STA COLOUR_RAM,X
-   121  edd1 9d0085             		STA COLOUR_RAM+$100,X
-   122  edd4 9d0086             		STA COLOUR_RAM+$200,X
-   123  edd7 9d0087             		STA COLOUR_RAM+$300,X
+   120  ee4d 9d0088             		STA COLOUR_RAM,X
+   121  ee50 9d0089             		STA COLOUR_RAM+$100,X
+   122  ee53 9d008a             		STA COLOUR_RAM+$200,X
+   123  ee56 9d008b             		STA COLOUR_RAM+$300,X
    124                          !IF COLUMNS = 80 {
-   125  edda 9d0088             		STA COLOUR_RAM+$400,X
-   126  eddd 9d0089             		STA COLOUR_RAM+$500,X
-   127  ede0 9d008a             		STA COLOUR_RAM+$600,X
-   128  ede3 9d008b             		STA COLOUR_RAM+$700,X
+   125  ee59 9d008c             		STA COLOUR_RAM+$400,X
+   126  ee5c 9d008d             		STA COLOUR_RAM+$500,X
+   127  ee5f 9d008e             		STA COLOUR_RAM+$600,X
+   128  ee62 9d008f             		STA COLOUR_RAM+$700,X
    129                          }
-   130  ede6 e8                 		INX
-   131  ede7 d0e5               		BNE CCRAM1
-   132  ede9 60                 		RTS
+   130  ee65 e8                 		INX
+   131  ee66 d0e5               		BNE CCRAM1
+   132  ee68 60                 		RTS
    133                          
    134                          ;-------------- Sync Pointers - Current Line
    135                          ;
@@ -4708,16 +4720,16 @@
    138                          ; in the Character and Colour pointers.
    139                          
    140                          ColourPET_SyncPointersX
-   141  edea 85c4               		STA ScrPtr				; Pointer: Current Screen Line Address LO
-   142  edec bd7ae7             		LDA Line_Addr_Hi,X			; Screen Line Addresses HI
-   143  edef 85c5               		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
+   141  ee69 85c4               		STA ScrPtr				; Pointer: Current Screen Line Address LO
+   142  ee6b bd7ae7             		LDA Line_Addr_Hi,X			; Screen Line Addresses HI
+   143  ee6e 85c5               		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
    144                          
-   145  edf1 bd93e7             		LDA CLine_Addr_Lo,X			; Colour Screen Line Addresses LO
-   146  edf4 85c0               		STA COLOURPTR				; Colour Pointer: Current Screen Line Address LO
-   147  edf6 bdace7             		LDA CLine_Addr_Hi,X			; Colour Screen Line Addresses HI
-   148  edf9 85c1               		STA COLOURPTR + 1      			; Colour Pointer: Current Screen Line Address HI
+   145  ee70 bd93e7             		LDA CLine_Addr_Lo,X			; Colour Screen Line Addresses LO
+   146  ee73 85c0               		STA COLOURPTR				; Colour Pointer: Current Screen Line Address LO
+   147  ee75 bdace7             		LDA CLine_Addr_Hi,X			; Colour Screen Line Addresses HI
+   148  ee78 85c1               		STA COLOURPTR + 1      			; Colour Pointer: Current Screen Line Address HI
    149                          
-   150  edfb 60                 		RTS
+   150  ee7a 60                 		RTS
    151                          
    152                          ;-------------- Sync Pointers - Next Line
    153                          ;
@@ -4726,74 +4738,74 @@
    156                          ; in the Character and Colour pointers.
    157                          
    158                          ColourPET_SyncPointers
-   159  edfc bd62e7             		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
-   160  edff 85c7               		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
-   161  ee01 bd7be7             		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
-   162  ee04 85c8               		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
+   159  ee7b bd62e7             		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
+   160  ee7e 85c7               		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
+   161  ee80 bd7be7             		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
+   162  ee83 85c8               		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
    163                          
-   164  ee06 bd94e7             		LDA CLine_Addr_Lo+1,X     		; Screen Line address table LO + 1
-   165  ee09 85c2               		STA COLOURPTR2				; Second Colour RAM Pointer
-   166  ee0b bdade7             		LDA CLine_Addr_Hi+1,X 			; Screen Line address table HI + 1
-   167  ee0e 85c3               		STA COLOURPTR2+1			;
-   168  ee10 60                 		RTS
+   164  ee85 bd94e7             		LDA CLine_Addr_Lo+1,X     		; Screen Line address table LO + 1
+   165  ee88 85c2               		STA COLOURPTR2				; Second Colour RAM Pointer
+   166  ee8a bdade7             		LDA CLine_Addr_Hi+1,X 			; Screen Line address table HI + 1
+   167  ee8d 85c3               		STA COLOURPTR2+1			;
+   168  ee8f 60                 		RTS
    169                          
    170                          ColourPET_SyncPointers2
-   171  ee11 bd60e7             		LDA Line_Addr_Lo-1,X			; Screen line address table LO - 1
-   172  ee14 85c7               		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
-   173  ee16 bd79e7             		LDA Line_Addr_Hi-1,X			; Screen line address table HI - 1
-   174  ee19 85c8               		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
+   171  ee90 bd60e7             		LDA Line_Addr_Lo-1,X			; Screen line address table LO - 1
+   172  ee93 85c7               		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
+   173  ee95 bd79e7             		LDA Line_Addr_Hi-1,X			; Screen line address table HI - 1
+   174  ee98 85c8               		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
    175                          
-   176  ee1b bd92e7             		LDA CLine_Addr_Lo-1,X     		; Screen Line address table LO - 1
-   177  ee1e 85c2               		STA COLOURPTR2				; Second Colour RAM Pointer
-   178  ee20 bdabe7             		LDA CLine_Addr_Hi-1,X 			; Screen Line address table HI - 1
-   179  ee23 85c3               		STA COLOURPTR2+1			;
-   180  ee25 60                 		RTS
+   176  ee9a bd92e7             		LDA CLine_Addr_Lo-1,X     		; Screen Line address table LO - 1
+   177  ee9d 85c2               		STA COLOURPTR2				; Second Colour RAM Pointer
+   178  ee9f bdabe7             		LDA CLine_Addr_Hi-1,X 			; Screen Line address table HI - 1
+   179  eea2 85c3               		STA COLOURPTR2+1			;
+   180  eea4 60                 		RTS
    181                          
    182                          
    183                          ;-------------- Scroll Left
    184                          
    185                          ColourPET_Scroll_Left
-   186  ee26 c8                 CPSL1		INY
-   187  ee27 b1c4               		LDA (ScrPtr),Y				; Read Character from Screen RAM
-   188  ee29 88                 		DEY					; move to the left
-   189  ee2a 91c4               		STA (ScrPtr),Y				; Write Character to Screen RAM
-   190  ee2c c8                 		INY
-   191  ee2d b1c0               		LDA (COLOURPTR),Y			; Read Colour from Colour RAM	@@@@@@@@@@@@@@ ColourPET
-   192  ee2f 88                 		DEY					; move to the left
-   193  ee30 91c0               		STA (COLOURPTR),Y			; Write Colour to Colour RAM	@@@@@@@@@@@@@@ ColourPET
-   194  ee32 c8                 		INY
-   195  ee33 c4d5               		CPY RightMargin
-   196  ee35 d0ef               		BNE CPSL1
-   197  ee37 60                 		RTS
+   186  eea5 c8                 CPSL1		INY
+   187  eea6 b1c4               		LDA (ScrPtr),Y				; Read Character from Screen RAM
+   188  eea8 88                 		DEY					; move to the left
+   189  eea9 91c4               		STA (ScrPtr),Y				; Write Character to Screen RAM
+   190  eeab c8                 		INY
+   191  eeac b1c0               		LDA (COLOURPTR),Y			; Read Colour from Colour RAM	@@@@@@@@@@@@@@ ColourPET
+   192  eeae 88                 		DEY					; move to the left
+   193  eeaf 91c0               		STA (COLOURPTR),Y			; Write Colour to Colour RAM	@@@@@@@@@@@@@@ ColourPET
+   194  eeb1 c8                 		INY
+   195  eeb2 c4d5               		CPY RightMargin
+   196  eeb4 d0ef               		BNE CPSL1
+   197  eeb6 60                 		RTS
    198                          
    199                          ;-------------- Insert
    200                          
    201                          ColourPET_Insert
-   202  ee38 88                 CPI1		DEY
-   203  ee39 b1c4               		LDA (ScrPtr),Y				; Read Character from Screen RAM
-   204  ee3b c8                 		INY					; move to the left
-   205  ee3c 91c4               		STA (ScrPtr),Y				; Write Character to Screen RAM
-   206  ee3e 88                 		DEY
-   207  ee3f b1c0               		LDA (COLOURPTR),Y			; Read Colour from Colour RAM	@@@@@@@@@@@@@@ ColourPET
-   208  ee41 c8                 		INY					; move to the left
-   209  ee42 91c0               		STA (COLOURPTR),Y			; Write Colour to Colour RAM	@@@@@@@@@@@@@@ ColourPET
-   210  ee44 88                 		DEY
-   211  ee45 c4c6               		CPY CursorCol
-   212  ee47 d0ef               		BNE CPI1
+   202  eeb7 88                 CPI1		DEY
+   203  eeb8 b1c4               		LDA (ScrPtr),Y				; Read Character from Screen RAM
+   204  eeba c8                 		INY					; move to the left
+   205  eebb 91c4               		STA (ScrPtr),Y				; Write Character to Screen RAM
+   206  eebd 88                 		DEY
+   207  eebe b1c0               		LDA (COLOURPTR),Y			; Read Colour from Colour RAM	@@@@@@@@@@@@@@ ColourPET
+   208  eec0 c8                 		INY					; move to the left
+   209  eec1 91c0               		STA (COLOURPTR),Y			; Write Colour to Colour RAM	@@@@@@@@@@@@@@ ColourPET
+   210  eec3 88                 		DEY
+   211  eec4 c4c6               		CPY CursorCol
+   212  eec6 d0ef               		BNE CPI1
    213                          
-   214  ee49 adda8b             		LDA COLOURV				; Current Colour              	@@@@@@@@@@@@@@ COLOURPET
-   215  ee4c 91c0               		STA (COLOURPTR),Y			; Write it to the Colour RAM	@@@@@@@@@@@@@@ COLOURPET
+   214  eec8 adda8f             		LDA COLOURV				; Current Colour              	@@@@@@@@@@@@@@ COLOURPET
+   215  eecb 91c0               		STA (COLOURPTR),Y			; Write it to the Colour RAM	@@@@@@@@@@@@@@ COLOURPET
    216                          
-   217  ee4e 60                 		RTS
+   217  eecd 60                 		RTS
    218                          
    219                          ;--------------- Copy Character and Colour from SOURCE to DEST
    220                          
    221                          ColourPET_Scroll_Dest
-   222  ee4f b1c7               		LDA (SAL),Y				; Read Character from Screen SOURCE
-   223  ee51 91c4               		STA (ScrPtr),Y				; Write it to Screen DESTINATION
-   224  ee53 b1c2               		LDA (COLOURPTR2),Y			; Read Colour from Colour RAM SOURCE	@@@@@@@@@@@@@@@ COLOURPET
-   225  ee55 91c0               		STA (COLOURPTR),Y			; Write it to Screen DESTINATION	@@@@@@@@@@@@@@@ COLOURPET
-   226  ee57 60                 		RTS
+   222  eece b1c7               		LDA (SAL),Y				; Read Character from Screen SOURCE
+   223  eed0 91c4               		STA (ScrPtr),Y				; Write it to Screen DESTINATION
+   224  eed2 b1c2               		LDA (COLOURPTR2),Y			; Read Colour from Colour RAM SOURCE	@@@@@@@@@@@@@@@ COLOURPET
+   225  eed4 91c0               		STA (COLOURPTR),Y			; Write it to Screen DESTINATION	@@@@@@@@@@@@@@@ COLOURPET
+   226  eed6 60                 		RTS
    227                          
    228                          ;-------------- Erase to End of Line
    229                          ;
@@ -4803,50 +4815,50 @@
    233                          ; Must not modify X since it is used as a line counter in WINDOW_CLEAR.
    234                          
    235                          ERASE_TO_EOL
-   236  ee58 98                 		TYA					; Save the Current offset
-   237  ee59 48                 		PHA					; to the stack
+   236  eed7 98                 		TYA					; Save the Current offset
+   237  eed8 48                 		PHA					; to the stack
    238                          
-   239  ee5a a920               		LDA #$20 				; <SPACE>
-   240  ee5c c8                 CEOL		INY					; next character
-   241  ee5d 91c4               		STA (ScrPtr),Y				; Pointer: Current Screen Line Address @@@@@@@@@@@@@@ ColourPET
-   242  ee5f c4d5                		CPY RightMargin
-   243  ee61 90f9               		BCC CEOL				; loop up for more
+   239  eed9 a920               		LDA #$20 				; <SPACE>
+   240  eedb c8                 CEOL		INY					; next character
+   241  eedc 91c4               		STA (ScrPtr),Y				; Pointer: Current Screen Line Address @@@@@@@@@@@@@@ ColourPET
+   242  eede c4d5                		CPY RightMargin
+   243  eee0 90f9               		BCC CEOL				; loop up for more
    244                          
-   245  ee63 68                 		PLA					; Pull the offset from the stack
-   246  ee64 a8                 		TAY					; 
+   245  eee2 68                 		PLA					; Pull the offset from the stack
+   246  eee3 a8                 		TAY					; 
    247                          
-   248  ee65 adda8b             		LDA COLOURV				; The current colour
-   249  ee68 c8                 CEOL2		INY					; Next colour ram location
-   250  ee69 91c0               		STA (COLOURPTR),Y			; Clear Colour RAM
-   251  ee6b c4d5               		CPY RightMargin
-   252  ee6d 90f9               		BCC CEOL2				; loop up for more
-   253  ee6f 60                 		RTS
+   248  eee4 adda8f             		LDA COLOURV				; The current colour
+   249  eee7 c8                 CEOL2		INY					; Next colour ram location
+   250  eee8 91c0               		STA (COLOURPTR),Y			; Clear Colour RAM
+   251  eeea c4d5               		CPY RightMargin
+   252  eeec 90f9               		BCC CEOL2				; loop up for more
+   253  eeee 60                 		RTS
    254                          
    255                          ;-------------- Writes the NEW Character and Colour to the Screen
    256                          Put_ColourChar_at_Cursor
-   257  ee70 48                 		PHA				; Save the character
-   258  ee71 a4c6               		LDY CursorCol			; Cursor Column on Current Line
-   259  ee73 adda8b             		LDA COLOURV			; Current Colour Attribute
-   260  ee76 91c0               		STA (COLOURPTR),Y		; Put the Colour to ColourRAM
-   261  ee78 68                 		PLA				; Restore the character
-   262  ee79 a4c6               		LDY CursorCol			; Cursor Column on Current Line		
-   263  ee7b 91c4               		STA (ScrPtr),Y			; Put the character on the screen!!!!!!!!!!!!!!!!!!!!! 
-   264  ee7d a902               		LDA #2				; Set blink count so cursor appears immediately
-   265  ee7f 85a8               		STA BLNCT			; Timer: Countdown to Toggle Cursor
-   266  ee81 60                 		RTS
+   257  eeef 48                 		PHA				; Save the character
+   258  eef0 a4c6               		LDY CursorCol			; Cursor Column on Current Line
+   259  eef2 adda8f             		LDA COLOURV			; Current Colour Attribute
+   260  eef5 91c0               		STA (COLOURPTR),Y		; Put the Colour to ColourRAM
+   261  eef7 68                 		PLA				; Restore the character
+   262  eef8 a4c6               		LDY CursorCol			; Cursor Column on Current Line		
+   263  eefa 91c4               		STA (ScrPtr),Y			; Put the character on the screen!!!!!!!!!!!!!!!!!!!!! 
+   264  eefc a902               		LDA #2				; Set blink count so cursor appears immediately
+   265  eefe 85a8               		STA BLNCT			; Timer: Countdown to Toggle Cursor
+   266  ef00 60                 		RTS
    267                          
    268                          ;-------------- Writes the OLD Colour at Cursor Position to the screen
    269                          Restore_Colour_at_Cursor
-   270  ee82 48                 		PHA				; Push Character
-   271  ee83 a4c6               		LDY CursorCol			; Cursor Column on Current Line
-   272  ee85 a5ed               		LDA CURSORCOLOUR		; Get current Colour
-   273  ee87 91c0               		STA (COLOURPTR),Y		; Set the Colour
-   274  ee89 68                 		PLA				; Pull Character
-   275  ee8a a4c6               		LDY CursorCol			; Cursor Column on Current Line		
-   276  ee8c 91c4               		STA (ScrPtr),Y			; Put the character on the screen!!!!!!!!!!!!!!!!!!!!! 
-   277  ee8e a902               		LDA #2				; Set blink count so cursor appears immediately
-   278  ee90 85a8               		STA BLNCT			; Timer: Countdown to Toggle Cursor
-   279  ee92 60                 		RTS
+   270  ef01 48                 		PHA				; Push Character
+   271  ef02 a4c6               		LDY CursorCol			; Cursor Column on Current Line
+   272  ef04 a5ed               		LDA CURSORCOLOUR		; Get current Colour
+   273  ef06 91c0               		STA (COLOURPTR),Y		; Set the Colour
+   274  ef08 68                 		PLA				; Pull Character
+   275  ef09 a4c6               		LDY CursorCol			; Cursor Column on Current Line		
+   276  ef0b 91c4               		STA (ScrPtr),Y			; Put the character on the screen!!!!!!!!!!!!!!!!!!!!! 
+   277  ef0d a902               		LDA #2				; Set blink count so cursor appears immediately
+   278  ef0f 85a8               		STA BLNCT			; Timer: Countdown to Toggle Cursor
+   279  ef11 60                 		RTS
    280                          
    281                          ;-------------- Colour Codes Table
    282                          ;
@@ -4855,24 +4867,24 @@
    285                          ;	PETSCII Code	C64 colour		C128 colour (*=changed)
    286                          ;       ------------   	----------		-----------
    287                          COLOURS
-   288  ee93 90                 	!byte $90	;0=black		0=black
-   289  ee94 98                 	!byte $98	;12=medium grey		1=medium grey
-   290  ee95 1f                 	!byte $1F	;6=blue			2=blue
-   291  ee96 9a                 	!byte $9A	;14=light blue		3=light blue
-   292  ee97 1e                 	!byte $1E	;5=green		4=green
-   293  ee98 99                 	!byte $99	;13=light green		5=light green	(CONFLICT! PET = SCROLL UP!)
-   294  ee99 97                 	!byte $97	;11=dark grey		6=dark cyan*
-   295  ee9a 9f                 	!byte $9F	;3=cyan			7=light cyan*
-   296  ee9b 1c                 	!byte $1C	;2=red			8=red
-   297  ee9c 96                 	!byte $96	;10=light red		9=light red	(CONFLICT! PET = ERASE END!)
-   298  ee9d 81                 	!byte $81	;8=orange		10=dark purple*
-   299  ee9e 9c                 	!byte $9C	;4=magenta		11=magenta/purple
-   300  ee9f 95                 	!byte $95	;9=brown		12=dark yellow* (CONFLICT! PET = INS LINE!)
-   301  eea0 9e                 	!byte $9E	;7=yellow		13=yellow
-   302  eea1 9b                 	!byte $9B	;15=light grey		14=light grey
-   303  eea2 05                 	!byte $05	;1=white		15=white
+   288  ef12 90                 	!byte $90	;0=black		0=black
+   289  ef13 98                 	!byte $98	;12=medium grey		1=medium grey
+   290  ef14 1f                 	!byte $1F	;6=blue			2=blue
+   291  ef15 9a                 	!byte $9A	;14=light blue		3=light blue
+   292  ef16 1e                 	!byte $1E	;5=green		4=green
+   293  ef17 99                 	!byte $99	;13=light green		5=light green	(CONFLICT! PET = SCROLL UP!)
+   294  ef18 97                 	!byte $97	;11=dark grey		6=dark cyan*
+   295  ef19 9f                 	!byte $9F	;3=cyan			7=light cyan*
+   296  ef1a 1c                 	!byte $1C	;2=red			8=red
+   297  ef1b 96                 	!byte $96	;10=light red		9=light red	(CONFLICT! PET = ERASE END!)
+   298  ef1c 81                 	!byte $81	;8=orange		10=dark purple*
+   299  ef1d 9c                 	!byte $9C	;4=magenta		11=magenta/purple
+   300  ef1e 95                 	!byte $95	;9=brown		12=dark yellow* (CONFLICT! PET = INS LINE!)
+   301  ef1f 9e                 	!byte $9E	;7=yellow		13=yellow
+   302  ef20 9b                 	!byte $9B	;15=light grey		14=light grey
+   303  ef21 05                 	!byte $05	;1=white		15=white
    304                          
-   305  eea3 00                 	!byte 0 ; separator
+   305  ef22 00                 	!byte 0 ; separator
    306                          
    307                          !IF COLOURMODE=1 {
    308                          
@@ -4935,23 +4947,23 @@
     13                          		!IF KEYBOARD=8 {
     14                          			LDY #15				; ROW=15
     15                          		} ELSE {
-    16  eea4 a009               			LDY #9				; ROW=9
+    16  ef23 a009               			LDY #9				; ROW=9
     17                          		}
     18                          CheckLoop
-    19  eea6 8c10e8             		STY PIA1_Port_A 			; Keyboard row select
-    20  eea9 ad12e8             		LDA PIA1_Port_B				; Keyboard col - keypressed
-    21  eeac d9b8ee             		CMP RebootCodes,Y
-    22  eeaf d006               		BNE CheckOut				; Exit if no match
-    23  eeb1 88                 		DEY					; ROW=ROW-1
-    24  eeb2 10f2               		BPL CheckLoop				; Get more if not <0
+    19  ef25 8c10e8             		STY PIA1_Port_A 			; Keyboard row select
+    20  ef28 ad12e8             		LDA PIA1_Port_B				; Keyboard col - keypressed
+    21  ef2b d937ef             		CMP RebootCodes,Y
+    22  ef2e d006               		BNE CheckOut				; Exit if no match
+    23  ef30 88                 		DEY					; ROW=ROW-1
+    24  ef31 10f2               		BPL CheckLoop				; Get more if not <0
     25                          
     26                          		!IF UPET=1 {
-    27  eeb4 4cc2ee             			JMP RebootUPet
+    27  ef33 4c41ef             			JMP RebootUPet
     28                          		} ELSE {
     29                          			JMP ($FFFC)			; All keys match, so reset!
     30                          		}
     31                          
-    32  eeb7 60                 CheckOut	RTS
+    32  ef36 60                 CheckOut	RTS
     33                          
     34                          ;-------------- Reboot Code Table
     35                          ;
@@ -4976,16 +4988,16 @@
     54                          
     55                          ;		----------------- Business Keyboard: ESC-SHIFT-SHIFT-DEL
     56                          !if (KEYBOARD=1) OR (KEYBOARD=4) OR (KEYBOARD=6) OR (KEYBOARD=7) {
-    57  eeb8 ff                 		!byte %11111111	; ROW 9
-    58  eeb9 ff                 		!byte %11111111	; ROW 8
-    59  eeba be                 		!byte %10111110	; ROW 7 - (ghost), ESC
-    60  eebb ff                 		!byte %11111111	; ROW 6
-    61  eebc 7f                 		!byte %01111111	; ROW 5 - DEL
-    62  eebd ff                 		!byte %11111111	; ROW 4
-    63  eebe be                 		!byte %10111110	; ROW 3 - SHIFT, SHIFT
-    64  eebf ff                 		!byte %11111111	; ROW 2
-    65  eec0 ff                 		!byte %11111111	; ROW 1
-    66  eec1 ff                 		!byte %11111111	; ROW 0
+    57  ef37 ff                 		!byte %11111111	; ROW 9
+    58  ef38 ff                 		!byte %11111111	; ROW 8
+    59  ef39 be                 		!byte %10111110	; ROW 7 - (ghost), ESC
+    60  ef3a ff                 		!byte %11111111	; ROW 6
+    61  ef3b 7f                 		!byte %01111111	; ROW 5 - DEL
+    62  ef3c ff                 		!byte %11111111	; ROW 4
+    63  ef3d be                 		!byte %10111110	; ROW 3 - SHIFT, SHIFT
+    64  ef3e ff                 		!byte %11111111	; ROW 2
+    65  ef3f ff                 		!byte %11111111	; ROW 1
+    66  ef40 ff                 		!byte %11111111	; ROW 0
     67                          }
     68                          
     69                          ;		----------------- DIN Keyboard: ESC-SHIFT-SHIFT-DEL
@@ -5080,33 +5092,33 @@
     20                          FLASH=$01
     21                          
     22                          RebootUPet
-    23  eec2 78                 		sei
+    23  ef41 78                 		sei
     24                          
-    25  eec3 a900               		lda #0
-    26  eec5 8d03e8             		sta SPEED	; 1MHz to make sure not to overrun SPI
-    27  eec8 8d01e8             		sta MEMMAP	; all RAM (writeable)
-    28  eecb 8d00e8             		sta VCTRL
-    29  eece 8d02e8             		sta LOW32K	
+    25  ef42 a900               		lda #0
+    26  ef44 8d03e8             		sta SPEED	; 1MHz to make sure not to overrun SPI
+    27  ef47 8d01e8             		sta MEMMAP	; all RAM (writeable)
+    28  ef4a 8d00e8             		sta VCTRL
+    29  ef4d 8d02e8             		sta LOW32K	
     30                          
-    31  eed1 a901               		lda #FLASH
-    32  eed3 8d08e8             		sta SPI
-    33  eed6 a903               		lda #3		; SPI Flash READ
-    34  eed8 8d09e8             		sta SPIDATA
-    35  eedb a900               		lda #0
-    36  eedd 8d09e8             		sta SPIDATA
-    37  eee0 8d09e8             		sta SPIDATA
-    38  eee3 8d09e8             		sta SPIDATA
-    39  eee6 ad09e8             		lda SPIDATA	; trigger first byte
+    31  ef50 a901               		lda #FLASH
+    32  ef52 8d08e8             		sta SPI
+    33  ef55 a903               		lda #3		; SPI Flash READ
+    34  ef57 8d09e8             		sta SPIDATA
+    35  ef5a a900               		lda #0
+    36  ef5c 8d09e8             		sta SPIDATA
+    37  ef5f 8d09e8             		sta SPIDATA
+    38  ef62 8d09e8             		sta SPIDATA
+    39  ef65 ad09e8             		lda SPIDATA	; trigger first byte
     40                          
-    41  eee9 a200               		ldx #0
-    42  eeeb ad09e8             loop		lda SPIDATA
-    43  eeee 9d00ff             		sta $ff00,x
-    44  eef1 e8                 		inx
-    45  eef2 d0f7               		bne loop
+    41  ef68 a200               		ldx #0
+    42  ef6a ad09e8             loop		lda SPIDATA
+    43  ef6d 9d00ff             		sta $ff00,x
+    44  ef70 e8                 		inx
+    45  ef71 d0f7               		bne loop
     46                          
-    47  eef4 8e08e8             		stx SPI
+    47  ef73 8e08e8             		stx SPI
     48                          
-    49  eef7 6cfcff             		JMP ($FFFC)
+    49  ef76 6cfcff             		JMP ($FFFC)
     50                          
     51                          
     52                          }
@@ -5133,7 +5145,7 @@
    136                          ; We finish off by padding the binary to exactly 4K bytes.
    137                          ;#########################################################################################################
    138                          
-   139  eefa ffffffffffffffff...	!IF OPTROM=0 { !FILL $F000-*,$FF }				; PAD to 4K ######################
+   139  ef79 ffffffffffffffff...	!IF OPTROM=0 { !FILL $F000-*,$FF }				; PAD to 4K ######################
    140                          
    141                          }
    142                          ; This is the end of the check for EXT code.
