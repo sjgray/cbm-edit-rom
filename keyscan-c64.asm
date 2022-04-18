@@ -130,6 +130,9 @@ SCAN_GOT
                 ; could do LDA KBD_Page_Indicator,Y:BNE NOT_KBD_NORMAL to change which base to use for index in X
                 LDA KBD_NORMAL,x
 
+!IF ESCCODES=1 { JMP EUROSWAP }
+SCAN_NORM2
+
 ;-------------- Process Key Image
 
 DECODE_DONE     STA Key_Image           ; Key Image
