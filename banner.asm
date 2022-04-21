@@ -147,7 +147,7 @@
 		!byte $92,$E9,$5		; <OFF><diag block><WHT>
 
 !IF UPET=1 {
-		!pet "  the ultra-pet development prototype"
+		!pet "  the ultra-pet prototype"
 } ELSE {
 		!pet "  the commodore colourpet"
 }
