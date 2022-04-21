@@ -39,6 +39,14 @@
 	!IF CODEBASE=1 {!SOURCE "editrom80.asm"}			; 80-column CODEBASE
 	!IF CODEBASE=2 {!SOURCE "editrom82.asm"}			; 80-column EXTENDED CODEBASE
 
+;=======================================================================
+; CODEBASE 0 Overflow Code
+;=======================================================================
+; This code is included only for Codebase 0, and only contains feature
+; code that overflows the first 2k (e.g. C64 keyboard tables)
+
+	!IF CODEBASE = 0 {!SOURCE "code0overflow.asm" }
+
 ;----------------------- Determine if we need to generate more code!
 ; We must include this area if:
 ;   1) We are using CODEBASE 2
