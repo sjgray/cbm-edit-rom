@@ -62,3 +62,8 @@ CLS_LOOP	STA SCREEN_RAM,X			; LOOP[  Screen RAM page 1
 }
 		INX					;   Next position
 		BNE CLS_LOOP				; ] Loop back for more
+
+!IF (COLOURPET=1) {
+		JSR ClearColourRAM
+}
+
