@@ -34,10 +34,6 @@
 		!SOURCE "keyboard-tables3.asm"
 }
 
-!IF (BACKARROW = 1) {
-		!SOURCE "editbarrow.asm"
-}
-
 !IF (COLOURPET = 1) {
 		!SOURCE "screen1c.asm"
 }

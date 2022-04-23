@@ -1349,7 +1349,7 @@ POWERSOF2       !byte $80,$40,$20,$10,$08,$04,$02,$01	; BIT table
 ; note - these had to be moved to code0overflow.asm to make place for 
 ; colourpet and other code
 
-;!IF BACKARROW =1 { !SOURCE "editbarrow.asm" }		; Patch for Back Arrow
+!IF BACKARROW =1 { !SOURCE "editbarrow.asm" }		; Patch for Back Arrow
 
 ;*********************************************************************************************************
 ;** FILLER
