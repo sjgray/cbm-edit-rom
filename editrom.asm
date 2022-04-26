@@ -40,12 +40,11 @@
 	!IF CODEBASE=2 {!SOURCE "editrom82.asm"}			; 80-column EXTENDED CODEBASE
 
 ;=======================================================================
-; CODEBASE 0 Overflow Code
+; CODEBASE Overflow Code
 ;=======================================================================
 ; This code is included only for Codebase 0, and only contains feature
 ; code that overflows the first 2k (e.g. C64 keyboard tables)
 
-	!IF CODEBASE = 0 {!SOURCE "code0overflow.asm" }
 
 ;----------------------- Determine if we need to generate more code!
 ; We must include this area if:
@@ -53,7 +52,7 @@
 ;   2) Certain EXTended features are enabled
 ;   3) BACKARROW feature needs relocating.
 
-	!IF (CODEBASE=2) | ((COLOURPET + ESCCODES + WEDGE + EXECUDESK + SS40 + AUTORUN + KEYRESET) > 0) | (BACKARROW=2) {
+	!IF ((CODEBASE=2) | ((COLOURPET + ESCCODES + WEDGE + EXECUDESK + SS40 + AUTORUN + KEYRESET) > 0) | (BACKARROW=2) | (CODEBASE=0 & KEYSCAN=3)) {
 
 ;=======================================================================
 ; EXT 4K Edit ROM code starts here
@@ -76,6 +75,8 @@
 ; CODEBASE 2 Code
 ;=======================================================================
 ; This code is included only for Codebase 2
+
+
 
 	!IF CODEBASE = 2 {!SOURCE "editromext.asm" }
 
@@ -103,6 +104,8 @@
 		!IF BANNER > 0    { !SOURCE "editbanner.asm" }
 		!IF WEDGE = 1	  { !SOURCE "editwedge.asm" }		
 	}
+
+	!IF CODEBASE = 0 {!SOURCE "code0overflow.asm" }
 
 	;----- These features require ESC codes
 

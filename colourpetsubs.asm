@@ -139,7 +139,13 @@ CCRAM1
 
 ColourPET_SyncPointersX
 		STA ScrPtr				; Pointer: Current Screen Line Address LO
+!IF (CODEBASE=0) { 
+		LDA CLine_Addr_Hi,X			; Screen Line Addresses HI
+		AND #%11110111 
+} ELSE {
 		LDA Line_Addr_Hi,X			; Screen Line Addresses HI
+}
+
 		STA ScrPtr+1         			; Pointer: Current Screen Line Address HI
 
 		LDA CLine_Addr_Lo,X			; Colour Screen Line Addresses LO
@@ -158,7 +164,12 @@ ColourPET_SyncPointersX
 ColourPET_SyncPointers
 		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
 		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
-		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
+!IF (CODEBASE=0) { 
+		LDA CLine_Addr_Hi+1,X			; Screen Line Addresses HI
+		AND #%11110111 
+} ELSE {
+		LDA Line_Addr_Hi+1,X			; Screen Line Addresses HI
+}
 		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
 
 		LDA CLine_Addr_Lo+1,X     		; Screen Line address table LO + 1
@@ -170,7 +181,12 @@ ColourPET_SyncPointers
 ColourPET_SyncPointers2
 		LDA Line_Addr_Lo-1,X			; Screen line address table LO - 1
 		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
-		LDA Line_Addr_Hi-1,X			; Screen line address table HI - 1
+!IF (CODEBASE=0) { 
+		LDA CLine_Addr_Hi-1,X			; Screen Line Addresses HI
+		AND #%11110111 
+} ELSE {
+		LDA Line_Addr_Hi-1,X			; Screen Line Addresses HI
+}
 		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
 
 		LDA CLine_Addr_Lo-1,X     		; Screen Line address table LO - 1

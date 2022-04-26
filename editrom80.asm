@@ -1380,7 +1380,7 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e	; BELL chime values
 ;** Small patches here  [E787]
 ;*********************************************************************************************************
 
-!IF BACKARROW >0 { !SOURCE "editbarrow.asm" }		; Patch for BackArrow toggling of screen mode
+!IF BACKARROW =1 { !SOURCE "editbarrow.asm" }		; Patch for BackArrow toggling of screen mode
 
 ;#########################################################################################################
 !IF CRUNCH=0 {	!byte $cd }		; to match 901474-04
