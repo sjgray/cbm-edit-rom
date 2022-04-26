@@ -174,7 +174,9 @@ UPDATE_SCREEN_PTR
 ;** Get a KEY from keyboard buffer. Reads a character from 'KEYD' then shifts remaining buffer characters
 ;** If there is NO key it will return $FF.
 ;*********************************************************************************************************
-!FILL $e0a7-*,$aa ; FIXED ENTRY POINT! This must not move!
+
+	!IF NOFILL=0 { !FILL $e0a7-*,$aa }		; FIXED ENTRY POINT! This must not move!
+
 ;#########################################################################################################
 
 GETKEY
@@ -279,7 +281,9 @@ PL_SKIP 	INY					; last was not <SPACE> so move ahead one
 ;** INPUT_CHARACTER  [E116]  (Called from Jump Table) - FIXED ENTRY POINT!!!!!
 ;** Push X and Y to stack then call Input a Character routine via pointer
 ;*********************************************************************************************************
-!FILL $e116-*,$aa ; FIXED ENTRY POINT! This must not move!
+
+		!IF NOFILL=0 { !FILL $e116-*,$aa }	; FIXED ENTRY POINT! This must not move!
+
 ;#########################################################################################################
 
 INPUT_CHARACTER	TYA
@@ -489,7 +493,9 @@ WIN_SET_TOP	STA TopMargin				; First line of window
 ;** $E202 - FIXED ENTRY POINT! Some BASIC/KERNAL bypass the Jump Table and jump directly here
 ;** Output Character to Screen Dispatch 
 ;*********************************************************************************************************
-!FILL $e202-*,$aa ; FIXED ENTRY POINT! This must not move!
+
+		!IF NOFILL=0 { !FILL $e202-*,$aa }	; FIXED ENTRY POINT! This must not move!
+
 ;#########################################################################################################
 
 CHROUT_SCREEN	PHA
@@ -995,7 +1001,9 @@ Be3fe		JSR ERASE_TO_EOL			; Clear the bottom line
 ;** The CRTC chip's V-Sync line is fed to a VIA to generate IRQ's. When an IRQ is triggered, the
 ;** Clock is updated, the keyboard scanned, ieee polled and tape monitored.
 ;*********************************************************************************************************
-!FILL $e442-*,$aa ; FIXED ENTRY POINT! This routine must not move!
+
+		!IF NOFILL=0 { !FILL $e442-*,$aa }	; FIXED ENTRY POINT! This routine must not move!
+
 ;#########################################################################################################
 
 !SOURCE "irq.asm"
@@ -1143,7 +1151,9 @@ Be5ed		CMP #14 				; Is it CTRL-SHIFT-N? (Graphics mode)
 ;** IRQ_END  [E600]  (Called from Jump Table) - FIXED ENTRY POINT!
 ;** The IRQ routine jumps here when completed. Do not modify this routine!
 ;*********************************************************************************************************
-!FILL $e600-*,$aa ;FIXED ENTRY POINT! This routine must not move! It is called directly from KERNAL
+
+		!IF NOFILL=0 { !FILL $e600-*,$aa }	;FIXED ENTRY POINT! This routine must not move! It is called directly from KERNAL
+
 ;#########################################################################################################
 
 IRQ_END		PLA
@@ -1388,6 +1398,8 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e	; BELL chime values
 ;*********************************************************************************************************
 ;** FILLER
 ;*********************************************************************************************************
-		!FILL $e800-*,$aa	; 78 bytes - Fill to end of 2K
+
+		!IF NOFILL=0 { !FILL $e800-*,$aa }	; 78 bytes - Fill to end of 2K
+
 ;#########################################################################################################
 ;END! DO NOT ADD ANYTHING BELOW THIS LINE!!!!!!!!

@@ -143,7 +143,7 @@ NOTSUPPORTED	RTS
 ;** If there is NO key it will return $FF.
 ;*********************************************************************************************************
 
-		!FILL $e0a7-*,$aa ; FIXED ENTRY POINT! This must not move! (approx 14 bytes filler for std rom)
+		!IF NOFILL=0 { !FILL $e0a7-*,$aa }	; FIXED ENTRY POINT! This must not move! (approx 14 bytes filler for std rom)
 
 ;#########################################################################################################
 
@@ -249,7 +249,7 @@ PL_SKIP 	INY					; last checked was not space so move one forward
 ;** Push X and Y to stack then call Input a Character routine via pointer
 ;*********************************************************************************************************
 
-		!FILL $e116-*,$aa ; FIXED ENTRY POINT! This must not move!
+		!IF NOFILL=0 { !FILL $e116-*,$aa }	; FIXED ENTRY POINT! This must not move!
 
 ;#########################################################################################################
 
@@ -432,7 +432,7 @@ PL_SKIP2	DEX
 ;** Output Character to Screen Dispatch 
 ;*********************************************************************************************************
 
-		!FILL $e202-*,$aa ; FIXED ENTRY POINT! This must not move!
+		!IF NOFILL=0 { !FILL $e202-*,$aa }	; FIXED ENTRY POINT! This must not move!
 
 ;#########################################################################################################
 
@@ -925,7 +925,7 @@ ADVANCE_TIMER	JSR UDTIME				; Update System Jiffy Clock. KERNAL routine $FFEA
 ;** Clock is updated, the keyboard scanned, ieee polled and tape monitored.
 ;*********************************************************************************************************
 
-		!FILL $e442-*,$aa ; FIXED ENTRY POINT! This routine must not move!
+		!IF NOFILL=0 { !FILL $e442-*,$aa }	; FIXED ENTRY POINT! This routine must not move!
 
 ;#########################################################################################################
 
@@ -976,14 +976,18 @@ CHECK_TAB	TYA
 }
 
 ;################################################################################
-		!fill $e600-*,$aa	;########################################
+
+		!IF NOFILL=0 { !fill $e600-*,$aa }	;########################
+
 ;################################################################################
 
 ;*********************************************************************************************************
 ;** IRQ_END  [E600] (Called from Jump Table) - FIXED ENTRY POINT!
 ;** The IRQ routine jumps here when completed. Do not modify this routine!
 ;*********************************************************************************************************
-!FILL $e600-*,$aa ;FIXED ENTRY POINT! This routine must not move! It is called directly from KERNAL
+
+		!IF NOFILL=0 { !FILL $e600-*,$aa }	;FIXED ENTRY POINT! This routine must not move! It is called directly from KERNAL
+
 ;#########################################################################################################
 
 IRQ_END		PLA
@@ -1354,6 +1358,8 @@ POWERSOF2       !byte $80,$40,$20,$10,$08,$04,$02,$01	; BIT table
 ;*********************************************************************************************************
 ;** FILLER
 ;*********************************************************************************************************
-		!FILL $e800-*,$aa	; Fill to end of 2K
+
+		!IF NOFILL=0 { !FILL $e800-*,$aa }	; Fill to end of 2K
+
 ;#########################################################################################################
 ;END! DO NOT ADD ANYTHING BELOW THIS LINE!!!!!!!!

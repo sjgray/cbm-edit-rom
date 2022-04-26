@@ -17,10 +17,10 @@
 }
 
 !pet " keyboard="
-	!if KEYBOARD= 0 { !pet "n-qwerty" }
-	!if KEYBOARD= 1 { !pet "b-qwerty" }	; QWERTY layout
-	!if KEYBOARD= 2 { !pet "din" }
-	!if KEYBOARD= 3 { !pet "c64/vic" }
+	!if KEYBOARD= 0 { !pet "n" }		; QWERTY layout
+	!if KEYBOARD= 1 { !pet "b" }		; QWERTY layout
+	!if KEYBOARD= 2 { !pet "din" }		; German layout
+	!if KEYBOARD= 3 { !pet "c64" }		; C64 or VIC layout
 	!if KEYBOARD= 4 { !pet "b-sjg" }	; Modified layout - cursor keys, esc etc
 	!if KEYBOARD= 5 { !pet "n-sjg" }	; Modified layout - @ replaced with ESC, backarrow becomes @
 	!if KEYBOARD= 6 { !pet "b-qwertz" }	; QWERTZ layout
@@ -64,12 +64,13 @@
 	!if REFRESH= 99 { !pet "custom" }
 
 !pet " features="
+!if DISKBOOT=1  { !pet "diskboot" }
 !if ESCCODES=1  { !pet "esc-codes" }
 !if AUTORUN=1   { !pet ",autorun" }
 !if BYPASS=1    { !pet "+bypass" }
 !if BANNER>0    { !pet ",banner" }
 !if WEDGE=1     { !pet ",wedge" }
-!if REBOOT=1    { !pet ",reboot" }
+!if KEYRESET=1  { !pet ",reboot" }
 !if EXECUDESK=1 { !pet ",execudesk" }
 !if BACKARROW>0 { !pet ",backarrow" }
 !if MOT6845=1   { !pet ",mot6845" }

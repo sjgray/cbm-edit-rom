@@ -301,26 +301,25 @@ Restore_Colour_at_Cursor
 ;	PETSCII Code	C64 colour		C128 colour (*=changed)
 ;       ------------   	----------		-----------
 COLOURS
-	!byte $90	;0=black		0=black
-	!byte $98	;12=medium grey		1=medium grey
-	!byte $1F	;6=blue			2=blue
-	!byte $9A	;14=light blue		3=light blue
-	!byte $1E	;5=green		4=green
-	!byte $99	;13=light green		5=light green	(CONFLICT! PET = SCROLL UP!)
-	!byte $97	;11=dark grey		6=dark cyan*
-	!byte $9F	;3=cyan			7=light cyan*
-	!byte $1C	;2=red			8=red
-	!byte $96	;10=light red		9=light red	(CONFLICT! PET = ERASE END!)
-	!byte $81	;8=orange		10=dark purple*
-	!byte $9C	;4=magenta		11=magenta/purple
-	!byte $95	;9=brown		12=dark yellow* (CONFLICT! PET = INS LINE!)
-	!byte $9E	;7=yellow		13=yellow
-	!byte $9B	;15=light grey		14=light grey
-	!byte $05	;1=white		15=white
+	!byte $90	; 0=black		0=black
+	!byte $98	; 12=medium grey	1=medium grey
+	!byte $1F	; 6=blue		2=blue
+	!byte $9A	; 14=light blue		3=light blue
+	!byte $1E	; 5=green		4=green
+	!byte $99	; 13=light green	5=light green	(CONFLICT! PET = SCROLL UP!)
+	!byte $97	; 11=dark grey		6=dark cyan*
+	!byte $9F	; 3=cyan		7=light cyan*
+	!byte $1C	; 2=red			8=red
+	!byte $96	; 10=light red		9=light red	(CONFLICT! PET = ERASE END!)
+	!byte $81	; 8=orange		10=dark purple*
+	!byte $9C	; 4=magenta		11=magenta/purple
+	!byte $95	; 9=brown		12=dark yellow* (CONFLICT! PET = INS LINE!)
+	!byte $9E	; 7=yellow		13=yellow
+	!byte $9B	; 15=light grey		14=light grey
+	!byte $05	; 1=white		15=white
 
-	!byte 0 ; separator
+	!byte 0 	; separator
 
-!IF COLOURMODE=1 {
 
 ;-------------- Analog Colour Conversion Table
 ; 
@@ -329,22 +328,24 @@ COLOURS
 ; If "I" is off, R and G have values of 4, B is 2.
 ; If "I" is on, R and G have values of 7, B is 3.
 
+!IF COLOURMODE=1 {
+
 RGBTABLE
 ;              RRRGGGBB
-	!byte %00000000	;0=black
-	!byte %01101101	;1=medium grey
-	!byte %00000010	;2=blue
-	!byte %00000011	;3=light blue
-	!byte %00010000	;4=green
-	!byte %00011100	;5=light green
-	!byte %10010000	;6=dark cyan*
-	!byte %11111100	;7=light cyan*
-	!byte %10000000	;8=red
-	!byte %11100000	;9=light red
-	!byte %10000010	;10=dark purple*
-	!byte %11100011	;11=magenta/purple
-	!byte %00010010	;12=dark yellow*
-	!byte %00011111	;13=yellow
-	!byte %11011010	;14=light grey
-	!byte %11111111	;15=white
+	!byte %00000000	; 0=black
+	!byte %01101101	; 1=medium grey
+	!byte %00000010	; 2=blue
+	!byte %00000011	; 3=light blue
+	!byte %00010000	; 4=green
+	!byte %00011100	; 5=light green
+	!byte %10010000	; 6=dark cyan*
+	!byte %11111100	; 7=light cyan*
+	!byte %10000000	; 8=red
+	!byte %11100000	; 9=light red
+	!byte %10000010	; 10=dark purple*
+	!byte %11100011	; 11=magenta/purple
+	!byte %00010010	; 12=dark yellow*
+	!byte %00011111	; 13=yellow
+	!byte %11011010	; 14=light grey
+	!byte %11111111	; 15=white
 }
