@@ -83,7 +83,7 @@
 
 	;----- These features can stand alone
 
-	!IF KEYSCAN=3	  { !SOURCE "keyboard-tables3.asm" }	; C64 Keyboard Scanning Tables
+	!IF (CODEBASE=0 & KEYSCAN=3)	  { !SOURCE "keyboard-tables3.asm" }	; C64 Keyboard Scanning Tables
 	!IF KEYRESET = 1  { !SOURCE "editreboot.asm" }		; Keyboard Reset Code
 	!IF BACKARROW = 2 { !SOURCE "editbarrow.asm" }		; Back Arrow "hack" Code
 	!IF EXECUDESK > 0 { !SOURCE "execudesk.asm" }		; Execudesk Code
