@@ -35,7 +35,7 @@ OPTROM    = 0   ; Location of EXT code		0=$E800-EFFF, 1=$9000, 2=$A000  Normal i
 
 ;-- Keyboard
 KEYSCAN   = 1   ; Keyboard Scanner		0=Normal,1=Business,2=DIN
-KEYBOARD  = 2	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
+KEYBOARD  = 6	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
 REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
 FONTSET   = 0	; Initial Screen Font		0=Text/Lower, 1=Upper/Graphics	Generally: 40xx machines=1, 8xxx machines=0
 
