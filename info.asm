@@ -11,12 +11,11 @@
 !IF CODEBASE=2 { !pet "2" }
 
 !IF COLOURPET = 1 {
-	!pet " COLOURPET-"
-	!if COLOURVER=0 { !pet "beta" }
-	!if COLOURVER=1 { !pet "release" }
+	!pet ",colorpet"
+	!if COLOURVER=0 { !pet "-beta" }
 }
 
-!pet " keyboard="
+!pet ". kbd="
 	!if KEYBOARD= 0 { !pet "n" }		; QWERTY layout
 	!if KEYBOARD= 1 { !pet "b" }		; QWERTY layout
 	!if KEYBOARD= 2 { !pet "din" }		; German layout
