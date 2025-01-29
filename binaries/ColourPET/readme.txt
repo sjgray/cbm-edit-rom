@@ -1,16 +1,17 @@
 EditROM Binaries - Updated 2025-01-29
 ================
 
-Binaries are sorted into folders
+ColourPET Binaries folder
 
-* 40-Column........ 4000 series machines CODEBASE0
-* 80-Column........ 8000/SuperPET        CODEBASE1/2
-* 8296D............ 8296D which uses different CRTC settings
-* ColourPET........ For 80-Column machines modded with Colour Board
-* Switchable40-80.. For 80-Column machines or those with MultiEdit40/80 boards.
-* Experimental..... For custom binaries with new/special features.
+These BINARIES for for 80 column PETs MODDED for Colour, using either
+a hand-built colour circuit or the ColourPET/Dual PCB.
+These are currently 40-column Editor ROMs.
 
-Inside each folders are BINARY files with specific filenames.
+NOTE: Early ColourPET binaries use CODEBASE1. This means you are
+====  limited to entering/editing BASIC lines of 40 columns MAX.
+      In the near future I will be adding binaries using
+      CODEBASE0, which will support proper line-linking for 80
+      character (2-lines) long BASIC programs.
 
 
 Filenames
