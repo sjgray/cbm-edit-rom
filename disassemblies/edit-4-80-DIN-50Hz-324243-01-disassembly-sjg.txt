@@ -699,6 +699,9 @@ $E46E: 85 A9     STA $A9
 L_E470:
 $E470: 49 80     EOR #$80
 $E472: 91 C4     STA ($C4),Y
+
+;		--------------------------------------- Prep for keyboard scanning
+
 L_E474:
 $E474: A0 00     LDY #$00
 $E476: AD 10 E8  LDA PIA1ROW ;PIA#1 Keyboard Row Select
@@ -764,11 +767,17 @@ $E4D4: E4 E3     CPX $E3
 $E4D6: B0 05     BCS L_E4DD
 $E4D8: 9D 6F 02  STA KEYBUF,X ;Keyboard Input Buffer
 $E4DB: E6 9E     INC $9E
+
+;		--------------------------------------- Patch to fix STOP KEY on DIN Keyboard
+
 L_E4DD:
 $E4DD: C9 03     CMP #$03
 $E4DF: D0 04     BNE L_E4E5
 $E4E1: A9 EF     LDA #$EF
 $E4E3: 85 9B     STA $9B
+
+;		--------------------------------------- 
+
 L_E4E5:
 $E4E5: 60        RTS
 $E4E6:           .BYT AA,AA,AA,AA,AA,AA,AA,AA ;filler

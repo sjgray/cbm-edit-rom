@@ -14,7 +14,7 @@
      3                          ; A Project to create replacement EDIT ROMs for the PET/CBM line of computers.
      4                          ; Use MAKE.BAT to assemble (ACME.EXE must be in same folder or in search path).
      5                          ; For complete documentation see:
-     6                          ;      http://www.6502.org/users/sjgray/projects/editrom/index.html
+     6                          ;      http://www.cbmsteve.ca/editrom/index.html
      7                          ;
      8                          ; Edit these settings to choose which features are included.
      9                          ;
@@ -34,7 +34,7 @@
     23                          ; The following DATE and COMMENT strings will be placed in the IO area (if used).
     24                          ; Take care that comments do not overflow into code space!
     25                          
-    26                          !macro DATE      { !pet "2024-05-14" }
+    26                          !macro DATE      { !pet "2025-01-15" }
     27                          !macro COMMENT   { !pet "sjg-editrom" }
     28                          
     29                          ;----------------------------------------------------------------------------------------------------------------------------
@@ -2046,13 +2046,18 @@
    161                          		JSR TestBackArrow	; Patch/Hack to use SHIFT-BACKARROW as screen mode toggle (text/graphic)
    162                          }
    163                          
-   164                          !if KEYBOARD != 1 {
-   165                          ;		Compensate for STOP key not in standard position
-   166  e569 c903               		CMP #3			; Is keycode "3" (STOP key)?
-   167  e56b d004               		BNE SCAN_OUT
-   168  e56d a9ef               		LDA #$EF		; fool kernal into thinking STOP is pressed
-   169  e56f 859b               		STA STKEY		; store it
-   170                          }
+   164                          ;-------------- STOP KEY FIX
+   165                          ; In the PET KERNAL there is code to check for the STOP key but is hard coded for N and B keyboards.
+   166                          ; This fix puts the proper value ($EF) into STKEY ($9B) when the relocated STOP key is pressed.
+   167                          ; NOTE: Must investigate further!
+   168                          
+   169                          !if KEYBOARD > 1 {
+   170                          ;		Compensate for STOP key not in standard position
+   171  e569 c903               		CMP #3			; Is keycode "3" (STOP key)?
+   172  e56b d004               		BNE SCAN_OUT
+   173  e56d a9ef               		LDA #$EF		; fool kernal into thinking STOP is pressed
+   174  e56f 859b               		STA STKEY		; store it
+   175                          }
 
 ; ******** Source: editrom80.asm
   1021  e571 60                 }		; Business Keyboard

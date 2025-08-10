@@ -1,4 +1,4 @@
-; PET/CBM EDIT ROM - Soft Reboot (C)2013 Steve J. Gray
+; PET/CBM EDIT ROM - Soft Reboot (C)2013-2025 Steve J. Gray
 ; ================
 ; Soft Reboot - Hold down a combination of keys to reset the computer.
 ; The RebootCodes table holds 10 or 16 values, one for each keyboard ROW. All
@@ -29,7 +29,11 @@ CheckLoop
 			JMP ($FFFC)			; All keys match, so reset!
 		}
 
-CheckOut	RTS
+;-------------- We should leave ROW 0 selected on exit so that STOP key can be detected in KERNAL
+
+CheckOut	LDY #0					; Set ROW 0
+		STY PIA1_Port_A 			; Keyboard row select
+		RTS
 
 ;-------------- Reboot Code Table
 ;

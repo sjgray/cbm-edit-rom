@@ -161,7 +161,12 @@ SCAN_NORM2	LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 		JSR TestBackArrow	; Patch/Hack to use SHIFT-BACKARROW as screen mode toggle (text/graphic)
 }
 
-!if KEYBOARD != 1 {
+;-------------- STOP KEY FIX
+; In the PET KERNAL there is code to check for the STOP key but is hard coded for N and B keyboards.
+; This fix puts the proper value ($EF) into STKEY ($9B) when the relocated STOP key is pressed.
+; NOTE: Must investigate further!
+
+!if KEYBOARD > 1 {
 ;		Compensate for STOP key not in standard position
 		CMP #3			; Is keycode "3" (STOP key)?
 		BNE SCAN_OUT
