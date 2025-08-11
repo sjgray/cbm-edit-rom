@@ -23,7 +23,7 @@
 ; The following DATE and COMMENT strings will be placed in the IO area (if used).
 ; Take care that comments do not overflow into code space!
 
-!macro DATE      { !pet "2025-01-15" }
+!macro DATE      { !pet "2025-08-11" }
 !macro COMMENT   { !pet "sjg-editrom" }
 
 ;----------------------------------------------------------------------------------------------------------------------------
@@ -35,17 +35,17 @@ OPTROM    = 0   ; Location of EXT code		0=$E800-EFFF, 1=$9000, 2=$A000  Normal i
 
 ;-- Keyboard
 KEYSCAN   = 1   ; Keyboard Scanner		0=Normal,1=Business,2=DIN
-KEYBOARD  = 6	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
+KEYBOARD  = 3	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
 REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
 FONTSET   = 0	; Initial Screen Font		0=Text/Lower, 1=Upper/Graphics	Generally: 40xx machines=1, 8xxx machines=0
 
 ;-- Screen
-REFRESH   = 0	; Screen refresh:		0=Euro,1=N.America,2=PAL,3=NTSC,4=9",82=8296D#1,83=8296D#2,90=32-line,91=35-line,92=90x35,99=Custom
+REFRESH   = 1	; Screen refresh:		0=Euro,1=N.America,2=PAL,3=NTSC,4=9",82=8296D#1,83=8296D#2,90=32-line,91=35-line,92=90x35,99=Custom
 COLUMNS   = 80	; Screen Width			40,80,90,32 columns		Special cases 32 or 90.
 ROWS      = 25  ; Screen Height			25,35,16 rows			Special cases 16 or 35.
 
 ;-- Line Frequency (50/60)
-HERTZ     = 50	; Line Frequency (Clock):	50=Euro,60=N.America
+HERTZ     = 60	; Line Frequency (Clock):	50=Euro,60=N.America
 IRQFIX    = 0   ; Fix Jiffy Clock?		0=No, 1=Yes			Still needs investigating.
 
 ;-- ESC Codes
@@ -58,10 +58,10 @@ COLOURPET = 0	; ColourPET additions?		0=No, 1=Yes			Requires ESC Codes! ESC+0 to
 UPET      = 0   ; Is a Ultra-PET/Micro-PET?     0=No, 1=Yes                     For special Reboot - Andre Fachat's project
 
 ;-- AutoRUN Features
-AUTORUN   = 0   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner,wedge, or disk boot
+AUTORUN   = 1   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner,wedge, or disk boot
 BYPASS    = 0   ; Check for key to bypass? 	0=No, 1=Yes			Valid when AUTORUN=1. Hold key on ROW9 to bypass.
-BANNER    = 0   ; Custom Banner (power on msg)?	0=No, N=Banner# (1-19,98,99)    Valid when AUTORUN=1. Refer to docs or source. 99=custom message
-WEDGE     = 0	; DOS Wedge?			0=No, 1=Yes			Valid when AUTORUN=1.
+BANNER    = 5   ; Custom Banner (power on msg)?	0=No, N=Banner# (1-19,98,99)    Valid when AUTORUN=1. Refer to docs or source. 99=custom message
+WEDGE     = 1	; DOS Wedge?			0=No, 1=Yes			Valid when AUTORUN=1.
 WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes			Valid when AUTORUN=1 and WEDGE>0.
 DISKBOOT  = 0	; Boot first file on disk?	0=No, 1=Yes			Valid when AUTORUN=1.
 
@@ -72,9 +72,9 @@ SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns		Valid when SS40=1.
 HARD4080  = 0   ; Hardware 40/80 Board?         0=No, 1=Yes			Valid when SS40=1.
 
 ;-- Misc Options
-KEYRESET  = 0	; Add keyboard reset? 		0=No, 1=Yes
+KEYRESET  = 1	; Add keyboard reset? 		0=No, 1=Yes
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
-BACKARROW = 0   ; SHIFT-Backarrow Hack code?	0=NO, 1=Yes, 2=Yes EXT		Enable Shift-Backarrow, and where to put the code.
+BACKARROW = 2   ; SHIFT-Backarrow Hack code?	0=NO, 1=Yes, 2=Yes EXT		Enable Shift-Backarrow, and where to put the code.
 BACKACTION= 0   ; Backarrow Action		0=Text/Graphic, 1=40/80		Which Backarrow Action? NOTE: 40/80 requires ESC Codes!
 
 MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility.

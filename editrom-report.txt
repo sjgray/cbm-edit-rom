@@ -34,7 +34,7 @@
     23                          ; The following DATE and COMMENT strings will be placed in the IO area (if used).
     24                          ; Take care that comments do not overflow into code space!
     25                          
-    26                          !macro DATE      { !pet "2025-01-15" }
+    26                          !macro DATE      { !pet "2025-08-11" }
     27                          !macro COMMENT   { !pet "sjg-editrom" }
     28                          
     29                          ;----------------------------------------------------------------------------------------------------------------------------
@@ -46,17 +46,17 @@
     35                          
     36                          ;-- Keyboard
     37                          KEYSCAN   = 1   ; Keyboard Scanner		0=Normal,1=Business,2=DIN
-    38                          KEYBOARD  = 6	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
+    38                          KEYBOARD  = 3	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
     39                          REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
     40                          FONTSET   = 0	; Initial Screen Font		0=Text/Lower, 1=Upper/Graphics	Generally: 40xx machines=1, 8xxx machines=0
     41                          
     42                          ;-- Screen
-    43                          REFRESH   = 0	; Screen refresh:		0=Euro,1=N.America,2=PAL,3=NTSC,4=9",82=8296D#1,83=8296D#2,90=32-line,91=35-line,92=90x35,99=Custom
+    43                          REFRESH   = 1	; Screen refresh:		0=Euro,1=N.America,2=PAL,3=NTSC,4=9",82=8296D#1,83=8296D#2,90=32-line,91=35-line,92=90x35,99=Custom
     44                          COLUMNS   = 80	; Screen Width			40,80,90,32 columns		Special cases 32 or 90.
     45                          ROWS      = 25  ; Screen Height			25,35,16 rows			Special cases 16 or 35.
     46                          
     47                          ;-- Line Frequency (50/60)
-    48                          HERTZ     = 50	; Line Frequency (Clock):	50=Euro,60=N.America
+    48                          HERTZ     = 60	; Line Frequency (Clock):	50=Euro,60=N.America
     49                          IRQFIX    = 0   ; Fix Jiffy Clock?		0=No, 1=Yes			Still needs investigating.
     50                          
     51                          ;-- ESC Codes
@@ -69,10 +69,10 @@
     58                          UPET      = 0   ; Is a Ultra-PET/Micro-PET?     0=No, 1=Yes                     For special Reboot - Andre Fachat's project
     59                          
     60                          ;-- AutoRUN Features
-    61                          AUTORUN   = 0   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner,wedge, or disk boot
+    61                          AUTORUN   = 1   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner,wedge, or disk boot
     62                          BYPASS    = 0   ; Check for key to bypass? 	0=No, 1=Yes			Valid when AUTORUN=1. Hold key on ROW9 to bypass.
-    63                          BANNER    = 0   ; Custom Banner (power on msg)?	0=No, N=Banner# (1-19,98,99)    Valid when AUTORUN=1. Refer to docs or source. 99=custom message
-    64                          WEDGE     = 0	; DOS Wedge?			0=No, 1=Yes			Valid when AUTORUN=1.
+    63                          BANNER    = 5   ; Custom Banner (power on msg)?	0=No, N=Banner# (1-19,98,99)    Valid when AUTORUN=1. Refer to docs or source. 99=custom message
+    64                          WEDGE     = 1	; DOS Wedge?			0=No, 1=Yes			Valid when AUTORUN=1.
     65                          WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes			Valid when AUTORUN=1 and WEDGE>0.
     66                          DISKBOOT  = 0	; Boot first file on disk?	0=No, 1=Yes			Valid when AUTORUN=1.
     67                          
@@ -83,9 +83,9 @@
     72                          HARD4080  = 0   ; Hardware 40/80 Board?         0=No, 1=Yes			Valid when SS40=1.
     73                          
     74                          ;-- Misc Options
-    75                          KEYRESET  = 0	; Add keyboard reset? 		0=No, 1=Yes
+    75                          KEYRESET  = 1	; Add keyboard reset? 		0=No, 1=Yes
     76                          SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
-    77                          BACKARROW = 0   ; SHIFT-Backarrow Hack code?	0=NO, 1=Yes, 2=Yes EXT		Enable Shift-Backarrow, and where to put the code.
+    77                          BACKARROW = 2   ; SHIFT-Backarrow Hack code?	0=NO, 1=Yes, 2=Yes EXT		Enable Shift-Backarrow, and where to put the code.
     78                          BACKACTION= 0   ; Backarrow Action		0=Text/Graphic, 1=40/80		Which Backarrow Action? NOTE: 40/80 requires ESC Codes!
     79                          
     80                          MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility.
@@ -640,8 +640,8 @@
     61  e01e 4c88e0             		JMP CRT_PROGRAM		; [E01E] Program CRTC (Table pointer in A/X, chr set in Y)
     62  e021 4cc8e3             		JMP WIN_SCROLL_DN	; [E021] Scroll Window DOWN
     63  e024 4ce8e3             		JMP WIN_SCROLL_UP	; [E024] Scroll Window UP
-    64  e027 4cb8e4             		JMP SCAN_KEYBOARD	; [E027] Scan Keyboard
-    65  e02a 4ca7e6             		JMP BEEP		; [E02A] Ring BELL/CHIME
+    64  e027 4cbbe4             		JMP SCAN_KEYBOARD	; [E027] Scan Keyboard
+    65  e02a 4caae6             		JMP BEEP		; [E02A] Ring BELL/CHIME
     66  e02d 4c36e0             		JMP SET_REPEAT_MODE	; [E02D] Set REPEAT MODE
     67  e030 4ce1e1             		JMP WIN_SET_TOP		; [E030] Set Window Top
     68  e033 4cdce1             		JMP WIN_SET_BOT		; [E033] Set Window Bottom
@@ -722,7 +722,7 @@
    143  e06c a4e2               		LDY LeftMargin				; First column of window
    144  e06e 88                 		DEY
    145                          UPDATE_CURSOR_R3
-   146  e06f bd55e7             		LDA Line_Addr_Lo,X			; Screen Line Addresses LO
+   146  e06f bd58e7             		LDA Line_Addr_Lo,X			; Screen Line Addresses LO
    147                          
    148                          ;*********************************************************************************************************
    149                          ;** Update Screen Pointers
@@ -736,7 +736,7 @@
    157                          			JSR SS40_SyncPointersX		; Update screen pointers based on current screen width
    158                          		} ELSE {
    159  e072 85c4               			STA ScrPtr			; Pointer: Current Screen Line Address LO
-   160  e074 bd6ee7             			LDA Line_Addr_Hi,X		; Screen Line Addresses HI
+   160  e074 bd71e7             			LDA Line_Addr_Hi,X		; Screen Line Addresses HI
    161  e077 85c5               			STA ScrPtr+1         		; Pointer: Current Screen Line Address HI
    162                          		}
    163                          	}
@@ -768,7 +768,7 @@
     18                          
     19                          !if CODEBASE<2 {
     20                          	!IF SS40=0 {
-    21  e07a a92a               		LDA #<CRT_CONFIG_TEXT			; Point to CRTC Table
+    21  e07a a92d               		LDA #<CRT_CONFIG_TEXT			; Point to CRTC Table
     22  e07c a2e7               		LDX #>CRT_CONFIG_TEXT			; Point to CRTC Table
     23  e07e a00e               		LDY #$0E				; Character Set = TEXT
     24  e080 d006               		BNE CRT_PROGRAM
@@ -795,7 +795,7 @@
     45                          
     46                          !if CODEBASE<2 {
     47                          	!IF SS40=0 {
-    48  e082 a93c               		LDA #<CRT_CONFIG_GRAPHICS       	; Point to CRTC Table
+    48  e082 a93f               		LDA #<CRT_CONFIG_GRAPHICS       	; Point to CRTC Table
     49  e084 a2e7               		LDX #>CRT_CONFIG_GRAPHICS       	; Point to CRTC Table
     50  e086 a00c               		LDY #$0C				; Character Set = GRAPHICS
     51                          	} ELSE {
@@ -891,7 +891,7 @@
    206                          ;** the keyboard buffer (overwriting whatever might be there)
    207                          ;*********************************************************************************************************
    208                          
-   209  e0bc 208ce6             GETLINE		JSR ChrOutMarginBeep			; 
+   209  e0bc 208fe6             GETLINE		JSR ChrOutMarginBeep			; 
    210                          GETLINE2	!IF DEBUG=1 { INC DBLINE+5 }		; DEBUG - 6th chr on bottom line
    211  e0bf a59e               		LDA CharsInBuffer			; Are there any keys waiting?
    212  e0c1 85a7               		STA Blink 				; 0 chars -> blink cursor
@@ -917,7 +917,7 @@
    232  e0da 78                 		SEI
    233  e0db a209               		LDX #9					; Length of string
    234  e0dd 869e               		STX CharsInBuffer			; Set number of characters in buffer
-   235  e0df bd20e7             GL_2		LDA RUN_STRING-1,X			; Normally:  dL"*<RETURN>run<RETURN>
+   235  e0df bd23e7             GL_2		LDA RUN_STRING-1,X			; Normally:  dL"*<RETURN>run<RETURN>
    236  e0e2 9d6e02             		STA KEYD-1,X				; stuff it into the buffer
    237  e0e5 ca                 		DEX
    238  e0e6 d0f7               		BNE GL_2				; loop back for more
@@ -1333,7 +1333,7 @@
    648  e29c c909               Be29c		CMP #9 					; Is it <TAB>?
    649  e29e d030               		BNE Be2d0				; No, skip to next check (see [BUG?]
    650                          
-   651  e2a0 2072e5             		JSR JUMP_TO_TAB				; Perform <TAB>
+   651  e2a0 2075e5             		JSR JUMP_TO_TAB				; Perform <TAB>
    652  e2a3 ac3a03             Be2a3		LDY NextTab				; LOOP[
    653  e2a6 ee3a03             		INC NextTab
    654  e2a9 c4d5               		CPY RightMargin				;   Physical Screen Line Length
@@ -1385,7 +1385,7 @@
    700                          
    701  e2e0 c915               Be2e0		CMP #$15				; Is it <Ctrl U>? - DELETE LINE
    702  e2e2 f003               		BEQ DELETE_LINE				; Yes, go do it
-   703  e2e4 4c93e5             		JMP Scroll_Or_Select_Charset		; No, skip ahead
+   703  e2e4 4c96e5             		JMP Scroll_Or_Select_Charset		; No, skip ahead
    704                          
    705                          ;[E2E7]		--------------------------------------- Delete Line
    706                          
@@ -1396,7 +1396,7 @@
    711  e2ea a5d8               		LDA CursorRow				; Current Cursor Physical Line Number
    712  e2ec 85e0               		STA TopMargin				; Top Line of Window
    713  e2ee 20e8e3             		JSR WIN_SCROLL_UP			; Scroll window up
-   714  e2f1 4ccce5             		JMP Me5ca
+   714  e2f1 4ccfe5             		JMP Me5ca
    715                          
    716                          ;*********************************************************************************************************
    717                          ;** CHROUT_HI  [E2F4]
@@ -1520,7 +1520,7 @@
    835                          
    836                          ;		--------------------------------------- Set a TAB STOP HERE
    837                          
-   838  e380 2072e5             		JSR JUMP_TO_TAB
+   838  e380 2075e5             		JSR JUMP_TO_TAB
    839  e383 bdee03             		LDA TABS_SET,X
    840  e386 4d3e03             		EOR DOS_Syntax
    841  e389 9dee03             		STA TABS_SET,X
@@ -1532,7 +1532,7 @@
    847                          !IF COLOURPET=0 {
    848  e391 f003               		BEQ ERASE_TO_SOL			; Remove Conflict			
    849                          }
-   850  e393 4cbee5             		JMP ProcControl_A
+   850  e393 4cc1e5             		JMP ProcControl_A
    851                          
    852                          ;*********************************************************************************************************
    853                          ;** ERASE_TO_SOL / ESCAPE_P [E396]
@@ -1605,9 +1605,9 @@
    920                          
    921                          !IF COLOURPET=0 {
    922                          	!IF SS40=0 {
-   923  e3d3 bd54e7             		LDA Line_Addr_Lo-1,X    		; Screen Line address table LO - 1
+   923  e3d3 bd57e7             		LDA Line_Addr_Lo-1,X    		; Screen Line address table LO - 1
    924  e3d6 85c7               		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
-   925  e3d8 bd6de7             		LDA Line_Addr_Hi-1,X 			; Screen Line address table HI - 1
+   925  e3d8 bd70e7             		LDA Line_Addr_Hi-1,X 			; Screen Line address table HI - 1
    926  e3db 85c8               		STA SAL+1
    927                          	} ELSE {
    928                          		JSR SS40_SyncPointers2
@@ -1644,9 +1644,9 @@
    959                          
    960                          !IF COLOURPET=0 {
    961                          	!IF SS40=0 {	
-   962  e3f3 bd56e7             		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
+   962  e3f3 bd59e7             		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
    963  e3f6 85c7               		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
-   964  e3f8 bd6fe7             		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
+   964  e3f8 bd72e7             		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
    965  e3fb 85c8               		STA SAL+1				; Pointer: Tape Buffer/ Screen Scrolling
    966                          	} ELSE {
    967                          		JSR SS40_SyncPointers
@@ -1861,11 +1861,11 @@
     99  e4aa ad40e8             		LDA VIA_Port_B				; VIA Register 0 (flags)
    100  e4ad 29ef               		AND #$ef
    101  e4af 8d40e8             Be4a7		STA VIA_Port_B				; VIA Register 0 (flags)
-   102  e4b2 20b8e4             Be4aa		JSR SCAN_KEYBOARD			; Scan the keyboard
+   102  e4b2 20bbe4             Be4aa		JSR SCAN_KEYBOARD			; Scan the keyboard
    103                          
-   104                          !IF KEYRESET=1 {  JSR CheckReboot }			; Check for soft reset ******* should this go above Be474 ?????????????????
+   104  e4b5 20a4eb             !IF KEYRESET=1 {  JSR CheckReboot }			; Check for soft reset ******* should this go above Be474 ?????????????????
    105                          
-   106  e4b5 4c00e6             		JMP IRQ_END				; Return from Interrupt
+   106  e4b8 4c00e6             		JMP IRQ_END				; Return from Interrupt
    107                          
 
 ; ******** Source: editrom80.asm
@@ -1895,139 +1895,139 @@
     10                          SCAN_KEYBOARD
     11                          ;!if DEBUG = 1 { INC DBLINE+5 }		; DEBUG - 6th character on top line
     12                          
-    13  e4b8 a0ff               		LDY #$FF		; No Key
-    14  e4ba 84a6               		STY Key_Image		; Key Image
-    15  e4bc c8                 		INY
-    16  e4bd 8498               		STY KEYFLAGS		; Flag: Print Shifted Chars.
-    17  e4bf a5e4               		LDA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
-    18  e4c1 297f               		AND #$7F
-    19  e4c3 85e4               		STA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
+    13  e4bb a0ff               		LDY #$FF		; No Key
+    14  e4bd 84a6               		STY Key_Image		; Key Image
+    15  e4bf c8                 		INY
+    16  e4c0 8498               		STY KEYFLAGS		; Flag: Print Shifted Chars.
+    17  e4c2 a5e4               		LDA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
+    18  e4c4 297f               		AND #$7F
+    19  e4c6 85e4               		STA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
     20                          		!IF KEYBOARD=7 {
     21                          			LDX #$60	; 96 bytes in table. X is used as offset into the table (CBM-II keyboard)
     22                          		} ELSE {
-    23  e4c5 a250               			LDX #$50	; 80 bytes in table. X is used as offset into the table (normal keyboards)
+    23  e4c8 a250               			LDX #$50	; 80 bytes in table. X is used as offset into the table (normal keyboards)
     24                          		}
     25                          
     26                          SCAN_ROW
     27                          		!IF KEYBOARD=7 {
     28                          			 LDY #$06	; Number of Columns to check = 6 (CBM-II keyboard only)
     29                          		} ELSE {
-    30  e4c7 a008               			 LDY #$08	; Number of Columns to check = 8 (normal keyboards)
+    30  e4ca a008               			 LDY #$08	; Number of Columns to check = 8 (normal keyboards)
     31                          		}
     32                          
-    33  e4c9 ad12e8             		LDA PIA1_Port_B 	; Keyboard COL result
-    34  e4cc cd12e8             		CMP PIA1_Port_B 	; Keyboard COL result
-    35  e4cf d0f6               		BNE SCAN_ROW		; Debounce
+    33  e4cc ad12e8             		LDA PIA1_Port_B 	; Keyboard COL result
+    34  e4cf cd12e8             		CMP PIA1_Port_B 	; Keyboard COL result
+    35  e4d2 d0f6               		BNE SCAN_ROW		; Debounce
     36                          
-    37  e4d1 4a                 SCAN_COL	LSR			; Shift the value right
-    38  e4d2 b01f               		BCS SCAN_NEXT2		; If the bit was "1" then key is NOT down. Skip
+    37  e4d4 4a                 SCAN_COL	LSR			; Shift the value right
+    38  e4d5 b01f               		BCS SCAN_NEXT2		; If the bit was "1" then key is NOT down. Skip
     39                          
     40                          ;-------------- We have a key press. Look it up in the keyboard matrix
     41                          
-    42  e4d4 48                 		PHA			; Save for later
-    43  e4d5 bdd0e6             		LDA KEYBOARD_NORMAL-1,X	; Read Keyboard Matrix (X is offset)
-    44  e4d8 d006               		BNE SCAN_NOSH		; Is it SHIFT key? No, skip
+    42  e4d7 48                 		PHA			; Save for later
+    43  e4d8 bdd3e6             		LDA KEYBOARD_NORMAL-1,X	; Read Keyboard Matrix (X is offset)
+    44  e4db d006               		BNE SCAN_NOSH		; Is it SHIFT key? No, skip
     45                          
     46                          ;-------------- SHIFT key Detected
     47                          
-    48  e4da a901               		LDA #$01		; Set the SHIFT flag
-    49  e4dc 8598               		STA KEYFLAGS		; Flag: Print Shifted Chars.
-    50  e4de d012               		BNE SCAN_NEXT		; No, skip
+    48  e4dd a901               		LDA #$01		; Set the SHIFT flag
+    49  e4df 8598               		STA KEYFLAGS		; Flag: Print Shifted Chars.
+    50  e4e1 d012               		BNE SCAN_NEXT		; No, skip
     51                          
     52                          ;-------------- Non-SHIFT key
     53                          
-    54  e4e0 c910               SCAN_NOSH	CMP #$10		; Is it REPEAT?
-    55  e4e2 d008               		BNE SCAN_NORPT		; No, skip
+    54  e4e3 c910               SCAN_NOSH	CMP #$10		; Is it REPEAT?
+    55  e4e5 d008               		BNE SCAN_NORPT		; No, skip
     56                          
     57                          ;-------------- REPEAT key
     58                          
-    59  e4e4 a5e4               		LDA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
-    60  e4e6 0980               		ORA #$80
-    61  e4e8 85e4               		STA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
-    62  e4ea 3006               		BMI SCAN_NEXT
+    59  e4e7 a5e4               		LDA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
+    60  e4e9 0980               		ORA #$80
+    61  e4eb 85e4               		STA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
+    62  e4ed 3006               		BMI SCAN_NEXT
     63                          
-    64  e4ec c9ff               SCAN_NORPT	CMP #$FF		; Is it "no key"?
-    65  e4ee f002               		BEQ SCAN_NEXT		; Yes, skip
+    64  e4ef c9ff               SCAN_NORPT	CMP #$FF		; Is it "no key"?
+    65  e4f1 f002               		BEQ SCAN_NEXT		; Yes, skip
     66                          
     67                          ;-------------- Normal key
     68                          
-    69  e4f0 85a6               		STA Key_Image		; Store the key
+    69  e4f3 85a6               		STA Key_Image		; Store the key
     70                          
-    71  e4f2 68                 SCAN_NEXT	PLA			; Restore value from keyboard scan for next loop
-    72  e4f3 ca                 SCAN_NEXT2	DEX			; Decrement keyboard table offset
-    73  e4f4 f008               		BEQ SCAN_GOT		; If 0 we have completed the entire matrix...Process Key Image
+    71  e4f5 68                 SCAN_NEXT	PLA			; Restore value from keyboard scan for next loop
+    72  e4f6 ca                 SCAN_NEXT2	DEX			; Decrement keyboard table offset
+    73  e4f7 f008               		BEQ SCAN_GOT		; If 0 we have completed the entire matrix...Process Key Image
     74                          
-    75  e4f6 88                 		DEY			; Next COLUMN
-    76  e4f7 d0d8               		BNE SCAN_COL		; Go back up for next column bit
+    75  e4f9 88                 		DEY			; Next COLUMN
+    76  e4fa d0d8               		BNE SCAN_COL		; Go back up for next column bit
     77                          
     78                          ;-------------- Completed all bits in ROW, Increment ROW
     79                          
-    80  e4f9 ee10e8             		INC PIA1_Port_A		; Next Keyboard ROW
-    81  e4fc d0c9               		BNE SCAN_ROW		; More? Yes, loop back
+    80  e4fc ee10e8             		INC PIA1_Port_A		; Next Keyboard ROW
+    81  e4ff d0c9               		BNE SCAN_ROW		; More? Yes, loop back
     82                          
     83                          ;-------------- Process Key Image
     84                          
-    85  e4fe a5a6               SCAN_GOT	LDA Key_Image		; Key Image
-    86  e500 c597               		CMP KEYPRESSED		; Current Key Pressed: 255 = No Key
-    87  e502 f006               		BEQ SCAN_PRESS		; If key is the same then it's being held down
+    85  e501 a5a6               SCAN_GOT	LDA Key_Image		; Key Image
+    86  e503 c597               		CMP KEYPRESSED		; Current Key Pressed: 255 = No Key
+    87  e505 f006               		BEQ SCAN_PRESS		; If key is the same then it's being held down
     88                          
-    89  e504 a210               		LDX #$10
-    90  e506 86e6               		STX DELAY		; Repeat Delay Counter
-    91  e508 d02f               		BNE SCAN_REC
+    89  e507 a210               		LDX #$10
+    90  e509 86e6               		STX DELAY		; Repeat Delay Counter
+    91  e50b d02f               		BNE SCAN_REC
     92                          
-    93  e50a 24e4               SCAN_PRESS	BIT RPTFLG		; Check Repeat Flag: $80 = Repeat, $40 = disable
-    94  e50c 301e               		BMI SCAN_DELAY2
-    95  e50e 7061               		BVS SCAN_OUT		; Exit
-    96  e510 c9ff               		CMP #$FF		; No key?
-    97  e512 f05d               		BEQ SCAN_OUT		; Exit
-    98  e514 c914               		CMP #$14
-    99  e516 f00c               		BEQ SCAN_DELAY
-   100  e518 c920               		CMP #$20
-   101  e51a f008               		BEQ SCAN_DELAY
-   102  e51c c91d               		CMP #$1D
-   103  e51e f004               		BEQ SCAN_DELAY
-   104  e520 c911               		CMP #$11
-   105  e522 d04d               		BNE SCAN_OUT		; Exit
+    93  e50d 24e4               SCAN_PRESS	BIT RPTFLG		; Check Repeat Flag: $80 = Repeat, $40 = disable
+    94  e50f 301e               		BMI SCAN_DELAY2
+    95  e511 7061               		BVS SCAN_OUT		; Exit
+    96  e513 c9ff               		CMP #$FF		; No key?
+    97  e515 f05d               		BEQ SCAN_OUT		; Exit
+    98  e517 c914               		CMP #$14
+    99  e519 f00c               		BEQ SCAN_DELAY
+   100  e51b c920               		CMP #$20
+   101  e51d f008               		BEQ SCAN_DELAY
+   102  e51f c91d               		CMP #$1D
+   103  e521 f004               		BEQ SCAN_DELAY
+   104  e523 c911               		CMP #$11
+   105  e525 d04d               		BNE SCAN_OUT		; Exit
    106                          
-   107  e524 a6e6               SCAN_DELAY	LDX DELAY		; Repeat Delay Counter
-   108  e526 f004               		BEQ SCAN_DELAY2
-   109  e528 c6e6               		DEC DELAY		; Repeat Delay Counter
-   110  e52a d045               		BNE SCAN_OUT		; Exit
+   107  e527 a6e6               SCAN_DELAY	LDX DELAY		; Repeat Delay Counter
+   108  e529 f004               		BEQ SCAN_DELAY2
+   109  e52b c6e6               		DEC DELAY		; Repeat Delay Counter
+   110  e52d d045               		BNE SCAN_OUT		; Exit
    111                          
-   112  e52c c6e5               SCAN_DELAY2	DEC KOUNT		; Repeat Speed Counter
-   113  e52e d041               		BNE SCAN_OUT		; Exit
-   114  e530 a204               		LDX #$04
-   115  e532 86e5               		STX KOUNT		; Repeat Speed Counter
-   116  e534 a69e               		LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
-   117  e536 ca                 		DEX			; One less
-   118  e537 1038               		BPL SCAN_OUT		; Exit
+   112  e52f c6e5               SCAN_DELAY2	DEC KOUNT		; Repeat Speed Counter
+   113  e531 d041               		BNE SCAN_OUT		; Exit
+   114  e533 a204               		LDX #$04
+   115  e535 86e5               		STX KOUNT		; Repeat Speed Counter
+   116  e537 a69e               		LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
+   117  e539 ca                 		DEX			; One less
+   118  e53a 1038               		BPL SCAN_OUT		; Exit
    119                          
-   120  e539 8597               SCAN_REC	STA KEYPRESSED		; Current Key Pressed: 255 = No Key
-   121  e53b c9ff               		CMP #$FF		; No Key?
-   122  e53d f032                		BEQ SCAN_OUT		; Yes, exit
+   120  e53c 8597               SCAN_REC	STA KEYPRESSED		; Current Key Pressed: 255 = No Key
+   121  e53e c9ff               		CMP #$FF		; No Key?
+   122  e540 f032                		BEQ SCAN_OUT		; Yes, exit
    123                          
-   124  e53f aa                 		TAX
-   125  e540 08                 		PHP
-   126  e541 297f               		AND #$7F		; Mask off upper bit (non-shiftable flag in key matrix byte)
-   127  e543 28                 		PLP
-   128  e544 3017               		BMI SCAN_NORM
+   124  e542 aa                 		TAX
+   125  e543 08                 		PHP
+   126  e544 297f               		AND #$7F		; Mask off upper bit (non-shiftable flag in key matrix byte)
+   127  e546 28                 		PLP
+   128  e547 3017               		BMI SCAN_NORM
    129                          
    130                          ;-------------- Process SHIFT key flag with Numeric Keys or Graphic keys
    131                          
-   132  e546 4698               		LSR KEYFLAGS		; Check for SHIFT
-   133  e548 9013               		BCC SCAN_NORM		; No, store as-is
-   134  e54a c92c               		CMP #$2C		; Is it less than 2C? 
-   135  e54c 900d               		BCC SCAN_SHIFT		; Yes, skip
-   136  e54e c93c               		CMP #$3C		; Is it greater than 3C?
-   137  e550 b009               		BCS SCAN_SHIFT		; Yes, skip
-   138  e552 e90f               		SBC #$0F		; No, it must me Numeric so subtract 15
-   139  e554 c920               		CMP #$20		; Is it above <SPACE>
-   140  e556 b005               		BCS SCAN_NORM		; Yes
+   132  e549 4698               		LSR KEYFLAGS		; Check for SHIFT
+   133  e54b 9013               		BCC SCAN_NORM		; No, store as-is
+   134  e54d c92c               		CMP #$2C		; Is it less than 2C? 
+   135  e54f 900d               		BCC SCAN_SHIFT		; Yes, skip
+   136  e551 c93c               		CMP #$3C		; Is it greater than 3C?
+   137  e553 b009               		BCS SCAN_SHIFT		; Yes, skip
+   138  e555 e90f               		SBC #$0F		; No, it must me Numeric so subtract 15
+   139  e557 c920               		CMP #$20		; Is it above <SPACE>
+   140  e559 b005               		BCS SCAN_NORM		; Yes
    141                          
-   142  e558 6920               		ADC #$20		; Add 32 to convert to shifted symbol on number key
-   143  e55a 2c                 		!byte $2C		; Hide the next instruction trick
+   142  e55b 6920               		ADC #$20		; Add 32 to convert to shifted symbol on number key
+   143  e55d 2c                 		!byte $2C		; Hide the next instruction trick
    144                          
-   145  e55b 0980               SCAN_SHIFT	ORA #$80		; Set upper bit for Graphics Symbol
+   145  e55e 0980               SCAN_SHIFT	ORA #$80		; Set upper bit for Graphics Symbol
    146                          
    147                          ;-------------- Put the KEY into the Buffer (Key in accumulator)
    148                          
@@ -2035,15 +2035,15 @@
    150                          
    151                          !IF ESCCODES=1 { JMP EUROSWAP }		; Check if Eurokeys need swapping
    152                          
-   153  e55d a69e               SCAN_NORM2	LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
-   154  e55f e4e3               		CPX XMAX		; Size of Keyboard Buffer
-   155  e561 b00e               		BCS SCAN_OUT		; Exit if buffer full
-   156  e563 9d6f02             		STA KEYD,X		; Put the key into the buffer
+   153  e560 a69e               SCAN_NORM2	LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
+   154  e562 e4e3               		CPX XMAX		; Size of Keyboard Buffer
+   155  e564 b00e               		BCS SCAN_OUT		; Exit if buffer full
+   156  e566 9d6f02             		STA KEYD,X		; Put the key into the buffer
    157                          !IF BACKARROW=0 {
-   158  e566 e8                 		INX			; Increment character count
-   159  e567 869e               		STX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
+   158                          		INX			; Increment character count
+   159                          		STX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
    160                          } ELSE {
-   161                          		JSR TestBackArrow	; Patch/Hack to use SHIFT-BACKARROW as screen mode toggle (text/graphic)
+   161  e569 20c7eb             		JSR TestBackArrow	; Patch/Hack to use SHIFT-BACKARROW as screen mode toggle (text/graphic)
    162                          }
    163                          
    164                          ;-------------- STOP KEY FIX
@@ -2053,14 +2053,14 @@
    168                          
    169                          !if KEYBOARD > 1 {
    170                          ;		Compensate for STOP key not in standard position
-   171  e569 c903               		CMP #3			; Is keycode "3" (STOP key)?
-   172  e56b d004               		BNE SCAN_OUT
-   173  e56d a9ef               		LDA #$EF		; fool kernal into thinking STOP is pressed
-   174  e56f 859b               		STA STKEY		; store it
+   171  e56c c903               		CMP #3			; Is keycode "3" (STOP key)?
+   172  e56e d004               		BNE SCAN_OUT
+   173  e570 a9ef               		LDA #$EF		; fool kernal into thinking STOP is pressed
+   174  e572 859b               		STA STKEY		; store it
    175                          }
 
 ; ******** Source: editrom80.asm
-  1021  e571 60                 }		; Business Keyboard
+  1021  e574 60                 }		; Business Keyboard
   1022                          !IF KEYSCAN=2 { !SOURCE "keyscan-din.asm" }		; German DIN Keyboard
   1023                          !IF KEYSCAN=3 { !SOURCE "keyscan-c64.asm" }		; C64 Keyboard
   1024                          !IF KEYSCAN=4 { !SOURCE "keyscan-cbm2.asm" }		; CBM2 Keyboard (future implementation)
@@ -2070,61 +2070,61 @@
   1028                          ;** Tab positions are stored in a table of 80 bits (10 bytes). This routine
   1029                          ;*********************************************************************************************************
   1030                          
-  1031  e572 a5c6               JUMP_TO_TAB	LDA CursorCol				; Get Cursor column on current line
-  1032  e574 29f8               		AND #$f8				; mask off upper 5 bits
-  1033  e576 8d3a03             		STA NextTab				; This will be the new column to jump to
-  1034  e579 4a                 		LSR					; shift right 3 bits (divide by 8)
-  1035  e57a 4a                 		LSR
-  1036  e57b 4a                 		LSR
-  1037  e57c aa                 		TAX
-  1038  e57d a901               		LDA #1					; Set bit 0 to 1
-  1039  e57f 8d3e03             		STA DOS_Syntax				; temp storage
-  1040  e582 a4c6               		LDY CursorCol				; Get Cursor column on current line
-  1041  e584 cc3a03             JTTAB1 		CPY NextTab				; LOOP[ Is 
-  1042  e587 f009               		BEQ JTTABDONE				;   Yes, exit out
-  1043  e589 0e3e03             		ASL DOS_Syntax				;   No, Move the "1" bit forward
-  1044  e58c ee3a03             		INC NextTab				;   Move ahead one column
-  1045  e58f 4c84e5             		JMP JTTAB1				; ] Loop back for more
-  1046  e592 60                 JTTABDONE	RTS
+  1031  e575 a5c6               JUMP_TO_TAB	LDA CursorCol				; Get Cursor column on current line
+  1032  e577 29f8               		AND #$f8				; mask off upper 5 bits
+  1033  e579 8d3a03             		STA NextTab				; This will be the new column to jump to
+  1034  e57c 4a                 		LSR					; shift right 3 bits (divide by 8)
+  1035  e57d 4a                 		LSR
+  1036  e57e 4a                 		LSR
+  1037  e57f aa                 		TAX
+  1038  e580 a901               		LDA #1					; Set bit 0 to 1
+  1039  e582 8d3e03             		STA DOS_Syntax				; temp storage
+  1040  e585 a4c6               		LDY CursorCol				; Get Cursor column on current line
+  1041  e587 cc3a03             JTTAB1 		CPY NextTab				; LOOP[ Is 
+  1042  e58a f009               		BEQ JTTABDONE				;   Yes, exit out
+  1043  e58c 0e3e03             		ASL DOS_Syntax				;   No, Move the "1" bit forward
+  1044  e58f ee3a03             		INC NextTab				;   Move ahead one column
+  1045  e592 4c87e5             		JMP JTTAB1				; ] Loop back for more
+  1046  e595 60                 JTTABDONE	RTS
   1047                          
   1048                          ;		--------------------------------------- Check for CTRL-Y
   1049                          
   1050                          Scroll_Or_Select_Charset
   1051                          
-  1052  e593 c919               		CMP #$19 				; Is it CTRL-Y? (Scroll window up)
-  1053  e595 d006               		BNE Be59b				; No, skip ahead
-  1054  e597 20e8e3             		JSR WIN_SCROLL_UP 			; Yes, Window Scroll Up
-  1055  e59a 4cdbe5             		JMP Me5d9
+  1052  e596 c919               		CMP #$19 				; Is it CTRL-Y? (Scroll window up)
+  1053  e598 d006               		BNE Be59b				; No, skip ahead
+  1054  e59a 20e8e3             		JSR WIN_SCROLL_UP 			; Yes, Window Scroll Up
+  1055  e59d 4cdee5             		JMP Me5d9
   1056                          
   1057                          ;		--------------------------------------- Check for CTRL-O
   1058                          
-  1059  e59d c90f               Be59b		CMP #15 				; Is it CTRL-O (Set Window Top-Left)
-  1060  e59f d00b               		BNE Be5aa				; No, skip ahead
+  1059  e5a0 c90f               Be59b		CMP #15 				; Is it CTRL-O (Set Window Top-Left)
+  1060  e5a2 d00b               		BNE Be5aa				; No, skip ahead
   1061                          
   1062                          ;*********************************************************************************************************
   1063                          ;** ESCAPE_T
   1064                          ;** This sets the Window's Top-Left corner to the current cursor position
   1065                          ;*********************************************************************************************************
   1066                          
-  1067  e5a1 a5d8               ESCAPE_T	LDA CursorRow				; Get current cursor ROW
-  1068  e5a3 85e0               		STA TopMargin				; Store it as the TOP
-  1069  e5a5 a5c6               		LDA CursorCol				; Get current cursor COL
-  1070  e5a7 85e2               		STA LeftMargin				; Store it as the LEFT
-  1071  e5a9 4c99e1             Be5a7		JMP IRQ_EPILOG
+  1067  e5a4 a5d8               ESCAPE_T	LDA CursorRow				; Get current cursor ROW
+  1068  e5a6 85e0               		STA TopMargin				; Store it as the TOP
+  1069  e5a8 a5c6               		LDA CursorCol				; Get current cursor COL
+  1070  e5aa 85e2               		STA LeftMargin				; Store it as the LEFT
+  1071  e5ac 4c99e1             Be5a7		JMP IRQ_EPILOG
   1072                          
   1073                          ;		--------------------------------------- Check for CTRL-N
   1074                          
-  1075  e5ac c90e               Be5aa		CMP #14 				; Is it CTRL-N? (Text mode)
-  1076  e5ae d005               		BNE Be5b3				; No, skip ahead
-  1077  e5b0 207ae0             		JSR CRT_SET_TEXT			; Yes, do it
-  1078  e5b3 30f4               		BMI Be5a7
+  1075  e5af c90e               Be5aa		CMP #14 				; Is it CTRL-N? (Text mode)
+  1076  e5b1 d005               		BNE Be5b3				; No, skip ahead
+  1077  e5b3 207ae0             		JSR CRT_SET_TEXT			; Yes, do it
+  1078  e5b6 30f4               		BMI Be5a7
   1079                          
   1080                          ;		--------------------------------------- Check for CTRL-G
   1081                          
-  1082  e5b5 c907               Be5b3		CMP #7 					; Is it CTRL-G? (Ring Bell)
-  1083  e5b7 d0f0               		BNE Be5a7				; No, skip ahead
-  1084  e5b9 20a7e6             		JSR BEEP				; Yes, do BEEP
-  1085  e5bc f0eb               		BEQ Be5a7
+  1082  e5b8 c907               Be5b3		CMP #7 					; Is it CTRL-G? (Ring Bell)
+  1083  e5ba d0f0               		BNE Be5a7				; No, skip ahead
+  1084  e5bc 20aae6             		JSR BEEP				; Yes, do BEEP
+  1085  e5bf f0eb               		BEQ Be5a7
   1086                          
   1087                          ;*********************************************************************************************************
   1088                          ;** ProcControl_A  [E5BC]
@@ -2133,8 +2133,8 @@
   1091                          
   1092                          ProcControl_A
   1093                          !IF COLOURPET=0 {
-  1094  e5be c915               		CMP #$15 				; Is it CTRL-SHIFT-U? (Insert Line) - CONFLICT with colour code = DK YELLOW					
-  1095  e5c0 d012               		BNE ProcControl_C			; @@@@@@ Was: BNE ProcControl_B
+  1094  e5c1 c915               		CMP #$15 				; Is it CTRL-SHIFT-U? (Insert Line) - CONFLICT with colour code = DK YELLOW					
+  1095  e5c3 d012               		BNE ProcControl_C			; @@@@@@ Was: BNE ProcControl_B
   1096                          } ELSE {
   1097                          		JMP ProcControl_C
   1098                          }
@@ -2144,31 +2144,31 @@
   1102                          ;** Insert a blank line at current cursor position
   1103                          ;*********************************************************************************************************
   1104                          
-  1105  e5c2 a5e0               ESCAPE_I	LDA TopMargin
-  1106  e5c4 48                 		PHA
-  1107  e5c5 a5d8               		LDA CursorRow
-  1108  e5c7 85e0               		STA TopMargin
-  1109  e5c9 20c8e3             		JSR WIN_SCROLL_DN			; Scroll Window Down
-  1110  e5cc 68                 Me5ca		PLA
-  1111  e5cd 85e0               		STA TopMargin
-  1112  e5cf 2063e0             		JSR CURSOR_LM
-  1113  e5d2 d018               		BNE EB_DONE
+  1105  e5c5 a5e0               ESCAPE_I	LDA TopMargin
+  1106  e5c7 48                 		PHA
+  1107  e5c8 a5d8               		LDA CursorRow
+  1108  e5ca 85e0               		STA TopMargin
+  1109  e5cc 20c8e3             		JSR WIN_SCROLL_DN			; Scroll Window Down
+  1110  e5cf 68                 Me5ca		PLA
+  1111  e5d0 85e0               		STA TopMargin
+  1112  e5d2 2063e0             		JSR CURSOR_LM
+  1113  e5d5 d018               		BNE EB_DONE
   1114                          
   1115                          ;[E5D2]		--------------------------------------- Check for CTRL-SHIFT-Y
   1116                          
-  1117  e5d4 c919               ProcControl_C	CMP #$19 				; Is it CTRL-SHIFT-Y? (Scroll window up)
-  1118  e5d6 d008               		BNE Be5de				; No, skip ahead
+  1117  e5d7 c919               ProcControl_C	CMP #$19 				; Is it CTRL-SHIFT-Y? (Scroll window up)
+  1118  e5d9 d008               		BNE Be5de				; No, skip ahead
   1119                          
   1120                          !IF COLOURPET=0 {
-  1121  e5d8 20c8e3             		JSR WIN_SCROLL_DN			; CONFLICT with colour code = LT GREEN
+  1121  e5db 20c8e3             		JSR WIN_SCROLL_DN			; CONFLICT with colour code = LT GREEN
   1122                          }
-  1123  e5db 2067e0             Me5d9		JSR UPDATE_CURSOR_ROW
-  1124  e5de d00c               		BNE EB_DONE
+  1123  e5de 2067e0             Me5d9		JSR UPDATE_CURSOR_ROW
+  1124  e5e1 d00c               		BNE EB_DONE
   1125                          
   1126                          ;[E5DE]		--------------------------------------- Check for CTRL-SHIFT-O
   1127                          
-  1128  e5e0 c90f               Be5de		CMP #15 				; Is it CTRL-SHIFT-O? (Set Window Bottom)
-  1129  e5e2 d00b               		BNE Be5ed				; No, skip ahead
+  1128  e5e3 c90f               Be5de		CMP #15 				; Is it CTRL-SHIFT-O? (Set Window Bottom)
+  1129  e5e5 d00b               		BNE Be5ed				; No, skip ahead
   1130                          
   1131                          
   1132                          ;*********************************************************************************************************
@@ -2176,25 +2176,25 @@
   1134                          ;** Set Windos Bottom-Left
   1135                          ;*********************************************************************************************************
   1136                          
-  1137  e5e4 a5d8               ESCAPE_B	LDA CursorRow
-  1138  e5e6 85e1               		STA BotMargin
-  1139  e5e8 a5c6               		LDA CursorCol
-  1140  e5ea 85d5               		STA RightMargin
-  1141  e5ec 4c99e1             EB_DONE		JMP IRQ_EPILOG
+  1137  e5e7 a5d8               ESCAPE_B	LDA CursorRow
+  1138  e5e9 85e1               		STA BotMargin
+  1139  e5eb a5c6               		LDA CursorCol
+  1140  e5ed 85d5               		STA RightMargin
+  1141  e5ef 4c99e1             EB_DONE		JMP IRQ_EPILOG
   1142                          
   1143                          ;[E5ED]		--------------------------------------- Check for CTRL-SHIFT-N
   1144                          
-  1145  e5ef c90e               Be5ed		CMP #14 				; Is it CTRL-SHIFT-N? (Graphics mode)
-  1146  e5f1 d0c2               		BNE Be5b3				; No, skip ahead
-  1147  e5f3 2082e0             		JSR CRT_SET_GRAPHICS			; Yes, do it
-  1148  e5f6 30f4               		BMI EB_DONE
+  1145  e5f2 c90e               Be5ed		CMP #14 				; Is it CTRL-SHIFT-N? (Graphics mode)
+  1146  e5f4 d0c2               		BNE Be5b3				; No, skip ahead
+  1147  e5f6 2082e0             		JSR CRT_SET_GRAPHICS			; Yes, do it
+  1148  e5f9 30f4               		BMI EB_DONE
   1149                          
   1150                          ;*********************************************************************************************************
   1151                          ;** IRQ_END  [E600]  (Called from Jump Table) - FIXED ENTRY POINT!
   1152                          ;** The IRQ routine jumps here when completed. Do not modify this routine!
   1153                          ;*********************************************************************************************************
   1154                          
-  1155  e5f8 aaaaaaaaaaaaaaaa   		!IF NOFILL=0 { !FILL $e600-*,$aa }	;FIXED ENTRY POINT! This routine must not move! It is called directly from KERNAL
+  1155  e5fb aaaaaaaaaa         		!IF NOFILL=0 { !FILL $e600-*,$aa }	;FIXED ENTRY POINT! This routine must not move! It is called directly from KERNAL
   1156                          
   1157                          ;#########################################################################################################
   1158                          
@@ -2327,12 +2327,12 @@
   1285                          		LDA #1					; 1=Enabled
   1286                          		STA BELLMODE				; Flag to Enable BELL
   1287                          }
-  1288                          !IF AUTORUN=1 {	JSR AUTOSTART }				; Do Auto Run Prep
+  1288  e687 2012e9             !IF AUTORUN=1 {	JSR AUTOSTART }				; Do Auto Run Prep
   1289                          
   1290                          ;		--------------------------------------- Finish up by ringing BELL 4 times
   1291                          
-  1292  e687 20a4e6             		JSR BEEP_BEEP				; Power-up chimes
-  1293  e68a f018               		BEQ BEEP_BEEP				; More chimes (4 total)
+  1292  e68a 20a7e6             		JSR BEEP_BEEP				; Power-up chimes
+  1293  e68d f018               		BEQ BEEP_BEEP				; More chimes (4 total)
   1294                          
   1295                          
   1296                          ;*********************************************************************************************************
@@ -2341,30 +2341,30 @@
   1299                          ;*********************************************************************************************************
   1300                          
   1301                          ChrOutMarginBeep
-  1302  e68c 2002e2             		JSR CHROUT_SCREEN			; Output to Screen
-  1303  e68f aa                 		TAX
-  1304  e690 a5d5               		LDA RightMargin				; Physical Screen Line Length
-  1305  e692 38                 		SEC
-  1306  e693 e5c6               		SBC CursorCol				; Cursor Column on Current Line
-  1307  e695 c905               		CMP #5					; 5 characters from end of line
-  1308  e697 d037               		BNE BELLDONE
-  1309  e699 8a                 		TXA
-  1310  e69a c91d               		CMP #$1d 				; <Cursor Right> ?
-  1311  e69c f006               		BEQ BEEP_BEEP				; Ring BELL
-  1312  e69e 297f               		AND #$7f
-  1313  e6a0 c920               		CMP #$20 				; <SPACE>
-  1314  e6a2 902c               		BCC BELLDONE
+  1302  e68f 2002e2             		JSR CHROUT_SCREEN			; Output to Screen
+  1303  e692 aa                 		TAX
+  1304  e693 a5d5               		LDA RightMargin				; Physical Screen Line Length
+  1305  e695 38                 		SEC
+  1306  e696 e5c6               		SBC CursorCol				; Cursor Column on Current Line
+  1307  e698 c905               		CMP #5					; 5 characters from end of line
+  1308  e69a d037               		BNE BELLDONE
+  1309  e69c 8a                 		TXA
+  1310  e69d c91d               		CMP #$1d 				; <Cursor Right> ?
+  1311  e69f f006               		BEQ BEEP_BEEP				; Ring BELL
+  1312  e6a1 297f               		AND #$7f
+  1313  e6a3 c920               		CMP #$20 				; <SPACE>
+  1314  e6a5 902c               		BCC BELLDONE
   1315                          
   1316                          ;*********************************************************************************************************
   1317                          ;** BEEP / BEEP_BEEP  [E6A7]
   1318                          ;** Rings the BELL
   1319                          ;*********************************************************************************************************
   1320                          
-  1321  e6a4 20a7e6             BEEP_BEEP	JSR BEEP				; Double BEEP
+  1321  e6a7 20aae6             BEEP_BEEP	JSR BEEP				; Double BEEP
   1322                          BEEP							; Single BEEP
   1323                          
   1324                          !IF SILENT=0 {
-  1325  e6a7 a4e7               		LDY CHIME				; Chime Time FLAG
+  1325  e6aa a4e7               		LDY CHIME				; Chime Time FLAG
   1326                          } ELSE {
   1327                          		!IF CRUNCH=0 { NOP }			; To keep code aligned
   1328                          		RTS
@@ -2375,26 +2375,26 @@
   1333                          		BPL BELLENABLED
   1334                          		RTS
   1335                          }
-  1336  e6a9 f025               BELLENABLED	BEQ BELLDONE
-  1337  e6ab a910               		LDA #16
-  1338  e6ad 8d4be8             		STA VIA_ACR
-  1339  e6b0 a90f               		LDA #15
-  1340  e6b2 8d4ae8             		STA VIA_Shift
-  1341  e6b5 a207               		LDX #7
-  1342  e6b7 bd4de7             BELLOOP1	LDA SOUND_TAB-1,X
-  1343  e6ba 8d48e8             		STA VIA_Timer_2_Lo
-  1344  e6bd a5e7               		LDA CHIME				; Chime Time
+  1336  e6ac f025               BELLENABLED	BEQ BELLDONE
+  1337  e6ae a910               		LDA #16
+  1338  e6b0 8d4be8             		STA VIA_ACR
+  1339  e6b3 a90f               		LDA #15
+  1340  e6b5 8d4ae8             		STA VIA_Shift
+  1341  e6b8 a207               		LDX #7
+  1342  e6ba bd50e7             BELLOOP1	LDA SOUND_TAB-1,X
+  1343  e6bd 8d48e8             		STA VIA_Timer_2_Lo
+  1344  e6c0 a5e7               		LDA CHIME				; Chime Time
   1345                          
-  1346  e6bf 88                 BELLOOP2	DEY
-  1347  e6c0 d0fd               		BNE BELLOOP2				; Delay loop
-  1348  e6c2 38                 		SEC
-  1349  e6c3 e901               		SBC #1
-  1350  e6c5 d0f8               		BNE BELLOOP2				; Delay loop
-  1351  e6c7 ca                 		DEX
-  1352  e6c8 d0ed               		BNE BELLOOP1				; Delay loop
-  1353  e6ca 8e4ae8             		STX VIA_Shift
-  1354  e6cd 8e4be8             		STX VIA_ACR
-  1355  e6d0 60                 BELLDONE	RTS
+  1346  e6c2 88                 BELLOOP2	DEY
+  1347  e6c3 d0fd               		BNE BELLOOP2				; Delay loop
+  1348  e6c5 38                 		SEC
+  1349  e6c6 e901               		SBC #1
+  1350  e6c8 d0f8               		BNE BELLOOP2				; Delay loop
+  1351  e6ca ca                 		DEX
+  1352  e6cb d0ed               		BNE BELLOOP1				; Delay loop
+  1353  e6cd 8e4ae8             		STX VIA_Shift
+  1354  e6d0 8e4be8             		STX VIA_ACR
+  1355  e6d3 60                 BELLDONE	RTS
   1356                          
   1357                          ;*********************************************************************************************************
   1358                          ;** Keyboard Decoding Table  [E6D1]
@@ -2490,16 +2490,16 @@
     74                          !IF KEYBOARD=3 {
     75                          ;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES 
     76                          ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====
-    77                          !byte $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF ; NONE   NONE   NONE   NONE   NONE   NONE   NONE   NONE   ROW0/A
-    78                          !byte $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF ; NONE   NONE   NONE   NONE   NONE   NONE   NONE   NONE   ROW1/B
-    79                          !byte $19,$13,$2D,$30,$38,$36,$34,$32 ; F7     HOME   -      0      8      6      4      2      ROW2/C
-    80                          !byte $16,$5E,$40,$4F,$55,$54,$45,$51 ; F5     UP-ARR @      O      U      T      E      Q      ROW3/D
-    81                          !byte $15,$3D,$3A,$4B,$48,$46,$53,$9B ; F3     =      :      K      H      F      S      C=     ROW4/E
-    82                          !byte $0E,$00,$2E,$4D,$42,$43,$5A,$20 ; F1     SHIFT  .      M      B      C      Z      SPACE  ROW5/F
-    83                          !byte $11,$2F,$2C,$4E,$56,$58,$00,$03 ; DOWN   /      ,      N      V      X      SHIFT  STOP   ROW6/G
-    84                          !byte $1D,$3B,$4C,$4A,$47,$44,$41,$12 ; RIGHT  ;      L      J      G      D      A      CTRL   ROW7/H
-    85                          !byte $0D,$2A,$50,$49,$59,$52,$57,$DF ; RETURN *      P      I      Y      R      W      BK-ARR ROW8/I
-    86                          !byte $14,$5C,$2B,$39,$37,$35,$33,$31 ; DEL    POUND  +      9      7      5      3      1      ROW9/J
+    77  e6d4 ffffffffffffffff   !byte $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF ; NONE   NONE   NONE   NONE   NONE   NONE   NONE   NONE   ROW0/A
+    78  e6dc ffffffffffffffff   !byte $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF ; NONE   NONE   NONE   NONE   NONE   NONE   NONE   NONE   ROW1/B
+    79  e6e4 19132d3038363432   !byte $19,$13,$2D,$30,$38,$36,$34,$32 ; F7     HOME   -      0      8      6      4      2      ROW2/C
+    80  e6ec 165e404f55544551   !byte $16,$5E,$40,$4F,$55,$54,$45,$51 ; F5     UP-ARR @      O      U      T      E      Q      ROW3/D
+    81  e6f4 153d3a4b4846539b   !byte $15,$3D,$3A,$4B,$48,$46,$53,$9B ; F3     =      :      K      H      F      S      C=     ROW4/E
+    82  e6fc 0e002e4d42435a20   !byte $0E,$00,$2E,$4D,$42,$43,$5A,$20 ; F1     SHIFT  .      M      B      C      Z      SPACE  ROW5/F
+    83  e704 112f2c4e56580003   !byte $11,$2F,$2C,$4E,$56,$58,$00,$03 ; DOWN   /      ,      N      V      X      SHIFT  STOP   ROW6/G
+    84  e70c 1d3b4c4a47444112   !byte $1D,$3B,$4C,$4A,$47,$44,$41,$12 ; RIGHT  ;      L      J      G      D      A      CTRL   ROW7/H
+    85  e714 0d2a5049595257df   !byte $0D,$2A,$50,$49,$59,$52,$57,$DF ; RETURN *      P      I      Y      R      W      BK-ARR ROW8/I
+    86  e71c 145c2b3937353331   !byte $14,$5C,$2B,$39,$37,$35,$33,$31 ; DEL    POUND  +      9      7      5      3      1      ROW9/J
     87                          }
     88                          
     89                          ;---------- Business Keyboard - Modified QWERTY Layout - BSJG
@@ -2549,16 +2549,16 @@
    133                          !IF KEYBOARD=6 {
    134                          ;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES 
    135                          ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====
-   136  e6d1 16043a03393633df   !byte $16,$04,$3A,$03,$39,$36,$33,$DF ; CTRL-V CTRL-D :      STOP   9      6      3      BK-ARR ROW0 
-   137  e6d9 b12f15134d205812   !byte $B1,$2F,$15,$13,$4D,$20,$58,$12 ; KP 1   /      CTRL-U HOME   m      SPACE  x      RVS    ROW1 
-   138  e6e1 b2100fb02c4e5659   !byte $B2,$10,$0F,$B0,$2C,$4E,$56,$59 ; KP 2   RPT    CTRL-O KP 0   ,      n      v      y      ROW2 
-   139  e6e9 b30019ae2e424300   !byte $B3,$00,$19,$AE,$2E,$42,$43,$00 ; KP 3   SHIFT  CTRL-Y KP .   .      b      c      SHIFT  ROW3
-   140  e6f1 b4db4f1155544551   !byte $B4,$DB,$4F,$11,$55,$54,$45,$51 ; KP 4   ]      o      DOWN   u      t      e      q      ROW4 
-   141  e6f9 145049dc5a525709   !byte $14,$50,$49,$DC,$5A,$52,$57,$09 ; DEL    p      i      @      z      r      w      TAB    ROW5 
-   142  e701 b6c04c0d4a474441   !byte $B6,$C0,$4C,$0D,$4A,$47,$44,$41 ; KP 6   [      l      RETURN j      g      d      a      ROW6
-   143  e709 b53b4bdd4846539b   !byte $B5,$3B,$4B,$DD,$48,$46,$53,$9B ; KP 5   \      k      ;      h      f      s      ESC    ROW7
-   144  e711 b906deb7b0373431   !byte $B9,$06,$DE,$B7,$B0,$37,$34,$31 ; KP 9   CTRL-F UP-ARR KP 7   0      7      4      1      ROW8
-   145  e719 050e1db82d383532   !byte $05,$0E,$1D,$B8,$2D,$38,$35,$32 ; CTRL-E CTRL-N RIGHT  KP 8   -      8      5      2      ROW9
+   136                          !byte $16,$04,$3A,$03,$39,$36,$33,$DF ; CTRL-V CTRL-D :      STOP   9      6      3      BK-ARR ROW0 
+   137                          !byte $B1,$2F,$15,$13,$4D,$20,$58,$12 ; KP 1   /      CTRL-U HOME   m      SPACE  x      RVS    ROW1 
+   138                          !byte $B2,$10,$0F,$B0,$2C,$4E,$56,$59 ; KP 2   RPT    CTRL-O KP 0   ,      n      v      y      ROW2 
+   139                          !byte $B3,$00,$19,$AE,$2E,$42,$43,$00 ; KP 3   SHIFT  CTRL-Y KP .   .      b      c      SHIFT  ROW3
+   140                          !byte $B4,$DB,$4F,$11,$55,$54,$45,$51 ; KP 4   ]      o      DOWN   u      t      e      q      ROW4 
+   141                          !byte $14,$50,$49,$DC,$5A,$52,$57,$09 ; DEL    p      i      @      z      r      w      TAB    ROW5 
+   142                          !byte $B6,$C0,$4C,$0D,$4A,$47,$44,$41 ; KP 6   [      l      RETURN j      g      d      a      ROW6
+   143                          !byte $B5,$3B,$4B,$DD,$48,$46,$53,$9B ; KP 5   \      k      ;      h      f      s      ESC    ROW7
+   144                          !byte $B9,$06,$DE,$B7,$B0,$37,$34,$31 ; KP 9   CTRL-F UP-ARR KP 7   0      7      4      1      ROW8
+   145                          !byte $05,$0E,$1D,$B8,$2D,$38,$35,$32 ; CTRL-E CTRL-N RIGHT  KP 8   -      8      5      2      ROW9
    146                          }
    147                          
    148                          ;----------- Business Keyboard - French AZERTY Layout
@@ -2714,8 +2714,8 @@
   1364                          ;** SHIFT RUN/STOP string  [E721]
   1365                          ;*********************************************************************************************************
   1366                          
-  1367  e721 44cc222a0d         RUN_STRING	!byte $44,$cc,$22,$2a,$0d		; dL"*<RETURN>
-  1368  e726 52554e0d           		!byte $52,$55,$4e,$0d			; run<RETURN>
+  1367  e724 44cc222a0d         RUN_STRING	!byte $44,$cc,$22,$2a,$0d		; dL"*<RETURN>
+  1368  e729 52554e0d           		!byte $52,$55,$4e,$0d			; run<RETURN>
   1369                          
   1370                          ;*********************************************************************************************************
   1371                          ;** CRTC Chip Register Setup Tables (2K ROMs) [E72A]
@@ -2754,14 +2754,14 @@
     16                          ;
     17                          ;---------------------- 40/80x25, 50 Hz, 20 kHz for 12" Internal Monitor (inverted video R12=$10)
     18                          !IF REFRESH=0 {
-    19  e72a 3128290f27001920...CRT_CONFIG_TEXT:	!byte $31,$28,$29,$0f,$27,$00,$19,$20,$00,$09,$00,$00,$10,$00,$00,$00,$00,$00 
-    20  e73c 3128290f31001925...CRT_CONFIG_GRAPHICS:	!byte $31,$28,$29,$0f,$31,$00,$19,$25,$00,$07,$00,$00,$10,$00,$00,$00,$00,$00
+    19                          CRT_CONFIG_TEXT:	!byte $31,$28,$29,$0f,$27,$00,$19,$20,$00,$09,$00,$00,$10,$00,$00,$00,$00,$00 
+    20                          CRT_CONFIG_GRAPHICS:	!byte $31,$28,$29,$0f,$31,$00,$19,$25,$00,$07,$00,$00,$10,$00,$00,$00,$00,$00
     21                          }
     22                          
     23                          ;---------------------- 40/80x25, 60 Hz, 20 kHz for 12" Internal Monitor (inverted video)
     24                          !IF REFRESH=1 {
-    25                          CRT_CONFIG_TEXT:	!byte $31,$28,$29,$0f,$20,$03,$19,$1d,$00,$09,$00,$00,$10,$00,$00,$00,$00,$00 
-    26                          CRT_CONFIG_GRAPHICS:	!byte $31,$28,$29,$0f,$28,$05,$19,$21,$00,$07,$00,$00,$10,$00,$00,$00,$00,$00
+    25  e72d 3128290f2003191d...CRT_CONFIG_TEXT:	!byte $31,$28,$29,$0f,$20,$03,$19,$1d,$00,$09,$00,$00,$10,$00,$00,$00,$00,$00 
+    26  e73f 3128290f28051921...CRT_CONFIG_GRAPHICS:	!byte $31,$28,$29,$0f,$28,$05,$19,$21,$00,$07,$00,$00,$10,$00,$00,$00,$00,$00
     27                          }
     28                          
     29                          ;---------------------- 40/80x25, 50 Hz, 15.625 kHz (PAL)  for External Monitor (inverted video)
@@ -2852,7 +2852,7 @@
   1377                          ;** BELL Sound Table  [E74D]
   1378                          ;*********************************************************************************************************
   1379                          
-  1380  e74e 0e1e3e7e3e1e0e     SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e	; BELL chime values
+  1380  e751 0e1e3e7e3e1e0e     SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e	; BELL chime values
   1381                          
   1382                          ;*********************************************************************************************************
   1383                          ;** Screen Line Address Tables  [E755][E76E]
@@ -2898,14 +2898,14 @@
     36                          
     37                          ;---------- 80 characters wide 
     38                          !IF COLUMNS=80 {
-    39  e755 0050a0f04090e030...Line_Addr_Lo	!byte $00,$50,$a0,$f0,$40,$90,$e0,$30,$80,$d0
-    40  e75f 2070c01060b00050...		!byte $20,$70,$c0,$10,$60,$b0,$00,$50,$a0,$f0
-    41  e769 4090e03080         		!byte $40,$90,$e0,$30,$80
+    39  e758 0050a0f04090e030...Line_Addr_Lo	!byte $00,$50,$a0,$f0,$40,$90,$e0,$30,$80,$d0
+    40  e762 2070c01060b00050...		!byte $20,$70,$c0,$10,$60,$b0,$00,$50,$a0,$f0
+    41  e76c 4090e03080         		!byte $40,$90,$e0,$30,$80
     42                          !if ROWS>25 {	!byte $d0,$20,$70,$c0,$10,$60,$b0,$00,$50,$a0,$f0 }
     43                          
-    44  e76e 8080808081818182...Line_Addr_Hi	!byte $80,$80,$80,$80,$81,$81,$81,$82,$82,$82
-    45  e778 8383838484848585...		!byte $83,$83,$83,$84,$84,$84,$85,$85,$85,$85
-    46  e782 8686868787         		!byte $86,$86,$86,$87,$87
+    44  e771 8080808081818182...Line_Addr_Hi	!byte $80,$80,$80,$80,$81,$81,$81,$82,$82,$82
+    45  e77b 8383838484848585...		!byte $83,$83,$83,$84,$84,$84,$85,$85,$85,$85
+    46  e785 8686868787         		!byte $86,$86,$86,$87,$87
     47                          !if ROWS>25 {	!byte $87,$88,$88,$88,$89,$89,$89,$8a,$8a,$8a,$8a }
     48                          }
     49                          
@@ -2930,13 +2930,13 @@
   1393                          !IF BACKARROW =1 { !SOURCE "editbarrow.asm" }		; Patch for BackArrow toggling of screen mode
   1394                          
   1395                          ;#########################################################################################################
-  1396  e787 cd                 !IF CRUNCH=0 {	!byte $cd }		; to match 901474-04
+  1396  e78a cd                 !IF CRUNCH=0 {	!byte $cd }		; to match 901474-04
   1397                          
   1398                          ;*********************************************************************************************************
   1399                          ;** FILLER
   1400                          ;*********************************************************************************************************
   1401                          
-  1402  e788 aaaaaaaaaaaaaaaa...		!IF NOFILL=0 { !FILL $e800-*,$aa }	; 78 bytes - Fill to end of 2K
+  1402  e78b aaaaaaaaaaaaaaaa...		!IF NOFILL=0 { !FILL $e800-*,$aa }	; 78 bytes - Fill to end of 2K
   1403                          
   1404                          ;#########################################################################################################
   1405                          ;END! DO NOT ADD ANYTHING BELOW THIS LINE!!!!!!!!
@@ -2954,7 +2954,1141 @@
     48                          ;   3) BACKARROW feature needs relocating.
     49                          
     50                          	!IF ((CODEBASE=2) | ((COLOURPET + ESCCODES + WEDGE + EXECUDESK + SS40 + AUTORUN + KEYRESET) > 0) | (BACKARROW=2) | (CODEBASE=0 & KEYSCAN=3)) {
-    51                          		!SOURCE "editrom_hi.asm"
+
+; ******** Source: editrom_hi.asm
+     1                          ; PET/CBM EDIT ROM - Extended ROM Code (only if needed)
+     2                          ; ================
+     3                          ; $E800-EFFF for Extended ROM start address. Includes two sections:
+     4                          ;   1) $E800-E8FF - IO Area
+     5                          ;   3) $E900-EFFF - Extended area (Codebase 2 if required, New code)
+     6                           
+     7                          ;*=e800
+     8                          
+     9                          ;=======================================================================
+    10                          ; IO Area
+    11                          ;=======================================================================
+    12                          ; $E800-E8FF is not visible to the PET cpu as I/O is in this space.
+    13                          ; When not tring to duplicate existing code binaries, the IO.ASM file can
+    14                          ; be used to place comments here that will be readable in the ROM via
+    15                          ; binary viewers.
+    16                          
+    17                          	!IF OPTROM=0 {
+    18                          		!IF CODEBASE=2 {
+    19                          			!SOURCE "io_euro-4v4e.asm"			; Use Commodore's info block	
+    20                          			!IF NOFILL=0 { !FILL $e900-*,$ff }		; pad with $FF as per Commodore ROMS
+    21                          		} ELSE {
+
+; ******** Source: io.asm
+     1                          ; IO - This part of the ROM is not visible since IO is mapped here, so we will fill it
+     2                          ; ==   with a decription of the editrom features and options.
+     3                          
+     4  e800 2a2a43424d204544...!text "**CBM EDIT ROM**"
+     5  e810 5b                 !text "["
+     6  e811 323032352d30382d...+DATE
+     7                          
+     8  e81b 5d20434f44454241...!text "] CODEBASE="
+     9                          !IF CODEBASE=0 { !text "0" }
+    10  e826 31                 !IF CODEBASE=1 { !text "1" }
+    11                          !IF CODEBASE=2 { !text "2" }
+    12                          
+    13                          !IF COLOURPET = 1 {
+    14                          	!text " COLOURPET-"
+    15                          	!if COLOURVER=0 { !text "beta" }
+    16                          	!if COLOURVER=1 { !text "release" }
+    17                          }
+    18                          
+    19  e827 204b4559424f4152...!text " KEYBOARD="
+    20                          	!if KEYBOARD= 0 { !text "n-qwerty" }
+    21                          	!if KEYBOARD= 1 { !text "b-qwerty" }	; QWERTY layout
+    22                          	!if KEYBOARD= 2 { !text "din" }
+    23  e831 6336342f766963     	!if KEYBOARD= 3 { !text "c64/vic" }
+    24                          	!if KEYBOARD= 4 { !text "b-sjg" }	; Modified layout - cursor keys, esc etc
+    25                          	!if KEYBOARD= 5 { !text "n-sjg" }	; Modified layout - @ replaced with ESC, backarrow becomes @
+    26                          	!if KEYBOARD= 6 { !text "b-qwertz" }	; QWERTZ layout
+    27                          	!if KEYBOARD= 7 { !text "b-azerty" }	; AZERTY layout
+    28                          	!if KEYBOARD= 8 { !text "cbm-ii" }	; CBM-II keyboard (requires hardware mod)
+    29                          	!if KEYBOARD= 9 { !text "n-sjg2" }	; Modified layout - backarrow replaced with ESC
+    30                          	!if KEYBOARD=11 { !text "ted" }		; TED series (C16,C116,Plus/4 etc)
+    31                          
+    32  e838 2053435245454e3d   !text " SCREEN="
+    33                          	!if COLUMNS=32  { !text "32" }
+    34                          	!if COLUMNS=40  { !text "40" }
+    35  e840 3830               	!if COLUMNS=80  { !text "80" }
+    36                          	!if COLUMNS=90  { !text "90" }
+    37                          	!if ROWS=16     { !text "x16" }
+    38  e842 783235             	!if ROWS=25     { !text "x25" }
+    39                          	!if ROWS=32     { !text "x32" }
+    40                          	!if ROWS=35     { !text "x35" }
+    41                          	!if SOFT40=1    { !text " (soft40)" }
+    42                          	!if SS40=1      {
+    43                          		!pet " ("
+    44                          		!if HARD4080=1  { !text "hs" } else { !text "ss" }
+    45                          		!if SS40MODE=40 { !text "40)" }
+    46                          		!if SS40MODE=80 { !text "80)" }
+    47                          	}
+    48                          
+    49  e845 20484552545a3d     !text " HERTZ="
+    50                          	!if HERTZ=50 { !text "50" }
+    51  e84c 3630               	!if HERTZ=60 { !text "60" }
+    52                          
+    53  e84e 2052454652455348...!text " REFRESH="
+    54                          	!if REFRESH= 0 { !text "euro" }
+    55  e857 6e2e616d65726963...	!if REFRESH= 1 { !text "n.america" }
+    56                          	!if REFRESH= 2 { !text "pal" }
+    57                          	!if REFRESH= 3 { !text "ntsc" }
+    58                          	!if REFRESH= 4 { !text "9inch" }
+    59                          	!if REFRESH=82 { !text "8296d-v1" }
+    60                          	!if REFRESH=83 { !text "8296d-v2" }
+    61                          	!if REFRESH=90 { !text "8296(d)-n.a." }
+    62                          	!if REFRESH=91 { !text "8296(d)-n.a." }
+    63                          	!if REFRESH=92 { !text "8296(d)-n.a." }
+    64                          	!if REFRESH=98 { !text "special" }
+    65                          	!if REFRESH=99 { !text "custom" }
+    66                          
+    67  e860 2046454154555245...!text " FEATURES="
+    68                          !if ESCCODES=1  { !text "esc-codes" }
+    69  e86a 2c6175746f72756e   !if AUTORUN=1   { !text ",autorun" }
+    70                          !if BYPASS=1    { !text "+bypass" }
+    71  e872 2c62616e6e6572     !if BANNER>0    { !text ",banner" }
+    72  e879 2c7765646765       !if WEDGE=1     { !text ",wedge" }
+    73  e87f 2c6b657972657365...!if KEYRESET=1  { !text ",keyreset" }
+    74                          !if DISKBOOT=1  { !text ",disk boot" }
+    75                          !if EXECUDESK=1 { !text ",execudesk" }
+    76  e888 2c6261636b617272...!if BACKARROW>0 { !text ",backarrow" }
+    77                          !if SILENT=1    { !text ",silent" }
+    78                          !if CRUNCH=1    { !text ",crunch" }
+    79                          !if MOT6845=1   { !text ",mot6845" }
+    80                          !if DEBUG=1     { !text ",debug" }
+    81  e892 2e20434f4d4d454e...!text ". COMMENT="
+    82  e89c 534a472d45444954...+COMMENT
+    83                          
+
+; ******** Source: editrom_hi.asm
+    22                          			; Filler not visible due to I/O space!
+    23  e8a7 2020202020202020...			!IF NOFILL=0 { !FILL $E900-*,$20 }		; pad with SPACES for non-cbm
+    24                          		}
+    25                          	}
+    26                          
+    27                          ;=======================================================================
+    28                          ; EXTENDED Area
+    29                          ;=======================================================================
+    30                          ;*=e900
+    31                          
+    32                          ;=======================================================================
+    33                          ; CODEBASE 2 Code
+    34                          ;=======================================================================
+    35                          ; This code is included only for Codebase 2
+    36                          
+    37                          	!IF CODEBASE = 2 {!SOURCE "editrom82ext.asm" }
+    38                          
+    39                          ;=======================================================================
+    40                          ; NEW Code
+    41                          ;=======================================================================
+    42                          ; The EXTended features will go here. This is NEW code that has been added,
+    43                          ; or code that must be RELOCATED due to lack of space in the 2K area 
+    44                          ; due to restrictions of HARDCODED entrypoints.
+    45                          ;
+    46                          ; It is very likely that CODEBASE 2 will not have enough space for many of
+    47                          ; these additions.
+    48                          ;
+    49                          ; If OPTROM is greater than 0 then this code will be put in the OPTION ROM space.
+    50                          
+    51                          	;----- If OPTION ROM then adjust Code assembly address
+    52                          	
+    53                          	!IF OPTROM=1 { *=$9000 }  				; Assemble to option ROM at $9000
+    54                          	!IF OPTROM=2 { *=$A000 }  				; Assemble to option ROM at $A000
+    55                          	!IF OPTROM=99 {!SOURCE "io.asm"}			; Special case for development purposes
+    56                          
+    57                          	;----- These features require AUTORUN
+    58                          
+    59                          	!IF AUTORUN = 1 {
+
+; ******** Source: editautorun.asm
+     1                          ; PET/CBM EDIT ROM - Auto Run
+     2                          ; ================
+     3                          ;
+     4                          ; This module controls auto running tasks after PET has booted. It does this by
+     5                          ; stuffing the keyboard buffer with a SYS command. We need to do this because
+     6                          ; the editrom code runs before basic and zero-page are initialized.
+     7                          ;
+     8                          ; The SYS command will automatically be erased.
+     9                          ;
+    10                          ;-------------- Autostart Dispatch
+    11                          ; This should assemble to the $E900,$9000, or $A000 depending on OPTROM setting.
+    12                          ; The SYS points to here.
+    13                          ; We check options to see what needs to Auto Run.
+    14                          
+    15                          AUTODISPATCH
+    16  e900 200ae9             		JSR ERASE_SYS
+    17  e903 204ce9             		!IF BANNER > 0   { JSR SHOW_BANNER   }		; Display Custom Banner Message
+    18  e906 20f4e9             		!IF WEDGE  > 0   { JSR INSTALL_WEDGE }		; Install DOS Wedge
+    19                          		!IF EXECUDESK =2 { JSR EDESKMENU }		; Run Execudesk Menu
+    20                          		!IF DISKBOOT > 0 { JSR DOBOOT }			; Do Disk Boot
+    21  e909 60                 		RTS
+    22                          
+    23                          ERASE_SYS
+    24  e90a a92c               		LDA #<ERASE_TXT			; pointer to erase text string
+    25  e90c a0e9               		LDY #>ERASE_TXT
+    26  e90e 201dbb             		JSR STROUTZ			; print it
+    27  e911 60                 		RTS
+    28                          
+    29                          ;-------------- Wedge Prep (1st Step)
+    30                          ; We jump to here in the Editor ROM Init code, near the end.
+    31                          ; If BYPASS=1 then we check for a key on ROW0 (which is ROW9 in the keyboard table)
+    32                          
+    33                          AUTOSTART
+    34                          
+    35                          !IF BYPASS=1 {
+    36                          		LDA PIA1_Port_A 		; Keyboard ROW select - PIA#1, Register 0
+    37                          						; Upper bits: IEEE and Cassette
+    38                          						; Lower bits: Keyboard ROW select
+    39                          		AND #$F0			; Mask off lower 4 bits (reset keyboard scan row)
+    40                          		STA PIA1_Port_A			; Keyboard ROW select - PIA#1, Register 0				CHIP
+    41                          		LDA PIA1_Port_B			; Keyboard COL result							CHIP
+    42                          		CMP #$FF			; Are any keys pressed?  (FF=No keys down)
+    43                          		BEQ AUTO_GO			; No, so do Auto Run
+    44                          
+    45                          !IF COLOURPET > 0 {
+    46                          						; For ColourPET we can change the colours to indicate no wedge installed
+    47                          		LDA #BYPASSFG			; ColourPET Foreground for Wedge Bypass
+    48                          		STA COLOURFG
+    49                          		LDA #BYPASSBG 			; ColourPET Background for Wedge Bypass
+    50                          		STA COLOURBG
+    51                          		}
+    52                          
+    53                          		RTS				; Exit without activating wedge sys
+    54                          }
+    55                          
+    56                          ;-------------- Stuff Keyboard
+    57                          AUTO_GO
+    58  e912 a209               		LDX #9				; Length of string
+    59                          
+    60  e914 bd22e9             AUTO_LOOP	LDA AUTO_SYS,X			; Get a key from table
+    61  e917 9d6f02             		STA KEYD,X 			; put it in the Keyboard Buffer
+    62  e91a ca                 		DEX
+    63  e91b 10f7               		BPL AUTO_LOOP			; loop until done
+    64                          
+    65  e91d a909               		LDA #9				; Length of string
+    66  e91f 859e               		STA CharsInBuffer		; Set characters in keyboard buffer 
+    67  e921 60                 AUTO_DONE	RTS
+    68                          
+    69                          ;-------------- TEXT to stuff into keyboard buffer
+    70                          
+    71                          AUTO_SYS
+    72  e922 5359533539363438   		!IF OPTROM=0 {!text "SYS59648"}		; Autostart is located at $E900!
+    73                          		!IF OPTROM=1 {!text "SYS36864"}		; Autostart is located at $9000!
+    74                          		!IF OPTROM=2 {!text "SYS40960"}		; Autostart is located at $A000!
+    75  e92a 0d00               		!byte $0D,0				; <CR> and zero pad byte
+    76                          
+    77                          ;-------------- TEXT to erase SYS and READY from screen
+    78                          
+    79                          ERASE_TXT
+    80  e92c 91                 		!byte $91			; <UP>
+    81  e92d 2020202020202020...		!text "            "		; erase "SYS" message
+    82  e939 0d                 		!byte $0D			; <CR>
+    83  e93a 2020202020202020...		!text "            "		; erase "READY" message
+    84  e946 0d                 		!byte $0D			; <CR>
+    85  e947 91919191           		!byte $91,$91,$91,$91		; <UP><UP><UP><UP>
+    86  e94b 00                 		!byte 0
+    87                          
+    88                          ;============================================================================================
+    89                          ; DISK AUTOBOOT
+    90                          ;============================================================================================
+    91                          ; This puts the SHIFT RUN/STOP code into the keyboard buffer and the system
+    92                          ; will take care of the rest!
+    93                          
+    94                          !IF DISKBOOT >0 {
+    95                          DOBOOT
+    96                          		LDA #$83			; SHIFT RUN/STOP
+    97                          		STA KEYD			; First position of Keyboard Input Buffer
+    98                          		LDA #1				; One character
+    99                          		STA $9E				; Set number of characters in keyboard buffer
+   100                          		RTS
+   101                          }
+
+; ******** Source: editrom_hi.asm
+    60                          
+
+; ******** Source: editbanner.asm
+     1                          ; PET/CBM EDIT ROM - Custom Banner
+     2                          ; ================
+     3                          ;
+     4                          ; You can display a custom banner message when the machine is turned on. This could be a simple
+     5                          ; welcome message, or a completely new message. By including CLS, HOME or CURSOR characters you
+     6                          ; can overwrite the PET's normal power-up banner with anything you like.
+     7                          ;
+     8                          ; NOTES:
+     9                          ; - The default banner "*** COMMODORE BASIC 4.0 ***"  (27 characters wide) is located in the
+    10                          ;   BASIC ROM so we cannot change it, but we can clear or overwrite it.
+    11                          ; - Be sure to use proper cursoring so that the "READY" prompt is positioned correctly!
+    12                          ; - If you clear the screen you will lose the "xxxxx BYTES FREE" message.
+    13                          ; - For ColourPET, if you set the initial FG and BG colours to be the same then the PET banner
+    14                          ;   will be invisible. Be sure to set the colour before printing your custom message.
+    15                          
+    16                          ;-------------- Display the Banner
+    17                          
+    18                          SHOW_BANNER
+    19  e94c a954               		lda #<BANNER_TXT		; pointer to BANNER text string
+    20  e94e a0e9               		ldy #>BANNER_TXT
+    21  e950 201dbb             		jsr STROUTZ			; print it
+    22  e953 60                 		rts
+    23                          
+    24                          ;-------------- Include the Banner text
+    25                          
+    26                          BANNER_TXT
+
+; ******** Source: banner.asm
+     1                          ; PET/CBM EDIT ROM - Custom Banner (Power-on) Messages
+     2                          ; ================
+     3                          
+     4                          ; You can display a custom banner message when the machine is turned on. This could be a simple
+     5                          ; welcome message, or a completely new message. By including CLS, HOME or CURSOR characters you
+     6                          ; can overwrite the PET's normal power-up banner with anything you like.
+     7                          ;
+     8                          ; NOTES:
+     9                          ; - The default banner "*** COMMODORE BASIC 4.0 ***"  (27 characters wide) is located in the
+    10                          ;   BASIC ROM so we cannot change it, but we can clear or overwrite it.
+    11                          ; - Be sure to use proper cursoring so that the "READY" prompt is positioned correctly!
+    12                          ; - If you clear the screen you will lose the "xxxxx BYTES FREE" message.
+    13                          ; - For ColourPET, if you set the initial FG and BG colours to be the same then the PET banner
+    14                          ;   will be invisible. Be sure to set the colour before printing your custom message.
+    15                          ;
+    16                          ; Currently the following are available:
+    17                          ;
+    18                          ; ##  MODEL  MODE   TYPE MESSAGE / DESCRIPTION                   40                                      80
+    19                          ; --  -----  ----   ---- "---------!---------!---------!---------!---------!---------!---------!---------!"
+    20                          ;  1  CPET   GRAPH  OVER "COMMODORE COLOURPET"
+    21                          ;  2  CPET   TEXT   OVER "ColourPET BASIC4 + Wedge"
+    22                          ;  3  80COL  TEXT   OVER "Commodore EDITROM Project - Wedge/ESC/SS40"
+    23                          ;  4  ANY    GRAPH  OVER "CBM BASIC 4 WITH WEDGE"
+    24                          ;  5  CPET   GRAPH  FULL C65-like screen with colour bars
+    25                          ;  6  80COL  ANY    OVER "*** commodore basic 4.0 with wedge/esc/ss40"
+    26                          ;  7  80COL  ANY    OVER "*** commodore basic 4.0 with wedge,esc,reboot,40/80 switcher"
+    27                          ;  8  8296   ANY    OVER "*** commodore 8296 basic 4.0 with wedge,esc,reboot,80x35 screen"
+    28                          ;  9  8296   ANY    OVER "*** commodore 8296 basic 4.0 with wedge,esc,reboot,extended screen"
+    29                          ; 10  80COL  ANY    OVER "*** commodore basic 4.0 with wedge,esc,reboot,ss40, execudesk"
+    30                          ; 11  80COL  ANY    OVER "*** commodore basic 4.0 with enhanced editor and wedge"
+    31                          ; 12  40COL  ANY    OVER "*** cbm basic 4 plus editor+wedge ***"
+    32                          ; 13  8296D  ANY    OVER "*** commodore 8296 basic 4.0 with wedge,reboot, backarrow ***"
+    33                          ; 14  8296D  ANY    OVER "*** commodore 8296 basic 4.0 with custom editor rom ***"
+    34                          ; 15  8296D  ANY    OVER "*** commodore 8296d basic 4.0 with custom editor rom ***"
+    35                          ; 16  80COL  ANY    OVER "*** commodore basic 4.0 with custom editor rom ***"
+    36                          ; 17  40COL  ANY    OVER "*** cbm basic 4 custom editrom ***"
+    37                          ; 18  40COL  ANY    OVER "*** commodore basic 4.0 *** hard40/80,n"
+    38                          ; 19  40COL  ANY    OVER "*** commodore basic 4.0 *** disk boot"
+    39                          ; 98  ANY    ANY    ADD  Show DATE and COMMENT for debug purposes
+    40                          ; 99  CUSTOM ...    ...  Your own banner text
+    41                          ;
+    42                          ; TYPE: FULL = Replaces all, OVER = Overwrites part, ADD = Adds additional text
+    43                          ;
+    44                          ;-----------------------------------------------
+    45                          ; CUSTOM BANNER
+    46                          ;-----------------------------------------------
+    47                          !IF BANNER=99 {
+    48                          		!byte $13
+    49                          ;Screen columns:      44444444444444444444444444v44444444444448888888888888888888888888888888888888888
+    50                          		!pet "*** commodore basic 4.0 *** hard40/80,n",$0D
+    51                          		!pet "waltermixx edition!"
+    52                          		!byte $0D      			; <CR><CR><CR>
+    53                          }
+    54                          
+    55                          ;-----------------------------------------------
+    56                          ; DEBUG BANNER
+    57                          ;-----------------------------------------------
+    58                          
+    59                          !IF BANNER=98 {	!pet "date: "
+    60                          		+DATE
+    61                          		!byte $0D
+    62                          		!pet "comment: "
+    63                          		+COMMENT
+    64                          		!byte $0D				
+    65                          }
+    66                          
+    67                          !IF BANNER=19 {	!byte $13
+    68                          		!pet "*** commodore basic 4.0 *** disk boot"
+    69                          		!byte $0D,$0D,$0D      		; <CR><CR><CR>
+    70                          }
+    71                          
+    72                          !IF BANNER=18 {	!byte $13
+    73                          		!pet "*** commodore basic 4.0 *** hard40/80,n"
+    74                          		!byte $0D,$0D,$0D      		; <CR><CR><CR>
+    75                          }
+    76                          
+    77                          !if BANNER=17 { !byte $13            		; <HOME> 
+    78                                   	!pet "*** cbm basic 4 with custom editrom ***"
+    79                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+    80                          }
+    81                          
+    82                          !if BANNER=16 { !byte $13            		; <HOME> 
+    83                                   	!pet "*** commodore basic 4.0 with custom editor rom ***"
+    84                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+    85                          }
+    86                          
+    87                          !if BANNER=15 { !byte $13            		; <HOME> 
+    88                                   	!pet "*** commodore 8296d basic 4.0 with custom editor rom ***"
+    89                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+    90                          }
+    91                          
+    92                          !if BANNER=14 { !byte $13            		; <HOME> 
+    93                                   	!pet "*** commodore 8296 basic 4.0 with custom editor rom ***"
+    94                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+    95                          }
+    96                          
+    97                          !if BANNER=13 { !byte $13            		; <HOME> 
+    98                                   	!pet "*** commodore 8296d basic 4.0 with wedge,reboot,din ***"
+    99                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   100                          }
+   101                          
+   102                          !if BANNER=12 {	!byte $13            		; <HOME> 
+   103                                   	!pet "*** cbm basic 4 plus editor+wedge ***"
+   104                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   105                          }
+   106                          
+   107                          !if BANNER=11 {	!byte $13            		; <HOME> 
+   108                                   	!pet "*** commodore basic 4.0 with enhanced editor and wedge ***"
+   109                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   110                          }
+   111                          
+   112                          !if BANNER=10 {	!byte $13            		; <HOME> 
+   113                                   	!pet "*** commodore basic 4.0 with wedge,esc,reboot,ss40, execudesk ***"
+   114                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   115                          }
+   116                          
+   117                          !if BANNER=9 {	!byte $13            		; <HOME> 
+   118                                   	!pet "*** commodore 8296 basic 4.0 with wedge,esc,reboot,extended screen ***"
+   119                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   120                          }
+   121                          
+   122                          !if BANNER=8 {	!byte $13            		; <HOME> 
+   123                                   	!pet "*** commodore 8296 basic 4.0 with wedge,esc,reboot,80x35 screen ***"
+   124                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   125                          }
+   126                          
+   127                          !if BANNER=7 {	!byte $13            		; <HOME> 
+   128                                   	!pet "*** commodore basic 4.0 with wedge,esc,reboot,40/80 switcher ***"
+   129                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   130                          }
+   131                          
+   132                          !if BANNER=6 {	!byte $13            		; <HOME> 
+   133                                   	!pet "*** commodore basic 4.0 with wedge/esc/ss40 ***"
+   134                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   135                          }
+   136                          
+   137                          ;-----------------------------------------------
+   138                          ; Custom ColourPET-40 C65-like startup screen with colour bars
+   139                          ; TIP: Set foreground and background colour to <BLUE> to hide initial banner message
+   140                          ;-----------------------------------------------
+   141                          !IF BANNER=5 {
+   142  e954 051f938e           		!byte $5,$1F,$93,142		; <WHT><BLUE><CLS><GRAPHICS>
+   143                          		
+   144                          		;-- line 1		
+   145  e958 1c12               		!byte $1C,$12			;<RED><RVS>
+   146  e95a 2020202020202020...		!pet "         "		; bar
+   147  e963 92e905             		!byte $92,$E9,$5		; <OFF><diag block><WHT>
+   148                          
+   149                          !IF UPET=1 {
+   150                          		!pet "  the ultra-pet prototype"
+   151                          } ELSE {
+   152  e966 202054484520434f...		!pet "  the commodore colourpet"
+   153                          }
+   154                          
+   155  e97f 0d                 		!byte $0D			; <CR>
+   156                          
+   157                          		;-- line 2
+   158  e980 9612               		!byte $96,$12			; <LT RED><RVS>
+   159  e982 20202020202020     		!pet "       "			; bar
+   160  e989 92e90d             		!byte $92,$E9,$0D		; <OFF><diag block><CR>
+   161                          
+   162                          		;-- line 3
+   163  e98c 9e12               		!byte $9E,$12			; <YEL><RVS>
+   164  e98e 2020202020         		!pet "     "                    ; bar
+   165  e993 92e905             		!byte $92,$E9,$5		; <OFF><diag block><WHT>
+   166                          
+   167                          !IF UPET=1 {
+   168                          		!pet "      by andre fachat"
+   169                          } ELSE {
+   170  e996 2020202020202843...		!pet "      (c) steve j. gray"
+   171                          }
+   172                          
+   173  e9ad 0d                 		!byte $0D			; <CR>
+   174                          
+   175                          		;-- line 4
+   176  e9ae 9912               		!byte $99,$12			; <LT GRN><RVS>
+   177  e9b0 202020             		!pet "   "			; bar
+   178  e9b3 92e905             		!byte $92,$E9,$5		; <OFF><diag block><WHT>
+   179  e9b6 2020202020202020...		!pet "        basic 4.0  31743 bytes free"
+   180  e9d9 0d                 		!byte $0D
+   181                          
+   182                          		;-- line 5,6
+   183  e9da 0d                 		!byte $0D
+   184  e9db 4d4f44204b455942...		!pet "mod keyboard and wedge"
+   185  e9f1 0d                 		!byte $0D				
+   186                          }
+   187                          
+   188                          ;-----------------------------------------------
+   189                          ; Custom 4032 - For GRAPHICS MODE startup screen
+   190                          ;-----------------------------------------------
+   191                          
+   192                          !if BANNER=4 {	!byte $13            		; <HOME> 
+   193                                   	!pet "*** CBM BASIC 4 WITH WEDGE ***"
+   194                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   195                          }
+   196                          
+   197                          ;-----------------------------------------------
+   198                          ; Custom 8032 - For TEXT MODE startup screen
+   199                          ;-----------------------------------------------
+   200                          
+   201                          !if BANNER=3 {	!byte $13            		; <HOME> 
+   202                                   	!pet "*** Commodore EDITROM Project - Wedge/ESC/SS40 ***"
+   203                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   204                          }
+   205                          
+   206                          ;-----------------------------------------------
+   207                          ; Custom ColourPET message courtesy Christian Dirks - For GRAPHICS MODE startup screen
+   208                          ;-----------------------------------------------
+   209                          
+   210                          !if BANNER=2 {	!byte $13,$99          		; <HOME><GRN>
+   211                                   	!pet "*** "
+   212                                   	!byte $1c            		; <RED>
+   213                                   	!pet "co"
+   214                                   	!byte $99            		; <GRN>
+   215                                   	!pet "lo"
+   216                                   	!byte $9a            		; <BLU>
+   217                                   	!pet "ur"
+   218                                   	!byte $9e            		; <YEL>
+   219                                   	!pet "pet"
+   220                                   	!byte $99            		; <GRN>
+   221                                   	!pet " basic 4.0 + wedge ***"   ; message
+   222                                   	!byte $0D,$0D,$0D      		; <CR><CR><CR>
+   223                          }
+   224                          
+   225                          ;-----------------------------------------------
+   226                          ; Custom ColourPET message for TEXT MODE startup screen
+   227                          ;-----------------------------------------------
+   228                          
+   229                          !if BANNER=1 {	!byte $93,$5			; <CLS><WHT>
+   230                          		!pet "*** "
+   231                          		!byte $9f			; <LTCYN>
+   232                          		!pet "Commodore "
+   233                          		!byte $1c			; <RED>
+   234                          		!pet "Co"
+   235                          		!byte $99			; <GRN>
+   236                          		!pet "lo"
+   237                          		!byte $9a			; <BLU>
+   238                          		!pet "ur"
+   239                          		!byte $9e			; <YEL>
+   240                          		!pet "PET"
+   241                          		!byte $05			; <WHT>
+   242                          		!pet " ***"
+   243                          		!byte 11,11
+   244                          		!byte $0D			; <cr>
+   245                          }
+   246                          
+   247                          ;-----------------------------------------------
+   248                          ; Unspecified values
+   249                          ;-----------------------------------------------
+   250                          
+   251  e9f2 0000               		!byte 0,0			; Zeros must end string.
+
+; ******** Source: editbanner.asm
+    27                          
+    28                          
+    29                          
+
+; ******** Source: editrom_hi.asm
+    61                          }
+
+; ******** Source: editwedge.asm
+     1                          ; PET/CBM EDIT ROM - Wedge
+     2                          ; ================
+     3                          ;
+     4                          ; Based on Commodore's universal wedge taken from 8050's test/demo disk
+     5                          ; but rewritten and enhanced by Nils Eilers
+     6                          ;
+     7                          ; Adapted for EDIT-ROM and ACME assembler by Steve Gray.
+     8                          ;
+     9                          ; NOTE: The reason we have to stuff the keyboard buffer to activate the wedge is because
+    10                          ;       the editrom code runs before basic and zero-page are initialized.
+    11                          ;
+    12                          ;----------------------------------------------------------------------------------------
+    13                          ; Wedge commands are only available in direct mode. 
+    14                          ;
+    15                          ; #<unit number> 	- sets the default drive. Without unit number shows the current default drive.
+    16                          ; @$[[drive]:filename] 	- displays the disk's directory. SPACE=Pause, any other key to continue. STOP=Abort.
+    17                          ;				@$ displays the entire directory.
+    18                          ;				@$1: displays the directory of default's device drive 1 only. Do not confuse drive and device.
+    19                          ;				@$:N* displays all files having a "N" as the first letter in their filename.
+    20                          ; /filename		- Loads a program.
+    21                          ; ^filename		- Loads and runs a file ("^" is up arrow, NOT "carat")
+    22                          ; @			- Read disk status. Without any parameters reads and displays the disk drive error message channel.
+    23                          ; @<string>		- Sends <string> to the device's command channel. 
+    24                          ;				@C:newfile=existingfile	- Copy a file on the same diskette
+    25                          ;				@I 			- Initialize the disk drive.
+    26                          ;				@N:diskname		- New a disk that was already formatted
+    27                          ;				@N:diskname,id		- Format a diskette, giving it an index at your choice
+    28                          ;				@R:newname=oldname	- Rename a file
+    29                          ;				@S:file1[,file2 ...]	- Scratch file(s). Wild cards allowed. Status channel returns # of files scratched.
+    30                          ;				@UJ			- Reset drive. Status channel will return the DOS version string.
+    31                          ;				@V			- Validate disk
+    32                          ;				@D1=0			- Duplicate disk (dual drive units only). Target drive first, then source.
+    33                          ;------------------------------------------------------------------------------------------------------------------------------------------
+    34                          
+    35                          
+    36                          ;-------------- INSTALL WEDGE
+    37                          ; This patches the CHRGET routine in Zero Page to point to the WEDGE interpreter
+    38                          
+    39                          INSTALL_WEDGE
+    40  e9f4 a905               		lda #<resident_wedge		; patch CHRGET JMP address
+    41  e9f6 8571               		sta CHRGET+1 			; to jump into wedge
+    42  e9f8 a9ea               		lda #>resident_wedge
+    43  e9fa 8572               		sta CHRGET+2
+    44  e9fc a94c               		lda #$4c			; insert JMP command in CHRGET routine
+    45  e9fe 8570               		sta CHRGET
+    46                          
+    47  ea00 a908               		lda #8				; init default device
+    48  ea02 8573               		sta CHRGETX			; $73=unused byte in CHRGET
+    49                          
+    50                          !if WEDGEMSG=1 {
+    51                          		lda #<WEDGESTRING		; write "wedge installed"
+    52                          		ldy #>WEDGESTRING
+    53                          		jsr STROUTZ
+    54                          }	
+    55  ea04 60                 		rts				; exit to BASIC
+    56                          
+    57                          ;-------------- MESSAGE
+    58                          WEDGESTRING
+    59                          !if WEDGEMSG=1 {
+    60                          		!pet "wedge installed"		; message
+    61                          		!byte 0				; extra 0 padding
+    62                          }
+    63                          
+    64                          ;-------------- Resident part of the universal DOS wedge
+    65                          ; When installed, the CHRGET routine points here.
+    66                          
+    67                          resident_wedge
+    68                          		wedge_unit = CHRGETX		; default device, unused byte in CHRGET
+    69                          		wedge_char = SAVELA		; $B3 -0 if @># else load/run char / ^
+    70                          
+    71  ea05 e677               		inc TXTPTR			; increment text pointer 
+    72  ea07 d002               		bne MAIN2
+    73  ea09 e678               		inc TXTPTR + 1
+    74                          MAIN2 
+    75                          
+    76                          ; if MAINS is stacked, CHRGET is called from direct mode. abort if not called from there
+    77                          
+    78  ea0b 86b3               		stx wedge_char			; save X
+    79  ea0d ba                 		tsx 
+    80  ea0e bd0101             		lda STACK+1,x
+    81  ea11 c90f               		cmp #<MAINS
+    82  ea13 d037               		bne restabort
+    83  ea15 bd0201             		lda STACK+2,x
+    84  ea18 c9b4               		cmp #>MAINS
+    85  ea1a d030               		bne restabort			; abort if textpointer doesn't point to $0200
+    86                          
+    87  ea1c a577               		lda TXTPTR
+    88  ea1e d02e               		bne abort
+    89  ea20 a578               		lda TXTPTR + 1
+    90  ea22 c902               		cmp #2
+    91  ea24 d028               		bne abort
+    92                          
+    93  ea26 a000               		ldy #0				; NUL when @>#
+    94  ea28 84b3               		sty wedge_char			; else load/run character /^
+    95                          
+    96  ea2a b177               testchar	lda (TXTPTR),y
+    97  ea2c c920               		cmp #32				; skip leading spaces
+    98  ea2e d004               		bne nospace
+    99  ea30 e677               		inc TXTPTR
+   100  ea32 d0f6               		bne testchar
+   101                          
+   102  ea34 c93e               nospace		cmp #$3e			; '>'
+   103  ea36 f019               		beq command_or_status
+   104  ea38 c940               		cmp #$40			; '@'
+   105  ea3a f015               		beq command_or_status
+   106  ea3c c923               		cmp #$23			; '#'
+   107  ea3e f01c               		beq default_device
+   108  ea40 85b3               		sta wedge_char			; save load/run character
+   109  ea42 c92f               		cmp #$2f			; '/'
+   110  ea44 f057               		beq to_prepare_fn
+   111  ea46 c95e               		cmp #$5e			; '^'
+   112  ea48 f053               		beq to_prepare_fn
+   113  ea4a d002               		bne abort
+   114                          
+   115  ea4c a6b3               restabort	ldx wedge_char			; restore X
+   116  ea4e 4c7600             abort		jmp CHRGOT
+   117                          
+   118                          ;-------------- COMMAND OR STATUS
+   119                          
+   120                          command_or_status
+   121  ea51 c8                 		iny 
+   122  ea52 b177               		lda (TXTPTR),y
+   123  ea54 f049               		beq get_status
+   124  ea56 c924               		cmp #'$'			; '$'
+   125  ea58 f06b               		beq prepare_fn
+   126  ea5a d01d               		bne send_cmd
+   127                          
+   128                          ;-------------- SET DEVICE
+   129                          
+   130                          default_device
+   131  ea5c e677               		inc TXTPTR
+   132  ea5e b177               		lda (TXTPTR),y			; Y is still 0
+   133  ea60 d00c               		bne set_device			; parameter given -> set device number
+   134                          
+   135  ea62 a673               		ldx wedge_unit			; show current device number
+   136  ea64 98                 		tya
+   137  ea65 2083cf             		jsr INTOUT
+   138  ea68 2034d5             		jsr CRLF
+   139  ea6b 4cffb3             		jmp READY
+   140                          
+   141                          set_device
+   142                          		; prerequsites for RDINT: 
+   143                          		; - TXTPTR $77/$78 point to first char
+   144                          		; - A contains that first char
+   145                          		; - Carry is cleared
+   146                          
+   147  ea6e 18                 		clc
+   148  ea6f 20f6b8             		jsr RDINT			; convert string to unsigned int
+   149  ea72 a511               		lda LINNUM			; LSB of converted number
+   150  ea74 8573               		sta wedge_unit
+   151  ea76 4cffb3             		jmp READY
+   152                          	
+   153                          ;-------------- SEND COMMAND
+   154                          
+   155  ea79 a573               send_cmd	lda wedge_unit
+   156  ea7b 85d4               		sta FA
+   157  ea7d a96f               		lda #$6f			; DATA SA 15
+   158  ea7f 85d3               		sta SA
+   159  ea81 20d5f0             		jsr LISTN			; LISTEN 
+   160  ea84 a5d3               		lda SA
+   161  ea86 2043f1             		jsr SECND			; send secondary address
+   162                          
+   163  ea89 e677               SENDCMD2	inc TXTPTR
+   164  ea8b a000               		ldy #0			
+   165  ea8d b177               		lda (TXTPTR),y
+   166  ea8f f006               		beq SENDCMDDONE	
+   167  ea91 209ef1             		jsr CIOUT			; send char to IEEE
+   168  ea94 b8                 		clv 
+   169  ea95 50f2               		bvc SENDCMD2			; branch always
+   170                          
+   171  ea97 20b9f1             SENDCMDDONE	jsr UNLSN
+   172  ea9a 18                 		clc
+   173  ea9b 9002               		bcc get_status
+   174                          
+   175                          ;-------------- Relative Branch forwarder
+   176                          
+   177  ea9d f026               to_prepare_fn:	beq prepare_fn		
+   178                          
+   179                          ;-------------- GET STATUS
+   180                          
+   181  ea9f 8477               get_status	sty TXTPTR
+   182  eaa1 a573               		lda wedge_unit
+   183  eaa3 85d4               		sta FA
+   184  eaa5 20d2f0             		jsr TALK			; TALK
+   185  eaa8 a96f               		lda #$6f			; DATA SA 15
+   186  eaaa 85d3               		sta SA
+   187  eaac 2043f1             		jsr SECND			; send secondary address
+   188                          
+   189  eaaf 20c0f1             GS_NEXTCHAR	jsr ACPTR			; read byte from IEEE bus
+   190  eab2 c90d               		cmp #$0D			; last byte = CR?		
+   191  eab4 f006               		beq GS_DONE
+   192  eab6 2002e2             		jsr SCROUT			; write char to screen
+   193  eab9 b8                 		clv 
+   194  eaba 50f3               		bvc GS_NEXTCHAR			; branch always
+   195                          
+   196  eabc 2002e2             GS_DONE		jsr SCROUT			; write char to screen
+   197  eabf 20aef1             		jsr UNTLK			; UNTALK
+   198  eac2 4cffb3             		jmp READY
+   199                          
+   200                          ;------------------------------------------------------------------------------
+   201                          ; identify filename to load/run, includes quote handling
+   202                          
+   203                          prepare_fn
+   204  eac5 c8                 		iny				; count filename length
+   205  eac6 b177               		lda (TXTPTR),y
+   206  eac8 f01a               		beq end_name
+   207  eaca c922               		cmp #'"'			; quote character
+   208  eacc d0f7               		bne prepare_fn
+   209                          
+   210  eace a5b3               handle_quote	lda wedge_char
+   211  ead0 3012               		bmi end_name
+   212  ead2 0980               		ora #$80
+   213  ead4 85b3               		sta wedge_char 
+   214  ead6 98                 		tya
+   215  ead7 a000               		ldy #0
+   216  ead9 18                 		clc
+   217  eada 6577               		adc TXTPTR
+   218  eadc 8577               		sta TXTPTR
+   219  eade 90e5               		bcc prepare_fn
+   220  eae0 e678               		inc TXTPTR+1
+   221  eae2 d0e1               		bne prepare_fn
+   222                          
+   223  eae4 88                 end_name	dey 
+   224  eae5 84d1               		sty FNLEN			; store length
+   225  eae7 a677               		ldx TXTPTR
+   226  eae9 e8                 		inx
+   227  eaea 86da               		stx FNADR
+   228  eaec a578               		lda TXTPTR + 1
+   229  eaee 85db               		sta FNADR + 1
+   230  eaf0 a573               		lda wedge_unit
+   231  eaf2 85d4               		sta FA
+   232  eaf4 a5b3               		lda wedge_char			; load/run?
+   233  eaf6 297f               		and #$7f
+   234  eaf8 85b3               		sta wedge_char
+   235  eafa d039               		bne to_loadrun			; yes
+   236                          
+   237                          ;-------------- DIRECTORY
+   238                          
+   239  eafc a900               		lda #0				; Clear the status flag
+   240  eafe 8596               		sta STATUS
+   241  eb00 a960               		lda #$60			; DATA SA 0
+   242  eb02 85d3               		sta SA
+   243  eb04 20a5f4             		jsr OPENI			; open file
+   244  eb07 20d2f0             		jsr TALK
+   245  eb0a a5d3               		lda SA
+   246  eb0c 2043f1             		jsr SECND
+   247                          
+   248  eb0f a003               		ldy #3
+   249                          list_blocks
+   250  eb11 84d1               		sty FNLEN
+   251  eb13 20c0f1             		jsr ACPTR			; read byte from IEEE
+   252  eb16 85fd               		sta MEMUSS			; store blocks LSB
+   253  eb18 a496               		ldy STATUS			; check the status. is it non-zero?
+   254  eb1a d01b               		bne to_stoplisting		; yes
+   255  eb1c 20c0f1             		jsr ACPTR
+   256  eb1f 85fe               		sta MEMUSS + 1			; store blocks MSB
+   257  eb21 a496               		ldy STATUS
+   258  eb23 d012               		bne to_stoplisting
+   259  eb25 a4d1               		ldy FNLEN
+   260  eb27 88                 		dey 
+   261  eb28 d0e7               		bne list_blocks
+   262  eb2a a6fd               		ldx MEMUSS
+   263  eb2c a5fe               		lda MEMUSS + 1
+   264  eb2e 2083cf             		jsr INTOUT			; write #blocks to screen
+   265  eb31 a920               		lda #' '
+   266  eb33 d006               		bne listing			; branch always
+   267                          
+   268                          ;-------------- Relative Branch forwarder
+   269                          
+   270  eb35 d03b               to_loadrun:	bne loadrun
+   271  eb37 d031               to_stoplisting:	bne stoplisting
+   272  eb39 d0d6               to_list_blocks:	bne list_blocks
+   273                          
+   274                          
+   275                          ;-------------- Continuation of DIRECTORY
+   276                          
+   277                          listing
+   278  eb3b 2002e2             		jsr SCROUT
+   279  eb3e 20c0f1             LISTLOOP	jsr ACPTR			; read byte from IEEE
+   280  eb41 a696               		ldx STATUS			; was it successful?
+   281  eb43 d025               		bne stoplisting			; no, so exit
+   282  eb45 c900               		cmp #0				; Is it end of line
+   283  eb47 f018               		beq newline			; yes, jump ahead
+   284  eb49 2002e2             		jsr SCROUT			; write filename and type
+   285  eb4c 2035f3             		jsr STOPEQ			; Was STOP key pressed?
+   286  eb4f f019               		beq stoplisting			; Yes, we're done. Jump out
+   287  eb51 20e4ff             		jsr GETIN			; pause listing with SPACE key
+   288  eb54 f0e8               		beq LISTLOOP			; no key pressed -> continue
+   289  eb56 c920               		cmp #32				; <space>?
+   290  eb58 d0e4               		bne LISTLOOP			; No, go back for more
+   291                          
+   292  eb5a 20e4ff             listwait	jsr GETIN			; get a key
+   293  eb5d f0fb               		beq listwait			; 0=no key, so keep waiting
+   294                          
+   295  eb5f d0dd               		bne LISTLOOP			; then continue
+   296                          
+   297                          ;-------------- end of directory entry
+   298                          
+   299  eb61 a90d               newline		lda #$0D			; <CR>
+   300  eb63 2002e2             		jsr SCROUT			; print it
+   301  eb66 a002               		ldy #2
+   302  eb68 d0cf               		bne to_list_blocks
+   303                          
+   304                          ;-------------- listing is done - end or stop key pressed
+   305                          
+   306  eb6a 202ff7             stoplisting	jsr CLSEI			; close file with $E0, unlisten
+   307                          
+   308  eb6d 68                 		pla 
+   309  eb6e 68                 		pla 
+   310  eb6f 4cffb3             		jmp READY			; BASIC warm start
+   311                          
+   312                          ;-------------- LOAD / RUN
+   313                          
+   314                          loadrun
+   315  eb72 a900               		lda #0				; Clear status byte
+   316  eb74 8596               		sta STATUS
+   317  eb76 859d               		sta VERCK			; LOAD=0, VERIFY=1
+   318  eb78 2056f3             		jsr LOADOP			; LOAD without pointer change
+   319                          
+   320  eb7b a596               		lda STATUS			; Did it load?
+   321  eb7d 2910               		and #$10
+   322  eb7f d020               		bne loaderr			; No, exit out
+   323                          
+   324  eb81 a5ca               		lda EAL+1			; end of program MSB
+   325  eb83 852b               		sta VARTAB+1			; start of basic variables MSB
+   326  eb85 a5c9               		lda EAL				; end of program LSB
+   327  eb87 852a               		sta VARTAB			; start of basic variables LSB
+   328                          
+   329  eb89 2034d5             		jsr CRLF
+   330  eb8c 20e9b5             		jsr RSTXCLR			; reset TXTPTR and perform CLR
+   331  eb8f 20b6b4             		jsr LINKPRG			; rebuild chaining of BASIC lines
+   332                          
+   333  eb92 a5b3               		lda wedge_char
+   334  eb94 c92f               		cmp #$2f			; if '/' then load only, omit RUN
+   335  eb96 d003               		bne startprg			; '^' --> RUN
+   336  eb98 4cffb3             		jmp READY			; load only, exit with BASIC warm start
+   337                          
+   338  eb9b 2022b6             startprg	jsr STXTPT			; reset TXTPTR
+   339  eb9e 4c4ab7             		jmp NEWSTT			; RUN
+   340                          
+   341  eba1 4c25f4             loaderr		jmp FILENOTFOUND		; FILE NOT FOUND, return to basic
+   342                          
+
+; ******** Source: editrom_hi.asm
+    62                          }		
+    63                          	}
+    64                          
+    65                          	;----- These features require ESC codes
+    66                          
+    67                          	!IF ESCCODES = 1 {
+    68                          		!SOURCE "editescape.asm"
+    69                          		!IF COLOURPET = 1 {
+    70                          			!SOURCE "cpetsubs.asm"
+    71                          			!IF CODEBASE=0 { !SOURCE "screen1c.asm" }
+    72                           		}
+    73                          
+    74                          		!IF SS40 = 1 {
+    75                          			!SOURCE "editsoft40.asm"
+    76                          			!IF CODEBASE=0 {
+    77                          				!SOURCE "editrom40link.asm"	; Relocate linking code here to make space in main.
+    78                          				!SOURCE "editrom40scrollup.asm"	; Relocate scroll up code here to make space in main.
+    79                          				JMP CHECK_SCROLL_CONTROL	; Jump back to main.
+    80                          			}
+    81                          		}
+    82                          	}
+    83                          
+    84                          	;----- These features can stand alone
+    85                          
+    86                          	!IF (CODEBASE=0 & KEYSCAN=3)	  { !SOURCE "keyboard-tables3.asm" }	; C64 Keyboard Scanning Tables
+
+; ******** Source: editreboot.asm
+     1                          ; PET/CBM EDIT ROM - Soft Reboot (C)2013-2025 Steve J. Gray
+     2                          ; ================
+     3                          ; Soft Reboot - Hold down a combination of keys to reset the computer.
+     4                          ; The RebootCodes table holds 10 or 16 values, one for each keyboard ROW. All
+     5                          ; values must match to trigger the reset. Note the values are RAW Keyboard
+     6                          ; column bits NOT PETSCII. When a key is DOWN the bit in that column is ZERO.
+     7                          ; IE, $FF means NO keys are down. Do not fill table with all $FF's or the 
+     8                          ; machine will reboot constantly.
+     9                          ;
+    10                          ; OPTIONS: KEYBOARD selects reboot matrix
+    11                          
+    12                          CheckReboot
+    13                          		!IF KEYBOARD=8 {
+    14                          			LDY #15				; ROW=15
+    15                          		} ELSE {
+    16  eba4 a009               			LDY #9				; ROW=9
+    17                          		}
+    18                          CheckLoop
+    19  eba6 8c10e8             		STY PIA1_Port_A 			; Keyboard row select
+    20  eba9 ad12e8             		LDA PIA1_Port_B				; Keyboard col - keypressed
+    21  ebac d9bdeb             		CMP RebootCodes,Y
+    22  ebaf d006               		BNE CheckOut				; Exit if no match
+    23  ebb1 88                 		DEY					; ROW=ROW-1
+    24  ebb2 10f2               		BPL CheckLoop				; Get more if not <0
+    25                          
+    26                          		!IF UPET=1 {
+    27                          			JMP RebootUPet
+    28                          		} ELSE {
+    29  ebb4 6cfcff             			JMP ($FFFC)			; All keys match, so reset!
+    30                          		}
+    31                          
+    32                          ;-------------- We should leave ROW 0 selected on exit so that STOP key can be detected in KERNAL
+    33                          
+    34                          CheckOut
+    35                          		!IF KEYBOARD=3 {
+    36  ebb7 a008               			LDY #8				; Attempted fix for C64 "9" key causing BREAK
+    37                          		} ELSE {
+    38                          			LDY #0				; Set ROW 0 (normal)
+    39                          		}
+    40                          
+    41  ebb9 8c10e8             		STY PIA1_Port_A 			; Keyboard row select
+    42  ebbc 60                 		RTS
+    43                          
+    44                          ;-------------- Reboot Code Table
+    45                          ;
+    46                          ; Note: Rows are entered in reverse order compared to the keyboard matrix
+    47                          ; IMPORTANT!: Be aware of keyboard "ghosting", which means pressing multiple keys
+    48                          ; can sometimes cause other keys to appear pressed.
+    49                          
+    50                          RebootCodes
+    51                          ;		----------------- Normal/Graphic Keyboard: @-SHIFT-SHIFT-DEL
+    52                          !if (KEYBOARD=0) OR (KEYBOARD=5) OR (KEYBOARD=9) {
+    53                          		!byte %11111111	; ROW 9 - No keys
+    54                          		!byte %01111111	; ROW 8 - <DEL>
+    55                          		!byte %11111111	; ROW 7 - No keys
+    56                          		!byte %11111111	; ROW 6 - No keys
+    57                          		!byte %11111111	; ROW 5 - No keys
+    58                          		!byte %11111111	; ROW 4 - No keys
+    59                          		!byte %11111111	; ROW 3 - No keys
+    60                          		!byte %11111111	; ROW 2 - No keys
+    61                          		!byte %11011100	; ROW 1 - @ + Both Shifts
+    62                          		!byte %11111111	; ROW 0 - No keys
+    63                          }
+    64                          
+    65                          ;		----------------- Business Keyboard: ESC-SHIFT-SHIFT-DEL
+    66                          !if (KEYBOARD=1) OR (KEYBOARD=4) OR (KEYBOARD=6) OR (KEYBOARD=7) {
+    67                          		!byte %11111111	; ROW 9
+    68                          		!byte %11111111	; ROW 8
+    69                          		!byte %10111110	; ROW 7 - (ghost), ESC
+    70                          		!byte %11111111	; ROW 6
+    71                          		!byte %01111111	; ROW 5 - DEL
+    72                          		!byte %11111111	; ROW 4
+    73                          		!byte %10111110	; ROW 3 - SHIFT, SHIFT
+    74                          		!byte %11111111	; ROW 2
+    75                          		!byte %11111111	; ROW 1
+    76                          		!byte %11111111	; ROW 0
+    77                          }
+    78                          
+    79                          ;		----------------- DIN Keyboard: ESC-SHIFT-SHIFT-DEL
+    80                          !if KEYBOARD=2 { 
+    81                          		!byte %11011111	; ROW 9 - DEL
+    82                          		!byte %11111111	; ROW 8
+    83                          		!byte %10111110	; ROW 7 - (ghost), ESC
+    84                          		!byte %11111111	; ROW 6
+    85                          		!byte %11111111	; ROW 5
+    86                          		!byte %11111111	; ROW 4
+    87                          		!byte %10111110	; ROW 3 - SHIFT, SHIFT
+    88                          		!byte %11111111	; ROW 2
+    89                          		!byte %11111111	; ROW 1
+    90                          		!byte %11111111	; ROW 0
+    91                          }
+    92                          
+    93                          ;		--------------- C64 Keyboard: CTRL-SHIFT-SHIFT-DEL
+    94                          !if KEYBOARD=3 { 
+    95  ebbd 7f                 		!byte %01111111	; ROW 9 - DEL
+    96  ebbe ff                 		!byte %11111111	; ROW 8
+    97  ebbf fe                 		!byte %11111110	; ROW 7 - CTRL
+    98  ebc0 fd                 		!byte %11111101	; ROW 6 - SHIFT
+    99  ebc1 bf                 		!byte %10111111	; ROW 5 - SHIFT
+   100  ebc2 ff                 		!byte %11111111	; ROW 4
+   101  ebc3 ff                 		!byte %11111111	; ROW 3
+   102  ebc4 ff                 		!byte %11111111	; ROW 2
+   103  ebc5 ff                 		!byte %11111111	; ROW 1 - row not connected
+   104  ebc6 ff                 		!byte %11111111	; ROW 0 - row not connected
+   105                          }
+   106                          
+   107                          ;		--------------- B modified Keyboard: ESC-SHIFT-SHIFT-DEL
+   108                          !if KEYBOARD=4 { 
+   109                          		!byte %11111111	; ROW 9
+   110                          		!byte %11111111	; ROW 8
+   111                          		!byte %11111111	; ROW 7
+   112                          		!byte %11111111	; ROW 6
+   113                          		!byte %11111111	; ROW 5
+   114                          		!byte %11111111	; ROW 4
+   115                          		!byte %10101110	; ROW 3 - SHIFT, (ghost), SHIFT
+   116                          		!byte %11111111	; ROW 2
+   117                          		!byte %11111111	; ROW 1
+   118                          		!byte %10101110	; ROW 0 - (ghost), DEL, ESC
+   119                          }
+   120                          
+   121                          ;		--------------- CBM-II Keyboard (16 ROWS): ?
+   122                          ;		Note: The CBM-II keyboard is 16x6. Two columns are not connected
+   123                          ;		TODO: Development is in progress; wiring is TBD
+   124                          !if KEYBOARD=8 { 
+   125                          		!byte %11111111	; ROW 15
+   126                          		!byte %11111111	; ROW 14
+   127                          		!byte %11111111	; ROW 13
+   128                          		!byte %11111111	; ROW 12
+   129                          		!byte %11111111	; ROW 11
+   130                          		!byte %11111111	; ROW 10
+   131                          		!byte %11111111	; ROW 9
+   132                          		!byte %11111111	; ROW 8
+   133                          		!byte %11111111	; ROW 7
+   134                          		!byte %11111111	; ROW 6
+   135                          		!byte %11111111	; ROW 5
+   136                          		!byte %11111111	; ROW 4
+   137                          		!byte %11111111	; ROW 3
+   138                          		!byte %11111111	; ROW 2
+   139                          		!byte %11111111	; ROW 1
+   140                          		!byte %11111111	; ROW 0
+   141                          }
+
+; ******** Source: editrom_hi.asm
+    87                          }		; Keyboard Reset Code
+
+; ******** Source: editbarrow.asm
+     1                          ; PET/CBM EDIT ROM - BackArrow Hack/Patch
+     2                          ; ================ - Adapted from 8096 edit rom found at World of Commodore 2015
+     3                          ;
+     4                          ; The BACKACTION variable determines which action code is included:
+     5                          ; 0=Toggle Screen Text/Graphic Font
+     6                          ; 1=Toggle 40/80 Column Mode (either soft40 or hardware 40/80)
+     7                          
+     8                          TestBackArrow
+     9                          !IF KEYBOARD=0 {                        ; Graphics keyboard -> "@" as top left key
+    10                                                                  ; Note: scanner clears KEYFLAGS, so can only be seen on bit 7 set
+    11                          		CMP #$c0		; Is it (shifted) "@" key? (top left key).
+    12                          					; NOTE: this is a graphics character. It will get discarded!
+    13                          
+    14                          } ELSE {
+    15                                                        		; others use left arrow as top left key
+    16  ebc7 a498               		LDY KEYFLAGS		; Is it a Shifted Char?
+    17  ebc9 f004               		BEQ TestBAExit		; No, so exit and store key
+    18  ebcb c95f               		CMP #$5F		; Is it BackArrow key?
+    19                          }
+    20  ebcd f004               		BEQ DoBackArrow		; Yes, perform the action then RETURN (do not store key!)
+    21                          
+    22  ebcf e8                 TestBAExit	INX			; No, treat it as a normal key and store it, then increment char count
+    23  ebd0 869e               		STX CharsInBuffer	; Num Chars in Keyboard Buffer
+    24  ebd2 60                 		RTS
+    25                          
+    26                          ;---------------------------------------- Do the action
+    27                          ; BACKACTION=0 to toggle Text/Graphics mode
+    28                          ; BACKACTION=1 to toggle 40/80 column
+    29                          
+    30                          DoBackArrow:
+    31                          
+    32                          !IF BACKACTION=0 {
+    33  ebd3 ad4ce8             		LDA VIA_PCR 		; VIA PCR - Reg#C
+    34  ebd6 4902               		EOR #$02		; toggle bit 1 (graphic/text mode bit)
+    35  ebd8 8d4ce8             		STA VIA_PCR 		; VIA PCR - Reg#C
+    36  ebdb 60                 		RTS
+    37                          }
+    38                          
+    39                          !IF BACKACTION=1 {
+    40                          		JMP SS40_SwapModes	; Swap 40/80 mode
+    41                          }
+
+; ******** Source: editrom_hi.asm
+    88                          }		; Back Arrow "hack" Code
+    89                          	!IF EXECUDESK > 0 { !SOURCE "execudesk.asm" }		; Execudesk Code
+    90                          	!IF UPET = 1      { !SOURCE "upet.asm" }		; UltraPET Code (Andre Fachat)
+    91                          
+    92                          ;=========================================================================================================
+    93                          ; INFOSTRING
+    94                          ;=========================================================================================================
+    95                          ; Used to include project INFO into the code area so it can be used with ESC-BackArrow
+    96                          ; This string can be included twice:
+    97                          ;   1. In hidden I/O area from $E800-E8FF.
+    98                          ;   2. Here at end of EXT binary (which needs a label so it can be printed).
+    99                          
+   100                          INFOSTRING
+   101                          	!IF INFO > 0      { !SOURCE "info.asm" }
+   102                          
+   103                          ;=========================================================================================================
+   104                          ; END OF CODE
+   105                          ;=========================================================================================================
+   106                          ; We finish off by padding the binary to exactly 4K bytes.
+   107                          ;#########################################################################################################
+   108                          
+   109                          	!IF OPTROM=0 {
+   110  ebdc ffffffffffffffff...		!IF NOFILL=0 { !FILL $F000-*,$FF }		; PAD to 4K ######################
+   111                          	}				
+   112                          
+   113                          ; This is the end of the EXT code.
+   114                          ; Do not place code below this point!
+
+; ******** Source: editrom.asm
+    51                          
     52                          	}
     53                          
     54                          ; Do not place code below this point!
