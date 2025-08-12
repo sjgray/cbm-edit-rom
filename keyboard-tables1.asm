@@ -7,6 +7,12 @@
 ;       Labelling:
 ;	   KP = Keypad, S- = Shift , GR- = Graphic Code, NONE = No Key
 ;          CTRL- = CTRL+key , SHC- = Shift-CTRL+key, A- = Accent
+;
+; STOP KEY:
+; The normal EDITROM N/B scanner scans the keyboard from ROW9 to ROW0. ROW0 is left selected when complete.
+; The KERNAL has a routine at $F7A1 that scans the last selected ROW, which is ROW0 and puts it in STKEY ($9B).
+; Then the routine at $F335 checks for STOP by looking in $9B for a zero in BIT4. On N/B this at: ROW X, COL 2.
+; If the STOP key is relocated, the key at ROW0/COL3 will trigger STOP.
 
 KEYBOARD_NORMAL
 
@@ -15,7 +21,7 @@ KEYBOARD_NORMAL
 !IF KEYBOARD=0 {
 ;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES 
 ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====
-!byte $3d,$2e,$10,$03,$3c,$20,$5b,$12 ; KP =   KP .   CTRL-P STOP   <      SPACE  [      RVS    ROW0/A
+!byte $3d,$2e,$10,$03,$3c,$20,$5b,$12 ; KP =   KP .   CTRL-P STOP   <      SPACE  [      RVS    ROW0/A  STOP is in DEFAULT location
 !byte $2d,$30,$00,$3e,$ff,$5d,$40,$00 ; KP -   KP 0   SHIFT  >      NONE   ]      @      SHIFT  ROW1/B
 !byte $2b,$32,$ff,$3f,$2c,$4e,$56,$58 ; KP +   KP 2   NONE   ?      ,      n      v      x      ROW2/C
 !byte $33,$31,$0d,$3b,$4d,$42,$43,$5a ; KP 3   KP 1   RETURN ;      m      b      c      z      ROW3/D
@@ -32,7 +38,7 @@ KEYBOARD_NORMAL
 !IF KEYBOARD=1 {
 ;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES 
 ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====
-!byte $16,$04,$3A,$03,$39,$36,$33,$DF ; CTRL-V CTRL-D :      STOP   9      6      3      BK-ARR ROW0/A
+!byte $16,$04,$3A,$03,$39,$36,$33,$DF ; CTRL-V CTRL-D :      STOP   9      6      3      BK-ARR ROW0/A  STOP is in DEFAULT location
 !byte $B1,$2F,$15,$13,$4D,$20,$58,$12 ; KP 1   /      CTRL-U HOME   m      SPACE  x      RVS    ROW1/B
 !byte $B2,$10,$0F,$B0,$2C,$4E,$56,$5A ; KP 2   RPT    CTRL-O KP 0   ,      n      v      z      ROW2/C 
 !byte $B3,$00,$19,$AE,$2E,$42,$43,$00 ; KP 3   SHIFT  CTRL-Y KP .   .      b      c      SHIFT  ROW3/D
@@ -49,7 +55,7 @@ KEYBOARD_NORMAL
 !IF KEYBOARD=2 {
 ;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES
 ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====
-!byte $16,$04,$40,$03,$39,$36,$33,$5F ; CTRL-V CTRL-D @      STOP   9      6      3      BK-ARR ROW0/A  ..x....x
+!byte $16,$04,$40,$03,$39,$36,$33,$5F ; CTRL-V CTRL-D @      STOP   9      6      3      BK-ARR ROW0/A  ..x....x  STOP is in DEFAULT location
 !byte $B1,$2F,$15,$13,$4D,$20,$58,$12 ; KP 1   /      CTRL-U HOME   M      SPACE  x      RVS    ROW1/B  ........
 !byte $B2,$80,$0F,$01,$2C,$4E,$56,$59 ; KP 2   CTRL   CTRL-O KP 0   ,      n      v      y      ROW2/C  .x.x...x <- $80=CTRL (was $10=REPEAT)
 !byte $B3,$00,$19,$AE,$2E,$42,$43,$00 ; KP 3   SHIFT  CTRL-Y KP .   .      b      c      SHIFT  ROW3/D  ........ <- $00=SHIFT
@@ -74,13 +80,13 @@ KEYBOARD_NORMAL
 !IF KEYBOARD=3 {
 ;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES 
 ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====
-!byte $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF ; NONE   NONE   NONE   NONE   NONE   NONE   NONE   NONE   ROW0/A
+!byte $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF ; NONE   NONE   NONE   NONE   NONE   NONE   NONE   NONE   ROW0/A  STOP is RELOCATED!
 !byte $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF ; NONE   NONE   NONE   NONE   NONE   NONE   NONE   NONE   ROW1/B
 !byte $19,$13,$2D,$30,$38,$36,$34,$32 ; F7     HOME   -      0      8      6      4      2      ROW2/C
 !byte $16,$5E,$40,$4F,$55,$54,$45,$51 ; F5     UP-ARR @      O      U      T      E      Q      ROW3/D
 !byte $15,$3D,$3A,$4B,$48,$46,$53,$9B ; F3     =      :      K      H      F      S      C=     ROW4/E
 !byte $0E,$00,$2E,$4D,$42,$43,$5A,$20 ; F1     SHIFT  .      M      B      C      Z      SPACE  ROW5/F
-!byte $11,$2F,$2C,$4E,$56,$58,$00,$03 ; DOWN   /      ,      N      V      X      SHIFT  STOP   ROW6/G
+!byte $11,$2F,$2C,$4E,$56,$58,$00,$03 ; DOWN   /      ,      N      V      X      SHIFT  STOP   ROW6/G <- to here
 !byte $1D,$3B,$4C,$4A,$47,$44,$41,$12 ; RIGHT  ;      L      J      G      D      A      CTRL   ROW7/H
 !byte $0D,$2A,$50,$49,$59,$52,$57,$DF ; RETURN *      P      I      Y      R      W      BK-ARR ROW8/I
 !byte $14,$5C,$2B,$39,$37,$35,$33,$31 ; DEL    POUND  +      9      7      5      3      1      ROW9/J
@@ -95,14 +101,14 @@ KEYBOARD_NORMAL
 !IF KEYBOARD=4 {
 ;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES 
 ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== ======
-!byte $16,$04,$3A,$14,$39,$36,$33,$9B ; CTRL-V CTRL-D :      DEL    9      6      3      ESC    ROW0/A 
+!byte $16,$04,$3A,$14,$39,$36,$33,$9B ; CTRL-V CTRL-D :      DEL    9      6      3      ESC    ROW0/A  STOP is RELOCATED!
 !byte $B1,$2F,$15,$1D,$4D,$20,$58,$10 ; KP 1   /      CTRL-U RIGHT  m      SPACE  x      REPT   ROW1/B 
 !byte $B2,$11,$0F,$B0,$2C,$4E,$56,$5A ; KP 2   DOWN   CTRL-O KP 0   ,      n      v      z      ROW2/C
 !byte $B3,$00,$19,$AE,$2E,$42,$43,$00 ; KP 3   SHIFT  CTRL-Y KP .   .      n      c      SHIFT  ROW3/D
 !byte $B4,$DB,$4F,$DF,$55,$54,$45,$51 ; KP 4   [      o      BK-ARR u      t      e      q      ROW4/E
 !byte $DE,$50,$49,$DD,$59,$52,$57,$09 ; UP-ARR p      i      ]      y      r      w      TAB    ROW5/F
 !byte $B6,$C0,$4C,$0D,$4A,$47,$44,$41 ; KP 6   @      l      RETURN j      g      d      a      ROW6/G
-!byte $B5,$3B,$4B,$DC,$48,$46,$53,$03 ; KP 5   ;      k      \      h      f      s      STOP   ROW7/H
+!byte $B5,$3B,$4B,$DC,$48,$46,$53,$03 ; KP 5   ;      k      \      h      f      s      STOP   ROW7/H <- to here
 !byte $B9,$06,$12,$B7,$B0,$37,$34,$31 ; KP     CTRL-F RVS    KP 7   0      7      4      1      ROW8/I
 !byte $05,$0E,$13,$B8,$2D,$38,$35,$32 ; CTRL-E CTRL-N HOME   KP 8   -      8      5      2      ROW9/J
 }
@@ -116,16 +122,16 @@ KEYBOARD_NORMAL
 !IF KEYBOARD=5 {
 ;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES 
 ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====
-!byte $3d,$2e,$10,$03,$3c,$20,$5b,$12 ; KP =   KP .   CTRL-P STOP   <      SPACE  [      RVS    
-!byte $2d,$30,$00,$3e,$ff,$5d,$9b,$00 ; KP -   KP 0   SHIFT  >      NONE   ]      ESC    SHIFT  @ replaced with ESC
-!byte $2b,$32,$ff,$3f,$2c,$4e,$56,$58 ; KP +   KP 2   NONE   ?      ,      n      v      x
-!byte $33,$31,$0d,$3b,$4d,$42,$43,$5a ; KP 3   KP 1   RETURN ;      m      b      c      z
-!byte $2a,$35,$ff,$3a,$4b,$48,$46,$53 ; KP *   KP 5   NONE   :      k      h      f      s
-!byte $36,$34,$ff,$4c,$4a,$47,$44,$41 ; KP 6   KP 4   NONE   l      j      g      d      a
-!byte $2f,$38,$ff,$50,$49,$59,$52,$57 ; KP /   KP 8   NONE   p      i      y      r      w
-!byte $39,$37,$5e,$4f,$55,$54,$45,$51 ; KP 9   KP 7   UP-ARR o      u      t      e      q
-!byte $14,$11,$09,$29,$5c,$27,$24,$22 ; DEL    DOWN   TAB??? )      \      '      $      "
-!byte $1d,$13,$40,$28,$26,$25,$23,$21 ; RIGHT  HOME   @      (      &      %      #      !      BACKARROW replaced by @
+!byte $3d,$2e,$10,$03,$3c,$20,$5b,$12 ; KP =   KP .   CTRL-P STOP   <      SPACE  [      RVS    ROW0/A  STOP is in DEFAULT location
+!byte $2d,$30,$00,$3e,$ff,$5d,$9b,$00 ; KP -   KP 0   SHIFT  >      NONE   ]      ESC    SHIFT  ROW1/B  @ replaced with ESC
+!byte $2b,$32,$ff,$3f,$2c,$4e,$56,$58 ; KP +   KP 2   NONE   ?      ,      n      v      x      ROW2/C
+!byte $33,$31,$0d,$3b,$4d,$42,$43,$5a ; KP 3   KP 1   RETURN ;      m      b      c      z      ROW3/D
+!byte $2a,$35,$ff,$3a,$4b,$48,$46,$53 ; KP *   KP 5   NONE   :      k      h      f      s      ROW4/E
+!byte $36,$34,$ff,$4c,$4a,$47,$44,$41 ; KP 6   KP 4   NONE   l      j      g      d      a      ROW5/F
+!byte $2f,$38,$ff,$50,$49,$59,$52,$57 ; KP /   KP 8   NONE   p      i      y      r      w      ROW6/G
+!byte $39,$37,$5e,$4f,$55,$54,$45,$51 ; KP 9   KP 7   UP-ARR o      u      t      e      q      ROW7/H
+!byte $14,$11,$09,$29,$5c,$27,$24,$22 ; DEL    DOWN   TAB??? )      \      '      $      "      ROW8/I
+!byte $1d,$13,$40,$28,$26,$25,$23,$21 ; RIGHT  HOME   @      (      &      %      #      !      ROW9/J  BACKARROW replaced by @
 }
 
 ;---------- Business Keyboard - QWERTZ Layout
@@ -133,16 +139,16 @@ KEYBOARD_NORMAL
 !IF KEYBOARD=6 {
 ;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES 
 ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====
-!byte $16,$04,$3A,$03,$39,$36,$33,$DF ; CTRL-V CTRL-D :      STOP   9      6      3      BK-ARR ROW0 
-!byte $B1,$2F,$15,$13,$4D,$20,$58,$12 ; KP 1   /      CTRL-U HOME   m      SPACE  x      RVS    ROW1 
-!byte $B2,$10,$0F,$B0,$2C,$4E,$56,$59 ; KP 2   RPT    CTRL-O KP 0   ,      n      v      y      ROW2 
-!byte $B3,$00,$19,$AE,$2E,$42,$43,$00 ; KP 3   SHIFT  CTRL-Y KP .   .      b      c      SHIFT  ROW3
-!byte $B4,$DB,$4F,$11,$55,$54,$45,$51 ; KP 4   ]      o      DOWN   u      t      e      q      ROW4 
-!byte $14,$50,$49,$DC,$5A,$52,$57,$09 ; DEL    p      i      @      z      r      w      TAB    ROW5 
-!byte $B6,$C0,$4C,$0D,$4A,$47,$44,$41 ; KP 6   [      l      RETURN j      g      d      a      ROW6
-!byte $B5,$3B,$4B,$DD,$48,$46,$53,$9B ; KP 5   \      k      ;      h      f      s      ESC    ROW7
-!byte $B9,$06,$DE,$B7,$B0,$37,$34,$31 ; KP 9   CTRL-F UP-ARR KP 7   0      7      4      1      ROW8
-!byte $05,$0E,$1D,$B8,$2D,$38,$35,$32 ; CTRL-E CTRL-N RIGHT  KP 8   -      8      5      2      ROW9
+!byte $16,$04,$3A,$03,$39,$36,$33,$DF ; CTRL-V CTRL-D :      STOP   9      6      3      BK-ARR ROW0/A  STOP is in DEFAULT location 
+!byte $B1,$2F,$15,$13,$4D,$20,$58,$12 ; KP 1   /      CTRL-U HOME   m      SPACE  x      RVS    ROW1/B 
+!byte $B2,$10,$0F,$B0,$2C,$4E,$56,$59 ; KP 2   RPT    CTRL-O KP 0   ,      n      v      y      ROW2/C 
+!byte $B3,$00,$19,$AE,$2E,$42,$43,$00 ; KP 3   SHIFT  CTRL-Y KP .   .      b      c      SHIFT  ROW3/D
+!byte $B4,$DB,$4F,$11,$55,$54,$45,$51 ; KP 4   ]      o      DOWN   u      t      e      q      ROW4/E
+!byte $14,$50,$49,$DC,$5A,$52,$57,$09 ; DEL    p      i      @      z      r      w      TAB    ROW5/F
+!byte $B6,$C0,$4C,$0D,$4A,$47,$44,$41 ; KP 6   [      l      RETURN j      g      d      a      ROW6/G
+!byte $B5,$3B,$4B,$DD,$48,$46,$53,$9B ; KP 5   \      k      ;      h      f      s      ESC    ROW7/H
+!byte $B9,$06,$DE,$B7,$B0,$37,$34,$31 ; KP 9   CTRL-F UP-ARR KP 7   0      7      4      1      ROW8/I
+!byte $05,$0E,$1D,$B8,$2D,$38,$35,$32 ; CTRL-E CTRL-N RIGHT  KP 8   -      8      5      2      ROW9/J
 }
 
 ;----------- Business Keyboard - French AZERTY Layout
@@ -150,7 +156,7 @@ KEYBOARD_NORMAL
 !IF KEYBOARD=7 {
 ;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES 
 ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====
-!byte $16,$04,$3A,$03,$39,$36,$33,$DF ; CTRL-V CTRL-D :      STOP   9      6      3      BK-ARR ROW0/A
+!byte $16,$04,$3A,$03,$39,$36,$33,$DF ; CTRL-V CTRL-D :      STOP   9      6      3      BK-ARR ROW0/A  STOP is in DEFAULT location
 !byte $B1,$2F,$15,$13,$4D,$20,$58,$12 ; KP 1   /      CTRL-U HOME   m      SPACE  x      RVS    ROW1/B
 !byte $B2,$10,$0F,$B0,$2C,$4E,$56,$5A ; KP 2   RPT    CTRL-O KP 0   ,      n      v      z      ROW2/C 
 !byte $B3,$00,$19,$AE,$2E,$42,$43,$00 ; KP 3   SHIFT  CTRL-Y KP .   .      b      c      SHIFT  ROW3/D
@@ -199,7 +205,7 @@ KEYBOARD_NORMAL
 !IF KEYBOARD=9 {
 ;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES 
 ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====
-!byte $3d,$2e,$10,$03,$3c,$20,$5b,$12 ; KP =   KP .   CTRL-P STOP   <      SPACE  [      RVS    ROW0/A
+!byte $3d,$2e,$10,$03,$3c,$20,$5b,$12 ; KP =   KP .   CTRL-P STOP   <      SPACE  [      RVS    ROW0/A  STOP is in DEFAULT location
 !byte $2d,$30,$00,$3e,$ff,$5d,$40,$00 ; KP -   KP 0   SHIFT  >      NONE   ]      @      SHIFT  ROW1/B
 !byte $2b,$32,$ff,$3f,$2c,$4e,$56,$58 ; KP +   KP 2   NONE   ?      ,      n      v      x      ROW2/C
 !byte $33,$31,$0d,$3b,$4d,$42,$43,$5a ; KP 3   KP 1   RETURN ;      m      b      c      z      ROW3/D
@@ -232,9 +238,9 @@ KEYBOARD_NORMAL
 ;PIN: 17  14  13  2   6   8   9   16
 ;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES  PIN
 ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====  ===
-!byte $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF ; NONE   NONE   NONE   NONE   NONE   NONE   NONE   NONE   ROW0/A -
+!byte $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF ; NONE   NONE   NONE   NONE   NONE   NONE   NONE   NONE   ROW0/A -    STOP is RELOCATED
 !byte $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF ; NONE   NONE   NONE   NONE   NONE   NONE   NONE   NONE   ROW1/B -
-!byte $31,$13,$00,$03,$20,$0E,$51,$32 ;	1      CLR    CTRL   STOP   SPACE  C=     Q      2      ROW2/C 5
+!byte $31,$13,$00,$03,$20,$0E,$51,$32 ;	1      CLR    CTRL   STOP   SPACE  C=     Q      2      ROW2/C 5 
 !byte $33,$57,$41,$00,$5A,$53,$45,$34 ; 3      W      A      SHIFT  Z      S      E      4      ROW3/D 7
 !byte $35,$52,$44,$58,$43,$46,$54,$36 ; 5      R      D      X      C      F      T      6      ROW4/E 11
 !byte $37,$59,$47,$56,$42,$48,$55,$38 ; 7      Y      G      V      B      H      U      8      ROW5/F 10
@@ -273,7 +279,7 @@ KEYBOARD_NORMAL
 ;PIN: 12  11  10  5   8   7   6   9
 ;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES  PIN
 ;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====  ===
-!byte $14,$0D,$1D,$88,$85,$86,$87,$11 ; DEL    RETURN RIGHT  .      .      .      .      DOWN   ROW0   13
+!byte $14,$0D,$1D,$88,$85,$86,$87,$11 ; DEL    RETURN RIGHT  .      .      .      .      DOWN   ROW0   13  STOP is RELOCATED
 !byte $33,$57,$41,$34,$5A,$53,$45,$00 ; 3      w      a      4      z      s      e      SHIFT  ROW1   19
 !byte $35,$52,$44,$36,$43,$46,$54,$58 ; 5      r      d      6      c      f      t      x      ROW2   18
 !byte $37,$59,$47,$38,$42,$48,$55,$56 ; 7      y      g      8      b      h      u      v      ROW3   17

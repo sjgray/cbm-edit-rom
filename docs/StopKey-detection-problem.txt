@@ -1,0 +1,62 @@
+STOP-KEY Detection Problem for alternate PET Keyboards
+========
+
+* These are code fragments from PET firmware: KERNAL, EDITROM, BASIC
+* ZERO PAGE: $9B hold keyboard scan code and checks for STOP key
+* Both "N" and "B" Keyboards have STOP key at the same MATRIX position: ROW 1, COL 4 (11101111= $EF)
+* DIN Keyboard has STOP in the "REPEAT" key position: ROW 3, COL 2 (10111111 = $BF) where 0=down
+* Do custom EditROM options make a difference? IE: Does KEY RESET option make a difference?
+* Problems with C64 keys: K,M,O,0
+
+*** CALLS TO UDTIME ****
+;-------------- The EDITOR ROM 50Hz Patch calls KERNAL JUMP TABLE, which then calls UDTIME
+E431	iE431	JSR $FFEA	; jmp $f768	udtim	Update System Jiffy Clock
+
+;-------------- The KERNAL JUMP table calls UDTIME
+ FFEA	iFFEA	JMP $F768	; Update Jiffy Clock
+
+;-------------- the TAPE routine calls UDTIME *** DIRECTLY!!!!
+ F924		JSR $F768	; Update Jiffy Clock
+
+;-------------- stop	Check STOP Key
+ F343	iF343	JSR $F335	; -	-stop-
+ F346		JMP $B7C6	; stop	Perform [stop], [end], break
+
+;-------------- Check STOP KEY
+; This routine checks $9B for a specific value ($EF) which indicates the STOP key is down. The problem
+; here is this is totally POSITION dependent, rather than the actual code assignment of the key!
+; This means we can't move the STOP key, or we have to fudge the scan (as is done for DIN layout where CLR/HOME is in
+; this position!
+
+ F335	iF335	LDA $9B		; Flag: STOP key / RVS key (raw bits from row scan at $F7A1)
+ F337		CMP #$EF	; this value indicates the STOP key is pressed
+ F339		BNE $F342	; no, skip
+ F33B		PHP		; yes...
+ F33C		JSR $F2A6	; clrchn	Restore Default I/O
+ F33F		STA $9E		; No. of Chars. in Keyboard Buffer (Queue)
+ F341		PLP
+ F342	iF342	RTS
+
+
+;-------------- UDTIME!!!!!!!!!!!!!!! 
+; Update Jiffy Clock
+
+ F768	iF768	INC $99		; Jiffy clock correction: 623rd 1/60 sec does not increment time
+;This routine falls into F7A1
+
+;-------------- scan the keyboard currently selected ROW. The CHECKSTOP routine at $F335 checks $9B for #$EF
+
+ F7A1	iF7A1	LDA $E812	; KEYBOARD ROW (does not set row here! must be in IRQ)
+ F7A4		CMP $E812	; Read ROW again (debounce)
+ F7A7		BNE $F7A1	; loop back if different
+ F7A9		STA $9B		; Flag: STOP key / RVS key - this is the raw bits returned from the ROW scan
+ F7AB	iF7AB	RTS
+
+;-------------- TAPE Routine JUMPS to IRQ follow up in two places
+
+ FA0D	iFA0D	JMP $E600	; -	Return From Interrupt
+ ...
+ FA49		JMP $E600	; -	Return From Interrupt
+
+
+
