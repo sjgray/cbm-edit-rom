@@ -99,6 +99,7 @@ SCAN_PRESS	BIT RPTFLG		; Check Repeat Flag: $80 = Repeat, $40 = disable
 
 		CMP #$FF		; Was it a key?
 		BEQ SCAN_OUT		; No, Exit
+
 		CMP #$14		; Yes, check for auto-repeat keys. Is it <DEL>?
 		BEQ SCAN_DELAY
 		CMP #$20		; Is it <SPACE>?
@@ -143,7 +144,7 @@ SCAN_REC	STA KEYPRESSED		; Current Key Pressed: 255 = No Key
 		BCC SCAN_SHIFT		; Yes, skip
 		CMP #$3C		; Is it greater than 3C?
 		BCS SCAN_SHIFT		; Yes, skip
-		SBC #$0F		; No, it must me Numeric so subtract 15
+		SBC #$0F		; No, it must be Numeric so subtract 15
 		CMP #$20		; Is it above <SPACE>
 		BCS SCAN_NORM		; Yes
 

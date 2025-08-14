@@ -23,7 +23,7 @@
 ; The following DATE and COMMENT strings will be placed in the IO area (if used).
 ; Take care that comments do not overflow into code space!
 
-!macro DATE      { !pet "2025-08-11" }
+!macro DATE      { !pet "2025-08-14" }
 !macro COMMENT   { !pet "sjg-editrom" }
 
 ;----------------------------------------------------------------------------------------------------------------------------
@@ -49,32 +49,32 @@ HERTZ     = 60	; Line Frequency (Clock):	50=Euro,60=N.America
 IRQFIX    = 0   ; Fix Jiffy Clock?		0=No, 1=Yes			Still needs investigating.
 
 ;-- ESC Codes
-ESCCODES  = 0	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
+ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
 VIDSWITCH = 0   ; Video Mode Select ESC codes?  0=No, 1=Yes			Requires ESC Codes! ESC+0 to ESC+9 to Switch CRTC parameters.
 
 ;-- EXTended Features
-EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes, 2=Yes/OPTROM	Note: Requires BOOT to TEXT mode!
+EXECUDESK = 1	; Add Execudesk Menu?		0=No, 1=Yes, 2=Yes/OPTROM	Note: Requires BOOT to TEXT mode!
 COLOURPET = 0	; ColourPET additions?		0=No, 1=Yes			Requires ESC Codes! ESC+0 to ESC+? to set Colour (unless VIDSWITCH=1).
 UPET      = 0   ; Is a Ultra-PET/Micro-PET?     0=No, 1=Yes                     For special Reboot - Andre Fachat's project
 
 ;-- AutoRUN Features
-AUTORUN   = 1   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use EITHER banner,wedge, or disk boot
+AUTORUN   = 1   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use any AUTOBOOT feature below
 BYPASS    = 0   ; Check for key to bypass? 	0=No, 1=Yes			Valid when AUTORUN=1. Hold key on ROW9 to bypass.
-BANNER    = 5   ; Custom Banner (power on msg)?	0=No, N=Banner# (1-19,98,99)    Valid when AUTORUN=1. Refer to docs or source. 99=custom message
+BANNER    = 1  	; Custom Banner (power on msg)?	0=No, N=Banner# (1-21,98,99)    Valid when AUTORUN=1. Refer to docs or source. 99=custom message
 WEDGE     = 1	; DOS Wedge?			0=No, 1=Yes			Valid when AUTORUN=1.
 WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes			Valid when AUTORUN=1 and WEDGE>0.
 DISKBOOT  = 0	; Boot first file on disk?	0=No, 1=Yes			Valid when AUTORUN=1.
 
 ;-- 40/80 Switching
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
-SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1. Also if BACKARROW>0 and BACKACTION=1.
+SS40      = 1	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1. Also if BACKARROW>0 and BACKACTION=1.
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns		Valid when SS40=1.
-HARD4080  = 0   ; Hardware 40/80 Board?         0=No, 1=Yes			Valid when SS40=1.
+HARD4080  = 1   ; Hardware 40/80 Board?         0=No, 1=Yes			Valid when SS40=1.
 
 ;-- Misc Options
-KEYRESET  = 1	; Add keyboard reset? 		0=No, 1=Yes
+KEYRESET  = 0	; Add keyboard reset? 		0=No, 1=Yes
 SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
-BACKARROW = 2   ; SHIFT-Backarrow Hack code?	0=NO, 1=Yes, 2=Yes EXT		Enable Shift-Backarrow, and where to put the code.
+BACKARROW = 1   ; SHIFT-Backarrow Hack code?	0=NO, 1=Yes, 2=Yes EXT		Enable Shift-Backarrow, and where to put the code.
 BACKACTION= 0   ; Backarrow Action		0=Text/Graphic, 1=40/80		Which Backarrow Action? NOTE: 40/80 requires ESC Codes!
 
 MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility.

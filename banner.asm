@@ -36,6 +36,9 @@
 ; 17  40COL  ANY    OVER "*** cbm basic 4 custom editrom ***"
 ; 18  40COL  ANY    OVER "*** commodore basic 4.0 *** hard40/80,n"
 ; 19  40COL  ANY    OVER "*** commodore basic 4.0 *** disk boot"
+; 20  40COL  ANY    OVER "*** commodore basic 4.0 *** sjg-edit"
+; 21  80COL  ANY    OVER "*** commodore basic 4.0 *** + wedge/esc/backarrow/ss40"
+; 22  80COL  ANY    OVER "*** commodore basic 4.0 *** + wedge,esc,backarrow,hs40/80"
 ; 98  ANY    ANY    ADD  Show DATE and COMMENT for debug purposes
 ; 99  CUSTOM ...    ...  Your own banner text
 ;
@@ -62,6 +65,22 @@
 		!pet "comment: "
 		+COMMENT
 		!byte $0D				
+}
+
+!IF BANNER=22 {	!byte $13
+		!pet "*** commodore basic 4.0 *** + wedge,esc,backarrow,hs40/80"
+		!byte $0D,$0D,$0D      		; <CR><CR><CR>
+}
+
+!IF BANNER=21 {	!byte $13
+		!pet "*** commodore basic 4.0 *** + wedge/esc/backarrow/ss40"
+		!byte $0D,$0D,$0D      		; <CR><CR><CR>
+}
+
+
+!IF BANNER=20 {	!byte $13
+		!pet "*** commodore basic 4.0 *** sjg-edit"
+		!byte $0D,$0D,$0D      		; <CR><CR><CR>
 }
 
 !IF BANNER=19 {	!byte $13
