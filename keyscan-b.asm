@@ -13,10 +13,11 @@ SCAN_KEYBOARD
 		LDY #$FF		; No Key
 		STY Key_Image		; Key Image
 		INY
-		STY KEYFLAGS		; Flag: Print Shifted Chars.
-		LDA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
-		AND #$7F
-		STA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
+		STY KEYFLAGS		; Store 0 in KEYFLAGS
+		LDA RPTFLG		; Get Repeat Flag     : REPEAT Key Used, $80 = Repeat, $40 = disable
+		AND #$7F		; Clear all bits except HI bit
+		STA RPTFLG		; Write it back       : REPEAT Key Used, $80 = Repeat, $40 = disable
+
 		!IF KEYBOARD=7 {
 			LDX #$60	; 96 bytes in table. X is used as offset into the table (CBM-II keyboard)
 		} ELSE {
@@ -49,17 +50,19 @@ SCAN_COL	LSR			; Shift the value right
 		STA KEYFLAGS		; Flag: Print Shifted Chars.
 		BNE SCAN_NEXT		; No, skip
 
-;-------------- Non-SHIFT key
+;-------------- Check REPEAT key
 
 SCAN_NOSH	CMP #$10		; Is it REPEAT?
 		BNE SCAN_NORPT		; No, skip
 
-;-------------- REPEAT key
+;-------------- Turn on REPEAT Mode
 
 		LDA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
 		ORA #$80
 		STA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
 		BMI SCAN_NEXT
+
+;-------------- Repeat is OFF
 
 SCAN_NORPT	CMP #$FF		; Is it "no key"?
 		BEQ SCAN_NEXT		; Yes, skip
@@ -91,18 +94,21 @@ SCAN_GOT	LDA Key_Image		; Key Image
 		BNE SCAN_REC
 
 SCAN_PRESS	BIT RPTFLG		; Check Repeat Flag: $80 = Repeat, $40 = disable
-		BMI SCAN_DELAY2
+		BMI SCAN_DELAY2		; Repeat not set, so skip
 		BVS SCAN_OUT		; Exit
-		CMP #$FF		; No key?
-		BEQ SCAN_OUT		; Exit
-		CMP #$14
+
+		CMP #$FF		; Was it a key?
+		BEQ SCAN_OUT		; No, Exit
+		CMP #$14		; Yes, check for auto-repeat keys. Is it <DEL>?
 		BEQ SCAN_DELAY
-		CMP #$20
+		CMP #$20		; Is it <SPACE>?
 		BEQ SCAN_DELAY
-		CMP #$1D
+		CMP #$1D		; Is it <RIGHT>?
 		BEQ SCAN_DELAY
-		CMP #$11
-		BNE SCAN_OUT		; Exit
+		CMP #$11		; Is it <DOWN>?
+		BNE SCAN_OUT		; No auto-repeat keys so exit
+
+;-------------- Found a repeating key. Set Delay counters
 
 SCAN_DELAY	LDX DELAY		; Repeat Delay Counter
 		BEQ SCAN_DELAY2
@@ -116,6 +122,8 @@ SCAN_DELAY2	DEC KOUNT		; Repeat Speed Counter
 		LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 		DEX			; One less
 		BPL SCAN_OUT		; Exit
+
+;-------------- Record the Keypress
 
 SCAN_REC	STA KEYPRESSED		; Current Key Pressed: 255 = No Key
 		CMP #$FF		; No Key?
