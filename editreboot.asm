@@ -9,7 +9,7 @@
 ;
 ; OPTIONS: KEYBOARD selects reboot matrix
 
-CheckReboot
+CheckReboot	; NOTE: We are scanning the matrix in REVERSE compared to EDITROM
 		!IF KEYBOARD=8 {
 			LDY #15				; ROW=15
 		} ELSE {
@@ -29,19 +29,10 @@ CheckLoop
 			JMP ($FFFC)			; All keys match, so reset!
 		}
 
-;-------------- We should leave ROW 0 selected on exit so that STOP key can be detected in KERNAL
-; This includes a fix for the C64 keyboard where the "9" key causes BREAK because it is in the
-; same position as RUN/STOP was in the N and B keyboards. Setting KEYBOARD ROW to 9 cause it to
-; point to an unused ROW in the keyboard matrix instead of ROW 0. The C64 RUN/STOP key still works
-; due to a patch in the KEYBOARD scanning routine.
+;-------------- We should leave ROW 9 selected on exit so that STOP key can be detected in KERNAL
 
 CheckOut
-		!IF KEYBOARD=3 {
-			LDY #8				; Fix for C64 "9" key causing BREAK
-		} ELSE {
-			LDY #0				; Set ROW 0 (normal)
-		}
-
+		LDY #9					; Leave at last ROW
 		STY PIA1_Port_A 			; Keyboard row select
 		RTS
 
