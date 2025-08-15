@@ -8,29 +8,36 @@
 ;	   KP = Keypad, S- = Shift , GR- = Graphic Code, NONE = No Key
 ;          CTRL- = CTRL+key , SHC- = Shift-CTRL+key, A- = Accent
 ;
+; The keyboard matrix bytes are arranged in the order they appear in the ROM.
+; The keyboard is scanned from ROW 9/COL7 and works its way backwards to ROW0/COL0 in the matrix.
+; Due to hardware, ROWS are wired BACKWARDS, so when it stores a 0 into the PIA ROW SELECT register
+; it is selecting ROW 9 in the table. The scanner selects a ROW then reads the COL bits which are
+; also BACKWARDS. C7 is BIT0 and C0 is BIT7. Any KEY that is DOWN will set the BIT to "0". 
+;
 ; STOP KEY:
-; The normal EDITROM N/B scanner scans the keyboard from ROW9 to ROW0. ROW0 is left selected when complete.
+; When scanning is complete ROW0 is left selected. This is HARDWARE ROW9.
 ; The KERNAL has a routine at $F7A1 that scans the last selected ROW, which is ROW0 and puts it in STKEY ($9B).
 ; Then the routine at $F335 checks for STOP by looking in $9B for a zero in BIT4. On N/B this at: ROW X, COL 2.
-; If the STOP key is relocated, the key at ROW0/COL3 will trigger STOP.
+; If the STOP key is relocated, the key at ROW0/COL3 will trigger STOP by returning 11101111 binary (Hex $EF).
 
 KEYBOARD_NORMAL
 
 ;---------- Normal/Graphic Keyboard - QWERTY Layout (chicklet or standard type)
 ;
 !IF KEYBOARD=0 {
-;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES 
-;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== =====
-!byte $3d,$2e,$10,$03,$3c,$20,$5b,$12 ; KP =   KP .   CTRL-P STOP   <      SPACE  [      RVS    ROW0/A  STOP is in DEFAULT location
-!byte $2d,$30,$00,$3e,$ff,$5d,$40,$00 ; KP -   KP 0   SHIFT  >      NONE   ]      @      SHIFT  ROW1/B
-!byte $2b,$32,$ff,$3f,$2c,$4e,$56,$58 ; KP +   KP 2   NONE   ?      ,      n      v      x      ROW2/C
-!byte $33,$31,$0d,$3b,$4d,$42,$43,$5a ; KP 3   KP 1   RETURN ;      m      b      c      z      ROW3/D
-!byte $2a,$35,$ff,$3a,$4b,$48,$46,$53 ; KP *   KP 5   NONE   :      k      h      f      s      ROW4/E
-!byte $36,$34,$ff,$4c,$4a,$47,$44,$41 ; KP 6   KP 4   NONE   l      j      g      d      a      ROW5/F
-!byte $2f,$38,$ff,$50,$49,$59,$52,$57 ; KP /   KP 8   NONE   p      i      y      r      w      ROW6/G
-!byte $39,$37,$5e,$4f,$55,$54,$45,$51 ; KP 9   KP 7   UP-ARR o      u      t      e      q      ROW7/H
-!byte $14,$11,$09,$29,$5c,$27,$24,$22 ; DEL    DOWN   TAB??? )      \      '      $      "      ROW8/I
-!byte $1d,$13,$5f,$28,$26,$25,$23,$21 ; RIGHT  HOME   BK-ARR (      &      %      #      !      ROW9/J
+; BIT: 7   6   5   4   3   2   1   0
+;     C0  C1  C2  C3  C4  C5  C6  C7    COL0   COL1   COL2   COL3   COL4   COL5   COL6   COL7   NOTES HWROW
+;     === === === === === === === ===   ====== ====== ====== ====== ====== ====== ====== ====== ===== =====
+!byte $3d,$2e,$10,$03,$3c,$20,$5b,$12 ; KP =   KP .   CTRL-P STOP   <      SPACE  [      RVS    ROW0/A  9    STOP is in DEFAULT location
+!byte $2d,$30,$00,$3e,$ff,$5d,$40,$00 ; KP -   KP 0   SHIFT  >      NONE   ]      @      SHIFT  ROW1/B  8
+!byte $2b,$32,$ff,$3f,$2c,$4e,$56,$58 ; KP +   KP 2   NONE   ?      ,      n      v      x      ROW2/C  7
+!byte $33,$31,$0d,$3b,$4d,$42,$43,$5a ; KP 3   KP 1   RETURN ;      m      b      c      z      ROW3/D  6
+!byte $2a,$35,$ff,$3a,$4b,$48,$46,$53 ; KP *   KP 5   NONE   :      k      h      f      s      ROW4/E  5
+!byte $36,$34,$ff,$4c,$4a,$47,$44,$41 ; KP 6   KP 4   NONE   l      j      g      d      a      ROW5/F  4
+!byte $2f,$38,$ff,$50,$49,$59,$52,$57 ; KP /   KP 8   NONE   p      i      y      r      w      ROW6/G  3
+!byte $39,$37,$5e,$4f,$55,$54,$45,$51 ; KP 9   KP 7   UP-ARR o      u      t      e      q      ROW7/H  2
+!byte $14,$11,$09,$29,$5c,$27,$24,$22 ; DEL    DOWN   TAB??? )      \      '      $      "      ROW8/I  1 
+!byte $1d,$13,$5f,$28,$26,$25,$23,$21 ; RIGHT  HOME   BK-ARR (      &      %      #      !      ROW9/J  0
 }
 
 ;---------- Business Keyboard - QWERTY Layout
