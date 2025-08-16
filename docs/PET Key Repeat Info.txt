@@ -1,0 +1,13 @@
+PET "Key Repeat" Info
+=====================
+
+* VICE: Both Symbolic and Positional use pc's PGDN key as REPEAT
+
+* Only the "B" keyboard has a repeat key
+* In B Key scanner it will autorepeat the following keys:
+	DEL, SPACE, CURSOR KEYS
+* the Repeat Flag is: RPTFLG = $E4 - $80=Enabled, $40=Disabled
+* CODEBASE 1 Usage:
+	$E02D - EditROM Jump Table. Calls $E036 (this is not called within EditROM)
+	$E036 - Set Repeat Flag using .A
+	Keyboard Scanner

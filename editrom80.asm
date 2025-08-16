@@ -1398,8 +1398,11 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e	; BELL chime values
 ;*********************************************************************************************************
 ;** FILLER
 ;*********************************************************************************************************
+; There are approximately 120 unused bytes HERE in a CODEBASE 1 EditROM.
+; When some patches are applied they will push more code here and have less fill bytes.
+; If too many patches are applied ACME will generate a "produced too much code" error.
 
-		!IF NOFILL=0 { !FILL $e800-*,$aa }	; 78 bytes - Fill to end of 2K
+		!IF NOFILL=0 { !FILL $e800-*,$aa }	; Fill to end of 2K
 
 ;#########################################################################################################
 ;END! DO NOT ADD ANYTHING BELOW THIS LINE!!!!!!!!

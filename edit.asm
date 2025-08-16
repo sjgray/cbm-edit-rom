@@ -35,7 +35,7 @@ OPTROM    = 0   ; Location of EXT code		0=$E800-EFFF, 1=$9000, 2=$A000  Normal i
 
 ;-- Keyboard
 KEYSCAN   = 1   ; Keyboard Scanner		0=Normal,1=Business,2=DIN
-KEYBOARD  = 3	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
+KEYBOARD  = 1	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
 REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
 FONTSET   = 0	; Initial Screen Font		0=Text/Lower, 1=Upper/Graphics	Generally: 40xx machines=1, 8xxx machines=0
 
@@ -49,32 +49,33 @@ HERTZ     = 60	; Line Frequency (Clock):	50=Euro,60=N.America
 IRQFIX    = 0   ; Fix Jiffy Clock?		0=No, 1=Yes			Still needs investigating.
 
 ;-- ESC Codes
-ESCCODES  = 1	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
+ESCCODES  = 0	; Add ESC codes? 		0=No, 1=Yes			Enable when using COLOURPET or SS40.
 VIDSWITCH = 0   ; Video Mode Select ESC codes?  0=No, 1=Yes			Requires ESC Codes! ESC+0 to ESC+9 to Switch CRTC parameters.
 
 ;-- EXTended Features
-EXECUDESK = 1	; Add Execudesk Menu?		0=No, 1=Yes, 2=Yes/OPTROM	Note: Requires BOOT to TEXT mode!
+EXECUDESK = 0	; Add Execudesk Menu?		0=No, 1=Yes, 2=Yes/OPTROM	Note: Requires BOOT to TEXT mode!
 COLOURPET = 0	; ColourPET additions?		0=No, 1=Yes			Requires ESC Codes! ESC+0 to ESC+? to set Colour (unless VIDSWITCH=1).
 UPET      = 0   ; Is a Ultra-PET/Micro-PET?     0=No, 1=Yes                     For special Reboot - Andre Fachat's project
 
 ;-- AutoRUN Features
-AUTORUN   = 1   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use any AUTOBOOT feature below
+AUTORUN   = 0   ; Set for BANNER and/or WEDGE	0=No, 1=Yes			Enable if you use any AUTOBOOT feature below
 BYPASS    = 0   ; Check for key to bypass? 	0=No, 1=Yes			Valid when AUTORUN=1. Hold key on ROW9 to bypass.
-BANNER    = 1  	; Custom Banner (power on msg)?	0=No, N=Banner# (1-21,98,99)    Valid when AUTORUN=1. Refer to docs or source. 99=custom message
-WEDGE     = 1	; DOS Wedge?			0=No, 1=Yes			Valid when AUTORUN=1.
+BANNER    = 0  	; Custom Banner (power on msg)?	0=No, N=Banner# (1-21,98,99)    Valid when AUTORUN=1. Refer to docs or source. 99=custom message
+WEDGE     = 0	; DOS Wedge?			0=No, 1=Yes			Valid when AUTORUN=1.
 WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes			Valid when AUTORUN=1 and WEDGE>0.
 DISKBOOT  = 0	; Boot first file on disk?	0=No, 1=Yes			Valid when AUTORUN=1.
 
 ;-- 40/80 Switching
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
-SS40      = 1	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1. Also if BACKARROW>0 and BACKACTION=1.
+SS40      = 0	; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1. Also if BACKARROW>0 and BACKACTION=1.
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns		Valid when SS40=1.
-HARD4080  = 1   ; Hardware 40/80 Board?         0=No, 1=Yes			Valid when SS40=1.
+HARD4080  = 0   ; Hardware 40/80 Board?         0=No, 1=Yes			Valid when SS40=1.
 
 ;-- Misc Options
-KEYRESET  = 0	; Add keyboard reset? 		0=No, 1=Yes
-SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled
-BACKARROW = 1   ; SHIFT-Backarrow Hack code?	0=NO, 1=Yes, 2=Yes EXT		Enable Shift-Backarrow, and where to put the code.
+GRKMODE   = 1   ; REPEAT generates Graphic Chr	0=No, 1=Yes			For B keyboard to generate graphics symbols like N keyboard
+KEYRESET  = 0	; Add keyboard reset? 		0=No, 1=Yes			Reboot machine when combination of keys are pressed
+SILENT    = 0	; Disable BELL/CHIME		0=Normal, 1=Disabled		Disables BELL
+BACKARROW = 0   ; SHIFT-Backarrow Hack code?	0=NO, 1=Yes, 2=Yes EXT		Enable Shift-Backarrow, and where to put the code.
 BACKACTION= 0   ; Backarrow Action		0=Text/Graphic, 1=40/80		Which Backarrow Action? NOTE: 40/80 requires ESC Codes!
 
 MOT6845   = 0   ; Is CRTC a Motorola6845?       0=No, 1=Yes			Probably 0=No for compatibility.

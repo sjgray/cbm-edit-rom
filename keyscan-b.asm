@@ -15,7 +15,7 @@ SCAN_KEYBOARD
 		INY
 		STY KEYFLAGS		; Store 0 in KEYFLAGS
 		LDA RPTFLG		; Get Repeat Flag     : REPEAT Key Used, $80 = Repeat, $40 = disable
-		AND #$7F		; Clear all bits except HI bit
+		AND #$7F		; Clear HI bit - Turn off Repeat Mode
 		STA RPTFLG		; Write it back       : REPEAT Key Used, $80 = Repeat, $40 = disable
 
 		!IF KEYBOARD=7 {
@@ -24,6 +24,8 @@ SCAN_KEYBOARD
 			LDX #$50	; 80 bytes in table. X is used as offset into the table (normal keyboards)
 		}
 
+;-------------- Start Scan
+
 SCAN_ROW
 		!IF KEYBOARD=7 {
 			 LDY #$06	; Number of Columns to check = 6 (CBM-II keyboard only)
@@ -31,9 +33,11 @@ SCAN_ROW
 			 LDY #$08	; Number of Columns to check = 8 (normal keyboards)
 		}
 
-		LDA PIA1_Port_B 	; Keyboard COL result
-		CMP PIA1_Port_B 	; Keyboard COL result
-		BNE SCAN_ROW		; Debounce
+		LDA PIA1_Port_B 	; Get byte from Keyboard ROW result
+		CMP PIA1_Port_B 	; Read again and compare
+		BNE SCAN_ROW		; If they are not equal loop back up (Debounce)
+
+;-------------- Shift the COL BITS
 
 SCAN_COL	LSR			; Shift the value right
 		BCS SCAN_NEXT2		; If the bit was "1" then key is NOT down. Skip
@@ -42,34 +46,37 @@ SCAN_COL	LSR			; Shift the value right
 
 		PHA			; Save for later
 		LDA KEYBOARD_NORMAL-1,X	; Read Keyboard Matrix (X is offset)
-		BNE SCAN_NOSH		; Is it SHIFT key? No, skip
 
-;-------------- SHIFT key Detected
+;-------------- Check if SHIFT key pressed
 
-		LDA #$01		; Set the SHIFT flag
-		STA KEYFLAGS		; Flag: Print Shifted Chars.
-		BNE SCAN_NEXT		; No, skip
+		BNE SCAN_NOSH		; Is it SHIFT key ($00)? No, skip
 
-;-------------- Check REPEAT key
+;-------------- SHIFT key is pressed. Set SHIFT FLAG
+
+		LDA #$01		; 1=Shift Key Pressed
+		STA KEYFLAGS		; Save it 
+		BNE SCAN_NEXT		; branch always
+
+;-------------- Check REPEAT key pressed
 
 SCAN_NOSH	CMP #$10		; Is it REPEAT?
 		BNE SCAN_NORPT		; No, skip
 
 ;-------------- Turn on REPEAT Mode
+; Note: We have Max 16 bytes we can insert here before we get "produced too much code"
 
 		LDA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
 		ORA #$80
 		STA RPTFLG		; Flag: REPEAT Key Used, $80 = Repeat, $40 = disable
 		BMI SCAN_NEXT
 
-;-------------- Repeat is OFF
+;-------------- Check if any other KEY is pressed
 
-SCAN_NORPT	CMP #$FF		; Is it "no key"?
-		BEQ SCAN_NEXT		; Yes, skip
+SCAN_NORPT	CMP #$FF		; $FF=No key
+		BEQ SCAN_NEXT		; No, skip
+		STA Key_Image		; Yes, store the key
 
-;-------------- Normal key
-
-		STA Key_Image		; Store the key
+;-------------- Scan Next COL bit
 
 SCAN_NEXT	PLA			; Restore value from keyboard scan for next loop
 SCAN_NEXT2	DEX			; Decrement keyboard table offset
@@ -81,12 +88,12 @@ SCAN_NEXT2	DEX			; Decrement keyboard table offset
 ;-------------- Completed all bits in ROW, Increment ROW
 
 		INC PIA1_Port_A		; Next Keyboard ROW
-		BNE SCAN_ROW		; More? Yes, loop back
+		BNE SCAN_ROW		; More? Yes, loop back UP to scan next ROW
 
 ;-------------- Process Key Image
 
 SCAN_GOT	LDA Key_Image		; Key Image
-		CMP KEYPRESSED		; Current Key Pressed: 255 = No Key
+		CMP KEYPRESSED		; Current Key Pressed
 		BEQ SCAN_PRESS		; If key is the same then it's being held down
 
 		LDX #$10
@@ -100,6 +107,8 @@ SCAN_PRESS	BIT RPTFLG		; Check Repeat Flag: $80 = Repeat, $40 = disable
 		CMP #$FF		; Was it a key?
 		BEQ SCAN_OUT		; No, Exit
 
+;-------------- Check Auto-Repeat for specific keys
+
 		CMP #$14		; Yes, check for auto-repeat keys. Is it <DEL>?
 		BEQ SCAN_DELAY
 		CMP #$20		; Is it <SPACE>?
@@ -107,9 +116,9 @@ SCAN_PRESS	BIT RPTFLG		; Check Repeat Flag: $80 = Repeat, $40 = disable
 		CMP #$1D		; Is it <RIGHT>?
 		BEQ SCAN_DELAY
 		CMP #$11		; Is it <DOWN>?
-		BNE SCAN_OUT		; No auto-repeat keys so exit
+		BNE SCAN_OUT		; No auto-repeat keys skip ahead
 
-;-------------- Found a repeating key. Set Delay counters
+;-------------- Found a non-repeating key. Set Delay counters
 
 SCAN_DELAY	LDX DELAY		; Repeat Delay Counter
 		BEQ SCAN_DELAY2
@@ -126,7 +135,7 @@ SCAN_DELAY2	DEC KOUNT		; Repeat Speed Counter
 
 ;-------------- Record the Keypress
 
-SCAN_REC	STA KEYPRESSED		; Current Key Pressed: 255 = No Key
+SCAN_REC	STA KEYPRESSED		; Save the KEY
 		CMP #$FF		; No Key?
  		BEQ SCAN_OUT		; Yes, exit
 
@@ -135,6 +144,7 @@ SCAN_REC	STA KEYPRESSED		; Current Key Pressed: 255 = No Key
 		AND #$7F		; Mask off upper bit (non-shiftable flag in key matrix byte)
 		PLP
 		BMI SCAN_NORM
+
 
 ;-------------- Process SHIFT key flag with Numeric Keys or Graphic keys
 
@@ -150,12 +160,20 @@ SCAN_REC	STA KEYPRESSED		; Current Key Pressed: 255 = No Key
 
 		ADC #$20		; Add 32 to convert to shifted symbol on number key
 		!byte $2C		; Hide the next instruction trick
-
 SCAN_SHIFT	ORA #$80		; Set upper bit for Graphics Symbol
 
 ;-------------- Put the KEY into the Buffer (Key in accumulator)
 
 SCAN_NORM
+
+!IF GRKMODE=1 {				; Handle GRKMODE - Changes KEYS to GRAPHIC SYMBOLS
+		LDX RPTFLG		; Check if REPEAT MODE is on
+		BPL GRKSKIP		; No, skip ahead
+		CMP #33			; Is it "!"?
+		BMI GRKSKIP		; Less, so skip ahead
+		ORA #$C0		; 11000000 Set BIT 7,6 - convert it to graphic symbol
+GRKSKIP
+}
 
 !IF ESCCODES=1 { JMP EUROSWAP }		; Check if Eurokeys need swapping
 
@@ -168,6 +186,7 @@ SCAN_NORM2	LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 		STX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 } ELSE {
 		JSR TestBackArrow	; Patch/Hack to use SHIFT-BACKARROW as screen mode toggle (text/graphic)
+					; This patch is code-size neutral for THIS routine
 }
 
 ;-------------- STOP KEY FIX
@@ -175,8 +194,7 @@ SCAN_NORM2	LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 ; This fix puts the proper value ($EF) into STKEY ($9B) when the relocated STOP key is pressed.
 ; NOTE: Must investigate further!
 
-!if KEYBOARD > 1 {
-;		Compensate for STOP key not in standard position
+!if KEYBOARD > 1 {			; Compensate for STOP key not in standard position
 		CMP #3			; Is keycode "3" (STOP key)?
 		BNE SCAN_OUT
 		LDA #$EF		; fool kernal into thinking STOP is pressed
