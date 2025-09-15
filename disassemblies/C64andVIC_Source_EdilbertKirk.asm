@@ -98,7 +98,7 @@ VIC_REGS = $10
 ; --+------+---------------------------------------+--------------------
 ;  4| 9004 |                  RAST                 | raster value
 ; --+------+---------------------------------------+--------------------
-;  5| 9005 |  1 |    SMA       |      CMA          | screen/char memory
+;  5| 9005 |  1 |ï¿½   SMA       |ï¿½     CMA          | screen/char memory
 ; --+------+---------------------------------------+--------------------
 ;  6| 9006 |                  LPH                  | light pen horiz.
 ; --+------+---------------------------------------+--------------------
@@ -116,7 +116,7 @@ VIC_REGS = $10
 ; --+------+---------------------------------------+--------------------
 ; 13| 900d | NSW|             NOIS                 | noise sound
 ; --+------+---------------------------------------+--------------------
-; 14| 900e |      AUXC         |      VOL          | aux. color / volume
+; 14| 900e |      AUXC         |ï¿½     VOL          | aux. color / volume
 ; --+------+---------------------------------------+--------------------
 ; 15| 900f |      SCOL         | REV|     BCOL     | screen/border color
 ; --+------+----+----+----+----+----+----+----+----+--------------------
@@ -222,16 +222,16 @@ VIA1_ACR  = $911B    ; VIA 1 auxiliary control register
                      ; --------------------------------
                      ; bit 7   : T1 PB7 enabled/disabled
                      ; bit 6   : T1 free run/one shot
-                     ; bit 5   : T2 clock PB6/Ø2
+                     ; bit 5   : T2 clock PB6/ï¿½2
                      ; bit 432 : function
                      ; ------------------
                      ; 000   shift register disabled
                      ; 001   shift in , rate controlled by T2
-                     ; 010   shift in , rate controlled by Ø2
+                     ; 010   shift in , rate controlled by ï¿½2
                      ; 011   shift in , rate controlled by external clock
                      ; 100   shift out, rate controlled by T2, free run
                      ; 101   shift out, rate controlled by T2
-                     ; 110   shift out, rate controlled by Ø2
+                     ; 110   shift out, rate controlled by ï¿½2
                      ; 111   shift out, rate controlled by external clock
                      ; bit 1   : PB latch (1 = enabled)
                      ; bit 0   : PA latch (1 = enabled)
@@ -318,7 +318,7 @@ VIA2_DATA  = $9121   ; VIA 2 DRA, keyboard row port
                      ;       c7   c6   c5   c4   c3   c2   c1   c0
                      ;   +------------------------------------------------
                      ; r7|   F7   F5   F3   F1   DN  RGT  RET  DEL
-                     ; r6|    /   UP    =  RSH HOME    ;    *    £
+                     ; r6|    /   UP    =  RSH HOME    ;    *    ï¿½
                      ; r5|    ,    @    :    .    -    L    P    +
                      ; r4|    0    O    K    M    N    J    I    9
                      ; r3|    8    U    H    B    V    G    Y    7
@@ -550,7 +550,7 @@ VIC_REGS = $2F
 ; --+-------+----+----+----+----+----+----+----+----+------------------------
 ;  8| $dc08 | S/A|  0 |  0 |  0 |       TODS        | Time Of Day [1/10 sec]
 ; --+-------+----+----+----+----+----+----+----+----+------------------------
-;  9| $dc09 |  0 |  TODS [10s]  |     TODS [1s]     | Time Of Day [sec]
+;  9| $dc09 |  0 |  TODS [10s]  |ï¿½    TODS [1s]     | Time Of Day [sec]
 ; --+-------+----+--------------+-------------------+------------------------
 ; 10| $dc0a |  0 |  TODM [10m]  |     TODM [1m]     | Time Of Day [min]
 ; --+-------+----+--------------+-------------------+------------------------
@@ -580,7 +580,7 @@ CIA1_PRB   = $DC01   ; CIA1 Peripheral data Register B
                      ; r3|    2  HOM    -    0    8    6    4   F7
                      ; r2|  CTL    ;    L    J    G    D    A  RGT
                      ; r1|  LFT    *    P    I    Y    R    W  RET
-                     ; r0|    1    £    +    9    7    5    3  DEL
+                     ; r0|    1    ï¿½    +    9    7    5    3  DEL
 
 CIA1_DDRA  = $DC02   ; CIA1 Data Direction  Register A
 CIA1_DDRB  = $DC03   ; CIA1 Data Direction  Register B
@@ -1759,13 +1759,13 @@ TK_PI      = $FF   ; PI token
 ; ---------+-----+-----+-----+-----+-----+-----+-----+-----
 ; Type     | Exa.|  0  |  1  |  2  |  3  |  4  |  5  |  6
 ; ---------+-----+-----+-----+-----+-----+-----+-----+-----
-; Float    | AB  |  A  |  B  | EXP | MSB | MAN | MAN | LSB
+; Float    | AB  |  A  |  B  | EXP | MSB |ï¿½MAN | MAN |ï¿½LSB
 ; ---------+-----+-----+-----+-----+-----+-----+-----+-----
-; Integer  | AB% |  A^ |  B^ | MSB | LSB |  0  |  0  |  0  
+; Integer  | AB% |  A^ |ï¿½ B^ | MSB | LSB |  0  |  0  |  0  
 ; ---------+-----+-----+-----+-----+-----+-----+-----+-----
-; Function | AB( |  A^ |  B  | LFP | MFP | LBP | MBP |  0  
+; Function | AB( |  A^ |ï¿½ B  | LFP | MFP | LBP | MBP |  0  
 ; ---------+-----+-----+-----+-----+-----+-----+-----+-----
-; String   | AB$ |  A  |  B^ | LEN | LSP | MSP |  0  |  0
+; String   | AB$ |  A  |ï¿½ B^ |ï¿½LEN | LSP | MSP |  0  |  0
 ; ---------+-----+-----+-----+-----+-----+-----+-----+-----
 
 ; ************
@@ -1777,9 +1777,9 @@ TK_PI      = $FF   ; PI token
 ; ---------+-----+-----+-----+---------------+
 ; Float    | AB  |  A  |  B  |       5       |
 ; ---------+-----+-----+-----+---------------+
-; Integer  | AB% |  A^ |  B^ |       2       |
+; Integer  | AB% |  A^ |ï¿½ B^ |       2       |
 ; ---------+-----+-----+-----+---------------+
-; String   | AB$ |  A  |  B^ |       3       |
+; String   | AB$ |  A  |ï¿½ B^ |       3       |
 ; ---------+-----+-----+-----+---------------+
 
 ; The circumflex ^ indicates characters OR'ed with $80
@@ -2760,7 +2760,7 @@ LIST_20              ; else ...
 LIST_25
    STY FORPNT        ; save index for line
    JSR Print_Integer_XA
-   LDA #' '          ; print [SPACE] after line #
+   LDA #' '          ; print [SPACE]ï¿½after line #
 
 LIST_30
    LDY FORPNT        ; get index for line
@@ -8102,7 +8102,7 @@ EOE_Ret
    TXA               ; copy logical file number to A
    LDX #$01          ; set default device number, cassette
 
-GOCP_05
+GOColourPET_05
    LDY #$00          ; set default command
    JSR SETLFS        ; set logical, first and second addresses
    JSR Exit_On_EOS
@@ -8111,10 +8111,10 @@ GOCP_05
    LDY #$00          ; clear command
    LDA FORPNT        ; get logical file number
    CPX #$03          ; compare device number with screen
-   BCC GOCP_10       ; branch if less than screen
+   BCC GOColourPET_10       ; branch if less than screen
    DEY               ; else decrement command
 
-GOCP_10
+GOColourPET_10
    JSR SETLFS        ; set logical, first and second addresses
    JSR Exit_On_EOS
    JSR Get_Byte_Param
@@ -9719,7 +9719,7 @@ Jiffy_e9c6
    CPX #$fe
 #endif
 #else
-   LDA #CTRL_COL     ; set keyboard column for [CTRL] key
+   LDA #CTRL_COL     ; set keyboard column for [CTRL]ï¿½key
    STA KEYB_COL      ; set VIA/CIA keyboard column
    LDA KEYB_ROW      ; get VIA/CIA keyboard row
    CMP #CTRL_ROW     ; compare with row of [CTRL] key
@@ -9729,7 +9729,7 @@ Jiffy_e9c6
    LDX NDX           ; chars in keyboard buffer
    BEQ ScSc_27       ; none
    LDA KBUFFR-1,X    ; last key
-   SBC #$13          ; [CTRL] S
+   SBC #$13          ; [CTRL]ï¿½S
    BNE ScSc_40
    STA NDX           ; clear keyboard buffer
 
@@ -9743,8 +9743,8 @@ ScSc_28
    LDA #STND_COL     ; set standard keyboard col
    STA KEYB_COL      ; set VIA/CIA keyboard column
    PLP               ; restore status
-   BNE ScSc_40       ; skip if no [CTRL] key down
-   LDY #0            ; delay scrolling if [CTRL] key down
+   BNE ScSc_40       ; skip if no [CTRL]ï¿½key down
+   LDY #0            ; delay scrolling if [CTRL]ï¿½key down
 
 ScSc_30
    NOP               ; waste cycles
@@ -13858,7 +13858,7 @@ JiLo_20
 
 JiLo_30
    LDA COMSAV
-   CMP #11           ; verify command (´)
+   CMP #11           ; verify command (ï¿½)
    BEQ JiLo_20       ; output verify OK
    BCS JiDi_40
    CMP #8            ; load ml (%)
@@ -14485,7 +14485,7 @@ Bfa8a
 Bfaa7
    LDX #4
    JSR CHRGET
-   JSR GOCP_05
+   JSR GOColourPET_05
    JSR Jiffy_Validate_FA
 
 ; *****
@@ -14646,12 +14646,12 @@ JiLO_10
 
 JiLO_20
    LDA TAPE1         ; [3:14]
-   STX CIA2_PRA      ; [4:18] data (5) and clock (4) output = 0
-   BIT CIA2_PRA      ; [4:22] 
+   STX CIA2_PRA      ; [4:18]ï¿½data (5) and clock (4) output = 0
+   BIT CIA2_PRA      ; [4:22]ï¿½
    BVC Bfaf0         ; [2:24]
-   NOP               ; [2:26] wait
+   NOP               ; [2:26]ï¿½wait
    STA CIA2_PRA      ; [4:30]
-   ORA CIA2_PRA      ; [4:34] get bit 0 & 1 of byte      <--
+   ORA CIA2_PRA      ; [4:34]ï¿½get bit 0 & 1 of byte      <--
    LSR A             ; [2:36] A = .XX.....
    LSR A             ; [2:38] A = ..XX....
    NOP               ; [2:40] wait 2 cycles
@@ -14833,7 +14833,7 @@ JiAC_10
    AND #7              ; [2:10] modulo 7
    CMP #7              ; [2:12] compare with 7
    BCS JiAC_10         ; [2:14] we're one line before a bad line
-   PLA                 ; [4:18] restore bits 2-0
+   PLA                 ; [4:18]ï¿½restore bits 2-0
    STA CIA2_PRA        ; [4:22] data (5) and clock (4) output = 0
    STA TBTCNT          ; [3:25] save bits 2-0
    ORA #%00100000      ; [2:27] data (5) output = 1
@@ -14863,7 +14863,7 @@ JiAC_10
    JMP Set_IEC_Status
 #endif
 
-; §§
+; ï¿½ï¿½
 
 #if VIC
 ; read one byte from IEC bus
@@ -14882,9 +14882,9 @@ JiAC_10
    LDA #$80
    STA DPSW
    TXA                 ; [2: 2]
-   PHA                 ; [3: 4] save X
-   PHA                 ; [3: 7] wait 3 cycles
-   PLA                 ; [4:11] wait 4 cycles
+   PHA                 ; [3: 4]ï¿½save X
+   PHA                 ; [3: 7]ï¿½wait 3 cycles
+   PLA                 ; [4:11]ï¿½wait 4 cycles
    LDA IEC_PCR         ; [4:15] 
    AND #%11011101      ; [2:17]
    STA IEC_PCR         ; [4:21] data (5) and clock (1) = 0
@@ -14892,24 +14892,24 @@ JiAC_10
    TAX                 ; [2:25] save mask in X
    BIT DPSW            ; [3:28] wait
    BIT DPSW            ; [3:31] wait
-   BIT DPSW            ; [3:34] wait
-   LDA IEC_DRAN        ; [4:38] get bit 0 & 1            <--
-   ROR A               ; [2:40] bit 0 (clock) -> bit 7
+   BIT DPSW            ; [3:34]ï¿½wait
+   LDA IEC_DRAN        ; [4:38]ï¿½get bit 0 & 1            <--
+   ROR A               ; [2:40]ï¿½bit 0 (clock) -> bit 7
    ROR A               ; [2:42] bit 1 (data ) -> carry
-   AND #$80            ; [2:44] mask received bit 0
-   ORA IEC_DRAN        ; [4:48] get bit 2 & 3            <--
-   ROL A               ; [2:50] A = .....XXX
-   ROL A               ; [2:52] A = ....XXXX
+   AND #$80            ; [2:44]ï¿½mask received bit 0
+   ORA IEC_DRAN        ; [4:48]ï¿½get bit 2 & 3            <--
+   ROL A               ; [2:50]ï¿½A = .....XXX
+   ROL A               ; [2:52]ï¿½A = ....XXXX
    STA TAPE1+1         ; [3:55] store lower nibble
-   LDA IEC_DRAN        ; [4:59] get bit 4 & 5            <--
-   ROR A               ; [2:61] bit 4 (clock) -> bit 7
-   ROR A               ; [2:63] bit 5 (data ) -> carry
-   AND DPSW            ; [3:66] mask received bit 4
+   LDA IEC_DRAN        ; [4:59]ï¿½get bit 4 & 5            <--
+   ROR A               ; [2:61]ï¿½bit 4 (clock) -> bit 7
+   ROR A               ; [2:63]ï¿½bit 5 (data ) -> carry
+   AND DPSW            ; [3:66]ï¿½mask received bit 4
    ORA IEC_DRAN        ; [4:70] get bit 6 & 7            <--
-   ROL A               ; [2:72] A = .....XXX
-   ROL A               ; [2:74] A = ....XXXX
-   STA CAS1            ; [3:77] store upper nibble
-   LDA IEC_DRAN        ; [4:81] get status bits
+   ROL A               ; [2:72]ï¿½A = .....XXX
+   ROL A               ; [2:74]ï¿½A = ....XXXX
+   STA CAS1            ; [3:77]ï¿½store upper nibble
+   LDA IEC_DRAN        ; [4:81]ï¿½get status bits
    STX IEC_PCR         ; [4:85] data out (5) = 1
    STA DPSW            ; save status bits
    JSR Jiffy_Combine_Nibbles
@@ -16353,7 +16353,7 @@ TAPE_Write_Leader
 #if VIC
    LDA #$F7          ; set keyboard column 3 active
    STA KEYB_COL      ; set VIA 2 DRB, keyboard column
-   LDA #$40          ; set T1 free run, T2 clock Ø2,
+   LDA #$40          ; set T1 free run, T2 clock ï¿½2,
    STA VIA2_ACR      ; set VIA 2 ACR
 #endif
    JSR Program_Timer_A
@@ -16716,10 +16716,10 @@ TAPE_IRQ_Vectors
    LDA #$7F          ; disable all interrupts
    STA RS2_IRQ_REG   ; on VIA 1 IER ..
    STA VIA2_IER      ; .. and VIA 2 IER
-   LDA #$40          ; set T1 free run, T2 clock Ø2,
+   LDA #$40          ; set T1 free run, T2 clock ï¿½2,
                      ; SR disabled, latches disabled
    STA VIA2_ACR      ; set VIA 2 ACR
-   LDA #$40          ; set T1 free run, T2 clock Ø2,
+   LDA #$40          ; set T1 free run, T2 clock ï¿½2,
                      ; SR disabled, latches disabled
    STA VIA1_ACR      ; set VIA 1 ACR
    LDA #$FE          ; CB2 high, RS232 Tx

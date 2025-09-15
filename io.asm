@@ -1,83 +1,92 @@
-; IO - This part of the ROM is not visible since IO is mapped here, so we will fill it
-; ==   with a decription of the editrom features and options.
+; PET/CBM Editor ROM Project - Generates custom IO Area ($E800-E8FF) contents
+; ==========================   IO.ASM
+;
+; This part of the ROM is not visible since IO is mapped here, so we will fill it
+; with a decription of the editrom features and options.
+; Files IO.ASM and INFO.ASM should contain the same info except for the encoding.
+; This code use !TEXT so that it will appear normal for ASCII systems (ie: Windows, Mac)
+;*********************************************************************************************************
 
-!text "**CBM EDIT ROM**"
-!text "["
+!TEXT "**CBM EDIT ROM**"
+!TEXT "["
 +DATE
 
-!text "] CODEBASE="
-!IF CODEBASE=0 { !text "0" }
-!IF CODEBASE=1 { !text "1" }
-!IF CODEBASE=2 { !text "2" }
+!TEXT "] CODEBASE="
+!IF CODEBASE=0 { !TEXT "0" }
+!IF CODEBASE=1 { !TEXT "1" }
+!IF CODEBASE=2 { !TEXT "2" }
 
 !IF COLOURPET = 1 {
-	!text " COLOURPET-"
-	!if COLOURVER=0 { !text "beta" }
-	!if COLOURVER=1 { !text "release" }
+	!TEXT " COLOURPET-"
+	!IF COLOURVER=0 { !TEXT "beta" }
 }
 
-!text " KEYBOARD="
-	!if KEYBOARD= 0 { !text "n-qwerty" }
-	!if KEYBOARD= 1 { !text "b-qwerty" }	; QWERTY layout
-	!if KEYBOARD= 2 { !text "din" }
-	!if KEYBOARD= 3 { !text "c64/vic" }
-	!if KEYBOARD= 4 { !text "b-sjg" }	; Modified layout - cursor keys, esc etc
-	!if KEYBOARD= 5 { !text "n-sjg" }	; Modified layout - @ replaced with ESC, backarrow becomes @
-	!if KEYBOARD= 6 { !text "b-qwertz" }	; QWERTZ layout
-	!if KEYBOARD= 7 { !text "b-azerty" }	; AZERTY layout
-	!if KEYBOARD= 8 { !text "cbm-ii" }	; CBM-II keyboard (requires hardware mod)
-	!if KEYBOARD= 9 { !text "n-sjg2" }	; Modified layout - backarrow replaced with ESC
-	!if KEYBOARD=11 { !text "ted" }		; TED series (C16,C116,Plus/4 etc)
+!TEXT " KEYBOARD="
+	!IF KEYBOARD= 0 { !TEXT "n-qwerty" }
+	!IF KEYBOARD= 1 { !TEXT "b-qwerty" }	; QWERTY layout
+	!IF KEYBOARD= 2 { !TEXT "din" }
+	!IF KEYBOARD= 3 { !TEXT "c64/vic" }
+	!IF KEYBOARD= 4 { !TEXT "b-sjg" }	; Modified layout - cursor keys, esc etc
+	!IF KEYBOARD= 5 { !TEXT "n-sjg" }	; Modified layout - @ replaced with ESC, backarrow becomes @
+	!IF KEYBOARD= 6 { !TEXT "b-qwertz" }	; QWERTZ layout
+	!IF KEYBOARD= 7 { !TEXT "b-azerty" }	; AZERTY layout
+	!IF KEYBOARD= 8 { !TEXT "cbm-ii" }	; CBM-II keyboard (requires hardware mod)
+	!IF KEYBOARD= 9 { !TEXT "n-sjg2" }	; Modified layout - backarrow replaced with ESC
+	!IF KEYBOARD=11 { !TEXT "ted" }		; TED series (C16,C116,Plus/4 etc)
 
-!text " SCREEN="
-	!if COLUMNS=32  { !text "32" }
-	!if COLUMNS=40  { !text "40" }
-	!if COLUMNS=80  { !text "80" }
-	!if COLUMNS=90  { !text "90" }
-	!if ROWS=16     { !text "x16" }
-	!if ROWS=25     { !text "x25" }
-	!if ROWS=32     { !text "x32" }
-	!if ROWS=35     { !text "x35" }
-	!if SOFT40=1    { !text " (soft40)" }
-	!if SS40=1      {
-		!pet " ("
-		!if HARD4080=1  { !text "hs" } else { !text "ss" }
-		!if SS40MODE=40 { !text "40)" }
-		!if SS40MODE=80 { !text "80)" }
+!TEXT " SCREEN="
+	!IF COLUMNS=32  { !TEXT "32" }
+	!IF COLUMNS=40  { !TEXT "40" }
+	!IF COLUMNS=80  { !TEXT "80" }
+	!IF COLUMNS=90  { !TEXT "90" }
+	!IF ROWS=16     { !TEXT "x16" }
+	!IF ROWS=25     { !TEXT "x25" }
+	!IF ROWS=32     { !TEXT "x32" }
+	!IF ROWS=35     { !TEXT "x35" }
+	!IF SOFT40=1    { !TEXT " (soft40)" }
+	!IF SS40=1      {
+		!TEXT " ("
+		!IF HARD4080=1  { !TEXT "hs" } else { !TEXT "ss" }
+		!IF SS40MODE=40 { !TEXT "40)" }
+		!IF SS40MODE=80 { !TEXT "80)" }
 	}
 
-!text " HERTZ="
-	!if HERTZ=50 { !text "50" }
-	!if HERTZ=60 { !text "60" }
+!TEXT " HERTZ="
+	!IF HERTZ=50 { !TEXT "50" }
+	!IF HERTZ=60 { !TEXT "60" }
 
-!text " REFRESH="
-	!if REFRESH= 0 { !text "euro" }
-	!if REFRESH= 1 { !text "n.america" }
-	!if REFRESH= 2 { !text "pal" }
-	!if REFRESH= 3 { !text "ntsc" }
-	!if REFRESH= 4 { !text "9inch" }
-	!if REFRESH=82 { !text "8296d-v1" }
-	!if REFRESH=83 { !text "8296d-v2" }
-	!if REFRESH=90 { !text "8296(d)-n.a." }
-	!if REFRESH=91 { !text "8296(d)-n.a." }
-	!if REFRESH=92 { !text "8296(d)-n.a." }
-	!if REFRESH=98 { !text "special" }
-	!if REFRESH=99 { !text "custom" }
+!TEXT " REFRESH="
+!IF REFRESH=  0 { !TEXT "euro1" }
+!IF REFRESH=  1 { !TEXT "n.america" }
+!IF REFRESH=  2 { !TEXT "euro2" }
+!IF REFRESH=  3 { !TEXT "euro8296d" }
+!IF REFRESH=  9 { !TEXT "9inch" }
+!IF REFRESH= 10 { !TEXT "9inch-inv" }
+!IF REFRESH= 15 { !TEXT "pal" }
+!IF REFRESH= 16 { !TEXT "ntsc" }
+!IF REFRESH= 20 { !TEXT "debug-euro1" }
+!IF REFRESH= 21 { !TEXT "debug-n.america" }
+!IF REFRESH= 22 { !TEXT "debug-euro2" }
+!IF REFRESH= 23 { !TEXT "debug-euro8296d" }
+!IF REFRESH= 32 { !TEXT "exp-80x32" }
+!IF REFRESH= 32 { !TEXT "exp-80x35" }
+!IF REFRESH= 90 { !TEXT "exp-90x35" }
+!IF REFRESH= 99 { !TEXT "custom" }
 
-!text " FEATURES="
-!if ESCCODES=1  { !text "esc-codes" }
-!if AUTORUN=1   { !text ",autorun" }
-!if BYPASS=1    { !text "+bypass" }
-!if BANNER>0    { !text ",banner" }
-!if WEDGE=1     { !text ",wedge" }
-!if KEYRESET=1  { !text ",keyreset" }
-!if DISKBOOT=1  { !text ",disk boot" }
-!if EXECUDESK=1 { !text ",execudesk" }
-!if BACKARROW>0 { !text ",backarrow" }
-!if SILENT=1    { !text ",silent" }
-!if CRUNCH=1    { !text ",crunch" }
-!if MOT6845=1   { !text ",mot6845" }
-!if DEBUG=1     { !text ",debug" }
-!text ". COMMENT="
+!TEXT " FEATURES:"
+!IF DEBUG=1     { !TEXT " debug" }
+!IF AUTORUN=1   { !TEXT " autorun" }
+!IF BYPASS=1    { !TEXT "+bypass" }
+!IF BANNER>0    { !TEXT " banner" }
+!IF WEDGE=1     { !TEXT " wedge" }
+!IF DISKBOOT=1  { !TEXT " diskboot"}
+!IF EXECUDESK=1 { !TEXT " execudesk" }
+!IF ESCCODES=1  { !TEXT " esc-codes" }
+!IF KEYRESET=1  { !TEXT " keyreset" }
+!IF BACKARROW>0 { !TEXT " backarrow" }
+!IF SILENT=1    { !TEXT " silent" }
+!IF CRUNCH=1    { !TEXT " crunch" }
+!IF MOT6845=1   { !TEXT " mot6845" }
+
+!TEXT ". COMMENT="
 +COMMENT
-

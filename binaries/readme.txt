@@ -1,32 +1,36 @@
-EditROM Binaries - Updated 2025-01-29
+EditROM Binaries - Updated 2025-09-06
 ================
 
 Binaries are sorted into folders
 
-* 40-Column........ 4000 series machines CODEBASE0
-* 80-Column........ 8000/SuperPET        CODEBASE1/2
-* 8296D............ 8296D which uses different CRTC settings
-* ColourPET........ For 80-Column machines modded with Colour Board
+* CBM.............. Standard CBM Masked ROMs that ban be built and verified as exact.
+* 40-Column........ 4000 series machines CODEBASE0.
+* 80-Column........ 8000/SuperPET        CODEBASE1/2.
+* 8296D............ 8296D which uses different CRTC settings.
+* ColourPET........ For 80-Column machines modded with Colour Board.
+* MegaPET.......... For Mega65 MegaPET core
+* UltiPET.......... For Andre Fachat's UltiPET project
 * Switchable40-80.. For 80-Column machines or those with MultiEdit40/80 boards.
+* Keyboard C64..... Various binaries with C64 keyboard.
 * Experimental..... For custom binaries with new/special features.
 
 Inside each folders are BINARY files with specific filenames.
-
+By default, new binaries will go in this \binaries folder and
+can be transferred to a sub-folder when verified working.
 
 Filenames
 ---------
 
-The filename tells you the main features of the ROM image.
+The filename should be as descriptive is possible and the suggested format is:
 
-The format is:
-
-{group}-{codebase}-{column}-{keyboard}-{screen}-{features} (date).bin
+{group}{codebase}-{column}-{keyboard}-{screen}-{features} (date).bin
 
 Where:
 
 {group} is:
-	sjg-edit - PET/CBM computers:
+	sjg-edit   - PET/CBM computers:
 	colourpet - ColourPET board
+	megapet   - M65 MegaPET core
 
 {codebase} is:
 	c0 - 40 column 2K codebase
@@ -65,5 +69,4 @@ Where:
 	... and more
 
 (date) is:
-	The build date in the form (yyyy-mm-dd)
-
+	The build date in the form: YYYY-MM-DD

@@ -1,154 +1,107 @@
-PET/CBM CRTC Configuration
-==========================
+PET/CBM Editor ROM Project - Description of CRTC Registers and Configuration
+==========================   CRTC REGISTERS.TXT
 
 The MC6845 or MOS6545 CRTC (Cathode Ray Tube Controller) chip is a programmable video address generator.
-It has many registers, that determine the video configuration and timing that when combined generate the
+It has many registers that determine the video configuration and timing that when combined generate the
 video display you see. The PET/CBM machines use tables of 18 bytes.
 
-The following are the registers and their functions:
-
-REG#  DESCRIPTION			NOTES
-----  -----------			-----
-0	Horizontal Total		>40
-1	Horizontal Displayed		Always 40 in standard 40 or 80 column machines due to the way memory is configured
-2	Horizontal Sync Position
-3	Horizontal Sync Width
-4	Vertical Total			39 or 49
-5	Vertical Total Adjust
-6	Vertical Displayed		Always 25 for PET/CBM
-7	Vertical Sync Position
-8	Interlace Mode and Skew		Always 0. Some variations allow interlace mode
-9	Maximum Raster Address		7 (for Graphics Mode) or 9 (for Text Mode) - One less than actual # of rasters.
-10	Cursor Start Raster		Not used in PET/CBM
-11	Cursor End Raster		Not used in PET/CBM
-12	Display Start Address-High	Only lower 4-bits are used. Upper 4-bits control additional features.	
-13	Display Start Address-Low	
-14	Cursor Address (High)		Not used in PET/CBM
-15	Cursor Address (Low)		Not used in PET/CBM
-16	Light Pen Address (High)	Read for Light Pen position 
-17	Light Pen Address (Low)		Read for Light Pen position 
+All PET/CBM Machines except the Model 2001 contain a CRTC controller. This allows the PET to adapt the
+video parameters to different monitors and line frequencies. There are 18 registers that must be
+configured properly to generate a video display. The PET machines have two different screen modes:
+TEXT and GRAPHIC, which use a different FONT to display the characters as well as different character
+heights (raster lines), which means there are two register tables used in the Editor ROM. PET Machines
+sold in different markets with different monitors need different screen timings. When we add extra
+features such as SOFT40 or 40/80 column switcher boards, or want to output the video to an external
+monitor we need to add additional tables.
 
 
-Editor ROM Register Tables
+REFRESH SETTINGS
+================
+
+The REFRESH setting controls which CRTC tables are used. They are:
+
+ 0 - Standard 20kHz European Monitor #1          4000/8000/8296/SuperPET
+ 1 - Standard 20kHz US (North American) Monitor  4000/8000/8296/SuperPET
+ 2 - Standard 20kHz European Monitor #2          4000/8000/8296/SuperPET
+ 3 - 8296D European monitor                      8296D
+ 9 - Original 9" monitor - Normal
+10 - Original 9" monitor - Inverted
+15 - PAL scan rate (composite video)
+16 - NTSC scan rate (composite video/RGBI/CGA)
+20 - DEBUG 26 lines version of REFRESH 0
+21 - DEBUG 26 lines version of REFRESH 1
+22 - DEBUG 26 lines version of REFRESH 2
+23 - DEBUG 26 lines version of REFRESH 3
+32 - Experimental 80x32 SCREEN
+35 - Experimental 80x35 SCREEN
+90 - Experimental 90x35 SCREEN
+99 - Custom screen
+
+
+REGISTER TABLE DESCRIPTION
 ==========================
 
+This is a description of the register table entries of a typical PET screen
+
+REG#  DESCRIPTION		TEXT GRAPHICS   EXAMPLE NOTES
+----  -----------		---- --------   -------------
+00 Horizontal Total             $31  $31        Must be greater than REG#01. This is the screen area plus the RIGHT margin/border.
+01 Horizontal Displayed         $28  $28        Always 40 in standard 40 or 80 column machines due to the way memory is configured.
+02 Horizontal Sync Position     $29  $29        This is the LEFT margin/border.
+03 Horizontal Sync Width        $0F  $0F        Width of sync pulse. Monitor-dependent.
+04 Vertical Total               $31  $27        49 or 39. This takes into account the number of rasters per line.
+05 Vertical Total Adjust        $03  $03        Extra Rasters added to the bottom border area.
+06 Vertical Displayed		$19  $19        Always 25 except when using a DEBUG refresh which adds an extra line.
+07 Vertical Sync Position       $1D  $21        This is the TOP border area.
+08 Interlace Mode and Skew      $00  $00        Always 0. Some variations allow interlace mode.
+09 Rasters per lines            $09  $07	7 (for Graphics Mode) or 9 (for Text Mode) - One less than actual # of rasters.
+10 Cursor Start Raster          $00  $00        Not used in PET/CBM.
+11 Cursor End Raster            $00  $00        Not used in PET/CBM.
+12 Display Start Address-High   $10  $10        Normally $10 for and inverted screen. Lower 4-bits ($0)=Video address HI. Upper 4-bits ($1) control additional features.
+13 Display Start Address-Low    $00  $00        Normally $00 for Video address ($0000 is the offset from start of video RAM at $8000).
+14 Cursor Address (High)        $00  $00        Not used in PET/CBM.
+15 Cursor Address (Low)         $00  $00        Not used in PET/CBM.
+16 Light Pen Address (High)     $00  $00        Read for Light Pen position.
+17 Light Pen Address (Low)	$00  $00        Read for Light Pen position.
+
+
+EDITOR ROM REGISTER TABLES
+==========================      Thanks to Martin Hoffmann-Vetter for compiling this ROM chart!
+
 These are the CRTC registers as set by various Commodore Editor ROMs. All values in HEX.
+Note: REFRESH refers to the PET/CBM EDIT ROM PROJECT "REFRESH" setting.
 
-Model	LOC	Clk		R0	R1	R2	R3	R4	R5	R6	R7	R8	R9		SCREEN		ROM CBM P/N
------	---	---		--	--	--	--	--	--	--	--	--	--		------		-----------
-40xx	US	8		31	28	29	0f	20	03	19	1d	00	09		text		901499-01
-40xx	US	8		31	28	29	0f	28	05	19	21	00	07		graphics	901499-01
-80xx	US	16		31	28	29	0f	20	03	19	1d	00	09		text		901474-03
-80xx	US	16		31	28	29	0f	28	05	19	21	00	07		graphics	901474-03
-																
-40xx	EU	8		31	28	29	0f	27	00	19	20	00	09		text		901498-01
-40xx	EU	8		31	28	29	0f	31	00	19	25	00	07		graphics	901498-01
-80xx	EU	16		31	28	29	0f	27	00	19	20	00	09		text		901474-04o
-80xx	EU	16		31	28	29	0f	31	00	19	25	00	07		graphics	901474-04o
+MODEL LOC R0 R1 R2 R3 R4 R5 R6 R7 R8 R9  SCREEN   ROM CBM P/N	REFRESH
+----- --- -- -- -- -- -- -- -- -- -- --  ------   -----------	-------
+40xx  EU  31 28 29 0f 27 00 19 20 00 09  text     901498-01	0
+40xx  EU  31 28 29 0f 31 00 19 25 00 07  graphics 901498-01
+80xx  EU  31 28 29 0f 27 00 19 20 00 09  text     901474-04	0
+80xx  EU  31 28 29 0f 31 00 19 25 00 07  graphics 901474-04
+80xx  EU  31 28 29 0f 27 00 19 20 00 09  text     324243-01	0
+80xx  EU  31 28 29 0f 31 00 19 25 00 07  graphics 324243-01
 
-80xx	EU	16		3f	28	32	08	20	10	19	1d	00	08		text		901474-04a (PAL?)
-80xx	EU	16		3f	28	32	08	24	11	19	20	00	07		graphics	901474-04a (PAL?)
-80xx	EU	16		31	28	29	0f	27	00	19	20	00	09		text		324243-01 (4V2E)
-80xx	EU	16		31	28	29	0f	31	00	19	25	00	07		graphics	324243-01 (4V2E)
-																
-8296D	EU	16		32	28	28	08	26	02	19	20	00	09		text		901474-04 (324243-02?)
-8296D	EU	16		32	28	28	08	30	00	19	25	00	07		graphics	901474-04 (324243-02?)
-8x96D	EU	16		3a	28	2c	08	20	09	19	1d	00	09		text		324243-02B
-8x96D	EU	16		3a	28	2c	08	29	03	19	22	00	07		graphics	324243-02B
+40xx  US  31 28 29 0f 20 03 19 1d 00 09  text     901499-01	1
+40xx  US  31 28 29 0f 28 05 19 21 00 07  graphics 901499-01
+80xx  US  31 28 29 0f 20 03 19 1d 00 09  text     901474-03     1
+80xx  US  31 28 29 0f 28 05 19 21 00 07  graphics 901474-03
 
-8x96D	EU	16		3a	28	2c	08	20	09	19	1d	00	09		text		324243-03 (4V2E)
-8x96D	EU	16		3a	28	2c	08	29	03	19	22	00	07		graphics	324243-03 (4V2E)
-8x96D	EU	16		3a	28	2c	08	20	09	19	1d	00	09		text		324243-04 (4V4E)
-8x96D	EU	16		3a	28	2c	08	29	03	19	22	00	07		graphics	324243-04 (4V4E)
+80xx  EU  32 28 28 08 26 02 19 20 00 09  text     901474-04	2
+80xx  EU  32 28 28 08 30 00 19 25 00 07  graphics 901474-04
 
-These are additional tables for custom screens:
-
-8296	US	16		2f	28	29	0f	24	05	23	23	00	07		both		80x35 screen 
-8296	US	16		34	2d	2d	0c	28	11	23	27	00	07		both		90x35 screen 
+8x96D EU  3a 28 2c 08 20 09 19 1d 00 09  text     324243-02B	3
+8x96D EU  3a 28 2c 08 29 03 19 22 00 07  graphics 324243-02B
+8x96D EU  3a 28 2c 08 20 09 19 1d 00 09  text     324243-03	3
+8x96D EU  3a 28 2c 08 29 03 19 22 00 07  graphics 324243-03
+8x96D EU  3a 28 2c 08 20 09 19 1d 00 09  text     324243-04	3
+8x96D EU  3a 28 2c 08 29 03 19 22 00 07  graphics 324243-04
 
 
-Example Code
+EXAMPLE CODE
 ============
 
-The following is a sample of the source code that is used to configure the screen parameters.
+The following is an example of the source code to configure the screen parameters.
 
-[START]
-; PET/CBM EDIT ROM - CRTC Setup Tables
-; ================   xx Column x 25 Lines, xx Hz Line, xxkHz Horizonal (for ??? monitor)
-;
-; These tables are used to program the CRTC chip to set the screen to the proper rows, columns, and timing 
-
-;--------- Text Mode - 40 Column, 50 Hz, 20 kHz
-
-CRT_CONFIG_TEXT
-    		!byte $31	;  Horizontal Total = 49
-		!byte $28	;  Horizontal Displayed = 40
-		!byte $29	;  Horizontal Sync Position = 41
-		!byte $0f	;  Horizontal Sync Width = 15
-		!byte $27	;* Vertical Total = 39
-		!byte $00	;  Vertical Total Adjust = 0
-		!byte $19	;  Vertical Displayed = 25
-		!byte $20	;* Vertical Sync Position = 32
-    		!byte $00	;  Interlace Mode and Skew = 0 (Always 0)
-		!byte $09	;* Maximum Raster Address = 9  Character ROW Height (0-31). Text mode=9
-		!byte $00	;  Cursor Start Raster = 0 (Not used)
-		!byte $00	;  Cursor End Raster = 0 (Not used)
-		!byte $10	;  Display Start Address = 16 (High)	Low 4 bit=0, so HI=0, LO = 0, = $0000
-		!byte $00	;  Display Start Address = 0  (Low)     ($0000 is start of video ram as seen by CRTC)
-		!byte $00	;  Cursor Address-High = 0 (Not used)
-		!byte $00	;  Cursor Address-Low  = 0 (Not used)
-    		!byte $00	;  Light Pen Address-High = 0
-		!byte $00 	;  Light Pen Address-Low  = 0
-
-;--------- Graphics Mode - 40 Column, 50 Hz, 20 kHz
-
-CRT_CONFIG_GRAPHICS
-    		!byte $31	;  Horizontal Total = 49
-		!byte $28	;  Horizontal Displayed = 40
-		!byte $29	;  Horizontal Sync Position = 41
-		!byte $0f	;  Horizontal Sync Width = 15
-		!byte $31	;* Vertical Total = 49 
-		!byte $00	;  Vertical Total Adjust = 0
-		!byte $19	;  Vertical Displayed = 25
-		!byte $25	;* Vertical Sync Position = 37
-    		!byte $00	;  Interlace Mode and Skew =0 (Always 0)
-		!byte $07	;* Maximum Raster Address = 7  Character ROW Height (0-31). Graphics mode=7
-		!byte $00	;  Cursor Start Raster = 0 (Not used)
-		!byte $00	;  Cursor End Raster = 0   (Not used)
-		!byte $10	;  Display Start Address-High = 16 	
-		!byte $00	;  Display Start Address-Low  = 0
-		!byte $00	;  Cursor Address-High = 0 (Not used)
-		!byte $00	;  Cursor Address-Low  = 0 (Not used)
-    		!byte $00	;  Light Pen Address-High = 0
-		!byte $00 	;  Light Pen Address-Low  = 0
-
-;--------- This is a template for making new CRTC configuration files
-;
-; The MC6845 or MOS6545 CRTC (Cathode Ray Tube Controller) chip is a programmable video address generator.
-; It has many registers, that determine the video configuration and timing that when combined generate the
-; video display you see. The PET/CBM machines use tables of 18 bytes.
-;
-; The following are the registers and their functions:
-;
-; REG#  DESCRIPTION			NOTES
-; ----  -----------			-----
-; 0	Horizontal Total		>40
-; 1	Horizontal Displayed		Always 40 in standard 40 or 80 column machines due to the way memory is configured
-; 2	Horizontal Sync Position
-; 3	Horizontal Sync Width
-; 4	Vertical Total			39 or 49
-; 5	Vertical Total Adjust
-; 6	Vertical Displayed		Always 25 for PET/CBM
-; 7	Vertical Sync Position
-; 8	Interlace Mode and Skew		Always 0. Some variations allow interlace mode
-; 9	Maximum Raster Address		7 (for Graphics Mode) or 9 (for Text Mode) - One less than actual # of rasters.
-; 10	Cursor Start Raster		Not used in PET/CBM
-; 11	Cursor End Raster		Not used in PET/CBM
-; 12	Display Start Address-High	Only lower 4-bits are used. Upper 4-bits control additional features.	
-; 13	Display Start Address-Low	
-; 14	Cursor Address (High)		Not used in PET/CBM
-; 15	Cursor Address (Low)		Not used in PET/CBM
-; 16	Light Pen Address (High)	Read for Light Pen position 
-; 17	Light Pen Address (Low)		Read for Light Pen position 
-;
-; REMOVE THIS SECTION WHEN YOU ADD A NEW CONFIGURATION FILE!
+;			REG#:   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17
+;                              ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==
+CRT_CONFIG_TEXT		!BYTE $31,$28,$29,$0F,$27,$00,$19,$20,$00,$09,$00,$00,$10,$00,$00,$00,$00,$00
+CRT_CONFIG_GRAPHICS	!BYTE $31,$28,$29,$0F,$31,$00,$19,$25,$00,$07,$00,$00,$10,$00,$00,$00,$00,$00

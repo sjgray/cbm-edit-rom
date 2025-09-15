@@ -1,5 +1,5 @@
-; PET/CBM EDIT ROM - Keyboard Matrix Tables for KEYSCAN-N, KEYSCAN-B scanner code
-; ================
+; PET/CBM Editor ROM Project - Keyboard Matrix Tables for KEYSCAN-N, KEYSCAN-B scanner code
+; ==========================   KEYBOARD-TABLES.ASM
 ; 
 ; Notes:
 ;	Modifier Keys: 00 = Shift, 10 = Repeat, 80 = CTRL

@@ -1,21 +1,21 @@
-; PET/CBM EDIT ROM   Switchable Soft-40
-; ================
+; PET/CBM Editor ROM Project - Switchable Soft-40
+; ==========================   EDITSOFT40.ASM
 ;
 ; When 'SS40=1' module is included.
 ; When 'HARD4080=1' we use hardware 40/80 switching
 ; Memory location 'SCN4080BOARD' will be set to 1 in INIT routine when HARD4080 is set to 1.
-; Requires "crt-tables-ss40.asm" 
+; Requires "crt-tables-ss40.asm"
 ;
 ; Switchable Soft-40 allows the computer to switch from 80 column to 40 column mode.
 ; This can be accomplished in two ways:
-; 
+;
 ; 1) Software Only: Re-programs the CRTC chip's registers to increase the left/right margins and therefore
 ;                   reduce the number of characters per line to 40. The characters are still the same width.
 ;                   Memory is mapped exactly like 40-column mode, so pokes to the screen will work correctly.
 ;
 ; 2) Hardware Mod:  An add-on board modifies the hardware to behave like "real" 40 or 80 columns. The width
 ;                   of the characters changes so that 40 column characters are twice as wide as 80 column.
-;                   Margins remain the same, and in fact, CRTC registers do not need to be modified. 
+;                   Margins remain the same, and in fact, CRTC registers do not need to be modified.
 ;
 ; To implement SS40 we need to fix the following routines:
 ;
@@ -59,7 +59,7 @@ SS40_SET80	JSR SS40_INIT80				; Set to 80
 SS40_DOIT	JSR CRT_SET_TEXT_SS40			; Program CRTC for Text mode
 		JSR FULL_SCREEN				; Clear windows
 		JSR WIN_CLEAR				; Clear the screen
-		RTS		
+		RTS
 
 
 ;************* Set Screen to TEXT or GRAPHICS MODE
@@ -70,7 +70,7 @@ CRT_SET_TEXT_SS40
 CRT_SET_GRAPHICS_SS40
 		LDY #$0C				; Character Set = GRAPHICS
 
-;************* Check 40/80 Mode 
+;************* Check 40/80 Mode
 ; SCN4080BOARD low memory location will be set to "1" on powerup if board is installed.
 ; We can change this to "0" if we want to use the SOFTWARE method to do 40 columns.
 
@@ -100,7 +100,7 @@ CRT_PROGRAM_SS40
 
 		STA MYZP				; Pointer LO
 		STX MYZP+1				; Pointer HI
-		LDA VIA_PCR				; Get current register byte VIA Register C - CA2	CHIP 
+		LDA VIA_PCR				; Get current register byte VIA Register C - CA2	CHIP
 		AND #$f0				; mask out lower nibble
 		STA FNLEN				; save it to Temp Variable
 		TYA					; Move 'Character Set' byte to A
@@ -260,18 +260,19 @@ SS40_SP240
 		!IF COLOURPET=1 { !SOURCE "screen2c.asm" }	; Add the Colour RAM table
 
 ; ------------- For CODEBASE 0 we need to supply a "Line_Addr_Hi" table
-;
 
 ;***************************************************************************
 ;** Need to investigate the Line Address HI for Software switchable 40/80 **
-;** and how it integrates into the line linking routines                  ** 
+;** and how it integrates into the line linking routines                  **
 ;***************************************************************************
 
-!IF CODEBASE=0 {
+!IF CODEBASE =0 {
 
-Line_Addr_Hi2	!byte $80,$80,$80,$80,$80,$80,$80,$81,$81,$81
+	!IF SS40=0 {
+Line_Addr_Hi2
+		!byte $80,$80,$80,$80,$80,$80,$80,$81,$81,$81
 		!byte $81,$81,$81,$82,$82,$82,$82,$82,$82,$82
 		!byte $83,$83,$83,$83,$83
-!if ROWS>25 {	!byte $83,$84,$84,$84,$84,$84,$84,$85,$85,$85 }
-
+!IF ROWS>25 {	!byte $83,$84,$84,$84,$84,$84,$84,$85,$85,$85 }
+	}
 }

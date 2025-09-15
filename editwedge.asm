@@ -1,5 +1,5 @@
-; PET/CBM EDIT ROM - Wedge
-; ================
+; PET/CBM Editor ROM Project - DOS Wedge
+; ==========================   EDITWEDGE.ASM
 ;
 ; Based on Commodore's universal wedge taken from 8050's test/demo disk
 ; but rewritten and enhanced by Nils Eilers
@@ -10,7 +10,7 @@
 ;       the editrom code runs before basic and zero-page are initialized.
 ;
 ;----------------------------------------------------------------------------------------
-; Wedge commands are only available in direct mode. 
+; Wedge commands are only available in direct mode.
 ;
 ; #<unit number> 	- sets the default drive. Without unit number shows the current default drive.
 ; @$[[drive]:filename] 	- displays the disk's directory. SPACE=Pause, any other key to continue. STOP=Abort.
@@ -20,7 +20,7 @@
 ; /filename		- Loads a program.
 ; ^filename		- Loads and runs a file ("^" is up arrow, NOT "carat")
 ; @			- Read disk status. Without any parameters reads and displays the disk drive error message channel.
-; @<string>		- Sends <string> to the device's command channel. 
+; @<string>		- Sends <string> to the device's command channel.
 ;				@C:newfile=existingfile	- Copy a file on the same diskette
 ;				@I 			- Initialize the disk drive.
 ;				@N:diskname		- New a disk that was already formatted
@@ -47,16 +47,16 @@ INSTALL_WEDGE
 		lda #8				; init default device
 		sta CHRGETX			; $73=unused byte in CHRGET
 
-!if WEDGEMSG=1 {
+!IF WEDGEMSG=1 {
 		lda #<WEDGESTRING		; write "wedge installed"
 		ldy #>WEDGESTRING
 		jsr STROUTZ
-}	
+}
 		rts				; exit to BASIC
 
 ;-------------- MESSAGE
 WEDGESTRING
-!if WEDGEMSG=1 {
+!IF WEDGEMSG=1 {
 		!pet "wedge installed"		; message
 		!byte 0				; extra 0 padding
 }
@@ -68,15 +68,15 @@ resident_wedge
 		wedge_unit = CHRGETX		; default device, unused byte in CHRGET
 		wedge_char = SAVELA		; $B3 -0 if @># else load/run char / ^
 
-		inc TXTPTR			; increment text pointer 
+		inc TXTPTR			; increment text pointer
 		bne MAIN2
 		inc TXTPTR + 1
-MAIN2 
+MAIN2
 
 ; if MAINS is stacked, CHRGET is called from direct mode. abort if not called from there
 
 		stx wedge_char			; save X
-		tsx 
+		tsx
 		lda STACK+1,x
 		cmp #<MAINS
 		bne restabort
@@ -118,7 +118,7 @@ abort		jmp CHRGOT
 ;-------------- COMMAND OR STATUS
 
 command_or_status
-		iny 
+		iny
 		lda (TXTPTR),y
 		beq get_status
 		cmp #'$'			; '$'
@@ -139,7 +139,7 @@ default_device
 		jmp READY
 
 set_device
-		; prerequsites for RDINT: 
+		; prerequsites for RDINT:
 		; - TXTPTR $77/$78 point to first char
 		; - A contains that first char
 		; - Carry is cleared
@@ -149,23 +149,23 @@ set_device
 		lda LINNUM			; LSB of converted number
 		sta wedge_unit
 		jmp READY
-	
+
 ;-------------- SEND COMMAND
 
 send_cmd	lda wedge_unit
 		sta FA
 		lda #$6f			; DATA SA 15
 		sta SA
-		jsr LISTN			; LISTEN 
+		jsr LISTN			; LISTEN
 		lda SA
 		jsr SECND			; send secondary address
 
 SENDCMD2	inc TXTPTR
-		ldy #0			
+		ldy #0
 		lda (TXTPTR),y
-		beq SENDCMDDONE	
+		beq SENDCMDDONE
 		jsr CIOUT			; send char to IEEE
-		clv 
+		clv
 		bvc SENDCMD2			; branch always
 
 SENDCMDDONE	jsr UNLSN
@@ -174,7 +174,7 @@ SENDCMDDONE	jsr UNLSN
 
 ;-------------- Relative Branch forwarder
 
-to_prepare_fn:	beq prepare_fn		
+to_prepare_fn:	beq prepare_fn
 
 ;-------------- GET STATUS
 
@@ -187,10 +187,10 @@ get_status	sty TXTPTR
 		jsr SECND			; send secondary address
 
 GS_NEXTCHAR	jsr ACPTR			; read byte from IEEE bus
-		cmp #$0D			; last byte = CR?		
+		cmp #$0D			; last byte = CR?
 		beq GS_DONE
 		jsr SCROUT			; write char to screen
-		clv 
+		clv
 		bvc GS_NEXTCHAR			; branch always
 
 GS_DONE		jsr SCROUT			; write char to screen
@@ -210,7 +210,7 @@ prepare_fn
 handle_quote	lda wedge_char
 		bmi end_name
 		ora #$80
-		sta wedge_char 
+		sta wedge_char
 		tya
 		ldy #0
 		clc
@@ -220,7 +220,7 @@ handle_quote	lda wedge_char
 		inc TXTPTR+1
 		bne prepare_fn
 
-end_name	dey 
+end_name	dey
 		sty FNLEN			; store length
 		ldx TXTPTR
 		inx
@@ -257,7 +257,7 @@ list_blocks
 		ldy STATUS
 		bne to_stoplisting
 		ldy FNLEN
-		dey 
+		dey
 		bne list_blocks
 		ldx MEMUSS
 		lda MEMUSS + 1
@@ -305,8 +305,8 @@ newline		lda #$0D			; <CR>
 
 stoplisting	jsr CLSEI			; close file with $E0, unlisten
 
-		pla 
-		pla 
+		pla
+		pla
 		jmp READY			; BASIC warm start
 
 ;-------------- LOAD / RUN
@@ -339,4 +339,3 @@ startprg	jsr STXTPT			; reset TXTPTR
 		jmp NEWSTT			; RUN
 
 loaderr		jmp FILENOTFOUND		; FILE NOT FOUND, return to basic
-

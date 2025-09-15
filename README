@@ -1,24 +1,40 @@
-PET/CBM EDIT ROM PROJECT - Steve J. Gray - Started Nov 26, 2013
-======================== - Updated - Apr 26, 2022
+PET/CBM EDIT ROM PROJECT - Steve J. Gray - Started: 2013-11-26 (Nov 26, 2013)
+======================================== - Updated: 2025-09-11
 
 This project will allow you to build various EDIT ROMS for the Commodore PET/CBM line of computers.
 
+FOLDERS:
+
+\binaries       - Collections of binary files. See README(s) for info.
+\config-cbmrom  - Config files for original CBM binaries.
+\config-custom  - Config files for your Builds.
+\disassemblies  - Disassemblies of original Edit ROMs and other related code.
+\docs           - Related info
+\software       - Support software and disk images
+
 FILES:
 
-make.bat	- Type "make" to assemble with options set in "edit.asm" file
+!*.asm		- Config files. Replaces "edit.asm" file so you can have multiple settings files.
 
-edit.asm	- The "main" source file. Contains directives to choose which options to include/use.
+make.bat	- Type "make" to assemble A CUSTOM editor rom using "!custom.asm" settings file.
+maker.bat	- As above but also make a report file.
+makecbm.bat     - Builds specific CBM binary version by filename, and verifies match to original.
+makecbmrom.bat  - Builds specific CBM binary by CBMROM number, and verifies match to original.
 
 editrom.asm	- Logic to assemble code in LOWER 2K area and determine if HI area is required.
-edit_hi.asm	- Logic to assemble code in UPPER 2K area, including IO area.
-editrom40.asm	- CODEBASE 0 - 40 column, 2K ROM
-editrom80.asm   - CODEBASE 1 - 80 column, 2K ROM
-editrom82.asm   - CODEBASE 2 - LOWER area. 80 column, 4K ROM, DIN editor
+
+editrom40.asm	- CODEBASE 0 - 40 column, 2K ROM.
+editrom80.asm   - CODEBASE 1 - 80 column, 2K ROM.
+editrom82.asm   - CODEBASE 2 - LOWER area. 80 column, 4K ROM, DIN editor.
 editrom82ext.asm- CODEBASE 2 - UPPER area.
 
-ext*		- Code for CODEBASE 2's upper 2K of 4K (subsections)
+edit40hi.asm	- Logic to assemble CODEBASE 0 to UPPER 2K area, including IO area.
+edit80hi.asm	- Logic to assemble CODEBASE 1 to UPPER 2K area, including IO area.
+edit82hi.asm	- Logic to assemble CODEBASE 2 to UPPER 2K area, including IO area.
+
+ext*		- Code for CODEBASE 2 extended code in UPPER 2K area (subsections).
 crt*		- Files to define screen settings. Written to CRTC controller chip.
-kbd*		- Files to define keyboard matrix for simple keyboard scanning routine.
-kbdx*		- Keyboard matrices for extended keyboard scanning routine.
-screen*		- Screen line pointer tables for 40/80 column screens
-mem*		- Standard PET/CBM memory usage includes - zero page, low mem, and chips etc
+keyscan         - Keyboard scanning code.
+keyboard-*	- Keyboard matrix tables.
+screen*		- Screen line pointer tables for 40/80 column screens.
+mem*		- Standard PET/CBM memory usage includes - zero page, low mem, and chips etc.

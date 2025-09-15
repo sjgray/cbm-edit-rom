@@ -1,10 +1,11 @@
-; PET/CBM EDIT ROM - C64/VIC Keyboard scanning routines
-; ===================
-; VIC20 routines originally Provided by Edilbert Kirk
-; Adapted from/to PET by Andre Fachat
+; PET/CBM Editor ROM Project - Keyboard Scanner - C64/VIC Keyboards
+; ==========================   KEYSCAN-C64.ASM
 ;
-; NOTE: C64 tables were removed in favour of VIC tables
-;--------------------------------------------------------------
+; VIC20 routines originally Provided by Edilbert Kirk. Adapted from/to PET by Andre Fachat
+;
+; NOTE:	C64 tables were removed in favour of VIC tables
+;	This code is too big for normal EDITROM space and must be relocated to EXT space!
+;----------------------------------------------------------------------------------------
 
                      ; Vic 20 keyboard matrix layout
                      ;       c7   c6   c5   c4   c3   c2   c1   c0
@@ -21,7 +22,7 @@
 ; Note: for the PET keyboard scan routine, the table needs to be transposed.
 
 ; KEYFLAGS
-; 
+;
 ; This flag signals which of the SHIFT, CTRL, or C= keys are currently
 ; being pressed.
 
@@ -124,9 +125,9 @@ SCAN_GOT
                 CMP #$ff
                 BEQ DECODE_DONE
                 LDY KEYFLAGS
-                CLC                     
+                CLC
                 ADC KBD_Decode_Pointer,Y ; Load base address for keytable (as offset to KBD_NORMAL)
-                TAX                     
+                TAX
                 ; could do LDA KBD_Page_Indicator,Y:BNE NOT_KBD_NORMAL to change which base to use for index in X
                 LDA KBD_NORMAL,x
 
@@ -191,7 +192,7 @@ SCAN_REC        STA KEYPRESSED          ; Current Key Pressed: 255 = No Key
                 JSR TestBackArrow       ; Patch/Hack to use SHIFT-BACKARROW as screen mode toggle (text/graphic)
 }
 
-!if KEYBOARD != 1 {
+!IF KEYBOARD != 1 {
 ;               Compensate for STOP key not in standard position
                 CMP #3                  ; Is keycode "3" (STOP key)?
                 BNE SCAN_OUT
@@ -210,10 +211,10 @@ SCAN_OUT        RTS
                 !BYTE $00   	                ; unshifted
                 !BYTE KBD_SHIFTED-KBD_NORMAL    ; shifted
                 !BYTE KBD_CBMKEY-KBD_NORMAL     ; CBM
-                !BYTE KBD_CBMSHIFT-KBD_NORMAL   ; CBM+Shift 
+                !BYTE KBD_CBMSHIFT-KBD_NORMAL   ; CBM+Shift
                 !BYTE KBD_CONTROL-KBD_NORMAL    ; Ctrl
-                !BYTE KBD_CTRLSHIFT-KBD_NORMAL  ; Ctrl+Shift 
-                !BYTE KBD_CTRLCBM-KBD_NORMAL    ; Ctrl+CBM 
+                !BYTE KBD_CTRLSHIFT-KBD_NORMAL  ; Ctrl+Shift
+                !BYTE KBD_CTRLCBM-KBD_NORMAL    ; Ctrl+CBM
                 !BYTE KBD_CTRLCBMSHIFT-KBD_NORMAL ; Ctrl+shift+CBM (ctrl table)
 ;
 ;********** Vic 20 keyboard matrix layout
@@ -236,5 +237,3 @@ SCAN_OUT        RTS
 ;--------------------------------------------------
 ; see keyboard-tables3.asm for the actual mappings
 ;--------------------------------------------------
-
-

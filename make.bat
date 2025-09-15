@@ -1,2 +1,4 @@
-@rem pet/cbm edit roms - assembler directives are at the top of "edit.asm"... change as needed
-acme -r editrom-report.txt editrom.asm 
+@echo off
+rem MAKE.BAT - will build a binary using "!custom.asm".
+echo Building custom binary...
+acme config-custom\!custom.asm 

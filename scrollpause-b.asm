@@ -1,6 +1,6 @@
-; PET/CBM EDIT ROM - Scroll Pause/Resume Control - B
-; ================
-
+; PET/CBM Editor ROM Project - Scroll Pause/Resume Control - B
+; ==========================   SCROLLPAUSE-B.ASM
+;
 ;--------------- Check Keyboard Scroll Control
 
 iE40B		LDA PIA1_Port_B		; PIA#1, Register 2 - Keyboard COL input

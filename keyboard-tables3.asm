@@ -1,17 +1,17 @@
-; PET/CBM EDIT ROM - Keyboard Matrix Tables for KEYSCAN-C64 scanner code
-; ================
+; PET/CBM Editor ROM Project - Keyboard Matrix Tables for KEYSCAN-C64 scanner code
+; ==========================   KEYBOARD-TABLES3.ASM
 ; 
 ; The C64 Keyboard scanner requires eight keyboard matrix tables:
-; 1) Normal (un-shifted)
-; 2) Shifted
-; 3) with CBM key
-; 4) CBM + shift
-; 5) Ctrl
-; 6) Ctrl + shift
-; 7) Ctrl + CBM
-; 8) Ctrl + CBM + shift
+; 	1) Normal (un-shifted)
+; 	2) Shifted
+; 	3) with CBM key
+; 	4) CBM + shift
+; 	5) Ctrl
+; 	6) Ctrl + shift
+; 	7) Ctrl + CBM
+; 	8) Ctrl + CBM + shift
 ;
-; note that same may be pointing to the same table
+; NOTE: Some may point to the same table
 ;
 ; Also, for the C64 scanner, all tables must fit into a 1 page 
 ; area (256 consecutive bytes), or code changes are required

@@ -188,7 +188,7 @@ $E06B: A0 00     LDY #0         ; ROW 0, COL 0
 $E06D: 84 C6     STY PNTR   	; Set Cursor Column on Current Line
 $E06F: 84 D8     STY TBLX   	; Set Current Cursor ROW
 
-!IF COLOURPET+COLOURMIN >0 { JSR CP_SyncPointers }
+!IF COLOURPET+COLOURMIN >0 { JSR ColourPET_SyncPointers }
 
 
 ;===============================================================================

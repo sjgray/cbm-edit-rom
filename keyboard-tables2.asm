@@ -1,5 +1,5 @@
-; PET/CBM EDIT ROM - Keyboard Matrix Tables for KEYSCAN-DIN scanner code
-; ================
+; PET/CBM Editor ROM Project - Keyboard Matrix Tables for KEYSCAN-DIN scanner code 
+; ==========================   KEYBOARD-TABLES2.ASM
 ; 
 ; Notes: 00 = Shift or CTRL, 10 = Repeat, +80 = Unshiftable , FF   = No Key
 ;        KP = Keypad, S- = Shift , GR- = Graphic Code, NONE = No Key

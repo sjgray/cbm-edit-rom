@@ -1,11 +1,13 @@
-; PET/CBM EDIT ROM - Micro-PET Extensions (C)2021 Andre Fachat
-; ================
+; PET/CBM Editor ROM Project - Micro-PET Extensions (C)2021 Andre Fachat
+; ==========================
+;
 ; Editor-ROM extensions for the Ultra-PET/Micro-PET:
 ; 
 ; Currently only a hook into the Soft Reboot is used, to get to the Micro-PET
 ; Boot screen, where the actual type of PET can be selected.
 ;
 ; Some future extensions could be graphics options menu, or a speed selector
+;=====================================================================================
 
 !IF KEYRESET=1 {
 

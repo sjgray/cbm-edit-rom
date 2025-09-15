@@ -1,0 +1,36 @@
+PET/CBM EDIT ROM PROJECT - TODO List
+======================== - TODO.TZT  - Updated 2025-09-08
+
+- Continue to add memory variable descriptions (see Commodore's CBM-II source for 'official' labels)
+- Analyze extended keyboard scanning routine. Have special codes been modified?
+- Document added screen codes for character set switching
+
+- Update extended keyboard matrix tables
+	- SHIFT tables need fixing (except for DIN, which is the template)
+	- Do we need to add additional tables for "C=" (Commodore Key)?
+
+- ColourPET features:
+	- Some ESC codes not working.
+	- Some C128 colour codes conflict with PET/CBM codes (ie: SHIFT-ESC)
+	- ColourPET uses ZP variables in TAPE area. Do not use TAPE with ColourPET or find alternate storage locations.
+
+- CBM-II keyboard support will require hardware modification.
+- Sort out DIN keyboard matrix variations.
+
+- Investigate CRTC parameters for use with RGB/CGA to VGA adapters. Herv  connected his PET to a
+  GB8220 board and says the sync width needs adjusting to get a stable picture. His 8032 CRTC
+  is initialized with the following registers: 63,40,53,33,33,7,25,32,0,8
+
+NOTE:
+      Colour RAM has been relocated to $8800 and hardware will be updated so that 40/80 columns
+      can be supported with fixed colour ram locations
+
+Requests:
+---------
+
+- Toggle internal/external monitor settings. Hardware control for internal monitor shutoff
+
+
+Bugs:
+-----
+- When scrolling a window (using ESC-T for Top) it also scrolls the first character on the line (outside the window)

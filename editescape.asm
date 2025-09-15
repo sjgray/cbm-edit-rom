@@ -1,20 +1,26 @@
-; PET/CBM EDIT ROM - Code to check for ESC Sequence
-; ================
-; Goal is to support as many C128/CBM-II ESC codes as possible
+; PET/CBM Editor ROM Project - Checks for ESC key sequence then dispatch action
+; ==========================   EDITESCAPE.ASM
 ;
+; This is an Extended feature to add ESCAPE codes like in later CBM machine.
+; The goal is to support as many C128/CBM-II ESC codes as possible
 
-;-------------- Check for ESC as LAST character
+;*********************************************************************************************************
+;** Key Handler
+;*********************************************************************************************************
+; All key presses will be checked. We keep track of ESC key presses.
+; - If the previous character was ESC then we process the key as an escape sequence.
 ;
 ; NOTE: We JMP here from EDITROMxx.ASM. Accumulator holds code of CURRENT character
 ;       If we want to continue processing as normal we need to JMP ESC_DONE.
 ;       If we need to modify the action we set DATAX with the new character.
 ;       If we want to skip the rest of the character processing we should JMP IRQ_EPILOG .
+;*********************************************************************************************************
 
 CheckESC	LDX LASTCHAR 		; Previous character printed
 		CPX #$1B		; <ESC>?
 		BEQ ESC_YES		; Yes, process it
 		CMP #$1B		; Is current Chr ESC?
-		BEQ ESC_NOW		; Yes, 
+		BEQ ESC_NOW		; Yes,
 		JMP ESC_DONE		; No, back to normal checking
 
 ;-------------- ESC is current Chr
@@ -60,15 +66,16 @@ DoEscapeCode	AND #$7F		; Strip top bit
 
 DoESCDONE	JMP ESC_DONE
 
-;-------------- Esc Sequence Vectors    (*=changed from C128)
+;*********************************************************************************************************
+;** ESC Sequence Vectors    (*=changed from C128)
+;*********************************************************************************************************
+; COLOURPET ESC Codes: ESC 0 to 9 plus :;<=>?
+; Set Colour to specified value (0 to 15).
 
 ESCVECTORS
 
-;--------------- COLOURPET ESC Codes: ESC 0 to 9 plus :;<=>?
-;                Set Colour to specified value (0 to 15).
-;
-!IF (COLOURPET=1) OR (VIDSWITCH=1) {
-  !IF (COLOURPET=1) {
+!IF COLOURPET+VIDSWITCH>0 {
+  !IF COLOURPET=1 {
 		!WORD ESCAPE_NUM-1	; Esc-0 Set Colour to Black
 		!WORD ESCAPE_NUM-1	; Esc-1 Set Colour to Medium Grey
 		!WORD ESCAPE_NUM-1	; Esc-2 Set Colour to Blue
@@ -88,11 +95,11 @@ ESCVECTORS
 } ELSE {
 
 ;--------------- VIDSWITCH ESC Codes: ESC 0 to 9
-;                Sets a specific video mode immediately (and temporarily)
-;                For manually setting the video mode, when testing different
-;                monitors and/or NTSC/PAL composite adapters.
-;                COLOURPET and VIDSWITCH cannot be combined!
-;
+; Sets a specific video mode immediately (and temporarily)
+; For manually setting the video mode, when testing different
+; monitors and/or NTSC/PAL composite adapters.
+;  COLOURPET and VIDSWITCH cannot be combined!
+
 		!WORD ESCAPE_SETVID-1	; Esc-0 Set to Video MODE 0
 		!WORD ESCAPE_VID-1	; Esc-1 Set to Video MODE 1
 		!WORD ESCAPE_VID-1	; Esc-2 Set to Video MODE 2
@@ -111,7 +118,6 @@ ESCVECTORS
 		!WORD NOESCAPE-1	; NONE
   }
 }
-
 ;-------------- Normal ESC Codes
 
 		!WORD ESCAPE_AT-1	; Esc-@ Clear Remainder of Screen
@@ -162,7 +168,7 @@ ESCAPE_M	; Esc-m Scroll Off
 !IF SS40=0 {
 ESCAPE_X	; Esc-x Switch 40/80 Col
 }
-		
+
 !IF INFO=0 {
 ESCAPE_BA	; Esc-Backarrow Display Project info
 }
@@ -180,9 +186,10 @@ ESCAPE_J	; ESC-J Start of Line
 NOESCAPE	JMP IRQ_EPILOG				; Ignore sequence for now
 
 
-;====================================================================================
-; New ESC sequences
-;====================================================================================
+
+;*********************************************************************************************************
+;** New ESC sequences
+;*********************************************************************************************************
 
 ;-------------- ColourPET Colours
 
@@ -221,8 +228,9 @@ ESCVLOOP	LDA VIDMODE0,Y				; Get byte from table at offset Y
 		LDA #0					;
 		JMP IRQ_EPILOG				; Ignore sequence for now
 
-;-------------- VIDEO MODES TABLE
-;
+;*********************************************************************************************************
+;** VIDEO MODES TABLE
+;*********************************************************************************************************
 ; These are CRTC register sets. There are 16 bytes per set to make calculations simpler.
 ; Use ESC+0 to ESC+9 to select a set to configure the CRTC controller.
 ; NOTE: The CRTC registers can be updated using CHR codes 14 and 142 causing the video
@@ -247,7 +255,9 @@ VIDMODE9        !byte 63,40,47,20,36,123,25,32, 0, 7,  0,  0,  0,  0,  0,  0 ; P
 
 }
 
-;------------------------------------------------------------------------------------------------
+;*********************************************************************************************************
+;** ESCAPE BACKARROW - Display Project Info or Font
+;*********************************************************************************************************
 ; ESC-BACKARROW Display Project Info
 
 !IF INFO>0 {
@@ -262,7 +272,7 @@ INFLOOP		TYA				; LOOP[  A=Y
 		BNE INFLOOP			; ] Loop for more
 }
 
-;-------------- DISPLAY PROJECT INFO		
+;-------------- DISPLAY PROJECT INFO
 !IF INFO > 0 {
 		LDA #<INFOSTRING		; point to INFO string
 		LDY #>INFOSTRING
@@ -271,8 +281,9 @@ INFLOOP		TYA				; LOOP[  A=Y
 }
 }
 
-;------------------------------------------------------------------------------------------------
-; ESC-E = Fill BG Colour
+;*********************************************************************************************************
+;** ESCAPE E - Fill BG Colour
+;*********************************************************************************************************
 ; For NormalPET ?
 ; For ColourPET will fill the screen with the current BG colour (ignores window)
 ;               The FG of each character is not changed.
@@ -280,8 +291,8 @@ INFLOOP		TYA				; LOOP[  A=Y
 
 ESCAPE_E
 
-!if COLOURPET=1 {
-		LDA COLOURV
+!IF COLOURPET=1 {
+		LDA ColourV
 		AND #$F0
 		STA TMPZB7
 		LDX #0
@@ -334,17 +345,18 @@ ESCELOOP
 		JMP IRQ_EPILOG
 
 
-;------------------------------------------------------------------------------------------------
-; ESC-F = Flash Screen / Fill FG+BG Colour (was: Cursor Flash)
+;*********************************************************************************************************
+;** ESCAPE F - Flash Screen / Fill FG+BG Colour (was: Cursor Flash)
+;*********************************************************************************************************
 ; For NormalPET this will toggle the REVERSE bit (bit 7) of each character on the screen (ignores window)
 ; For ColourPET this will fill the screen with the current colour FG+BG (ignores window)
 ; Note: This might be changed in the future to work with windows!
 
 ESCAPE_F
 
-!if COLOURPET=1 {
+!IF COLOURPET=1 {
 		LDX #0
-		LDA COLOURV
+		LDA ColourV
 
 ESCFLOOP	STA COLOUR_RAM,X
 		STA COLOUR_RAM+$100,X
@@ -360,7 +372,7 @@ ESCFLOOP	STA COLOUR_RAM,X
 		BNE ESCFLOOP
 }
 
-!if COLOURPET=0 {
+!IF COLOURPET=0 {
 		LDX #0
 ESCFLOOP2
 		LDA SCREEN_RAM,X
@@ -403,39 +415,59 @@ ESCFLOOP2
 }
 		JMP IRQ_EPILOG
 
-;------------------------------------------------------------------------------------------------
-ESCAPE_G						; Esc-g Bell Enable
+;*********************************************************************************************************
+;** ESC+G - Bell Enable
+;*********************************************************************************************************
+
+ESCAPE_G
 		LDA #1
 		STA BELLMODE
 		JMP IRQ_EPILOG
 
-;------------------------------------------------------------------------------------------------
-ESCAPE_H						; Esc-h Bell Disable
+;*********************************************************************************************************
+;** ESC+H - Bell Disable
+;*********************************************************************************************************
+
+ESCAPE_H
 		LDA #0
 		STA BELLMODE
 		JMP IRQ_EPILOG
 
-;------------------------------------------------------------------------------------------------
-ESCAPE_Q						; Esc-q Erase End
-		JSR ERASE_TO_EOL
+;*********************************************************************************************************
+;** ESC-Q - Erase to End of Line
+;*********************************************************************************************************
+
+ESCAPE_Q
+		!IF COLOURPET=0 {JSR ERASE_TO_EOL }
+		!IF COLOURPET>0 {JSR ColourPET_Erase_To_EOL }
 		JMP IRQ_EPILOG
-;------------------------------------------------------------------------------------------------
-ESCAPE_S						; Esc-s Standard Lowercase (was: Block Cursor)
+
+;*********************************************************************************************************
+;** ESC+S - Text Mode
+;*********************************************************************************************************
+; Esc-s Standard Lowercase (was: Block Cursor)
+
+ESCAPE_S
 		JSR CRT_SET_TEXT			; Set Lowercase/Text Mode
 		JMP IRQ_EPILOG
-;------------------------------------------------------------------------------------------------
-ESCAPE_U						; Esc-u Uppercase (was: Underline Cursor - not supported on PET)
+
+;*********************************************************************************************************
+;** ESC+U - Uppercase (Grapics) mode
+;*********************************************************************************************************
+; Esc-u Uppercase (was: Underline Cursor - not supported on PET)
+
+ESCAPE_U
 		JSR CRT_SET_GRAPHICS			; Set Uppercase/Graphics Mode
 		JMP IRQ_EPILOG
 
-;-------------- Copy/Paste functions
-;
+;*********************************************************************************************************
+;** Copy/Paste Functions
+;*********************************************************************************************************
 ; These functions use Tape Buffer#1 to store copied byte(s)
 ; TAPEB1   - Set to "ESC" character to indicate valid Start Marker
 ; TAPEB+1  - Length of string (Max 160 characters)
-; TAPEB+2/3- Pointer to screen marked starting position 
+; TAPEB+2/3- Pointer to screen marked starting position
 ; TAPEB+4..- Buffer
-;
 ; TODO: Add check for buffer start > buffer end !!!!
 
 ;-------------- ESC-[ Mark Start
@@ -449,7 +481,7 @@ ESCAPE_LB
 		STA TAPEB1+1				; Set Buffer Length to zero
 		LDA #27					; Buffer identifier = ESC
 		STA TAPEB1				; Set Buffer identifier
-ESCLB_SET	
+ESCLB_SET
 		LDA ScrPtr+1				; Copy HI byte of line pointer
 		STA TAPEB1+3				; to buffer
 		LDA ScrPtr				; Get LO byte of line pointer
@@ -462,11 +494,11 @@ ESCLB_SKIP	JMP IRQ_EPILOG				; Return
 
 ;--------------- ESC-] Mark End (Copy to buffer)
 
-ESCAPE_RB	
+ESCAPE_RB
 		LDA TAPEB1				; Read Buffer Identifier
 		CMP #27					; is it ESC?
 		BNE ESCRB_EXIT				; No Start Mark, so exit out
-		
+
 ESCRB_INIT
 		LDA TAPEB1+3				; Copy Hi byte of paste buffer pointer
 		STA SAL+1				;   to work pointer
@@ -511,7 +543,7 @@ ESCRB_DONE	STX TAPEB1+1				; Store string length
 ESCRB_EXIT	JMP IRQ_EPILOG				; Return
 
 ;--------------- ESC-UPARROW - Copy from buffer to screen
-ESCAPE_UA	
+ESCAPE_UA
 		LDA TAPEB1				; Read Buffer Identifier
 		CMP #27					; is it ESC?
 		BNE ESCUA_OUT				; No Start Mark, so exit out
@@ -531,13 +563,15 @@ ESCUA_LOOP	LDY #0					; counter
 		INC SAL+1
 		BNE ESCUA_LOOP
 
-ESCUA_OUT	JMP IRQ_EPILOG				; Return		
+ESCUA_OUT	JMP IRQ_EPILOG				; Return
 
 
-;-------------- Eurokey Functions
-;
+;*********************************************************************************************************
+;** Euro Key functions
+;*********************************************************************************************************
 ; These functions SET or CLEAR the EUROFLAG location.
-; A '0' means use ASCII layout. A '1' means use DIN layout (swap Y and Z)
+; 0=ASCII layout
+; 1=DIN layout (swap Y and Z)
 
 ESCAPE_BS	LDA EUROFLAG
 		EOR #1
@@ -563,20 +597,22 @@ EUROSWAP2	CMP #'Y'		; Is it "Y"?
 EUROSWAP_OUT	JMP SCAN_NORM2		; Return to keyboard routine
 
 
-;-------------- Switchable 40/80 column Functions
-;
+;*********************************************************************************************************
+;** Switchable 40/80 column Functions
+;*********************************************************************************************************
 ; When SS40=1, ESC-X switches between 40/80 column mode.
 ; Currently this is done with SOFT40 method where the 80 column screen is
 ; reprogrammed to 40 column by increasing the left and right margins.
-; With future hardware we may be able to switch between REAL 40/80 column mode.
+; With my "Multi-EditROM 40/80" board we can switch between REAL 40/80 column mode.
 
 !IF SS40=1 {
 ESCAPE_X	JSR SS40_SwapModes	; Swap 40/80 Modes
-		JMP IRQ_EPILOG		
+		JMP IRQ_EPILOG
 }
 
-;-------------- CRTC Chip Functions
-;
+;*********************************************************************************************************
+;** CRTC Chip Functions
+;*********************************************************************************************************
 ; CRTC controller REGISTER 12 is used for Screen RAM Address HI
 ; BIT 4 controls the INVERT line     (normal=1,rvs=0)
 ; BIT 5 controls the CHR OPTION line (normal=0,alternate=1)
@@ -587,7 +623,7 @@ ESCAPE_X	JSR SS40_SwapModes	; Swap 40/80 Modes
 
 ESCAPE_N						; ESC-N = Screen Normal
 		JSR CRTPREP
-	!if MOT6845=1 {
+	!IF MOT6845=1 {
 		ORA #%00010000				; Set BIT 4
 	} else {
 		LDA #16					; Normal screen, Normal chr set
@@ -596,7 +632,7 @@ ESCAPE_N						; ESC-N = Screen Normal
 
 ESCAPE_R						; ESC-R = Screen Reverse
 		JSR CRTPREP
-	!if MOT6845=1 {
+	!IF MOT6845=1 {
 		AND #%11101111				; Clear BIT 4
 	} else {
 		LDA #0					; Reverse screen, Normal chr set
@@ -605,16 +641,16 @@ ESCAPE_R						; ESC-R = Screen Reverse
 
 ESCAPE_Y						; ESC-Y = Normal Chr Set    (B-series). Was: Set Default Tabs (C128)
 		JSR CRTPREP
-	!if MOT6845=1 {
+	!IF MOT6845=1 {
 		AND #%11011111				; Clear BIT 5
 	} else {
 		LDA #16					; Normal screen, Normal chr set
 	}
 		JMP CRTUPDATE
-				
+
 ESCAPE_Z						; ESC-Z = Alternate Chr Set (B-Series). Was: Clear All Tabs (C128)
 		JSR CRTPREP
-	!if MOT6845=1 {
+	!IF MOT6845=1 {
 		ORA #%00100000				; Set BIT 5
 	} else {
 		LDA #48					; Normal screen, Alternate chr set
@@ -626,6 +662,6 @@ CRTUPDATE
 
 CRTPREP		SEI
 		LDA #12					; CRTC Register#12 - Display Address HI
-		STA CRT_Address				; Select the Register 
+		STA CRT_Address				; Select the Register
 		LDA CRT_Status				; Read the Value (if CRTC chip is NOT a Motorola6845 then this will not work)
 		RTS

@@ -1,5 +1,5 @@
-; PET/CBM EDIT ROM - Update Screen Pointer
-; ================
+; PET/CBM Editor ROM Project - Update Screen Pointer
+; ==========================   EXTSCREENPTR.ASM
 ;
 ; Calculate screen pointer (ScrPtr) for printing to screen, scrolling etc.
 ; This routine is a replacement for the screen address table and is hardcoded to 80 columns.

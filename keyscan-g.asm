@@ -1,16 +1,16 @@
-; PET/CBM EDIT ROM - Keyboard Scan - Graphic Keyboards
-; ================
-; Standard Graphic Keyboard scanner. Requires one keyboard table.
-; NOTE: Does not handle shifted numerics!
+; PET/CBM Editor ROM Project - Keyboard Scanner - Graphic Keyboards
+; ==========================   KEYSCAN-G.ASM
 ;
+; Standard Graphic Keyboard scanner. Requires one keyboard table.
 ; OPTIONS: KEYBOARD=7 modifies scanner for CBM-II keyboard (16x6 matrix)
-
+; NOTE: Does not handle shifted numerics!
+;       ROW select is reset to zero in IRQ routine.
+;
 ;--------------- Scan Keyboard (scnkey)
-; NOTE: The keyboard ROW select is reset to zero in IRQ routine
 
 SCAN_KEYBOARD				; [$E4BF]
 
-;!if DEBUG = 1 { INC DBLINE+5 }		; DEBUG - 6th character on top line
+;!IF DEBUG = 1 { INC DBLINE+5 }		; DEBUG - 6th character on top line
 
 		LDY #$FF		; No Key
 		STY Key_Image		; Key Image
@@ -134,7 +134,7 @@ SCAN_REC	STA KEYPRESSED		; Current Key Pressed: 255 = No Key
 		CMP #$FF		; No Key?
  		BEQ SCAN_OUT		; Yes, exit
 
-		!if CRUNCH=0 {
+		!IF CRUNCH=0 {
 			NOP		; These NOPs are here to remove the code
 			NOP		; used to handle SHIFTED number keys.
 			NOP		; It appears the Business Keyboard scanner (80-column machines)
@@ -145,7 +145,7 @@ SCAN_REC	STA KEYPRESSED		; Current Key Pressed: 255 = No Key
 		}
     		LSR KEYFLAGS		;Flag: Print Shifted Chars.
     		BCC SCAN_NORM		;l_e57a
-		!if CRUNCH=0 {
+		!IF CRUNCH=0 {
 			NOP		; See above.
 			NOP
 			NOP

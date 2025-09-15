@@ -1,14 +1,19 @@
-; PET/CBM EDIT ROM - Keyboard Scanner - DIN Stub for lower ROM
-; ================
-; Requires "extkeyscan.asm"
-; TODO: Remame labels? OLD?
+; PET/CBM Editor ROM Project - Keyboard Scanner - DIN Keyboards (STUB)
+; ==========================   KEYSCAN-DIN.ASM
+;
+; Requires "extkeyscan.asm"! which requires TWO keyboard tables.
+; OPTIONS: None
+; This is a STUB routine that goes in the normal EDITROM location
+; and then calls a the enhanced DIN keyboard code in HI EDITROM area.
+;
+;---------------------------------------------------------------------------------------
 
-OLD_SCAN_KEYBOARD
+SCAN_KEYBOARD
            LDA #$ff
            STA Key_Image			; Key Image
            LDA CharsInBuffer
            PHA
-           JSR SCAN_KEYBOARD			; EXTENDED Keyboard scanner in EXTROM
+           JSR SCAN_KEYBOARD_EXT		; EXTENDED Keyboard scanner in EXTROM
            PLA
            CMP CharsInBuffer
            BCC Be4e5

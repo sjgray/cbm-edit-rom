@@ -1,22 +1,22 @@
-; PET/CBM EDIT ROM - CRTC Programming for Text/Graphics Screen Modes
-; ================
+; PET/CBM Editor ROM Project - CRTC Register programming for Text/Graphics Screen Modes
+; ==========================   CRTC.ASM
+;
 ; Programms the CRTC controller chip for various screen timings and Text/Graphic modes.
 ; This code requires two CRTC Register tables - One for Text and one for Graphics modes.
-
 
 ;************** Set Screen to TEXT or GRAPHICS MODE
 ;
 ; TEXT/GRAPHICS mode determines which font is displayed.
 ; - GRAPHICS mode has uppercase and full graphics. Characters take 8 scanlines
 ; - TEXT mode has lower case, upper case and limited graphics. Characters take 10 scanlines (normally)
-; 
+;
 ; OPTIONS: 'EXTENDED' and 'SS40'
 
 ;-------------- Initialize CRTC to TEXT Mode (Called from Jump Table)
 
 CRT_SET_TEXT
 
-!if CODEBASE<2 {
+!IF CODEBASE<2 {
 	!IF SS40=0 {
 		LDA #<CRT_CONFIG_TEXT			; Point to CRTC Table
 		LDX #>CRT_CONFIG_TEXT			; Point to CRTC Table
@@ -30,7 +30,7 @@ CRT_SET_TEXT
 !IF CODEBASE=2 {
 	JMP CRT_SET_TEXT_EXT				; Jump to EXTENDED version (upper rom)
 
-	!if CRUNCH=0 {	
+	!IF CRUNCH=0 {
 		NOP
 		NOP
 		NOP
@@ -43,7 +43,7 @@ CRT_SET_TEXT
 
 CRT_SET_GRAPHICS
 
-!if CODEBASE<2 {
+!IF CODEBASE<2 {
 	!IF SS40=0 {
 		LDA #<CRT_CONFIG_GRAPHICS       	; Point to CRTC Table
 		LDX #>CRT_CONFIG_GRAPHICS       	; Point to CRTC Table
@@ -55,7 +55,7 @@ CRT_SET_GRAPHICS
 !IF CODEBASE=2 {
 	JMP CRT_SET_GRAPHICS_EXT		; Jump to EXTENDED version (upper rom)
 
-	!if CRUNCH=0 {
+	!IF CRUNCH=0 {
 		NOP
 		NOP
 		NOP
@@ -80,7 +80,7 @@ CRT_PROGRAM
 
 		STA SAL					; Pointer LO: Tape Buffer/ Screen Scrolling
 		STX SAL+1				; Pointer HI
-		LDA VIA_PCR				; Get current register byte VIA Register C - CA2	CHIP 
+		LDA VIA_PCR				; Get current register byte VIA Register C - CA2	CHIP
 		AND #$f0				; mask out lower nibble
 		STA FNLEN				; save it to Temp Variable
 		TYA					; Move 'Character Set' byte to A

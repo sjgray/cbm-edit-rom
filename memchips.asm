@@ -1,5 +1,5 @@
-; PET/CBM EDIT ROM - Standard Chip Registers and Screen Ram
-; ================
+; PET/CBM Editor ROM Project - Standard Chip Registers and Screen Ram
+; ==========================   MEMCHIPS.ASM
 
 ;--------------------------- Screen RAM $8000-$8FFF
 

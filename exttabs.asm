@@ -1,9 +1,10 @@
-; PET/CBM EDIT ROM - Extended ROM Code for Tab Stop Table
-; ================
+; PET/CBM Editor ROM Project - Extended ROM Code for Tab Stop Table
+; ==========================   EXTTABS.ASM
+;
 ; This code goes in the upper half of the 4K EDIT ROMS
 
 ;*********************************************************************************************************
 ;** TAB-Stop Table [$EC4B]
 ;*********************************************************************************************************
 
-TABSTOPS   !byte $50,$48,$40,$38,$30,$28,$20,$18,$10,$08
+TABSTOPS        !byte $50,$48,$40,$38,$30,$28,$20,$18,$10,$08

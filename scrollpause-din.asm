@@ -1,5 +1,6 @@
-; PET/CBM EDIT ROM - Scroll Pause/Resume Control - DIN
-; ================
+; PET/CBM Editor ROM Project - Scroll Pause/Resume Control - DIN
+; ==========================   SCROLLPAUSE-DIN.ASM
+;
 ; This code looks very different from older ROMS
 
            LDA STKEY					; Key Scan value

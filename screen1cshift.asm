@@ -1,5 +1,5 @@
-; PET/CBM EDIT ROM - Screen line address table - Screen 1 @ $8400 Attributes (colour)
-; ================
+; PET/CBM Editor ROM Project - CODEBASE 0 - Screen line address tables - Screen 1 @ $8400 Attributes (colour)
+; ==========================   SCREEN1CSHIFT.ASM
 ;
 ; These tables are used to calculate the starting address of each line on the screen
 ; These tables are shifted one byte to correct for colour shift in ColourPET BETA design,

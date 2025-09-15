@@ -1,3 +1,6 @@
+; PET/CBM Editor ROM Project - CODEBASE 0 - Clearscreen Routine
+; ==========================   EDITROM40LINK.ASM
+
 ;*********************************************************************************************************
 ;** LINKLINES [$E1B3]
 ;** These routines are for 40-column line linking. When a character is printed to

@@ -1,12 +1,12 @@
-; PET/CBM EDIT ROM - Jiffy Clock Timer Fix
-; ================
+; PET/CBM Editor ROM Project - Jiffy Clock Timer Fix
+; ==========================   JIFFYFIX.ASM
 
 ;************** Correct Jiffy Clock Timer
 ; Patch for 50 Hz
 ; TODO: Analyze JIFFY CLOCK differences from older ROMs
 ; TODO: make selectable
 
-!if CODEBASE<2 {
+!IF CODEBASE<2 {
 ADVANCE_TIMER
 		JSR UDTIME			; Update System Jiffy Clock. KERNAL routine $FFEA
 		INC JIFFY6DIV5			; Counter to speed TI by 6/5

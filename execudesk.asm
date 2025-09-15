@@ -1,5 +1,6 @@
-; PET/CBM EDIT ROM - EXECUDESK 
-; ================
+; PET/CBM Editor ROM - EXECUDESK Menu System
+; ==================   EXECUDESK.ASM
+;
 ; Execudesk is a power-on menu system originally released for 8296 machines, but will work on any 4000/8000 model.
 ; NOTE: The Execudesk menu requires that the machine boot to TEXT mode!
 ;
@@ -28,14 +29,14 @@ IRQ_EDESK
 
 EDSTRING1	!byte $93,$12				; <CLS><RVS>
 		!text "             "
-!if COLUMNS=80 {!text "                   " }
-		!byte $C5,$D8,$C5,$C3,$D5,$20		; <SHIFT>"EXECU 
+!IF COLUMNS=80 {!text "                   " }
+		!byte $C5,$D8,$C5,$C3,$D5,$20		; <SHIFT>"EXECU
 		!byte $2D,$20,$C4,$C5,$D3,$CB		; - DESK"
 		!text "               "
-!if COLUMNS=80 {!text "                    " }
+!IF COLUMNS=80 {!text "                    " }
 
 		!byte $0D,$0D,$0D			; <CR>
-!if COLUMNS=80 {!text "           " }
+!IF COLUMNS=80 {!text "           " }
 		!byte $12,$20,$31,$20,$92		; <RVS> 1 <RVSOFF>
 		!text "      "
 		!byte $D7				; SHIFT-W
@@ -44,7 +45,7 @@ EDSTRING1	!byte $93,$12				; <CLS><RVS>
 		!text "ROCESSOR"
 		!byte $0D,$0D
 
-!if COLUMNS=80 {!text "           " }
+!IF COLUMNS=80 {!text "           " }
 		!byte $12,$20,$32,$20,$92		; <RVS> 2 <RVSOFF>
 		!text "      "
 		!byte $D3				; SHIFT-S
@@ -53,7 +54,7 @@ EDSTRING1	!byte $93,$12				; <CLS><RVS>
 		!text "HEET"
 		!byte $0D,$0D
 
-!if COLUMNS=80 {!text "           " }
+!IF COLUMNS=80 {!text "           " }
 		!byte $12,$20,$33,$20,$92		; <RVS> 3 <RVSOFF>
 		!text "      "
 		!byte $C4				; SHIFT-D
@@ -68,7 +69,7 @@ EDSTRING1	!byte $93,$12				; <CLS><RVS>
 ;--------------- STRING
 
 EDSTRING2
-!if COLUMNS=80 {!text "           " }
+!IF COLUMNS=80 {!text "           " }
 		!byte $12,$20,$34,$20,$92		; <RVS> 4 <RVSOFF>
 		!text "      "
 		!byte $C6				; SHIFT-F
@@ -77,7 +78,7 @@ EDSTRING2
 		!text "ALCULATIONS"
 		!byte $0D,$0D
 
-!if COLUMNS=80 {!text "           " }
+!IF COLUMNS=80 {!text "           " }
 		!byte $12,$20,$35,$20,$92		; <RVS> 5 <RVSOFF>
 		!text "      "
 		!byte $D4				; SHIFT-T
@@ -86,7 +87,7 @@ EDSTRING2
 		!text "OMMUNICATIONS"
 		!byte $0D,$0D
 
-!if COLUMNS=80 {!text "           " }
+!IF COLUMNS=80 {!text "           " }
 		!byte $12,$20,$36,$20,$92		; <RVS> 6 <RVSOFF>
 		!text "      "
 		!byte $D3				; SHIFT-S
@@ -99,7 +100,7 @@ EDSTRING2
 ;--------------- STRING
 
 EDSTRING3
-!if COLUMNS=80 {!text "           "}
+!IF COLUMNS=80 {!text "           "}
 		!byte $12,$20,$37,$20,$92		; <RVS> 7 <RVSOFF>
 		!text "      "
 		!byte $D3				; SHIFT-S
@@ -110,7 +111,7 @@ EDSTRING3
 		!text "OWN"
 		!byte $0D,$0D
 
-!if COLUMNS=80 {!text "           "}
+!IF COLUMNS=80 {!text "           "}
 		!byte $12,$20,$38,$20,$92		; <RVS> 8 <RVSOFF>
 		!text "      "
            	!byte $D5				; SHIFT-U
@@ -119,7 +120,7 @@ EDSTRING3
 		!text "OFTWARE"
 		!byte $0D,$0D
 
-!if COLUMNS=80 {!text "           "}
+!IF COLUMNS=80 {!text "           "}
 		!byte $12,$20,$39,$20,$92		; <RVS> 9 <RVSOFF>
 		!text "      "
 		!byte $C5				; SHIFT-E
@@ -133,7 +134,7 @@ EDSTRING3
 
 EDSTRING4	!byte $0D,$12				; <RVS>
 		!text "         "
-!if COLUMNS=80 {!text "                 "}
+!IF COLUMNS=80 {!text "                 "}
 		!byte $D0				; SHIFT-P
 		!text "RESS "
 		!byte $D3				; SHIFT-S
@@ -141,7 +142,7 @@ EDSTRING4	!byte $0D,$12				; <RVS>
 		!byte $C1				; SHIFT-A
 		!text "BOVE"
 		!text "          "
-!if COLUMNS=80 {!text "                     "}
+!IF COLUMNS=80 {!text "                     "}
 		!byte $92				; <RVSOFF>
 		!byte 0
 
@@ -150,7 +151,7 @@ EDSTRING4	!byte $0D,$12				; <RVS>
 EDSTRING5	!byte $93				; <CLS>
 		!byte $11,$11,$11,$11,$11,$11,$11,$11,$11,$11
 		!text "           "
-!if COLUMNS=80 {!text "           "}
+!IF COLUMNS=80 {!text "           "}
 		!byte $12,$20,$D0			; <RVS> SHIFT-P
 		!text "ROGRAM NOT FOUND ON DISK "
 		!byte $0D
@@ -160,7 +161,7 @@ EDSTRING5	!byte $93				; <CLS>
 
 EDSTRING6	!byte $11				; <DOWN>
 		!text "           "
-!if COLUMNS=80 {!text "           "}
+!IF COLUMNS=80 {!text "           "}
 		!byte $12,$20,$D3			; <RVS> SHIFT-S
 		!text "TRIKE ANY KEY TO TRY AGAIN "
 		!byte $0D
@@ -171,7 +172,7 @@ EDSTRING6	!byte $11				; <DOWN>
 EDSTRING7	!byte $93					; <CLS>
 		!byte $11,$11,$11,$11,$11,$11,$11,$11,$11,$11	; <DOWN>
 		!text "           "
-!if COLUMNS=80 {!text "           "}
+!IF COLUMNS=80 {!text "           "}
 	        !byte $12,$20,$C4				; <RVS> SHIFT-D
 		!text "ISK DRIVE NOT CONNECTED "
 		!byte $0D
@@ -237,7 +238,7 @@ ED_MOMENT	!byte $93					; <CLS>
 
 !IF EXECUDESK=1 {
 
-;--------------- New IRQ Handler entry point. 
+;--------------- New IRQ Handler entry point.
 ;
 ; This IRQ handler checks for an "*" at the top of the screen, indicating that the computer has booted.
 ; (ie: the "*** COMMODORE BASIC..." message is starting to print.)

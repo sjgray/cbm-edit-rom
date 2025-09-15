@@ -1,16 +1,14 @@
-; PET/CBM EDIT ROM - Auto Run
-; ================
+; PET/CBM Editor ROM Project - Auto-Run Dispatch
+; ==========================   EDITAUTORUN.ASM
 ;
 ; This module controls auto running tasks after PET has booted. It does this by
 ; stuffing the keyboard buffer with a SYS command. We need to do this because
 ; the editrom code runs before basic and zero-page are initialized.
-;
 ; The SYS command will automatically be erased.
-;
+
 ;-------------- Autostart Dispatch
 ; This should assemble to the $E900,$9000, or $A000 depending on OPTROM setting.
-; The SYS points to here.
-; We check options to see what needs to Auto Run.
+; The SYS points to here. We check options to see what needs to Auto Run.
 
 AUTODISPATCH
 		JSR ERASE_SYS
@@ -63,7 +61,7 @@ AUTO_LOOP	LDA AUTO_SYS,X			; Get a key from table
 		BPL AUTO_LOOP			; loop until done
 
 		LDA #9				; Length of string
-		STA CharsInBuffer		; Set characters in keyboard buffer 
+		STA CharsInBuffer		; Set characters in keyboard buffer
 AUTO_DONE	RTS
 
 ;-------------- TEXT to stuff into keyboard buffer

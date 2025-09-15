@@ -1,5 +1,6 @@
-; PET/CBM EDIT ROM - Screen line LO address table - Screen 1 @ $8000 Video (characters)
-; ================   For CODEBASE 0
+; PET/CBM Editor ROM Project - CODEBASE 0 - Screen line LO address table - Screen 1 @ $8000 Video (characters)
+; ==========================   SCREEN0V.ASM
+;
 ; Variables: ROWS,COLUMNS
 ; These tables are used to calculate the starting address of each line on the screen.
 ; The standard screens are 40x25 and 80x25. Experimental screens can be up to 90x35.

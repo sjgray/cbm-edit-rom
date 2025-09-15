@@ -1,13 +1,15 @@
-; PET/CBM EDIT ROM - Soft Reboot (C)2013-2025 Steve J. Gray
-; ================
+; PET/CBM Editor ROM Project - Soft Reboot via keyboard
+; ==========================   EDITREBOOT.ASM
+;
 ; Soft Reboot - Hold down a combination of keys to reset the computer.
 ; The RebootCodes table holds 10 or 16 values, one for each keyboard ROW. All
 ; values must match to trigger the reset. Note the values are RAW Keyboard
 ; column bits NOT PETSCII. When a key is DOWN the bit in that column is ZERO.
-; IE, $FF means NO keys are down. Do not fill table with all $FF's or the 
+; IE, $FF means NO keys are down. Do not fill table with all $FF's or the
 ; machine will reboot constantly.
 ;
 ; OPTIONS: KEYBOARD selects reboot matrix
+;*********************************************************************************************************
 
 CheckReboot	; NOTE: We are scanning the matrix in REVERSE compared to EDITROM
 		!IF KEYBOARD=8 {
@@ -44,7 +46,7 @@ CheckOut
 
 RebootCodes
 ;		----------------- Normal/Graphic Keyboard: @-SHIFT-SHIFT-DEL
-!if (KEYBOARD=0) OR (KEYBOARD=5) OR (KEYBOARD=9) {
+!IF (KEYBOARD=0) OR (KEYBOARD=5) OR (KEYBOARD=9) {
 		!byte %11111111	; ROW 9 - No keys
 		!byte %01111111	; ROW 8 - <DEL>
 		!byte %11111111	; ROW 7 - No keys
@@ -58,7 +60,7 @@ RebootCodes
 }
 
 ;		----------------- Business Keyboard: ESC-SHIFT-SHIFT-DEL
-!if (KEYBOARD=1) OR (KEYBOARD=4) OR (KEYBOARD=6) OR (KEYBOARD=7) {
+!IF (KEYBOARD=1) OR (KEYBOARD=4) OR (KEYBOARD=6) OR (KEYBOARD=7) {
 		!byte %11111111	; ROW 9
 		!byte %11111111	; ROW 8
 		!byte %10111110	; ROW 7 - (ghost), ESC
@@ -72,7 +74,7 @@ RebootCodes
 }
 
 ;		----------------- DIN Keyboard: ESC-SHIFT-SHIFT-DEL
-!if KEYBOARD=2 { 
+!IF KEYBOARD=2 {
 		!byte %11011111	; ROW 9 - DEL
 		!byte %11111111	; ROW 8
 		!byte %10111110	; ROW 7 - (ghost), ESC
@@ -86,7 +88,7 @@ RebootCodes
 }
 
 ;		--------------- C64 Keyboard: CTRL-SHIFT-SHIFT-DEL
-!if KEYBOARD=3 { 
+!IF KEYBOARD=3 {
 		!byte %01111111	; ROW 9 - DEL
 		!byte %11111111	; ROW 8
 		!byte %11111110	; ROW 7 - CTRL
@@ -100,7 +102,7 @@ RebootCodes
 }
 
 ;		--------------- B modified Keyboard: ESC-SHIFT-SHIFT-DEL
-!if KEYBOARD=4 { 
+!IF KEYBOARD=4 {
 		!byte %11111111	; ROW 9
 		!byte %11111111	; ROW 8
 		!byte %11111111	; ROW 7
@@ -116,7 +118,7 @@ RebootCodes
 ;		--------------- CBM-II Keyboard (16 ROWS): ?
 ;		Note: The CBM-II keyboard is 16x6. Two columns are not connected
 ;		TODO: Development is in progress; wiring is TBD
-!if KEYBOARD=8 { 
+!IF KEYBOARD=8 {
 		!byte %11111111	; ROW 15
 		!byte %11111111	; ROW 14
 		!byte %11111111	; ROW 13

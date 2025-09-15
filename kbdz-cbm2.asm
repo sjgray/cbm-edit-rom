@@ -1,5 +1,5 @@
-; PET/CBM EDIT ROM - FUTURE Keyboard Matrix Table
-; ================   CBM-II Keyboard - North American (Standard) Layout
+; PET/CBM Editor ROM Project - FUTURE CBM-II Keyboard Matrix Table (ASCII Layout)
+; ==========================   KBDZ-CBM2.ASM
 ; 
 ; Notes: 00 = Shift , 10 = Repeat, +80 = Unshiftable , FF   = No Key
 ;        KP = Keypad, S- = Shift , GR- = Graphic Code, NONE = No Key

@@ -1,5 +1,6 @@
-; PET/CBM EDIT ROM - ColourPET - Add colour to a standard PET/CBM machine
-; ================
+; PET/CBM Editor ROM Project - ColourPET - Add colour to a standard PET/CBM machine
+; ==========================   MEMCPET.ASM
+;
 ; The EVEN ram is re-defined for use as colour RAM. There are 8 bits (one byte) that corresponds
 ; to each character on the screen. These 8 bits are defined differently according to the hardware.
 ;
@@ -26,8 +27,8 @@
 ;---------------- Zero Page Storage
 ; NOTE: These locations were used for TAPE. Do not use TAPE on ColourPET!!!!!!!!
 
-COLOURPTR	= $C0		; Pointer for screen writes (WAS: Tape Pointer)
-COLOURPTR2	= $C2		; Pointer for scrolling etc (WAS: Tape Pointer)
+ColourPtr	= $C0		; Pointer for screen writes (WAS: Tape Pointer)
+ColourPtr2	= $C2		; Pointer for scrolling etc (WAS: Tape Pointer)
 CURSORCOLOUR    = $ED		; Storage for Colour at Cursor position
 
 ;---------------- Colour Screen RAM

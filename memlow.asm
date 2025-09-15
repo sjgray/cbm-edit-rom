@@ -1,5 +1,5 @@
-; PET/CBM EDIT ROM - Standard Low Mem locations/variables/storage
-; ================
+; PET/CBM Editor ROM Project - Standard Low Mem locations/variables/storage
+; ==========================   MEMLOW.ASM
 
 ;------------------------ Common Usage
 
@@ -27,14 +27,14 @@ DOS_Command_Buffer 	= $0353	;DOS command string buffer (to $0380)
 
 ;------------------------ 40-Column Usage
 
-!IF CODEBASE=0 {
+!IF CODEBASE = 0 {
 DELAY			= $03e9 ;Repeat Key countdown delay 	(40 col)
 KOUNT			= $03ea ;Delay between repeats 		(40 col)
 XMAX			= $03eb ;Max keyboard buffer size 	(40 col)
 CHIME			= $03ec ;Chime Time 0=off 		(40 col)
 JIFFY6DIV5		= $03ed ;TI clock adjust (speed by 6/5) (40 col) Was: TIADJ
 RPTFLG			= $03ee ;Repeat Flag                    (40 col)
-TABS			= $03ef ;TAB-STOP table			(40 col)
+TAB_SET			= $03ef ;TAB-STOP table			(40 col)
 }
 
 ;------------------------ Common Usage

@@ -1,37 +1,14 @@
-; PET/CBM EDIT ROM  - Commented and Adapted by Steve J. Gray, Dec 14, 2015
-; ================    sjgray@rogers.com
+; PET/CBM Editor ROM Project - CODEBASE 1 (8000-series) Main code.
+; ==========================   EDITROM80.ASM
 ;
-; ***** THIS IS 80-COLUMN CODEBASE *****
-; 
 ; This is reverse engineered source code for the EDIT ROMs of the Commodore PET/CBM computers.
 ; The "324243-04" ROM was used as a base as it was (AFAIK) the LAST EDIT ROM that Commodore made
 ; for the PET/CBM line; 8296 computer, 50HZ, 80 column, DIN keyboard, 4K size. Addresses inside
 ; [brackets] are original code addresses. This disassembly is a combination of my own disassembly
 ; plus a disassembly from Edilbert Kirk. Both were adapted by me for use with the ACME assembler.
 ;
-; The EDIT ROM is mapped from $E000 to EFFF (4K). Many Early versions used only $E000-E7FF (2K).
+; The EDIT ROM is mapped from $E000 to $EFFF (4K). Many Early versions used only $E000-$E7FF (2K).
 ; Note that the area from $E800 to $E8FF (256 bytes) is not available due to the I/O chips in this range.
-;
-; PET/CBM machines come in several flavours:
-;    * 40 or 80 column screens
-;    * Normal, Business, or DIN keyboards
-;    * 50 or 60 Hz power frequency
-;    * Specialized options, ie: Execudesk
-;
-; In addition I am adapting the EDIT roms to these additional options:
-;    * ColourPET - My own project to add colour capabilities
-;    * Alternate Keyboards - Such as the VIC/C64 keyboard
-;    * Soft40 - Simulate a 40 column screen on 80 column hardware
-;    * Soft-switchable SOFT40
-;    * Soft-switchable real 40/80 columns (requires hardware mod)
-;    * Extended screen editor - C128 or CBM-II compatible ESC sequences
-;    * Keyboard soft-reset (like CTRL-ALT-DEL on PC's)
-;    * Autoboot from default drive
-;    * DOS Wedge
-;
-; See EDIT.ASM for assemble OPTIONS!
-; Use MAKE.BAT to assemble a binary file with the current options.
-;
 ;-----------------------------------------------------------------------------------------------
 ; BUG!: the 80-column screen editor does not support line-linking. This means that you are
 ;       limited to entering BASIC lines to the maximum width of one screen line.
@@ -39,16 +16,13 @@
 ;       of the window. Take caution when editing BASIC lines inside a window; any line that
 ;       wraps around to the next line will be TRUNCATED if you edit it inside a window!!!!!
 
-;-----------------------------------------------------------------------------------------------
-* = $e000	; Normal start address for EDIT ROM is $E000
-
 ;*********************************************************************************************************
-;** Edit ROM Jump Table  [E000]
+;** EDITOR  [E000]  Edit ROM Jump Table
 ;** Note: Not all KERNAL and BASIC calls go through this table.
 ;** There are FIVE hard-coded entry points: $E0A7, $E116, $E202, $E442, $E600
 ;*********************************************************************************************************
 
-EDITOR		JMP RESET_EDITOR	; [E000] Main Initialization (called from Kernal power up reset at $FD16) 
+EDITOR		JMP RESET_EDITOR	; [E000] Main Initialization (called from Kernal power up reset at $FD16)
 		JMP GETKEY		; [E003] Get Character From Keyboard Buffer	(FIXED ENTRY POINT. Must not move!)
 		JMP INPUT_CHARACTER	; [E006] Input From Screen or Keyboard		(FIXED ENTRY POINT. Must not move!)
 		JMP CHROUT_SCREEN	; [E009] Output to Screen			(FIXED ENTRY POINT. Must not move!)
@@ -68,7 +42,7 @@ EDITOR		JMP RESET_EDITOR	; [E000] Main Initialization (called from Kernal power 
 		JMP WIN_SET_BOT		; [E033] Set Window Bottom
 
 ;*********************************************************************************************************
-;** SET_REPEAT_MODE  [E036]  (Called from Jump Table)
+;** SET_REPEAT_MODE  [E036]  - Called from Jump Table
 ;** Sets Repeat mode to 'A'. Flag: $80 = Repeat, $40 = disable
 ;*********************************************************************************************************
 
@@ -83,36 +57,38 @@ SET_REPEAT_MODE
 		}
 		RTS
 
-!IF CRUNCH=0 {	!FILL $e04b-*,$aa }			;#################################################
+!IF CRUNCH=0 {	!FILL $E04B-*,$AA }			;
 
 ;*********************************************************************************************************
-;** RESET_EDITOR  [E04B]  (Called from Jump Table)
+;** RESET_EDITOR  [E04B]  - Called from Jump Table
 ;** Initializes Editor, then sets the screen to TEXT or GRAPHICS mode.
 ;*********************************************************************************************************
 
 RESET_EDITOR
 
-!IF COLOURPET=0 {
-		JSR INIT_EDITOR				; Initialize Editor
-} ELSE {
+!IF COLOURPET>0 {
 		JSR ColourPET_Init			; Initialize ColourPET settings, then INIT_EDITOR
+	} ELSE {
+		JSR INIT_EDITOR				; Initialize Editor
 }
 
-!IF FONTSET=0	{ JSR CRT_SET_TEXT }			; Set Screen to TEXT mode
-!IF FONTSET=1	{ JSR CRT_SET_GRAPHICS }			; Set Screen to GRAPHICS mode
+!IF FONTSET=0 { JSR CRT_SET_TEXT }			; Set Screen to TEXT mode
+!IF FONTSET=1 { JSR CRT_SET_GRAPHICS }			; Set Screen to GRAPHICS mode
 
 ;*********************************************************************************************************
-;** WIN_CLEAR  [E051]  (Called from Jump Table)
-;** This routine Clears the current window. It clears ONLY the screen memory specified.
-;** Since this is the 80-column codebase there is no line-linking code. Both LO and HI
-;** screen address tables are in ROM.
+;** WIN_CLEAR  [E051]  - Called from Jump Table
+;** This routine Clears the current window. It clears ONLY the screen memory specified. Since this is the
+;** 80-column codebase there is no line-linking code. Both LO and HI screen address tables are in ROM.
 ;*********************************************************************************************************
 
 WIN_CLEAR	LDX TopMargin				; Window Top line
 		DEX					; prep for loop
 WC_LOOP		INX					; LOOP[  Next line
 		JSR UPDATE_CURSOR_R2			;   was: CURSOR_LM  ; Was: Cursor_BOL
-		JSR ERASE_TO_EOL			;   Erase the line
+
+		!IF COLOURPET=0 { JSR ERASE_TO_EOL }	;   Erase the line
+		!IF COLOURPET>0 { JSR ColourPET_Erase_To_EOL }	;   Erase the line
+
 		CPX BotMargin				;   Check if at the last line
 		BCC WC_LOOP				; ] No, go do next line
 
@@ -133,7 +109,7 @@ CURSOR_LM	LDY LeftMargin				; Get Left margin
 		STY CursorCol				; Set cursor there
 
 ;*********************************************************************************************************
-;** Update Cursor ROW [E067] - Get pointer from Screen Line Address Tables (and Colour)
+;** Update Cursor ROW  [E067] - Get pointer from Screen Line Address Tables (and Colour)
 ;*********************************************************************************************************
 
 UPDATE_CURSOR_ROW
@@ -146,11 +122,11 @@ UPDATE_CURSOR_R3
 		LDA Line_Addr_Lo,X			; Screen Line Addresses LO
 
 ;*********************************************************************************************************
-;** Update Screen Pointers
+;** Update Screen Pointers  [E072]
 ;*********************************************************************************************************
 
 UPDATE_SCREEN_PTR
-	!IF COLOURPET=1 {
+	!IF COLOURPET>0 {
 		JSR ColourPET_SyncPointersX		; Sync Pointers to Current Line
 	} ELSE {
 		!IF SS40=1 {
@@ -170,7 +146,7 @@ UPDATE_SCREEN_PTR
 !SOURCE "crtc.asm"
 
 ;*********************************************************************************************************
-;** GETKEY  [E0A7]  (Called from Jump Table)
+;** GETKEY  [E0A7]  - Called from Jump Table
 ;** Get a KEY from keyboard buffer. Reads a character from 'KEYD' then shifts remaining buffer characters
 ;** If there is NO key it will return $FF.
 ;*********************************************************************************************************
@@ -180,13 +156,11 @@ UPDATE_SCREEN_PTR
 ;#########################################################################################################
 
 GETKEY
-!IF DEBUG=1 { INC DBLINE+2,X }			; DEBUG
 		LDY KEYD				; Get key at start of buffer
 		LDX #0 					; Start at 0
 
 GK_LOOP		LDA KEYD+1,X				; LOOP[ START - Now shift the next keys in line
 		STA KEYD,X				;   to the front of the buffer
-!IF DEBUG=1 { STA DBLINE+10,X }				;   DEBUG - update screen
 		INX
 		CPX CharsInBuffer			;   Num Chars in Keyboard Buffer
 		BNE GK_LOOP				; ] Done? No, loop for another
@@ -194,7 +168,6 @@ GK_LOOP		LDA KEYD+1,X				; LOOP[ START - Now shift the next keys in line
 		DEC CharsInBuffer			; Reduce Num Chars in Keyboard Buffer
 
 		TYA					; Put the character in Accumulator
-!IF DEBUG=1 { STA DBLINE+3 }				; DEBUG - 4th chr on bottom line
 		CLI
 		RTS
 
@@ -206,13 +179,11 @@ GK_LOOP		LDA KEYD+1,X				; LOOP[ START - Now shift the next keys in line
 ;** the keyboard buffer (overwriting whatever might be there)
 ;*********************************************************************************************************
 
-GETLINE		JSR ChrOutMarginBeep			; 
-GETLINE2	!IF DEBUG=1 { INC DBLINE+5 }		; DEBUG - 6th chr on bottom line
+GETLINE		JSR ChrOutMarginBeep			;
+GETLINE2
 		LDA CharsInBuffer			; Are there any keys waiting?
 		STA Blink 				; 0 chars -> blink cursor
 		BEQ GETLINE2 				; loop until char in buffer
-
-!IF DEBUG=1 { INC DBLINE+6 }				; DEBUG - 7th chr on bottom line
 
 ;[E0C5]		--------------- Got a character, so process it
 
@@ -220,7 +191,7 @@ GETLINE2	!IF DEBUG=1 { INC DBLINE+5 }		; DEBUG - 6th chr on bottom line
 		LDA BlinkPhase				; Check if cursor in blink phase
 		BEQ GL_1				; no, so no need to restore original character
 		LDA CursorChar				; yes, get character under Cursor
-		LDY #0					; 
+		LDY #0					;
 		STY BlinkPhase				; Reset blinkphase
 		JSR RESTORE_CHR_AT_CRSR		; Restore OLD character under cursor before processing new one
 GL_1		JSR GETKEY				; Get Character From Keyboard Buffer
@@ -249,8 +220,6 @@ GL_3		CMP #$0D 				; Check if <RETURN> pressed
 ;*********************************************************************************************************
 
 PARSE_LINE
-		!IF DEBUG=1 { INC DBLINE+7 }		; DEBUG - 8th chr on bottom line
-
 		LDY RightMargin				; Physical Screen Line Length
 		STY CRSW 				; # 0 -> Screen Input
 
@@ -264,8 +233,8 @@ PL_LOOP		LDA (ScrPtr),Y				; LOOP[  Read Character from Screen RAM
 
 PL_SKIP 	INY					; last was not <SPACE> so move ahead one
 		STY LastInputCol			; record the position
-		JSR CURSOR_TO_LM			; Move to the start of the line [80] 
-!IF CRUNCH=0 {	NOP }					; (this is a patch)		[80] 
+		JSR CURSOR_TO_LM			; Move to the start of the line [80]
+!IF CRUNCH=0 {	NOP }					; (this is a patch)		[80]
 		STY QuoteMode 				; Turn off quote mode
 		LDA InputRow				; Cursor Y-X Pos. at Start of INPUT
 		BMI Screen_Input
@@ -278,12 +247,12 @@ PL_SKIP 	INY					; last was not <SPACE> so move ahead one
 		BCS Screen_Input2
 
 ;*********************************************************************************************************
-;** INPUT_CHARACTER  [E116]  (Called from Jump Table) - FIXED ENTRY POINT!!!!!
-;** Push X and Y to stack then call Input a Character routine via pointer
+;** INPUT_CHARACTER  [E116]  - Called from Jump Table - FIXED ENTRY POINT!!!!!
 ;*********************************************************************************************************
+; Push X and Y to stack then call Input a Character routine via pointer
 
-		!IF NOFILL=0 { !FILL $e116-*,$aa }	; FIXED ENTRY POINT! This must not move!
 
+		!IF NOFILL=0 { !FILL $E116-*,$AA }	; FIXED ENTRY POINT!
 ;#########################################################################################################
 
 INPUT_CHARACTER	TYA
@@ -294,8 +263,9 @@ INPUT_CHARACTER	TYA
 
 ;*********************************************************************************************************
 ;** DEFAULT_SCREEN_VECTOR  [E11D]
-;** Input from Screen Routine
 ;*********************************************************************************************************
+; Input from Screen Routine
+
 
 DEFAULT_SCREEN_VECTOR
 		LDA CRSW				; Flag: INPUT or GET from Keyboard
@@ -357,9 +327,9 @@ CQ_DONE		RTS
 
 ;*********************************************************************************************************
 ;** CHAR_TO_SCREEN  [E177]
-;** This puts a character in 'A' to screen. The character is handled differently according to the entry
-;** point. For example, when QUOTE mode is ON special characters are printed in RVS using CHAR_TO_SCREEN3
 ;*********************************************************************************************************
+; This puts a character in 'A' to screen. The character is handled differently according to the entry
+; point. For example, when QUOTE mode is ON special characters are printed in RVS using CHAR_TO_SCREEN3
 
 CHAR_TO_SCREEN	ORA #$40 				; '@'
 CHAR_TO_SCREEN2 LDX ReverseFlag				; Flag: Print Reverse Chars. -1=Yes
@@ -375,7 +345,7 @@ CTS_SKIP2
 !IF COLOURPET=0 {
 		JSR RESTORE_CHR_AT_CRSR			; Put character on screen
 } ELSE {
-		JSR Put_ColourChar_at_Cursor		; Put character AND Colour on screen
+		JSR ColourPET_PutChar_at_Cursor		; Put character AND Colour on screen
 }
 ;		--------------------------------------- Handle screen wrap
 
@@ -390,8 +360,8 @@ CHAR_TO_SCREEN4	JSR CURSOR_DOWN				; Go to next line
 
 ;*********************************************************************************************************
 ;** IRQ_EPILOG  [E199]
-;** IRQ Completion. We jump here when printing is complete.
 ;*********************************************************************************************************
+; IRQ Completion. We jump here when printing is complete.
 
 IRQ_EPILOG	LDA #0
 		STA HOMECT				; Home Count
@@ -408,8 +378,8 @@ IRQE_SKIP	PLA
 
 ;*********************************************************************************************************
 ;** CURSOR_TO_EOPL  [E1AA]
-;** Move Cursor to End of Previous Line
 ;*********************************************************************************************************
+; Move Cursor to End of Previous Line
 
 CURSOR_TO_EOPL	LDY RightMargin				; Physical Screen Line Length
 		LDX TopMargin
@@ -425,10 +395,10 @@ CEPL_SKIP	DEC CursorRow				; Current Cursor Physical Line Number
 		JMP UPDATE_CURSOR_ROW			; Set Screen Pointers
 
 ;*********************************************************************************************************
-;** ERASE_TO_ELO  [E1C1] 
-;** Erases from cursor to end of line
-;** Called from WIN_CLEAR. This routine is relocated/updated for COLOURPET
+;** ERASE_TO_ELO  [E1C1]
 ;*********************************************************************************************************
+; Erases from cursor to end of line
+; Called from WIN_CLEAR. This routine is relocated/updated for COLOURPET
 
 !IF COLOURPET=0 {
 ERASE_TO_EOL
@@ -442,8 +412,8 @@ EEOL_LOOP	INY
 
 ;*********************************************************************************************************
 ;** CURSOR_TO_LM / ESCAPE_J  [E1CB]
-;** Move Cursor to Left Margin
 ;*********************************************************************************************************
+; Move Cursor to Left Margin
 
 ESCAPE_J
 CURSOR_TO_LM
@@ -454,11 +424,11 @@ CURSOR_TO_LM
 
 ;*********************************************************************************************************
 ;** FULL_SCREEN  [E1D2]
-;** Set Full Screen (Exit Window). This routine set the screen to full size.
-;** OPTIONS: 'COLUMNS' determines 40 or 80 column screen
-;**          'SS40'    when COLUMNS=80 uses col size determined by Soft40 'SCNWIDTH' memory location
-;** Note: Changing SCNWIDTH does not change CRTC parameters. Use the ESC-X command!!!
 ;*********************************************************************************************************
+; Set Full Screen (Exit Window). This routine set the screen to full size.
+; OPTIONS: 'COLUMNS' determines 40 or 80 column screen
+;          'SS40'    when COLUMNS=80 uses col size determined by Soft40 'SCNWIDTH' memory location
+; Note: Changing SCNWIDTH does not change CRTC parameters. Use the ESC-X command!!!
 
 FULL_SCREEN	LDA #0					; Top/Left=0
 		TAX
@@ -472,8 +442,8 @@ FULL_SCREEN	LDA #0					; Top/Left=0
 
 ;*********************************************************************************************************
 ;** WIN_SET_BOT  [E1DC]
-;** Set Bottom Right Corner of Window
 ;*********************************************************************************************************
+; Set Bottom Right Corner of Window
 
 WIN_SET_BOT	STA BotMargin				; Last line of window
 		STX RightMargin				; Physical Screen Line Length
@@ -481,21 +451,20 @@ WIN_SET_BOT	STA BotMargin				; Last line of window
 
 ;*********************************************************************************************************
 ;** WIN_SET_TOP  [E1E1]
-;** Set Top Left Corner of Window
 ;*********************************************************************************************************
+; Set Top Left Corner of Window
 
 WIN_SET_TOP	STA TopMargin				; First line of window
 		STX LeftMargin				; First column of window
 		RTS
 
 ;*********************************************************************************************************
-;** CHROUT_SCREEN  [E202]  (Called from Jump Table)
-;** $E202 - FIXED ENTRY POINT! Some BASIC/KERNAL bypass the Jump Table and jump directly here
-;** Output Character to Screen Dispatch 
+;** CHROUT_SCREEN  [E202]  - Called from Jump Table - FIXED ENTRY POINT!
 ;*********************************************************************************************************
+; Some BASIC/KERNAL code bypasses the Jump Table and jumps directly here
+; Output Character to Screen Dispatch
 
-		!IF NOFILL=0 { !FILL $e202-*,$aa }	; FIXED ENTRY POINT! This must not move!
-
+		!IF NOFILL=0 { !FILL $E202-*,$AA }	; FIXED ENTRY POINT!
 ;#########################################################################################################
 
 CHROUT_SCREEN	PHA
@@ -508,9 +477,9 @@ CHROUT_SCREEN	PHA
 
 ;*********************************************************************************************************
 ;** CHROUT_NORMAL  [E20C]
-;** Output Character to Screen. Character to print must be in DATAX.
-;** SCROV vector normally points here
 ;*********************************************************************************************************
+; Output Character to Screen. Character to print must be in DATAX.
+; SCROV vector normally points here
 
 CHROUT_NORMAL	LDA #0
 		STA CRSW				; Flag: INPUT or GET from Keyboard
@@ -535,15 +504,15 @@ ESC_DONE2
 ;[E21D]		--------------------------------------- Reload character and check high bit
 
 CHROUT_CHECK	LDA DATAX				; Current Character to Print
-!IF COLOURPET=1 { JSR CheckColourCodes }		; Check table of color values @@@@@@@@@@@@@@@@ COLOURPET
+!IF COLOURPET>0 { JSR CheckColourCodes }		; Check table of color values @@@@@@@@@@@@@@@@ COLOURPET
 		BPL CHROUT_LO				; Is top bit CLEAR? Yes, handle UNSHIFTED Character
 		JMP CHROUT_HI				; No, Handle SHIFTED Character
 
 ;*********************************************************************************************************
 ;** Character Output with High Bit CLEAR  [E224]
-;** This section checks characters in the range 0 to 127.
-;** UN-SHIFTED character have the HI BIT is CLEAR
 ;*********************************************************************************************************
+; This section checks characters in the range 0 to 127.
+; UN-SHIFTED character have the HI BIT is CLEAR
 
 ;		--------------------------------------- Check for RETURN
 
@@ -597,9 +566,9 @@ Be251		INY					; LOOP[
 
 Be25c		LDA #$20 				; <SPACE>
 		STA (ScrPtr),Y				; put it on the screen!
-!IF COLOURPET=1 {
-		LDA COLOURV				; Get the current Colour	@@@@@@@@@@@@@@@ ColourPET
-		STA (COLOURPTR),Y			; put it to Colour MEM		@@@@@@@@@@@@@@@ ColourPET
+!IF COLOURPET>0 {
+		LDA ColourV				; Get the current Colour	@@@@@@@@@@@@@@@ ColourPET
+		STA (ColourPtr),Y			; Put it to Colour MEM		@@@@@@@@@@@@@@@ ColourPET
 }
 		BNE Be299
 
@@ -652,7 +621,7 @@ Be29c		CMP #9 					; Is it <TAB>?
 Be2a3		LDY NextTab				; LOOP[
 		INC NextTab
 		CPY RightMargin				;   Physical Screen Line Length
-		BCC Be2b6				;   
+		BCC Be2b6				;
 		LDA RightMargin				;   Physical Screen Line Length
 		STA CursorCol				;   Cursor Column on Current Line
 		DEC NextTab				;   temp var
@@ -684,10 +653,10 @@ Be2d0		CMP #$16 				; Is it <Ctrl V>? - Erase to EOL? NOTE: 40-col code has BUG 
 
 Be2d7		INY
 		STA (ScrPtr),Y				; Write it to the screen
-!IF COLOURPET=1 {
+!IF COLOURPET>0 {
 		PHA
-		LDA COLOURV				; Current Colour		@@@@@@@@@@@@@@ COLOURPET
-		STA (COLOURPTR),Y			; Write it to Colour RAM	@@@@@@@@@@@@@@ COLOURPET
+		LDA ColourV				; Current Colour		@@@@@@@@@@@@@@ COLOURPET
+		STA (ColourPtr),Y			; Write it to Colour RAM	@@@@@@@@@@@@@@ COLOURPET
 		PLA
 }
 		CPY RightMargin				; are we at right margin?
@@ -715,9 +684,9 @@ DELETE_LINE
 
 ;*********************************************************************************************************
 ;** CHROUT_HI  [E2F4]
-;** Character Output when High Bit SET (characters in the range 128 to 255).
-;** Handles: RETURN,INS,CRSR-UP,
 ;*********************************************************************************************************
+; Character Output when High Bit SET (characters in the range 128 to 255).
+; Handles: RETURN,INS,CRSR-UP,
 
 CHROUT_HI	AND #$7f				; strip off top bit
 		CMP #$7f				; special case: code for PI (7F)
@@ -797,7 +766,7 @@ COH_CHECK1	CMP #$11 				; Is it <CRSR-UP>? (SHIFT-CRSR-DOWN)
 ;		--------------------------------------- Do Cursor UP
 		LDX TopMargin
 		CPX CursorRow
-		BCS Be38c	
+		BCS Be38c
 		DEC CursorRow
 		JSR UPDATE_CURSOR_ROW
 		BNE Be38c
@@ -813,7 +782,7 @@ Be358		CMP #$12 				; Is it <OFF>?  (SHIFT-RVS)
 
 Be360		CMP #$1d 				; Is it <LEFT>? (Shift-Cursor RIGHT)
 		BNE Be373				; No, skip ahead
-		LDY LeftMargin			
+		LDY LeftMargin
 		CPY CursorCol				; Are we at the left margin already?
 		BCC Be36f 				; No, skip ahead         	@@@@@@@@@@@@@@@ was: BNE $E38C
 		JSR CURSOR_TO_EOPL			; Yes, go to end previous line
@@ -845,14 +814,14 @@ Be38c		JMP IRQ_EPILOG
 
 Be38f		CMP #$16 				; Is it <SHIFT>CTRL-V?  (Conflicts with COLOURPET!
 !IF COLOURPET=0 {
-		BEQ ERASE_TO_SOL			; Remove Conflict			
+		BEQ ERASE_TO_SOL			; Remove Conflict
 }
 		JMP ProcControl_A
 
 ;*********************************************************************************************************
-;** ERASE_TO_SOL / ESCAPE_P [E396]
-;** Erases from cursor to Start of Line
+;** ERASE_TO_SOL / ESCAPE_P  [E396]
 ;*********************************************************************************************************
+; Erases from cursor to Start of Line
 
 ESCAPE_P
 ERASE_TO_SOL	LDA #$20 				; <SPACE>
@@ -860,17 +829,17 @@ ERASE_TO_SOL	LDA #$20 				; <SPACE>
 ESOL_LOOP	CPY CursorCol				; LOOP[ Have we reached the cursor position?
 		BCS Be38c				;   Yes, skip ahead
 		STA (ScrPtr),Y				;   No, Write it to the screen
-!IF COLOURPET=1 {
-		LDA COLOURV				;   Current Colour
-		STA (COLOURPTR),Y			;   Write Current Colour to colour RAM
+!IF COLOURPET>0 {
+		LDA ColourV				;   Current Colour
+		STA (ColourPtr),Y			;   Write Current Colour to colour RAM
 }
 		INY					;   Move to next column
 		BNE ESOL_LOOP				; ] Loop back for more
 
 ;*********************************************************************************************************
-;** CURSOR_DOWN [E3A3]
-;** Do Cursor DOWN, Go to next line. If at bottom of window SCROLL UP.
+;** CURSOR_DOWN  [E3A3]
 ;*********************************************************************************************************
+; Do Cursor DOWN, Go to next line. If at bottom of window SCROLL UP.
 
 CURSOR_DOWN	LSR InputRow
 		LDX CursorRow
@@ -882,18 +851,19 @@ Be3b1		INC CursorRow
 		JMP UPDATE_CURSOR_ROW
 
 ;*********************************************************************************************************
-;** CURSOR_RETURN [E3B6]
-;** Cursor to start of line, then CURSOR DOWN. Also performs ESCAPE
+;** CURSOR_RETURN  [E3B6]
 ;*********************************************************************************************************
+; Cursor to start of line, then CURSOR DOWN. Also performs ESCAPE
+
 
 CURSOR_RETURN	LDY LeftMargin
 		STY CursorCol
 		JSR CURSOR_DOWN
 
 ;*********************************************************************************************************
-;** ESCAPE / ESCAPE_O [E3BD]
-;** Cancels Insert, Reverse and Quote modes
+;** ESCAPE / ESCAPE_O  [E3BD]
 ;*********************************************************************************************************
+; Cancels Insert, Reverse and Quote modes
 
 ESCAPE_O
 ESCAPE		LDA #0
@@ -906,9 +876,9 @@ ESCAPE		LDA #0
 		JMP IRQ_EPILOG
 
 ;*********************************************************************************************************
-;** WIN_SCROLL_DN / ESCAPE_W  [E3C8] (Called from Jump Table)
-;** Scrolls the current Window DOWN 
+;** WIN_SCROLL_DN / ESCAPE_W  [E3C8]  - Called from Jump Table
 ;*********************************************************************************************************
+; Scrolls the current Window DOWN
 
 ESCAPE_W
 WIN_SCROLL_DN	LDX BotMargin
@@ -944,9 +914,9 @@ Be3d8		INY
 		BCS Be3cb
 
 ;*********************************************************************************************************
-;** WIN_SCROLL_UP / ESCAPE_V  [E3E8] (Called from Jump Table)
-;** Scrolls current Window UP 
+;** WIN_SCROLL_UP / ESCAPE_V  [E3E8]  - Called from Jump Table
 ;*********************************************************************************************************
+; Scrolls current Window UP
 
 ESCAPE_V						; ESC-V Scroll Up
 WIN_SCROLL_UP
@@ -958,7 +928,7 @@ Be3e6		INX
 		BCS Be3fe
 
 !IF COLOURPET=0 {
-	!IF SS40=0 {	
+	!IF SS40=0 {
 		LDA Line_Addr_Lo+1,X			; Screen line address table LO + 1
 		STA SAL					; Pointer: Tape Buffer/ Screen Scrolling
 		LDA Line_Addr_Hi+1,X			; Screen line address table HI + 1
@@ -975,58 +945,59 @@ Be3f3		INY
 		LDA (SAL),Y				; Read Character from Screen SOURCE
 		STA (ScrPtr),Y				; Write to Screen DESTINATION
 } ELSE {
-		JSR ColourPET_Scroll_Dest		; Scroll Character and Colour RAM	
+		JSR ColourPET_Scroll_Dest		; Scroll Character and Colour RAM
 }
 		CPY RightMargin
 		BCC Be3f3
 		BCS Be3e6
 
-Be3fe		JSR ERASE_TO_EOL			; Clear the bottom line
+Be3fe		!IF COLOURPET=0 { JSR ERASE_TO_EOL } 	; Clear the bottom line
+		!IF COLOURPET>0 { JSR ColourPET_Erase_To_EOL }	; Clear the bottom line
 
 ;*********************************************************************************************************
-;** Check Keyboard Scroll Control E40B]
+;** Check Keyboard Scroll Control  [E40B]
 ;*********************************************************************************************************
 
 !SOURCE "scrollpause-b.asm"
 
 ;*********************************************************************************************************
-;** Jiffy Clock Timer Correction Patch [E431]
+;** Jiffy Clock Timer Correction Patch  [E431]
 ;*********************************************************************************************************
 
-!SOURCE "jiffyfix.asm"
+!IF HERTZ=50 {		!SOURCE "jiffyfix.asm" }	; Adjust for 50 Hz
 
 ;*********************************************************************************************************
-;** MAIN IRQ ENTRY [E442][E455] (Called from Jump Table) - FIXED ENTRY POINT!
-;** This entry point must not move! It is called directly from KERNAL
-;** The CRTC chip's V-Sync line is fed to a VIA to generate IRQ's. When an IRQ is triggered, the
-;** Clock is updated, the keyboard scanned, ieee polled and tape monitored.
+;** MAIN IRQ ENTRY  [E442] [E455]  - Called from Jump Table - FIXED ENTRY POINT!
 ;*********************************************************************************************************
+; This entry point must not move! It is called directly from KERNAL
+; The CRTC chip's V-Sync line is fed to a VIA to generate IRQ's. When an IRQ is triggered, the
+; Clock is updated, the keyboard scanned, ieee polled and tape monitored.
 
-		!IF NOFILL=0 { !FILL $e442-*,$aa }	; FIXED ENTRY POINT! This routine must not move!
-
+!IF NOFILL=0 { !FILL $E442-*,$AA }			; FIXED ENTRY POINT!
 ;#########################################################################################################
 
 !SOURCE "irq.asm"
-;!IF DEBUG=0 { !FILL $e4be-*,$aa }			;#################################################
+;!IF DEBUG=0 { !FILL $E4bE-*,$AA }			;#################################################
 
 ;*********************************************************************************************************
 ;** KEYBOARD SCANNER  [E4BE]
-;** The Keyboard is scanned during the IRQ and one keystroke is stored to KEYD. Other routines transfer
-;** this keystroke to or from a small 10-byte buffer. The keyboard scanner does the actual interfacing to
-;** the hardware to read the rows and columns of the keyboard matrix. When a key is pressed it gets the
-;** keycode from the keyboard matrix table. If no key is pressed, then $FF is returned.
 ;*********************************************************************************************************
+; The Keyboard is scanned during the IRQ and one keystroke is stored to KEYD. Other routines transfer
+; this keystroke to or from a small 10-byte buffer. The keyboard scanner does the actual interfacing to
+; the hardware to read the rows and columns of the keyboard matrix. When a key is pressed it gets the
+; keycode from the keyboard matrix table. If no key is pressed, then $FF is returned.
+
 
 !IF KEYSCAN=0 { !SOURCE "keyscan-g.asm" }		; Graphic Keyboard
 !IF KEYSCAN=1 { !SOURCE "keyscan-b.asm" }		; Business Keyboard
 !IF KEYSCAN=2 { !SOURCE "keyscan-din.asm" }		; German DIN Keyboard
-!IF KEYSCAN=3 { !SOURCE "keyscan-c64.asm" }		; C64 Keyboard
-!IF KEYSCAN=4 { !SOURCE "keyscan-cbm2.asm" }		; CBM2 Keyboard (future implementation)
+;!IF KEYSCAN=3 { !SOURCE "keyscan-c64.asm" }		; C64 Keyboard
+;!IF KEYSCAN=4 { !SOURCE "keyscan-cbm2.asm" }		; CBM2 Keyboard (future implementation)
 
 ;*********************************************************************************************************
 ;** JUMP_TO_TAB  [E570]
-;** Tab positions are stored in a table of 80 bits (10 bytes). This routine
 ;*********************************************************************************************************
+; Tab positions are stored in a table of 80 bits (10 bytes).
 
 JUMP_TO_TAB	LDA CursorCol				; Get Cursor column on current line
 		AND #$f8				; mask off upper 5 bits
@@ -1038,7 +1009,7 @@ JUMP_TO_TAB	LDA CursorCol				; Get Cursor column on current line
 		LDA #1					; Set bit 0 to 1
 		STA DOS_Syntax				; temp storage
 		LDY CursorCol				; Get Cursor column on current line
-JTTAB1 		CPY NextTab				; LOOP[ Is 
+JTTAB1 		CPY NextTab				; LOOP[ Is
 		BEQ JTTABDONE				;   Yes, exit out
 		ASL DOS_Syntax				;   No, Move the "1" bit forward
 		INC NextTab				;   Move ahead one column
@@ -1061,8 +1032,8 @@ Be59b		CMP #15 				; Is it CTRL-O (Set Window Top-Left)
 
 ;*********************************************************************************************************
 ;** ESCAPE_T
-;** This sets the Window's Top-Left corner to the current cursor position
 ;*********************************************************************************************************
+; This sets the Window's Top-Left corner to the current cursor position
 
 ESCAPE_T	LDA CursorRow				; Get current cursor ROW
 		STA TopMargin				; Store it as the TOP
@@ -1086,21 +1057,21 @@ Be5b3		CMP #7 					; Is it CTRL-G? (Ring Bell)
 
 ;*********************************************************************************************************
 ;** ProcControl_A  [E5BC]
-;** Continue checking codes.
 ;*********************************************************************************************************
+; Continue checking codes.
 
 ProcControl_A
 !IF COLOURPET=0 {
-		CMP #$15 				; Is it CTRL-SHIFT-U? (Insert Line) - CONFLICT with colour code = DK YELLOW					
+		CMP #$15 				; Is it CTRL-SHIFT-U? (Insert Line) - CONFLICT with colour code = DK YELLOW
 		BNE ProcControl_C			; @@@@@@ Was: BNE ProcControl_B
 } ELSE {
 		JMP ProcControl_C
 }
 
 ;*********************************************************************************************************
-;** ESCAPE_I
-;** Insert a blank line at current cursor position
+;** ESCAPE_I  [E5C0]
 ;*********************************************************************************************************
+; Insert a blank line at current cursor position
 
 ESCAPE_I	LDA TopMargin
 		PHA
@@ -1130,9 +1101,9 @@ Be5de		CMP #15 				; Is it CTRL-SHIFT-O? (Set Window Bottom)
 
 
 ;*********************************************************************************************************
-;** ESCAPE_B
-;** Set Windos Bottom-Left
+;** ESCAPE_B  [E5E2]
 ;*********************************************************************************************************
+; Set Window Bottom-Left
 
 ESCAPE_B	LDA CursorRow
 		STA BotMargin
@@ -1148,12 +1119,11 @@ Be5ed		CMP #14 				; Is it CTRL-SHIFT-N? (Graphics mode)
 		BMI EB_DONE
 
 ;*********************************************************************************************************
-;** IRQ_END  [E600]  (Called from Jump Table) - FIXED ENTRY POINT!
-;** The IRQ routine jumps here when completed. Do not modify this routine!
+;** IRQ_END  [E600]  - Called from Jump Table - FIXED ENTRY POINT!
 ;*********************************************************************************************************
+; The IRQ routine jumps here when completed. Do not modify this routine!
 
-		!IF NOFILL=0 { !FILL $e600-*,$aa }	;FIXED ENTRY POINT! This routine must not move! It is called directly from KERNAL
-
+!IF NOFILL=0 { !FILL $E600-*,$AA }	;FIXED ENTRY POINT!
 ;#########################################################################################################
 
 IRQ_END		PLA
@@ -1165,38 +1135,39 @@ IRQ_END		PLA
 
 ;*********************************************************************************************************
 ;** RESTORE_CHR_AT_CRSR  [E606]
-;** This routine is called to put the character back at the cursor position.
-;** It is called to put the initial character on the screen and as part of the cursor blinking routine.
-;** NOTE: ColourPET: DOES NOT set/change COLOUR ATTRIBUTE!
 ;*********************************************************************************************************
+; This routine is called to put the character back at the cursor position.
+; It is called to put the initial character on the screen and as part of the cursor blinking routine.
+; NOTE: ColourPET: DOES NOT set/change COLOUR ATTRIBUTE!
 
 RESTORE_CHR_AT_CRSR
-		LDY CursorCol				; Cursor Column on Current Line		
-		STA (ScrPtr),Y				; Put the character on the screen!!!!!!!!!!!!!!!!!!!!! 
+		LDY CursorCol				; Cursor Column on Current Line
+		STA (ScrPtr),Y				; Put the character on the screen!!!!!!!!!!!!!!!!!!!!!
 		LDA #2					; Set blink count so cursor appears immediately
 		STA BLNCT				; Timer: Countdown to Toggle Cursor
 		RTS
 
 ;*********************************************************************************************************
 ;** INIT_EDITOR  [E60F]
-;** Initializes the Editor. Clears Clock. Sets IRQ Vector. Sets Keyboard buffer size. Clears TABs.
-;** Sets zero-page locations. And finally, chimes the BELL.
 ;*********************************************************************************************************
+; Initializes the Editor. Clears Clock. Sets IRQ Vector. Sets Keyboard buffer size. Clears TABs.
+; Sets zero-page locations. And finally, chimes the BELL.
 
 INIT_EDITOR	LDA #$7f
 		STA VIA_IER				; VIA, Register E - I/O Timers
 		LDX #$6d
 		LDA #0
 		STA HOMECT				; Clear Home Count (80-col)
-	
+;[E616]
 !IF REPEATOPT = 1 { STA RPTFLG }			; Clear REPEAT ($80 = Repeat, $40 = disable)
 
 INITED1		STA JIFFY_CLOCK,X			; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
-		DEX
+		DEX					;[E61E]
 		BPL INITED1
-		STX KEYFLAGS 				; $FF = Clear all flags
+;[E621]
+;		STX KEYFLAGS 				; $FF = Clear all flags
 
-;		--------------------------------------- Set IRQ Vector - Normally $E455 or $E900 for Execudesk
+;[		--------------------------------------- Set IRQ Vector - Normally $E455 or $E900 for Execudesk
 
 !IF EXECUDESK=1 {
 		LDA #<IRQ_EDESK				; Execudesk IRQ Vector LO
@@ -1218,7 +1189,7 @@ INITED1		STA JIFFY_CLOCK,X			; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
 		STA SCN4080BOARD
 	} ELSE {
 		LDA #0					; 40/80 Switcher board NOT installed
-		STA SCN4080BOARD	
+		STA SCN4080BOARD
 	}
 
 	!IF SS40MODE=80 {
@@ -1235,7 +1206,7 @@ INITED1		STA JIFFY_CLOCK,X			; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
 		STA DFLTO				; Default Output (CMD) Device (3)
 		LDA #15
 		STA PIA1_Port_A 			; Keyboard ROW select
-		ASL 
+		ASL
 		STA VIA_Port_B
 		STA VIA_DDR_B
 		STX PIA2_Port_B
@@ -1256,7 +1227,7 @@ INITED1		STA JIFFY_CLOCK,X			; Clear Real-Time Jiffy Clock (approx) 1/60 Sec
 		STA VIA_IER
 		JSR FULL_SCREEN				; Exit Window - Set screen size (ie: 80x25)
 
-;[E669]		--------------------------------------- Clear Tab Stops (80 bits) 
+;[E669]		--------------------------------------- Clear Tab Stops (80 bits)
 
 CLEAR_TABS	LDX #12					; 12 bytes (10 bytes plus?)
 		LDA #0					; To Clear the table
@@ -1264,10 +1235,10 @@ CT_LOOP		STA TABS_SET,X				; LOOP[  Table of 80 bits to set TABs
 		DEX					;   next byte
 		BPL CT_LOOP				; ] Loop back for more
 
-;		--------------------------------------- Set Screen Input and Output Vectors
+;[E673]		--------------------------------------- Set Screen Input and Output Vectors
 
 		LDA #<DEFAULT_SCREEN_VECTOR		; LO Address of Screen Input vector (from E006)
-		LDX #>DEFAULT_SCREEN_VECTOR		; HI 
+		LDX #>DEFAULT_SCREEN_VECTOR		; HI
 		STA SCRIV				; Input from screen vector (from E006)
 		STX SCRIV+1				; Input from screen vector (from E006)
 
@@ -1276,10 +1247,12 @@ CT_LOOP		STA TABS_SET,X				; LOOP[  Table of 80 bits to set TABs
 		STA SCROV				; Print to screen vector (from E009)
 		STX SCROV+1				; Print to screen vector (from E009)
 
+;[E683]		--------------------------------------- Chime
+
 		LDA #$10
 		STA CHIME
 
-;		--------------------------------------- Patches for new features here
+;[E687] ************************************************ Patches for new features here
 
 !IF ESCCODES=1 {
 		LDA #1					; 1=Enabled
@@ -1287,7 +1260,9 @@ CT_LOOP		STA TABS_SET,X				; LOOP[  Table of 80 bits to set TABs
 }
 !IF AUTORUN=1 {	JSR AUTOSTART }				; Do Auto Run Prep
 
-;		--------------------------------------- Finish up by ringing BELL 4 times
+;****************************************************** End Patches
+
+;[E687]		--------------------------------------- Finish up by ringing BELL 4 times
 
 		JSR BEEP_BEEP				; Power-up chimes
 		BEQ BEEP_BEEP				; More chimes (4 total)
@@ -1295,8 +1270,8 @@ CT_LOOP		STA TABS_SET,X				; LOOP[  Table of 80 bits to set TABs
 
 ;*********************************************************************************************************
 ;** ChrOutMarginBeep  [E68C]
-;** Checks the cursor position and rings the BELL if near the end of the line
 ;*********************************************************************************************************
+; Checks the cursor position and rings the BELL if near the end of the line
 
 ChrOutMarginBeep
 		JSR CHROUT_SCREEN			; Output to Screen
@@ -1315,8 +1290,8 @@ ChrOutMarginBeep
 
 ;*********************************************************************************************************
 ;** BEEP / BEEP_BEEP  [E6A7]
-;** Rings the BELL
 ;*********************************************************************************************************
+; Rings the BELL
 
 BEEP_BEEP	JSR BEEP				; Double BEEP
 BEEP							; Single BEEP
@@ -1393,16 +1368,18 @@ SOUND_TAB	!byte $0e,$1e,$3e,$7e,$3e,$1e,$0e	; BELL chime values
 !IF BACKARROW =1 { !SOURCE "editbarrow.asm" }		; Patch for BackArrow toggling of screen mode
 
 ;#########################################################################################################
-!IF CRUNCH=0 {	!byte $cd }		; to match 901474-04
+!IF CRUNCH=0 {
+		!IF CBMROM=0 { !BYTE $FF }		; for custom rom
+		!IF CBMROM=3 { !BYTE $20 }		; to match 901474-03
+		!IF CBMROM=4 { !BYTE $CD }		; to match 901474-04
+		!IF CBMROM=5 { !BYTE $BE }		; to match 324243-02b-c1
+}
 
 ;*********************************************************************************************************
 ;** FILLER
 ;*********************************************************************************************************
-; There are approximately 120 unused bytes HERE in a CODEBASE 1 EditROM.
-; When some patches are applied they will push more code here and have less fill bytes.
-; If too many patches are applied ACME will generate a "produced too much code" error.
 
-		!IF NOFILL=0 { !FILL $e800-*,$aa }	; Fill to end of 2K
+		!IF NOFILL=0 { !FILL $E800-*,$AA }	; 78 bytes - Fill to end of 2K
 
 ;#########################################################################################################
 ;END! DO NOT ADD ANYTHING BELOW THIS LINE!!!!!!!!

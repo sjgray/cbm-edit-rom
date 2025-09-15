@@ -1,7 +1,7 @@
-; PET/CBM EDIT ROM - Standard Kernal calls
-; ================
+; PET/CBM Editor ROM Project - Standard Kernal calls
+; ==========================   MEMKERNAL.ASM
+;
 ; These are calls from the EDIT ROM to KERNAL entry points
-;---------------------------------------------------------
 ; Non-vectored calls (direct - caution: could change if KERNAL is changed)
 
 CHKSTOP 	= $F335 ; Check for STOP key

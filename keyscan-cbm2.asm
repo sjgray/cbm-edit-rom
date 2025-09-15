@@ -1,7 +1,9 @@
-; PET/CBM - EDIT ROM - Keyboard scanning routine from CBM-II series (taken from actual sourcecode)
-; ==================
-; TODO: Change memory/storage to PET locations
-; Comments in all caps are original commodore comments
+; PET/CBM Editor ROM Project - Keyboard Scanner from CBM-II series (taken from actual sourcecode)
+; ==========================   KEYSCAN-CBM2.ASM
+;
+; TODO: Change memory/storage to PET locations.
+; Comments in all caps are original commodore comments.
+;
 ; -------------------------------------------------------------------------------------------------
 
 KEY

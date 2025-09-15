@@ -21,13 +21,9 @@ The filename tells you the main features of the ROM image.
 
 The format is:
 
-{group}-{codebase}-{column}-{keyboard}-{screen}-{features} (date).bin
+colourpet-{codebase}-{column}-{keyboard}-{screen}-{features} (date).bin
 
 Where:
-
-{group} is:
-	sjg-edit - PET/CBM computers:
-	colourpet - ColourPET board
 
 {codebase} is:
 	c0 - 40 column 2K codebase
@@ -66,5 +62,4 @@ Where:
 	... and more
 
 (date) is:
-	The build date in the form (yyyy-mm-dd)
-
+	The build date in the form: YYYY-MM-DD

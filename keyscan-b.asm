@@ -1,14 +1,14 @@
-; PET/CBM EDIT ROM - Keyboard Scan - Business Keyboards
-; ================
-; Standard Business Keyboard scanner. Requires one keyboard table.
+; PET/CBM Editor ROM Project - Keyboard Scanner - Business Keyboards
+; ==========================   KEYSCAN-B.ASM
 ;
+; Standard Business Keyboard scanner. Requires one keyboard table.
 ; OPTIONS: KEYBOARD=7 modifies scanner for CBM-II keyboard (16x6 matrix)
-
+;
 ;--------------- Scan Keyboard (scnkey)
 ; NOTE: The keyboard ROW select is reset to zero in IRQ routine
 
 SCAN_KEYBOARD
-;!if DEBUG = 1 { INC DBLINE+5 }		; DEBUG - 6th character on top line
+;!IF DEBUG = 1 { INC DBLINE+5 }		; DEBUG - 6th character on top line
 
 		LDY #$FF		; No Key
 		STY Key_Image		; Key Image
@@ -54,7 +54,7 @@ SCAN_COL	LSR			; Shift the value right
 ;-------------- SHIFT key is pressed. Set SHIFT FLAG
 
 		LDA #$01		; 1=Shift Key Pressed
-		STA KEYFLAGS		; Save it 
+		STA KEYFLAGS		; Save it
 		BNE SCAN_NEXT		; branch always
 
 ;-------------- Check REPEAT key pressed
@@ -150,7 +150,7 @@ SCAN_REC	STA KEYPRESSED		; Save the KEY
 
 		LSR KEYFLAGS		; Check for SHIFT
 		BCC SCAN_NORM		; No, store as-is
-		CMP #$2C		; Is it less than 2C? 
+		CMP #$2C		; Is it less than 2C?
 		BCC SCAN_SHIFT		; Yes, skip
 		CMP #$3C		; Is it greater than 3C?
 		BCS SCAN_SHIFT		; Yes, skip
@@ -194,7 +194,7 @@ SCAN_NORM2	LDX CharsInBuffer	; No. of Chars. in Keyboard Buffer (Queue)
 ; This fix puts the proper value ($EF) into STKEY ($9B) when the relocated STOP key is pressed.
 ; NOTE: Must investigate further!
 
-!if KEYBOARD > 1 {			; Compensate for STOP key not in standard position
+!IF KEYBOARD > 1 {			; Compensate for STOP key not in standard position
 		CMP #3			; Is keycode "3" (STOP key)?
 		BNE SCAN_OUT
 		LDA #$EF		; fool kernal into thinking STOP is pressed
