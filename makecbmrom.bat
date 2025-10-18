@@ -2,7 +2,7 @@
 rem MAKECBMROM ##  will build the binary for the ROM associated with CBMROM ##. Example: MAKECBMROM 3
 
 if "%1" neq "" goto subfile
-echo Please supply ROM part# to compare. Do not include ".bin"!
+echo Please supply ROM part# to compare (1-10)!
 goto notok
 
 :subfile
