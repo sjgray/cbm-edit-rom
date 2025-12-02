@@ -64,7 +64,7 @@ RESET_EDITOR
 ; 40/80 column option. However, if we are using SS40 or COLOURPET then the routine will not
 ; fit and must be relocated!
 
-!IF SS40 = 0 { !SOURCE "editrom40cls.asm"
+!IF (SS40 + COLOURPET) = 0 { !SOURCE "editrom40cls.asm"
 		} ELSE { JMP WIN_CLEAR }
 
 ;*********************************************************************************************************
