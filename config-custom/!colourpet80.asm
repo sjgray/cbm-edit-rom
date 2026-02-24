@@ -1,5 +1,5 @@
 ; PET/CBM EDIT ROM - Configuration File
-; ================   FILENAME: !colourpet40.asm
+; ================   FILENAME: !colourpet80.asm
 ; 
 ; For complete documentation see:  cbmsteve.ca/editrom/index.html
 ;
@@ -13,26 +13,26 @@
 ;----------------------------------------------------------------------------------------------------------------------------
 ; The following will be put in the IO area (if used). Ensure comments do not overflow into code space!
 
-!macro DATE      { !pet "2025-09-06" }
-!macro COMMENT   { !pet "colourpet-editrom" }
+!macro DATE      { !pet "2025-11-04" }
+!macro COMMENT   { !pet "colourpet80-editrom" }
 
 ;----------------------------------------------------------------------------------------------------------------------------
 ; NAME		FEATURE				VALID OPTIONS			NOTES / FUTURE OPTIONS
 ;---------	-------				-------------			----------------------
 
-CODEBASE  = 0   ; Code Base			0=4000, 1=8000, 2=8296		Important!!! Read Webpage for details
+CODEBASE  = 1   ; Code Base			0=4000, 1=8000, 2=8296		Important!!! Read Webpage for details
 OPTROM    = 0   ; Location of EXT code		0=$E800-EFFF, 1=$9000, 2=$A000  Normal is 0.
 CBMROM    = 0   ; For CBM ROM specific code	0=none, 1-10 = CBM ROM #	Normal is 0.
 
 ;-- Keyboard
-KEYSCAN   = 0   ; Keyboard Scanner		0=Normal,1=Business,2=DIN
-KEYBOARD  = 0	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
+KEYSCAN   = 1   ; Keyboard Scanner		0=Normal,1=Business,2=DIN
+KEYBOARD  = 1	; Keyboard type:		0=N-QWERTY,1=B-QWERTY,2=DIN,3=C64,4=B-SJG,5=N-SJG,6=B-QWERTZ,7=B-AZERTY,8=CBM-II (req hw mod)
 REPEATOPT = 0	; Key Repeat Option		0=No (Always ON), 1=Yes
-FONTSET   = 1	; Initial Screen Font		0=Text/Lower, 1=Upper/Graphics	Generally: 40xx machines=1, 8xxx machines=0
+FONTSET   = 0	; Initial Screen Font		0=Text/Lower, 1=Upper/Graphics	Generally: 40xx machines=1, 8xxx machines=0
 
 ;-- Screen
 REFRESH   = 1	; Screen refresh:		0/2=Euro,1=N.A.,15=PAL,16=NTSC,9/10=9",82=8296,32=32-line,35=35-line,90=90x35,99=Custom
-COLUMNS   = 40	; Screen Width			40,80,90,32 columns		Special cases 32 or 90.
+COLUMNS   = 80	; Screen Width			40,80,90,32 columns		Special cases 32 or 90.
 ROWS      = 25  ; Screen Height			25,35,16 rows			Special cases 16 or 35.
 
 ;-- Line Frequency (50/60)
@@ -94,5 +94,5 @@ BYPASSBG  = 0   ; ColourPET Bypass BG     	0 to 15 RGBI
 
 ;-- Set output file and include the main EDITROM.ASM
 
-!TO "binaries/colourpet40.bin",plain			; Generic output file with no load address
+!TO "binaries/colourpet80.bin",plain			; Generic output file with no load address
 !SOURCE "editrom.asm"					; Do not modify this line!
