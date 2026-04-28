@@ -13,7 +13,7 @@
 ;----------------------------------------------------------------------------------------------------------------------------
 ; The following will be put in the IO area (if used). Ensure comments do not overflow into code space!
 
-!macro DATE      { !pet "2026-04-27" }
+!macro DATE      { !pet "2026-04-28" }
 !macro COMMENT   { !pet "sjg-edit-80-b-hs80-esc-ba4080" }
 
 ;----------------------------------------------------------------------------------------------------------------------------
@@ -51,14 +51,14 @@ UPET      = 0   ; Is a Ultra-PET/Micro-PET?     0=No, 1=Yes                     
 ;-- AutoRUN Features
 AUTORUN   = 1   ; Set for AutoRUN features	0=No, 1=Yes			Enable if you use any AUTOBOOT feature below
 BYPASS    = 0   ; Check for key to bypass? 	0=No, 1=Yes			Valid when AUTORUN=1. Hold key on ROW9 to bypass.
-BANNER    = 1   ; Custom Banner (power on msg)?	0=No, N=Banner# (1-21,98,99)    Valid when AUTORUN=1. Refer to docs or source. 99=custom message
+BANNER    = 23  ; Custom Banner (power on msg)?	0=No, N=Banner# (1-23,98,99)    Valid when AUTORUN=1. Refer to docs or source. 99=custom message
 WEDGE     = 1	; DOS Wedge?			0=No, 1=Yes			Valid when AUTORUN=1.
 WEDGEMSG  = 0	; Show wedge message?		0=No, 1=Yes			Valid when AUTORUN=1 and WEDGE>0.
 DISKBOOT  = 0	; Boot first file on disk?	0=No, 1=Yes			Valid when AUTORUN=1.
 
 ;-- 40/80 Switching
 SOFT40    = 0	; 40 columns on 8032s?		0=No, 1=Yes			Do NOT enable SOFT40 and SS40 at the same time!
-SS40      = 0   ; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1. Also if BACKARROW>0 and BACKACTION=1.
+SS40      = 1   ; Software Switchable Soft-40	0=No, 1=Yes			Also set ESCCODES=1. Also if BACKARROW>0 and BACKACTION=1.
 SS40MODE  = 80  ; Initial SS40 Mode		40 or 80 columns		Valid when SS40=1.
 HARD4080  = 1   ; Hardware 40/80 Board?         0=No, 1=Yes			Valid when SS40=1.
 
@@ -94,5 +94,5 @@ BYPASSBG  = 0   ; ColourPET Bypass BG     	0 to 15 RGBI
 
 ;-- Set output file and include the main EDITROM.ASM
 
-!TO "binaries/sjgedit-80-b-60-hs80-esc-ba4080 (2026-04-27).bin",plain			; Generic output file with no load address
+!TO "binaries/sjgedit-80-b-60-hs80-esc-ba4080 (2026-04-28).bin",plain			; Generic output file with no load address
 !SOURCE "editrom.asm"					; Do not modify this line!

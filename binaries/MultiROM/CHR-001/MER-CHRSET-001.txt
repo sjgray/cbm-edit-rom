@@ -1,0 +1,17 @@
+Multi-Character ROM Set 001
+characters-901640-01 (SuperPET).bin
+characters-1.901447-08.bin
+pet-c64-font.bin
+characters-german-324242-10 (8296).bin
+characters-french.bin
+characters-japan-901447-12.bin
+characters-swedish.bin
+characters-russian.bin
+characters-norwegian.bin
+characters-hungarian.bin
+characters-greek.bin
+superpet-swedish.bin
+character-other-Games2.bin
+pacman-sjg.bin
+characters-8096-unknown.bin
+characters-901447-10m.bin

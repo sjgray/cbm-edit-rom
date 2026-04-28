@@ -1,0 +1,17 @@
+Multi-EditROM Set #2
+sjg-edit-40-b-60-soft40-backarrow (2017-09-21).bin
+sjg-edit-40-b-60-backarrow (2017-12-08).bin
+sjg-edit-80-b-ntsc-backarrow (2017-09-21).bin
+sjg-edit-40-b-60-soft40-backarrow (2017-09-21).bin
+sjg-edit-80-b-60-esc-wedge-ss80-reboot-backarrow (2017-03-03).bin
+sjg-edit-80-b-60-esc-wedge-ss80-reboot-backarrow (2017-09-21).bin
+sjg-edit-80-b-ntsc-esc-wedge-ss80-reboot-backarrow (2017-09-21).bin
+sjg-edit-80-b-ntsc-esc-wedge-ss40-reboot-backarrow (2017-09-21).bin
+sjg-edit-80-b-60-esc-wedge-hs80-reboot-backarrow (2017-12-08).bin
+sjg-edit-80-b-60-esc-wedge-hs40-reboot-backarrow (2017-12-08).bin
+sjg-edit-80-b-ntsc-esc-wedge-hs80-reboot-backarrow (2017-12-08).bin
+sjg-edit-80-b-ntsc-esc-wedge-hs40-reboot-backarrow (2017-12-08).bin
+colourpet-40-bsjg-ntsc-esc-wedge-reboot-backarrow (2017-09-21).bin
+colourpet-40-bsjg-pal-esc-wedge-reboot-backarrow (2017-09-21).bin
+colourpet-40-c64-ntsc-esc-wedge-reboot-backarrow (2017-09-21).bin
+colourpet-40-c64-pal-esc-wedge-reboot-backarrow (2017-09-21).bin

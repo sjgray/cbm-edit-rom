@@ -39,6 +39,7 @@
 ; 20  40COL  ANY    OVER "*** commodore basic 4.0 *** sjg-edit"
 ; 21  80COL  ANY    OVER "*** commodore basic 4.0 *** + wedge/esc/backarrow/ss40"
 ; 22  80COL  ANY    OVER "*** commodore basic 4.0 *** + wedge,esc,backarrow,hs40/80"
+; 23  80COL  ANY    OVER "*** commodore basic 4.0 *** 40/80 switcher + esc/wedge/backarrow"
 ; 65  40COL  CPET   OVER For Mega65 MegaPET
 ; 98  ANY    ANY    ADD  Show DATE and COMMENT for debug purposes
 ; 99  CUSTOM ...    ...  Your own banner text
@@ -125,6 +126,13 @@
 		!IF WEDGE > 0 { !PET " and wedge" }
 		!byte $0D
 }
+
+!IF BANNER=23 {	!byte $13
+		!pet "*** commodore basic 4.0 *** 40/80 switcher + esc/wedge/backarrow"
+		!byte $0D,$0D,$0D      		; <CR><CR><CR>
+}
+
+
 
 !IF BANNER=22 {	!byte $13
 		!pet "*** commodore basic 4.0 *** + wedge,esc,backarrow,hs40/80"

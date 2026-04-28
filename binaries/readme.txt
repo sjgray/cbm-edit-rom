@@ -1,5 +1,5 @@
-EditROM Binaries - Updated 2025-09-06
-================
+EditorROM Binaries - Updated 2026-04-28
+==================
 
 Binaries are sorted into folders
 
@@ -13,6 +13,9 @@ Binaries are sorted into folders
 * Switchable40-80.. For 80-Column machines or those with MultiEdit40/80 boards.
 * Keyboard C64..... Various binaries with C64 keyboard.
 * Experimental..... For custom binaries with new/special features.
+* MultiROM......... Collections for Multi-ROM adapters (16 ROMs per set)
+
+NOTE: MultiROM sets can contain any ROM, such as Character, Editor, BASIC, and KERNAL!
 
 Inside each folders are BINARY files with specific filenames.
 By default, new binaries will go in this \binaries folder and

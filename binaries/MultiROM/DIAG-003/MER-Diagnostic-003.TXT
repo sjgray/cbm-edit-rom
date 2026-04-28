@@ -1,0 +1,17 @@
+MER 4000/8000/9000 Diagnostic - Set #003
+PETTESTE2KV04.bin
+pettester4032.bin
+pettester8032.bin
+kernal-4.901465-22.bin
+Basic4-b000.901465-19.bin
+Basic4-b000.901465-23.bin
+Basic4-c000.901465-20.bin
+Basic4-d000.901465-21.bin
+edit-4-40-n-50Hz.901498-01.bin
+edit-4-40-n-60Hz-901499-01.bin
+edit-4-80-b-50Hz-901474-04.bin
+edit-4-80-b-60Hz-901474-03.bin
+edit-4-80-n-60Hz-901474-xx.bin
+edit-8296D-324243-04 DIN 4V4E (2532).bin
+sjg-edit-80-b-60-esc-wedge-ss80-reboot-backarrow (2017-09-21).bin
+sjg-edit-80-b-ntsc-esc-wedge-ss80-reboot-backarrow (2017-09-21).bin

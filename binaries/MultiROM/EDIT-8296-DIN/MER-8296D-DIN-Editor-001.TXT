@@ -1,0 +1,17 @@
+MER 8296/8296D EditorROM- Set# 001
+edit-8296D-324243-04 DIN 4V4E (2532).bin
+edit-8296-324243-02b-DIN 4V2E (2532).bin
+edit-8296-901474-04-0384 (2532).bin
+edit-8296D-324243-01-XXX 4V2E (2532).bin
+edit-8296D-324243-02B (2K padded to 4K).bin
+edit-8296D-324243-03-XXX 4V2E (2532).bin
+sjg-edit-8296d-c1-din-50-execudesk (2018-11-29).bin
+sjg-edit-8296d-c1-din-50-esc-wedge-ss80-reboot-backarrow (2018-10-11).bin
+edit-8296D-324243-04 DIN 4V4E (2532).bin
+edit-8296D-324243-04 DIN 4V4E (2532).bin
+edit-8296D-324243-04 DIN 4V4E (2532).bin
+edit-8296D-324243-04 DIN 4V4E (2532).bin
+edit-8296D-324243-04 DIN 4V4E (2532).bin
+sjg-edit-8296d-c0-din-50-wedge-soft40-reboot-bypass-backarrow (2018-11-28).bin
+sjg-edit-8296d-c1-din-50-esc-wedge-ss80-reboot-bypass-info (2018-11-28).bin
+sjg-edit-8296d-c2-din-50-wedge,bypass (2018-11-28).bin

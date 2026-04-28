@@ -1,0 +1,17 @@
+Multi-EditROM Set - CBM-Editor (All Standard CBM Editor ROMs by partnumber)
+324243-01 (4-80-DIN-50Hz-8296D).bin
+324243-02B.bin
+324243-02B_VSM200 (klaus mandelatz).bin
+324243-03.bin
+324243-04.bin
+324243-04_editor_din_ue8_8296d.rom
+324728-02 (4-80-DIN-50Hz-8296).bin
+901447-29.bin
+901474-01 (2-xx-B-xx).bin
+901474-02.bin
+901474-03 (4-80-B-60Hz).bin
+901474-04 (4-80-B-50Hz).bin
+901474-04-3681 (4-80-B-50Hz).bin
+901498-01 (4-40-N-50Hz).bin
+901499-01 (4-40-N-60Hz).bin
+901499-01 (4-40-N-60Hz).bin

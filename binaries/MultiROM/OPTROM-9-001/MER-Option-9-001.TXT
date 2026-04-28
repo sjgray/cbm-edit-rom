@@ -1,0 +1,17 @@
+MER-Option ROM 9 - Set 001
+visicalc-9000.901472-04.bin
+mcterm1.11-rom-9000.bin
+mcterm1.17-rom-9000.bin
+mcterm1.21_rom-9000.bin
+newtim (9000).bin
+Power (9000).bin
+SpellMaster (9000).bin
+suo-9000-basic4.bin
+SuperChip BASIC2 (9000).bin
+Watcom BASIC\WatBASIC4-5929 (9000).bin
+wordpro3-rom.9000.bin
+wordcheck_rom-9000.bin
+Braindos-9000.bin
+smkit (9000).bin
+MicroMon-9000.bin
+BATPRO_4.8_ROM1 (9000).BIN
